@@ -6,23 +6,24 @@ authors = ["Amit Parekh <7276308+amitkparekh@users.noreply.github.com>"]
 
 packages = [{ include = "emma_experience_hub", from = "src" }]
 
-	[tool.poetry.dependencies]
-	python = "^3.9"
-	typer = "^0.4.1"
-	rich-click = "^1.5.1"
-	rich = "^12.4.4"
+[tool.poetry.dependencies]
+python = "^3.9"
+typer = "^0.4.1"
+rich-click = "^1.5.1"
+rich = "^12.4.4"
+torch = "^1.12.0"
 
-	[tool.poetry.dev-dependencies]
-	black = "^22.3.0"
-	wemake-python-styleguide = "^0.16.1"
-	flake8 = "^4.0.1"
-	mypy = "^0.961"
-	pytest = "^7.1.2"
-	pre-commit = "^2.19.0"
-	poethepoet = "^0.14.0"
-	isort = "^5.10.1"
-	pytest-cases = "^3.6.13"
-	types-requests = "^2.27.31"
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+wemake-python-styleguide = "^0.16.1"
+flake8 = "^4.0.1"
+mypy = "^0.961"
+pytest = "^7.1.2"
+pre-commit = "^2.19.0"
+poethepoet = "^0.14.0"
+isort = "^5.10.1"
+pytest-cases = "^3.6.13"
+types-requests = "^2.27.31"
 
 [tool.black]
 line-length = 99
