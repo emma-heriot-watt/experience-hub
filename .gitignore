@@ -353,3 +353,6 @@ logs/
 *.webm
 
 # End of https://www.toptal.com/developers/gitignore/api/data,images,video
+
+storage/**/*
+!storage/.gitkeep
