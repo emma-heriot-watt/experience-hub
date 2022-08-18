@@ -8,8 +8,6 @@ FROM ${IMAGE_BASE_NAME}:policy as builder__policy
 ARG IMAGE_BASE_NAME
 FROM ${IMAGE_BASE_NAME}:base
 
-ARG IMAGE_BASE_NAME
-
 WORKDIR /app
 
 # Copy the venvs and repos
