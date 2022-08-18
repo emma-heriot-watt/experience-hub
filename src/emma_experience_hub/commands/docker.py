@@ -1,7 +1,7 @@
 import subprocess
 from typing import Optional
 
-from rich_click import typer
+import typer
 
 from emma_experience_hub.commands.torch import (
     get_supported_cuda_version,
@@ -61,9 +61,7 @@ def torch_cuda_version_callback(torch_version: Optional[str]) -> str:
 
 @app.command()
 def build(
-    torch_cuda_version: Optional[str] = typer.Option(  # noqa: WPS404
-        None, callback=torch_cuda_version_callback
-    )
+    torch_cuda_version: Optional[str] = typer.Option(None, callback=torch_cuda_version_callback)
 ) -> None:
     """Build all the docker images for EMMA."""
     # TODO: Verify docker is installed
