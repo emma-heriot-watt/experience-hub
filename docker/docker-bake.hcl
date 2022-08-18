@@ -69,12 +69,3 @@ target "emma-full" {
     IMAGE_BASE_NAME = "${IMAGE_NAME}"
   }
 }
-
-target "emma-api" {
-  dockerfile = "docker/emma-api.Dockerfile"
-  tags       = ["${IMAGE_NAME}:api"]
-
-  args = {
-    IMAGE_BASE_NAME = "${IMAGE_NAME}"
-  }
-}
