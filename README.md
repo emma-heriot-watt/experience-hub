@@ -20,6 +20,7 @@ We've tried to make it as easy as possible to build the Docker images for EMMA, 
 
 1. We assume you have already installed the project and have activated the virtual environment (using `poetry shell`)
 1. You need the latest version of Docker
+1. Make sure Docker is running
 
 ### Building the images
 
