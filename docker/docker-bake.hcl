@@ -6,7 +6,7 @@ variable "PYTHON_VERSION" {
   default = "3.9"
 }
 
-variable "TORCH_VERISON_SUFFIX" {
+variable "TORCH_VERSION_SUFFIX" {
   default = ""
 }
 
@@ -46,7 +46,7 @@ target "emma-perception" {
   args = {
     REMOTE_REPO_URL      = "https://github.com/emma-simbot/perception"
     IMAGE_BASE_NAME      = "${IMAGE_NAME}"
-    TORCH_VERISON_SUFFIX = "${TORCH_VERISON_SUFFIX}"
+    TORCH_VERSION_SUFFIX = "${TORCH_VERSION_SUFFIX}"
   }
 }
 
@@ -57,7 +57,7 @@ target "emma-policy" {
   args = {
     REMOTE_REPO_URL      = "https://github.com/emma-simbot/policy"
     IMAGE_BASE_NAME      = "${IMAGE_NAME}"
-    TORCH_VERISON_SUFFIX = "${TORCH_VERISON_SUFFIX}"
+    TORCH_VERSION_SUFFIX = "${TORCH_VERSION_SUFFIX}"
   }
 }
 
