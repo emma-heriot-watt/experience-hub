@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "Split is: $SPLIT"
-
 function start_perception_api() {
 	# Go to the perception folder
 	cd './perception/' || exit
@@ -30,8 +28,13 @@ function start_policy_api() {
 		--max_frames 32
 }
 
-# Start the Perception API
-start_perception_api &
+if [[ -n $ONLY_PERCEPTION ]]; then
+	# Start the perception API
+	start_perception_api
+else
+	# Start the Perception API
+	start_perception_api &
 
-# Start the Policy API
-start_policy_api
+	# Start the Policy API
+	start_policy_api
+fi

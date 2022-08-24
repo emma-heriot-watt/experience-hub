@@ -112,6 +112,8 @@ per-file-ignores =
 		tests/*:D,F401,WPS118,WPS202,WPS204,WPS214,WPS218,WPS226,WPS231,WPS232,WPS235,WPS301,WPS432,WPS437,WPS442,S101
 		scripts/update_torch_cuda.py:S404,S603,S607,WPS323,WPS333,WPS432,WPS433,WPS459
 		src/*/commands/*:S404,S602,S603,S607,WPS404
+		src/*/common/*:S404,S602,S603,S607
+		src/*/__main__.py:WPS404
 
 extend-exclude=
 	.venv/,

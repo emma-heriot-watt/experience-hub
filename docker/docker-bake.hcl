@@ -69,3 +69,8 @@ target "emma-full" {
     IMAGE_BASE_NAME = "${IMAGE_NAME}"
   }
 }
+
+target "teach-inference" {
+  dockerfile = "docker/teach-inference.Dockerfile"
+  tags       = ["${IMAGE_NAME}:teach-inference"]
+}

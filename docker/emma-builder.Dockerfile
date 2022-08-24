@@ -3,6 +3,7 @@ ARG IMAGE_BASE_NAME
 FROM ${IMAGE_BASE_NAME}:base-poetry
 
 ARG REMOTE_REPO_URL
+ARG TORCH_VERSION_SUFFIX
 
 # Only get the dependency files
 WORKDIR ${PYSETUP_PATH}/repo

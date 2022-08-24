@@ -6,6 +6,8 @@ from typing import Optional
 from rich.console import Console
 from rich.logging import RichHandler
 
+from emma_experience_hub.common.settings import Settings
+
 
 console = Console()
 
@@ -16,6 +18,8 @@ logging.basicConfig(
     handlers=[RichHandler(console=console, markup=True, rich_tracebacks=True)],
 )
 log = logging.getLogger("rich")
+
+settings = Settings()
 
 
 def is_cuda_available() -> bool:
@@ -60,14 +64,21 @@ def get_supported_cuda_version() -> Decimal:
 
     log.info(f"Supported CUDA version: {cuda_version}")
 
+    if settings.cuda_version_upper_bound < cuda_version:
+        log.warning(
+            f"CUDA version is lower than {settings.cuda_version_upper_bound}. ",
+            f"Setting CUDA version to {cuda_version}.",
+        )
+        cuda_version = settings.cuda_version_upper_bound
+
     return Decimal(cuda_version)
 
 
 def get_torch_cuda_suffix(cuda_version: Decimal) -> str:
     """Get the relevant CUDA suffix from the version."""
     is_greater_than11 = cuda_version.compare(11) > 0  # noqa: WPS432
-    is_greater_than113 = cuda_version.compare(Decimal(11.3)) > 0  # noqa: WPS432
-    is_greater_than116 = cuda_version.compare(Decimal(11.6)) > 0  # noqa: WPS432
+    is_greater_than113 = cuda_version.compare(Decimal(11.3)) >= 0  # noqa: WPS432
+    is_greater_than116 = cuda_version.compare(Decimal(11.6)) >= 0  # noqa: WPS432
 
     if is_greater_than11 and not is_greater_than113:
         return "cu111"
@@ -79,3 +90,17 @@ def get_torch_cuda_suffix(cuda_version: Decimal) -> str:
         return "cu116"
 
     return ""
+
+
+def get_torch_version_suffix() -> str:
+    """Get the torch CUDA version that best supports the current machine."""
+    if not is_cuda_available():
+        return ""
+
+    supported_cuda_version = get_supported_cuda_version()
+    torch_suffix = get_torch_cuda_suffix(supported_cuda_version)
+
+    if torch_suffix:
+        torch_suffix = f"+{torch_suffix}"
+
+    return torch_suffix
