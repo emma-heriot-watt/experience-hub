@@ -10,6 +10,14 @@ variable "TORCH_VERSION_SUFFIX" {
   default = ""
 }
 
+variable "PERCEPTION_REPO_BRANCH" {
+  default = "main"
+}
+
+variable "POLICY_REPO_BRANCH" {
+  default = "main"
+}
+
 group "base-images" {
   targets = ["base", "base-poetry"]
 }
@@ -45,6 +53,7 @@ target "emma-perception" {
 
   args = {
     REMOTE_REPO_URL      = "https://github.com/emma-simbot/perception"
+    REMOTE_REPO_BRANCH   = "${PERCEPTION_REPO_BRANCH}"
     IMAGE_BASE_NAME      = "${IMAGE_NAME}"
     TORCH_VERSION_SUFFIX = "${TORCH_VERSION_SUFFIX}"
   }
@@ -56,6 +65,7 @@ target "emma-policy" {
 
   args = {
     REMOTE_REPO_URL      = "https://github.com/emma-simbot/policy"
+    REMOTE_REPO_BRANCH   = "${POLICY_REPO_BRANCH}"
     IMAGE_BASE_NAME      = "${IMAGE_NAME}"
     TORCH_VERSION_SUFFIX = "${TORCH_VERSION_SUFFIX}"
   }

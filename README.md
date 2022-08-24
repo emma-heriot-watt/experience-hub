@@ -14,7 +14,7 @@ poetry shell
 
 ## How to do things with the CLI
 
-There are more commands than mentioned here. To see what you can do with any command, just add `--help`.
+There are more commands than mentioned here. For more details regarding _any command_, just add `--help`!
 
 ### Prerequisites
 
@@ -29,6 +29,10 @@ We've tried to make it as easy as possible to build the Docker images for EMMA, 
 #### What about torch CUDA versions?
 
 We extract the current CUDA version from `nvidia-smi` and use the CUDA variant available. It should be automatic. If not, check out the `--help` on the command to see how to include it yourself.
+
+#### Specify the branch to use for either Policy or Perception
+
+With the build command (`python -m emma_experience_hub build-emma`), you can specify a specific branch to use with the `--perception-remote-branch-name` and `--policy-remote-branch-name` options.
 
 ### Running the inference runner with TEACh EDH instances
 

@@ -3,11 +3,12 @@ ARG IMAGE_BASE_NAME
 FROM ${IMAGE_BASE_NAME}:base-poetry
 
 ARG REMOTE_REPO_URL
+ARG REMOTE_REPO_BRANCH
 ARG TORCH_VERSION_SUFFIX
 
 # Only get the dependency files
 WORKDIR ${PYSETUP_PATH}/repo
-RUN git clone ${REMOTE_REPO_URL} . \
+RUN git clone -b ${REMOTE_REPO_BRANCH} --single-branch ${REMOTE_REPO_URL} . \
 	&& cp pyproject.toml poetry.lock ${PYSETUP_PATH}
 
 WORKDIR $PYSETUP_PATH
