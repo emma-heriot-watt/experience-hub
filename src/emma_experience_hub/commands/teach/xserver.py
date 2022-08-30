@@ -92,17 +92,27 @@ def startx(display: int) -> None:  # noqa: WPS231
     if not devices:
         raise RuntimeError("No NVIDIA cards found")
 
-    try:  # noqa: WPS229, WPS501
-        fd, path = tempfile.mkstemp()
-        with open(path, "w") as f:
-            f.write(generate_xorg_conf(devices))
-        command = shlex.split(
-            f"Xorg -noreset +extension GLX +extension RANDR +extension RENDER -config {path} :{display}"
-        )
+    fd, path = tempfile.mkstemp()
+    with open(path, "w") as f:
+        f.write(generate_xorg_conf(devices))
+
+    command = shlex.split(
+        f"Xorg -noreset +extension GLX +extension RANDR +extension RENDER -config {path} :{display}"
+    )
+
+    # Create an environment variable for the display
+    if not os.environ["DISPLAY"]:
+        os.environ["DISPLAY"] = str(display)
+
+    try:  # noqa: WPS501
         subprocess.call(command)
     finally:
         os.close(fd)
         os.unlink(path)
+
+        # Remove the display environment variable if it exists
+        if os.environ["DISPLAY"]:
+            del os.environ["DISPLAY"]  # noqa: WPS420
 
 
 def launch_xserver() -> None:

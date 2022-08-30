@@ -6,6 +6,7 @@ from rich.console import Console
 
 from emma_experience_hub.commands.teach.constants import (
     API_CONTAINER_NAME,
+    DOCKER_NETWORK_NAME,
     FEATURE_EXTRACTOR_CONTAINER_NAME,
     FEATURE_EXTRACTOR_DEFAULT_PORT,
     MODEL_DIR_WITHIN_CONTAINER,
@@ -13,7 +14,11 @@ from emma_experience_hub.commands.teach.constants import (
     TEAChDatasetSplit,
     TEAChPaths,
 )
-from emma_experience_hub.common.docker import stop_container
+from emma_experience_hub.common.docker import create_network_if_not_exists, stop_container
+from emma_experience_hub.common.system import (
+    is_xserver_display_running,
+    machine_supports_inference_without_display,
+)
 from emma_experience_hub.common.torch import is_cuda_available
 
 
@@ -81,6 +86,16 @@ def launch_api(
     # Stop the container if it is running already.
     stop_api()
 
+    # Check whether the API is going to be running without a display
+    should_run_without_display = (
+        machine_supports_inference_without_display() and is_xserver_display_running()
+    )
+    if should_run_without_display:
+        console.log(
+            "Launch the API to function [b u]without a display[/]. If this is [b u]not desired[/] then verify that your machine supports running inference without a display and that the display is running."
+        )
+        create_network_if_not_exists(DOCKER_NETWORK_NAME)
+
     paths = TEAChPaths()
     paths.create_output_dir(clear_output_dir)
 
@@ -89,6 +104,7 @@ def launch_api(
         "run",
         "--rm",
         f"--name {API_CONTAINER_NAME}",
+        f"--network {DOCKER_NETWORK_NAME}" if should_run_without_display else "",
         f"-p {api_port}:{POLICY_API_DEFAULT_PORT}",
         '--gpus "device=0"' if use_gpu else "",
         f"-v {paths.models.resolve()}:{MODEL_DIR_WITHIN_CONTAINER}",

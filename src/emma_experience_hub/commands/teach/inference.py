@@ -1,4 +1,3 @@
-import platform
 import random
 import subprocess
 from shutil import rmtree
@@ -10,13 +9,22 @@ from rich.console import Console
 
 from emma_experience_hub.commands.teach.constants import (
     API_CONTAINER_NAME,
+    DOCKER_NETWORK_NAME,
     INFERENCE_RUNNER_CONTAINER_NAME,
     INFERENCE_RUNNER_IMAGE_NAME,
     POLICY_API_DEFAULT_PORT,
     TEAChDatasetSplit,
     TEAChPaths,
 )
-from emma_experience_hub.common.docker import is_container_running, stop_container
+from emma_experience_hub.common.docker import (
+    create_network_if_not_exists,
+    is_container_running,
+    stop_container,
+)
+from emma_experience_hub.common.system import (
+    get_active_display_index,
+    machine_supports_inference_without_display,
+)
 from emma_experience_hub.common.torch import is_cuda_available
 
 
@@ -140,6 +148,7 @@ def launch_inference_runner_without_display(
 
     # Stop the container if it is running already.
     stop_inference_runner_container()
+    create_network_if_not_exists(DOCKER_NETWORK_NAME)
 
     # Verify that the inference runner is running
     if not is_container_running(API_CONTAINER_NAME):
@@ -161,7 +170,8 @@ def launch_inference_runner_without_display(
         "--rm",
         "--privileged",
         f"--name {INFERENCE_RUNNER_CONTAINER_NAME}",
-        "-e DISPLAY=:0",
+        f"--network {DOCKER_NETWORK_NAME}",
+        f"-e DISPLAY=:{get_active_display_index()}",
         "-e NVIDIA_DRIVER_CAPABILITIES=all",
         '--gpus "device=0"',
         "-v /tmp/.X11-unix:/tmp/.X11-unix:ro",
@@ -183,25 +193,11 @@ def launch_inference_runner_without_display(
     subprocess.run(" ".join(command), shell=True, check=True)
 
 
-def machine_supports_inference_without_display() -> bool:
-    """Validate that the current machine is able to launch the inference runner with Docker.
-
-    Conditions:
-        1. CUDA must be available
-        2. This application must be running Linux
-    """
-    conditions: list[bool] = [
-        is_cuda_available(),
-        platform.system().lower() == "linux",
-    ]
-
-    # All conditions must be true for Docker to be allowed
-    return all(conditions)
-
-
 def prepare_inference_runner(
     with_display: bool = typer.Option(
-        ..., help="Whether or not inference will be run with or without a display"
+        ... if machine_supports_inference_without_display() else True,
+        help="Whether or not inference will be run with or without a display",
+        hidden=not machine_supports_inference_without_display(),
     ),
     force_reset: bool = typer.Option(
         default=False, help="Force reset the prepared inference runner and set it up again"
@@ -220,7 +216,11 @@ def prepare_inference_runner(
 
 
 def launch_inference_runner(
-    use_display: bool = typer.Option(..., help="Run inference with or without a display"),
+    use_display: bool = typer.Option(
+        ... if machine_supports_inference_without_display() else True,
+        help="Run inference with or without a display",
+        hidden=not machine_supports_inference_without_display(),
+    ),
     dataset_split: TEAChDatasetSplit = typer.Option(
         ..., help="Choose with split to evaluate on", show_envvar=False
     ),
