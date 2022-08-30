@@ -18,13 +18,15 @@ COPY --from=builder__policy ${VIRTUAL_ENV} ./policy/.venv
 COPY --from=builder__policy ${PYSETUP_PATH}/repo ./policy/
 
 # Install packages as editable
+# hadolint ignore=DL3003,SC1091
 RUN cd ./perception \
 	&& . .venv/bin/activate \
-	&& pip install --no-deps -e .
+	&& pip install --no-cache-dir --no-deps -e .
 
+# hadolint ignore=DL3003,SC1091
 RUN cd ./policy \
 	&& . .venv/bin/activate \
-	&& pip install --no-deps -e .
+	&& pip install --no-cache-dir --no-deps -e .
 
 # Set the PYTHONPATH
 ENV PYTHONPATH='./src'

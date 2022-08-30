@@ -22,7 +22,7 @@ ENV PYTHONUNBUFFERED=1 \
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN apt-get update -qq \
-	&& apt-get dist-upgrade -y --no-install-recommends \
+	&& apt-get upgrade -y --no-install-recommends \
 	build-essential \
 	curl \
 	git \
@@ -32,5 +32,6 @@ RUN apt-get update -qq \
 	&& apt-get autoremove -y
 
 # Allow access to EMMA simbot repos, without exposing secrets
+WORKDIR /
 COPY docker/helpers/add-pat-to-git.sh .
 RUN --mount=type=secret,id=GITHUB_PAT bash ./add-pat-to-git.sh

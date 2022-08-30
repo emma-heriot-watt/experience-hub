@@ -25,6 +25,7 @@ repos:
     hooks:
       - id: check-github-workflows
         name: Validate GitHub workflows
+        types: [yaml]
 
   # ----------------------------- Check file issues ---------------------------- #
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -32,9 +33,11 @@ repos:
     hooks:
       - id: check-toml
         name: Check TOML
+        types: [toml]
       - id: check-yaml
         name: Check YAML
         args: [--allow-multiple-documents]
+        types: [yaml]
       - id: end-of-file-fixer
         name: Fix end of files
         types: [text]
@@ -54,18 +57,23 @@ repos:
     hooks:
       - id: debug-statements
         name: Check for debugger statements
+        types: [python]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.9.0
     hooks:
       - id: python-use-type-annotations
         name: Using type annotations over comments
+        types: [python]
       - id: python-check-blanket-noqa
         name: Check for blanket `# noqa`
+        types: [python]
       - id: python-check-blanket-type-ignore
         name: "Check for blanket `# type: ignore`"
+        types: [python]
       - id: python-no-log-warn
         name: Check for deprecated `.warn()` method of python loggers
+        types: [python]
 
   # ----------------------------- Automatic linters ---------------------------- #
   - repo: https://github.com/asottile/pyupgrade
@@ -73,9 +81,10 @@ repos:
     hooks:
       - id: pyupgrade
         name: Update syntax for newer Python
+        types: [python]
         args: ["--py39-plus"]
-  - repo: https://github.com/sirosen/fix-smartquotes
-    rev: 0.2.0
+  - repo: https://github.com/sirosen/texthooks
+    rev: 0.3.1
     hooks:
       - id: fix-smartquotes
         name: Fix Smart Quotes
@@ -84,6 +93,7 @@ repos:
     hooks:
       - id: yesqa
         name: Remove unnecessary `# noqa` comments
+        types: [python]
         additional_dependencies: [wemake-python-styleguide]
 
   # ------------------------------ Python imports ------------------------------ #
@@ -92,6 +102,7 @@ repos:
     hooks:
       - id: unimport
         name: Remove any unused imports
+        types: [python]
         args:
           [
             --remove,
@@ -104,14 +115,15 @@ repos:
     rev: v0.3.1
     hooks:
       - id: absolufy-imports
+        types: [python]
         name: Convert relative imports to absolute
-        # args: ["--application-directories", "."]
   - repo: https://github.com/timothycrosley/isort
     rev: 5.10.1
     hooks:
       - id: isort
         name: Format imports
         additional_dependencies: [toml]
+        types: [python]
         exclude: ^.*/?setup\.py$
 
   # -------------------------------- Formatting -------------------------------- #
@@ -125,9 +137,11 @@ repos:
     hooks:
       - id: docformatter
         name: Format docstrings
+        types: [python]
         args: [--in-place, --wrap-summaries=99, --wrap-descriptions=99]
   - repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:
       - id: black-jupyter
+        types: [python]
         name: Format code

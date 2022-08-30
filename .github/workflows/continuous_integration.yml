@@ -1,0 +1,205 @@
+name: Continuous Integration
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  PYTHON_VERSION: 3.9
+
+jobs:
+  changes:
+    name: Check for Python file changes
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    outputs:
+      python: ${{steps.filter.outputs.python}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - 'pyproject.toml'
+              - 'poetry.lock'
+              - '.github/workflows/**/*.yml'
+              - '.mypy.ini'
+              - '.flake8'
+
+  typecheck:
+    name: Type check Python
+    needs: [changes]
+    if: ${{needs.changes.outputs.python == 'true' && !github.event.pull_request.draft }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Configure GitHub to download private repos
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Load cached Python
+        uses: tespkg/actions-cache@v1
+        id: python-cache
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}-${{ hashFiles('pyproject.toml') }}
+          bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Load mypy cache
+        uses: tespkg/actions-cache@v1
+        id: mypy-cache
+        with:
+          path: .mypy_cache
+          key: ${{ runner.os }}-mypy-cache-${{ hashFiles('poetry.lock') }}-${{hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-mypy-cache-${{ hashFiles('poetry.lock') }}-${{hashFiles('pyproject.toml') }}
+            ${{ runner.os }}-mypy-cache-
+          bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Run mypy with reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          exit_val="0"
+          [[ $GITHUB_EVENT_NAME == "pull_request" ]] && reporter="github-pr-review" || reporter="github-check"
+          poetry run mypy \
+            --show-column-numbers \
+            --show-absolute-path \
+            --no-error-summary . 2>&1 | reviewdog \
+            -efm="%f:%l:%c: %t%*[^:]: %m" \
+            -name="mypy" \
+            -filter-mode=nofilter \
+            -fail-on-error \
+            -reporter="${reporter}" || exit_val="$?"
+          if [[ "${exit_val}" -ne '0' ]]; then
+            exit 1
+          fi
+
+  lint:
+    name: Lint Python
+    needs: [changes]
+    if: ${{needs.changes.outputs.python == 'true' && !github.event.pull_request.draft }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Configure GitHub to download private repos
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Load cached Python
+        uses: tespkg/actions-cache@v1
+        id: python-cache
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}-${{ hashFiles('pyproject.toml') }}
+          bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Run flake8
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          exit_val="0"
+          [[ $GITHUB_EVENT_NAME == "pull_request" ]] && reporter="github-pr-review" || reporter="github-check"
+          poetry run flake8 \
+            --format=default . 2>&1 | reviewdog \
+            -f=pep8 \
+            -name="flake8" \
+            -fail-on-error \
+            -filter-mode=file \
+            -reporter="${reporter}" || exit_val="$?"
+          if [[ "${exit_val}" -ne '0' ]]; then
+            exit 1
+          fi
+
+  format:
+    name: Format
+    runs-on: self-hosted
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install pre-commit
+        run: |
+          pip install pre-commit
+      - name: Load cached pre-commit environment
+        uses: tespkg/actions-cache@v1
+        id: pre-commit-cache
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('**/.pre-commit-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pre-commit-
+          bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Run pre-commit hook
+        id: run-pre-commit-hooks
+        run: |
+          git add .pre-commit-config.yaml
+          pre-commit run --color=always --all-files
+      - name: Annotate any changes using reviewdog
+        if: ${{ failure() }}
+        id: reviewdog-suggester
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: pre-commit
