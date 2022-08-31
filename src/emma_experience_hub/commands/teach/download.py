@@ -1,8 +1,9 @@
-import itertools
 import logging
 import random
 import subprocess
-from typing import Optional
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from typing import Optional, cast
 
 import boto3
 import typer
@@ -21,6 +22,14 @@ logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 
 
 console = Console()
+
+progress = Progress(
+    TextColumn("[bold blue]{task.description}", justify="right"),
+    BarColumn(bar_width=None),
+    "[progress.percentage]{task.percentage:>3.1f}%",
+    MofNCompleteColumn(),
+    TimeRemainingColumn(),
+)
 
 
 def download_models(
@@ -79,6 +88,9 @@ def download_edh_instances(
         min=1,
         show_envvar=False,
     ),
+    download_images: bool = typer.Option(
+        default=True, help="Download images for the EDH instances"
+    ),
 ) -> None:
     """Download TEACh EDH instances."""
     paths = TEAChPaths()
@@ -99,39 +111,8 @@ def download_edh_instances(
         if count:
             edh_instances_list = random.sample(edh_instances_list, count)
 
-        # Get URIs all the necessary images for each EDH instances
-        instance_image_prefixes_list: list[list[str]] = [
-            [
-                image_prefix["Key"]
-                for image_prefix in s3.list_objects_v2(
-                    Bucket=paths.s3_bucket_name,
-                    Prefix="{images_prefix}/{split}/{instance}".format(
-                        images_prefix=paths.s3_images_prefix,
-                        split=dataset_split.value,
-                        instance=edh_instance_prefix.split("/")[-1].split(".")[0],
-                    ),
-                )["Contents"]
-                if "driver" in image_prefix["Key"]
-            ]
-            for edh_instance_prefix in edh_instances_list
-        ]
-
-    # Create a progress bar and the tasks
-    progress = Progress(
-        TextColumn("[bold blue]{task.description}", justify="right"),
-        BarColumn(bar_width=None),
-        "[progress.percentage]{task.percentage:>3.1f}%",
-        "•",
-        MofNCompleteColumn(),
-        "•",
-        TimeRemainingColumn(),
-    )
+    # Create progress bar tasks
     instances_task_id = progress.add_task("Downloading instances", total=len(edh_instances_list))
-
-    images_task_id = progress.add_task(
-        "Downloading images for instances",
-        total=len(list(itertools.chain.from_iterable(instance_image_prefixes_list))),
-    )
 
     with progress:
         # Create the output directory for the EDH instances
@@ -148,7 +129,86 @@ def download_edh_instances(
 
             progress.advance(instances_task_id)
 
+    if download_images:
+        download_images_for_edh_instances(dataset_split)
+
+
+def _get_available_images_for_edh_instance(
+    edh_instance_id: str, *, dataset_split: TEAChDatasetSplit
+) -> set[str]:
+    """Return a set of image paths which should be downloaded for a given EDH instance.
+
+    This also ensure that images which already exist are not downloaded.
+    """
+    s3 = boto3.client("s3")
+
+    paths = TEAChPaths()
+    images_dir = paths.data_images.joinpath(dataset_split.value)
+
+    # If there are already some images downloaded, get a list of them
+    existing_images = (
+        {image.name for image in images_dir.joinpath(edh_instance_id).iterdir()}
+        if images_dir.joinpath(edh_instance_id).exists()
+        else set()
+    )
+
+    # Get a list of all the images that can be downloaded for the instance
+    available_images_for_instance = (
+        image_prefix["Key"]
+        for image_prefix in s3.list_objects_v2(
+            Bucket=paths.s3_bucket_name,
+            Prefix="{images_prefix}/{split}/{instance}".format(
+                images_prefix=paths.s3_images_prefix,
+                split=dataset_split.value,
+                instance=edh_instance_id.split(".")[0],
+            ),
+        )["Contents"]
+        if "driver" in image_prefix["Key"]
+    )
+
+    # Filter out images which already exist
+    image_prefixes_to_download: set[str] = {
+        prefix
+        for prefix in available_images_for_instance
+        if prefix.split("/")[-1] not in existing_images
+    }
+
+    return image_prefixes_to_download
+
+
+def download_images_for_edh_instances(
+    dataset_split: TEAChDatasetSplit = typer.Option(..., help="Dataset split to download")
+) -> None:
+    """Download images for EDH instances."""
+    s3 = boto3.client("s3")
+    paths = TEAChPaths()
+
+    with console.status("Getting list of downloaded instances..."):
+        downloaded_edh_instance_ids = [
+            instance.stem
+            for instance in paths.data_edh_instances.joinpath(dataset_split.value).iterdir()
+        ]
+
+    task_id = progress.add_task("Determining which images to download...", start=False, total=0)
+
+    with progress:
+        with ThreadPoolExecutor() as pool:
+            instance_image_prefixes_iterator = pool.map(
+                partial(_get_available_images_for_edh_instance, dataset_split=dataset_split),
+                downloaded_edh_instance_ids,
+            )
+
+            instance_image_prefixes_list = []
+
+            for prefixes in instance_image_prefixes_iterator:
+                instance_image_prefixes_list.append(prefixes)
+                progress.update(
+                    task_id, total=cast(float, progress.tasks[task_id].total) + len(prefixes)
+                )
+
         for instance_image_keys in instance_image_prefixes_list:
+            progress.update(task_id, description="Downloading images", start=True)
+
             for image_key in instance_image_keys:
                 # Create the directory for all the images
                 images_output_dir = paths.data.joinpath(
@@ -163,7 +223,7 @@ def download_edh_instances(
                     Filename=images_output_dir.joinpath(image_key.split("/")[-1]).as_posix(),
                 )
 
-                progress.advance(images_task_id)
+                progress.advance(task_id)
 
 
 def download_teach_data() -> None:
@@ -174,3 +234,5 @@ def download_teach_data() -> None:
     download_games()
     download_edh_instances(TEAChDatasetSplit.valid_seen)
     download_edh_instances(TEAChDatasetSplit.valid_unseen)
+    download_images_for_edh_instances(TEAChDatasetSplit.valid_seen)
+    download_images_for_edh_instances(TEAChDatasetSplit.valid_unseen)
