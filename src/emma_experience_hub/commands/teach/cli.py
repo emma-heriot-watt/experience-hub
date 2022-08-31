@@ -9,6 +9,10 @@ from emma_experience_hub.commands.teach.api import (
     stop_feature_extractor_api,
 )
 from emma_experience_hub.commands.teach.constants import TEAChDatasetSplit
+from emma_experience_hub.commands.teach.dataset import (
+    filter_edh_instances,
+    restore_filtered_edh_instances,
+)
 from emma_experience_hub.commands.teach.download import (
     download_edh_instances,
     download_games,
@@ -80,3 +84,6 @@ app.command(rich_help_panel="Inference Runner Commands")(prepare_inference_runne
 app.command(rich_help_panel="Inference Runner Commands")(launch_inference_runner)
 app.command(rich_help_panel="Inference Runner Commands")(launch_xserver)
 app.command(rich_help_panel="Inference Runner Commands")(stop_inference_runner_container)
+
+app.command(rich_help_panel="Dataset Commands")(filter_edh_instances)
+app.command(rich_help_panel="Dataset Commands")(restore_filtered_edh_instances)

@@ -1,4 +1,3 @@
-import random
 import subprocess
 from shutil import rmtree
 from typing import Optional
@@ -16,6 +15,10 @@ from emma_experience_hub.commands.teach.constants import (
     TEAChDatasetSplit,
     TEAChPaths,
 )
+from emma_experience_hub.commands.teach.dataset import (
+    limit_edh_instances_evaluated,
+    restore_unselected_edh_instances,
+)
 from emma_experience_hub.common.docker import (
     create_network_if_not_exists,
     is_container_running,
@@ -29,43 +32,6 @@ from emma_experience_hub.common.torch import is_cuda_available
 
 
 console = Console()
-
-
-def limit_edh_instances_evaluated(count: int, dataset_split: TEAChDatasetSplit) -> None:
-    """Limit the number of instances being evalauted."""
-    edh_instances_dir = TEAChPaths.data_edh_instances.joinpath(dataset_split.value)
-    if count > len(list(edh_instances_dir.iterdir())):
-        raise AssertionError(
-            "The maximum number of instances is greater than the number of instances available."
-        )
-
-    temp_instances_dir = TEAChPaths.data_unused_edh_instances.joinpath(dataset_split.value)
-    temp_instances_dir.mkdir(parents=True, exist_ok=True)
-
-    all_instance_paths = list(edh_instances_dir.iterdir())
-    selected_instances = random.sample(all_instance_paths, count)
-    unselected_instances = (
-        instance_path
-        for instance_path in all_instance_paths
-        if instance_path not in selected_instances
-    )
-
-    for instance_path in unselected_instances:
-        instance_path.rename(temp_instances_dir.joinpath(instance_path.name))
-
-
-def restore_unselected_edh_instances() -> None:
-    """Restore EDH instances that were not evaluated on."""
-    for instance_path in TEAChPaths.data_unused_edh_instances.rglob("*.json"):
-        instance_path.rename(
-            TEAChPaths.data_edh_instances.joinpath(
-                instance_path.parent.parts[-1], instance_path.name
-            )
-        )
-
-    for unused_dir in TEAChPaths.data_unused_edh_instances.iterdir():
-        unused_dir.rmdir()
-    TEAChPaths.data_unused_edh_instances.rmdir()
 
 
 def prepare_inference_runner_without_display() -> None:

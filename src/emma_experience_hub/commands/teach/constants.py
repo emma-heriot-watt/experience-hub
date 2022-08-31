@@ -41,6 +41,7 @@ class TEAChPaths:
     data_edh_instances = data.joinpath("edh_instances/")
     data_games = data.joinpath("games/")
     data_unused_edh_instances = data.joinpath("_unused_edh_instances")
+    data_filtered_edh_instances = data.joinpath("_filtered_edh_instances")
 
     policy_model = models.joinpath("policy_model_checkpoint")
     perception_model = models.joinpath("perception_model_checkpoint")
