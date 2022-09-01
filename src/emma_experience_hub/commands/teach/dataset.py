@@ -69,7 +69,7 @@ def filter_edh_instances(
         edh_instances = [
             TEAChEDHInstance.parse_file(instance_path)
             for instance_path in instances_dir.iterdir()
-            if instance_path.suffix == "json"
+            if instance_path.name.endswith("json")
         ]
 
     console.log(f"{len(edh_instances)} EDH instances found")
