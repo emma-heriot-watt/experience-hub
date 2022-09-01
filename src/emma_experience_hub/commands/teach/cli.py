@@ -16,6 +16,7 @@ from emma_experience_hub.commands.teach.dataset import (
 from emma_experience_hub.commands.teach.download import (
     download_edh_instances,
     download_games,
+    download_images_for_edh_instances,
     download_models,
     download_teach_data,
 )
@@ -62,6 +63,8 @@ def prepare_everything(
     download_games()
     download_edh_instances(TEAChDatasetSplit.valid_seen, count)
     download_edh_instances(TEAChDatasetSplit.valid_unseen, count)
+    download_images_for_edh_instances(TEAChDatasetSplit.valid_seen)
+    download_images_for_edh_instances(TEAChDatasetSplit.valid_unseen)
     prepare_inference_runner(with_display=True, force_reset=True)
 
     if machine_supports_inference_without_display():
@@ -72,6 +75,7 @@ app.command(rich_help_panel="Download Commands")(download_models)
 app.command(rich_help_panel="Download Commands")(download_teach_data)
 app.command(rich_help_panel="Download Commands")(download_games)
 app.command(rich_help_panel="Download Commands")(download_edh_instances)
+app.command(rich_help_panel="Download Commands")(download_images_for_edh_instances)
 
 app.command(rich_help_panel="API Commands")(launch_api)
 app.command(rich_help_panel="API Commands")(stop_api)
