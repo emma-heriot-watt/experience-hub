@@ -177,6 +177,12 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Configure GitHub to download private repos
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+
       - name: Install pre-commit
         run: |
           pip install pre-commit

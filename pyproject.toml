@@ -6,17 +6,41 @@ authors = ["Amit Parekh <7276308+amitkparekh@users.noreply.github.com>"]
 
 packages = [{ include = "emma_experience_hub", from = "src" }]
 
+[tool.poe]
+envfile = ".env"
+
+[tool.poe.tasks]
+
+[tool.poe.tasks.format]
+help = "Format using the pre-commit hooks"
+cmd = "pre-commit run --all-files"
+
+[tool.poe.tasks.typecheck]
+help = "Check types with mypy"
+cmd = "mypy ."
+
+[tool.poe.tasks.lint]
+help = "Lint with flake8"
+cmd = "flake8 ."
+
+[tool.poe.tasks.test]
+help = "Run the fast Python tests"
+cmd = "pytest --cov=src -m 'not slow'"
+
+[tool.poe.tasks.test-everything]
+help = "Run all the tests and get the coverage"
+cmd = "pytest -v --durations=40 --color=yes --junitxml=pytest.xml --cov=src -m 'not slow' -n 2"
+
 [tool.poetry.dependencies]
 python = "~3.9"
-typer = {extras = ["all"], version = "^0.6.1"}
+typer = { extras = ["all"], version = "^0.6.1" }
 torch = "^1.12.0"
 rich = "^12.5.1"
-pydantic = "^1.9.2"
+pydantic = { extras = ["dotenv"], version = "^1.10.1" }
 boto3 = "1.23.3"
-python-dotenv = "^0.20.0"
-emma-datasets = {git = "https://github.com/emma-simbot/datasets"}
+emma-datasets = { git = "https://github.com/emma-simbot/datasets" }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
 wemake-python-styleguide = "^0.16.1"
 flake8 = "^4.0.1"
@@ -26,6 +50,9 @@ pre-commit = "^2.19.0"
 poethepoet = "^0.14.0"
 isort = "^5.10.1"
 pytest-cases = "^3.6.13"
+pytest-xdist = "^2.5.0"
+pytest-cov = "^3.0.0"
+tbump = "^6.9.0"
 
 [tool.black]
 line-length = 99
@@ -37,6 +64,28 @@ lines_after_imports = 2
 line_length = 99
 known_first_party = ["emma_*"]
 
+
+[tool.tbump]
+github_url = "https://github.com/emma_simbot/experience_hub/"
+
+[tool.tbump.version]
+current = "0.1.0"
+
+regex = '''
+  (?P<major>\d+)
+  \.
+  (?P<minor>\d+)
+  \.
+  (?P<patch>\d+)
+  '''
+
+[tool.tbump.git]
+message_template = "Bump to {new_version}"
+tag_template = "v{new_version}"
+
+[[tool.tbump.file]]
+src = "pyproject.toml"
+
 [build-system]
-requires = ["poetry-core>=1.0.0", "setuptools"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

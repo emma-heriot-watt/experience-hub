@@ -1,0 +1,69 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore: ["**/*.md", "**/*.rst"]
+  push:
+    branches:
+      - main
+
+env:
+  PYTHON_VERSION: 3.9
+  # Disable tokenizers parallelism because this doesn't help, and can cause issues in distributed tests.
+  TOKENIZERS_PARALLELISM: "false"
+  # Disable multithreading with OMP because this can lead to dead-locks in distributed tests.
+  OMP_NUM_THREADS: "1"
+  # See https://github.com/pytorch/pytorch/issues/37377#issuecomment-677851112.
+  MKL_THREADING_LAYER: "GNU"
+
+jobs:
+  python:
+    name: Run Python test suite
+    defaults:
+      run:
+        shell: bash
+
+    runs-on: self-hosted
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Configure GitHub to download private repos
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+
+      - name: Load cached Python
+        uses: tespkg/actions-cache@v1
+        id: python-cache
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}-${{ hashFiles('pyproject.toml') }}
+          bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Run test suite
+        run: |
+          poetry run poe test-everything | tee pytest-coverage.txt
+
+      - name: Comment the coverage
+        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest.xml
