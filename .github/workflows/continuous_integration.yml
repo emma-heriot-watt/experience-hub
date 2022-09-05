@@ -31,7 +31,7 @@ jobs:
               - '**/*.py'
               - 'pyproject.toml'
               - 'poetry.lock'
-              - '.github/workflows/**/*.yml'
+              - '.github/workflows/continuous_integration.yml'
               - '.mypy.ini'
               - '.flake8'
 

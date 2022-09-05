@@ -10,7 +10,8 @@ jobs:
     name: Draft a release
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      # write permission is required to create a github release
+      contents: write
     steps:
       - uses: release-drafter/release-drafter@v5
         env:
