@@ -1,23 +1,12 @@
-import logging
 import subprocess
 from decimal import Decimal
 from typing import Optional
 
-from rich.console import Console
-from rich.logging import RichHandler
-
+from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.common.settings import Settings
 
 
-console = Console()
-
-logging.basicConfig(
-    level="NOTSET",
-    format="%(message)s",  # noqa: WPS323
-    datefmt="[%X]",  # noqa: WPS323
-    handlers=[RichHandler(console=console, markup=True, rich_tracebacks=True)],
-)
-log = logging.getLogger("rich")
+log = get_logger()
 
 settings = Settings()
 
