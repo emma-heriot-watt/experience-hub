@@ -57,8 +57,7 @@ def stop_container(container_name: str) -> None:
             subprocess.run(
                 f"docker stop {container_name}", shell=True, check=True, stdout=subprocess.PIPE
             )
-    else:
-        console.log("Container not currently running.")
+
     if does_container_exist(container_name):
         with console.status("Container still exists, deleting..."):
             subprocess.run(
