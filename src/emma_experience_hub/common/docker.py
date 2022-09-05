@@ -6,6 +6,25 @@ from rich.console import Console
 console = Console()
 
 
+def get_docker_version() -> str:
+    """Get the Docker version."""
+    query = subprocess.run("docker --version", shell=True, check=True, stdout=subprocess.PIPE)
+    response = query.stdout.decode("utf-8").strip()
+
+    version = response.split("version")[1].split(",")[0].strip()
+    build = response.split(",")[-1].strip()
+
+    return f"{version} (build {build})"
+
+
+def get_docker_buildx_version() -> str:
+    """Get the Docker buildx verison."""
+    query = subprocess.run("docker buildx version", shell=True, check=True, stdout=subprocess.PIPE)
+    response = query.stdout.decode("utf-8").strip()
+    version = response.split(" ")[1].strip()
+    return version
+
+
 def is_container_running(container_name: str) -> bool:
     """Check whether or not a container is currently running."""
     command = [
