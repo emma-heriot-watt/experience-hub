@@ -25,6 +25,7 @@ jobs:
         shell: bash
 
     runs-on: self-hosted
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
