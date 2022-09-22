@@ -1,10 +1,4 @@
-from dotenv import load_dotenv
-from pydantic import AnyUrl, BaseSettings, SecretStr, ValidationError
-
-from emma_experience_hub.common.logging import get_logger
-
-
-log = get_logger()
+from pydantic import AnyUrl, BaseSettings, SecretStr
 
 
 class Settings(BaseSettings):
@@ -24,21 +18,3 @@ class Settings(BaseSettings):
 
         env_file = ".env"
         env_file_encoding = "utf-8"
-
-
-def load_env_vars() -> None:
-    """Load the environment variables from the `.env` file and verify them."""
-    load_dotenv()
-
-    try:
-        Settings()
-    except ValidationError as exception:
-        log.exception(exception)
-        log.error(
-            "Could not load environment variables.",
-            "Do you have a `[bright_cyan u].env[/]` file?",
-        )
-
-
-if __name__ == "__main__":
-    load_env_vars()

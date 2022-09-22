@@ -1,3 +1,3 @@
 from emma_experience_hub.common.settings.emma_services import EmmaServiceSettings
-from emma_experience_hub.common.settings.settings import Settings, load_env_vars
+from emma_experience_hub.common.settings.settings import Settings
 from emma_experience_hub.common.settings.simbot import SimBotSettings
