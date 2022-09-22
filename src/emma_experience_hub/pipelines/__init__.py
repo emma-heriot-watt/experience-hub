@@ -1,0 +1,1 @@
+from emma_experience_hub.pipelines.request_processing import RequestProcessingPipeline

@@ -1,6 +1,7 @@
 import logging
 
 from rich.logging import RichHandler
+from rich.traceback import install
 
 
 def get_logger(name: str = "emma_experience_hub") -> logging.Logger:
@@ -9,7 +10,12 @@ def get_logger(name: str = "emma_experience_hub") -> logging.Logger:
     logging.basicConfig(
         format="%(message)s",  # noqa: WPS323
         datefmt="[%X]",  # noqa: WPS323
-        handlers=[RichHandler(markup=True, rich_tracebacks=True)],
+        handlers=[RichHandler(markup=True, rich_tracebacks=True, tracebacks_show_locals=True)],
     )
 
     return logging.getLogger(name)
+
+
+def enable_rich_tracebacks() -> None:
+    """Enable rich tracebacks."""
+    install(show_locals=True)

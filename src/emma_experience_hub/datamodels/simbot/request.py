@@ -1,0 +1,67 @@
+from typing import cast
+
+from pydantic import BaseModel, Field
+
+from emma_experience_hub.datamodels.simbot.actions import (
+    SimBotAction,
+    SimBotActionStatus,
+    SimBotAuxiliaryMetadataAction,
+    SimBotSpeechRecognitionAction,
+)
+from emma_experience_hub.datamodels.simbot.actions.actions import (
+    SIMBOT_ACTION_TYPE_TO_KEY_MAPPING,
+    SimBotActionType,
+)
+
+
+class SimBotRequestHeader(BaseModel):
+    """SimBot request headers, which must exist for each request."""
+
+    session_id: str = Field(..., alias="sessionId")
+    prediction_request_id: str = Field(..., alias="predictionRequestId")
+
+
+class SimBotRequestBody(BaseModel):
+    """Request body from the SimBot game engine."""
+
+    sensors: list[SimBotAction]
+    previous_actions: list[SimBotActionStatus] = Field(..., alias="previousActions")
+
+    @property
+    def has_previous_action_status(self) -> bool:
+        """Does the request contain the status of previous actions?"""
+        return bool(len(self.previous_actions))
+
+
+class SimBotRequest(BaseModel, extra="allow"):
+    """Request from the SimBot server.
+
+    FastAPI will directly parse the JSON body into this Pydantic model.
+    """
+
+    header: SimBotRequestHeader
+    request: SimBotRequestBody
+
+    @property
+    def auxiliary_metadata(self) -> SimBotAuxiliaryMetadataAction:
+        """Easily get the game metadata."""
+        return cast(
+            SimBotAuxiliaryMetadataAction,
+            self._easily_get_action_from_sensors("GameMetaData"),
+        )
+
+    @property
+    def speech_recognition(self) -> SimBotSpeechRecognitionAction:
+        """Easily get the speech recognition action."""
+        return cast(
+            SimBotSpeechRecognitionAction,
+            self._easily_get_action_from_sensors("SpeechRecognition"),
+        )
+
+    def _easily_get_action_from_sensors(self, action_type: SimBotActionType) -> SimBotAction:
+        """Easily get the action for the given action type from the sensors."""
+        for sensor in self.request.sensors:
+            if sensor.type == action_type:
+                return getattr(sensor, SIMBOT_ACTION_TYPE_TO_KEY_MAPPING[action_type])
+
+        raise AssertionError(f"{action_type} not found in the sensors list.")
