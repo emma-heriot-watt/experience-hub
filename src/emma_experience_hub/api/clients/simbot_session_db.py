@@ -6,10 +6,13 @@ from botocore.exceptions import ClientError
 from pydantic import parse_obj_as
 
 from emma_experience_hub.common import get_logger
+from emma_experience_hub.common.settings import Settings
 from emma_experience_hub.datamodels.simbot import SimBotSessionTurn
 
 
 log = get_logger()
+
+boto3.setup_default_session(profile_name=Settings().aws_profile)
 
 
 class DynamoDbClient:
@@ -44,7 +47,7 @@ class SimBotSessionDbClient(DynamoDbClient):
                 Item={
                     self.primary_key: session_turn.session_id,
                     self.sort_key: str(session_turn.timestamp.start),
-                    self.data_key: session_turn.dict(),
+                    self.data_key: session_turn.json(),
                 }
             )
         except ClientError as err:

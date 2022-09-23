@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     remote_perception_checkpoint_uri: AnyUrl
     remote_policy_checkpoint_uri: AnyUrl
     cuda_version_upper_bound: float = 11.3
+    aws_profile: str = "TeamProfile"
 
     class Config:
         """Config for the Settings."""

@@ -8,6 +8,8 @@ class SimBotSettings(BaseSettings):
 
     auxiliary_metadata_dir: DirectoryPath
     extracted_features_dir: DirectoryPath
+    memory_table_name: str = "MEMORY_TABLE"
+    db_region_name: str = "us-east-1"
 
     class Config:
         """Config for the settings."""
