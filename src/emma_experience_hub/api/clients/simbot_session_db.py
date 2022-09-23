@@ -78,4 +78,5 @@ class SimBotSessionDbClient(DynamoDbClient):
             # TODO: Should there be a raise here?
             raise err
 
+        # TODO: what if there are none? We should return an empty list
         return parse_obj_as(list[SimBotSessionTurn], response["Items"])

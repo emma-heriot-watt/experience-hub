@@ -3,12 +3,11 @@ from typing import Optional
 
 from pydantic import BaseModel, validator
 
-from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
+from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotIntent, SimBotRequest
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
     SimBotSpeechRecognitionPayload,
 )
-from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 
 
 class SimBotSessionTurnTimestamp(BaseModel):
@@ -47,6 +46,8 @@ class SimBotSessionTurn(BaseModel):
 
     intent: Optional[SimBotIntent] = None
 
+    actions: Optional[list[SimBotAction]] = None
+
     @classmethod
     def new_from_simbot_request(cls, request: SimBotRequest, idx: int) -> "SimBotSessionTurn":
         """Create a session turn from a SimBotRequest."""
@@ -66,6 +67,11 @@ class SimBotSessionTurn(BaseModel):
     def has_intent(self) -> bool:
         """Determine whether or not the turn has an extracted intent."""
         return self.intent is not None
+
+    @property
+    def has_actions(self) -> bool:
+        """Determine whether or not the turn has generated an action."""
+        return self.actions is not None
 
 
 class SimBotSession(BaseModel):

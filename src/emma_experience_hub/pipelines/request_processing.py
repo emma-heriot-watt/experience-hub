@@ -1,9 +1,18 @@
 from concurrent.futures import ThreadPoolExecutor
 
-from emma_experience_hub.api.clients import FeatureExtractorClient, SimBotCacheClient
+from emma_experience_hub.api.clients import (
+    FeatureExtractorClient,
+    SimBotCacheClient,
+    SimBotSessionDbClient,
+)
 from emma_experience_hub.common import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
-from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotSession, SimBotSessionTurn
+from emma_experience_hub.datamodels.simbot import (
+    SimBotActionStatus,
+    SimBotRequest,
+    SimBotSession,
+    SimBotSessionTurn,
+)
 from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
 
 
@@ -18,16 +27,24 @@ class RequestProcessingPipeline:
         feature_extractor_client: FeatureExtractorClient,
         auxiliary_metadata_cache_client: SimBotCacheClient[SimBotAuxiliaryMetadataPayload],
         extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
+        session_db_client: SimBotSessionDbClient,
     ) -> None:
         self._feature_extractor_client = feature_extractor_client
 
         self._auxiliary_metadata_cache_client = auxiliary_metadata_cache_client
         self._extracted_features_cache_client = extracted_features_cache_client
 
+        self._session_db_client = session_db_client
+
     def run(self, request: SimBotRequest) -> SimBotSession:
         """Run the pipeline for the current request."""
         # Get all the previous turns for the history
         session_history = self.get_session_history(request.header.session_id)
+
+        if session_history:
+            self.update_previous_turn_with_action_status(
+                session_history[-1], request.request.previous_actions
+            )
 
         # Create a turn for the current request and update the history
         session_history.append(
@@ -46,7 +63,36 @@ class RequestProcessingPipeline:
 
         This should use an API client to pull the history for the given session.
         """
-        raise NotImplementedError
+        return self._session_db_client.get_all_session_turns(session_id)
+
+    def update_previous_turn_with_action_status(
+        self, turn: SimBotSessionTurn, action_status: list[SimBotActionStatus]
+    ) -> None:
+        """Update the previous turn with the action status.
+
+        We are assuming that the order of actions is the exact same as the order of action
+        statuses.
+        """
+        if not action_status:
+            log.warning("Action status is empty. Doing nothing and retuning. ")
+            return
+
+        if turn.actions is None:
+            log.error("The turn should have an action. Is this the right turn?")
+            return
+
+        if len(turn.actions) != len(action_status):
+            log.error(
+                f"The number of actions with the turn is not equal to the number of statuses available. There are {len(turn.actions)} actions within the turn, but {len(action_status)} statuses."
+            )
+            log.warning("Trying to match the available actions to the available statuses anyway.")
+
+        # Update the action status for all the turns.
+        for idx, status in enumerate(action_status):
+            turn.actions[idx].status = status
+
+        # Put the updated session turn into the db
+        self._session_db_client.put_session_turn(turn)
 
     def validate_extracted_features_for_session(self, turns: list[SimBotSessionTurn]) -> None:
         """Check existance for all turns, and extract features if they do not exist."""
@@ -81,7 +127,7 @@ class RequestProcessingPipeline:
 
     def _get_auxiliary_metadata_for_turn(
         self, turn: SimBotSessionTurn
-    ) -> SimBotAuxiliaryMetadataAction:
+    ) -> SimBotAuxiliaryMetadataPayload:
         """Cache the auxiliary metadata for the given turn."""
         # Check whether the auxiliary metadata exists within the cache
         auxiliary_metadata_exists = self._auxiliary_metadata_cache_client.check_exist(
@@ -92,7 +138,7 @@ class RequestProcessingPipeline:
         auxiliary_metadata = (
             self._auxiliary_metadata_cache_client.load(turn.session_id, turn.prediction_request_id)
             if auxiliary_metadata_exists
-            else SimBotAuxiliaryMetadataAction.from_efs_uri(uri=turn.auxiliary_metadata_uri)
+            else SimBotAuxiliaryMetadataPayload.from_efs_uri(uri=turn.auxiliary_metadata_uri)
         )
 
         # If it has not been cached, upload it to the cache
@@ -106,7 +152,7 @@ class RequestProcessingPipeline:
         return auxiliary_metadata
 
     def _extract_features_from_session_turn(
-        self, auxiliary_metadata: SimBotAuxiliaryMetadataAction
+        self, auxiliary_metadata: SimBotAuxiliaryMetadataPayload
     ) -> list[EmmaExtractedFeatures]:
         """Extract visual features from the given turn."""
         if not self._feature_extractor_client.healthcheck():
