@@ -3,11 +3,11 @@ from typing import Optional
 
 from pydantic import BaseModel, validator
 
-from emma_experience_hub.datamodels.simbot.actions import (
-    SimBotAuxiliaryMetadataUri,
-    SimBotSpeechRecognitionAction,
-)
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
+from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotAuxiliaryMetadataUri,
+    SimBotSpeechRecognitionPayload,
+)
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 
 
@@ -40,7 +40,7 @@ class SimBotSessionTurn(BaseModel):
     unique_room_names: set[str]
     viewpoints: set[str]
 
-    speech: SimBotSpeechRecognitionAction
+    speech: SimBotSpeechRecognitionPayload
 
     # URI to the auxiliary metadata file, as provided by the SimBot Arena
     auxiliary_metadata_uri: SimBotAuxiliaryMetadataUri

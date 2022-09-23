@@ -5,12 +5,11 @@ from pydantic import BaseModel, Field
 from emma_experience_hub.datamodels.simbot.actions import (
     SimBotAction,
     SimBotActionStatus,
-    SimBotAuxiliaryMetadataAction,
-    SimBotSpeechRecognitionAction,
-)
-from emma_experience_hub.datamodels.simbot.actions.actions import (
-    SIMBOT_ACTION_TYPE_TO_KEY_MAPPING,
     SimBotActionType,
+)
+from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotAuxiliaryMetadataPayload,
+    SimBotSpeechRecognitionPayload,
 )
 
 
@@ -43,25 +42,25 @@ class SimBotRequest(BaseModel, extra="allow"):
     request: SimBotRequestBody
 
     @property
-    def auxiliary_metadata(self) -> SimBotAuxiliaryMetadataAction:
+    def auxiliary_metadata(self) -> SimBotAuxiliaryMetadataPayload:
         """Easily get the game metadata."""
         return cast(
-            SimBotAuxiliaryMetadataAction,
-            self._easily_get_action_from_sensors("GameMetaData"),
+            SimBotAuxiliaryMetadataPayload,
+            self._easily_get_action_from_sensors("GameMetaData").payload,
         )
 
     @property
-    def speech_recognition(self) -> SimBotSpeechRecognitionAction:
+    def speech_recognition(self) -> SimBotSpeechRecognitionPayload:
         """Easily get the speech recognition action."""
         return cast(
-            SimBotSpeechRecognitionAction,
-            self._easily_get_action_from_sensors("SpeechRecognition"),
+            SimBotSpeechRecognitionPayload,
+            self._easily_get_action_from_sensors("SpeechRecognition").payload,
         )
 
     def _easily_get_action_from_sensors(self, action_type: SimBotActionType) -> SimBotAction:
         """Easily get the action for the given action type from the sensors."""
         for sensor in self.request.sensors:
             if sensor.type == action_type:
-                return getattr(sensor, SIMBOT_ACTION_TYPE_TO_KEY_MAPPING[action_type])
+                return sensor
 
         raise AssertionError(f"{action_type} not found in the sensors list.")

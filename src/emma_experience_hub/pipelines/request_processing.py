@@ -4,7 +4,7 @@ from emma_experience_hub.api.clients import FeatureExtractorClient, SimBotCacheC
 from emma_experience_hub.common import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotSession, SimBotSessionTurn
-from emma_experience_hub.datamodels.simbot.actions import SimBotAuxiliaryMetadataAction
+from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
 
 
 log = get_logger()
@@ -16,7 +16,7 @@ class RequestProcessingPipeline:
     def __init__(
         self,
         feature_extractor_client: FeatureExtractorClient,
-        auxiliary_metadata_cache_client: SimBotCacheClient[SimBotAuxiliaryMetadataAction],
+        auxiliary_metadata_cache_client: SimBotCacheClient[SimBotAuxiliaryMetadataPayload],
         extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
     ) -> None:
         self._feature_extractor_client = feature_extractor_client

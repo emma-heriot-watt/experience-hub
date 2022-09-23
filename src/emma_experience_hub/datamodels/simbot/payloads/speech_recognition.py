@@ -25,7 +25,7 @@ class SimBotSpeechRecognitionToken(BaseModel):
     confidence: SimBotSpeechRecognitionConfidence
 
 
-class SimBotSpeechRecognitionAction(BaseModel):
+class SimBotSpeechRecognitionPayload(BaseModel):
     """Soeech Recognition action from the sensors."""
 
     _token_delimiter: str = " "

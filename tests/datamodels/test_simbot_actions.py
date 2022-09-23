@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
-from emma_experience_hub.datamodels.simbot.actions.actions import (
+from emma_experience_hub.datamodels.simbot.actions import (
     SIMBOT_ACTION_TYPE_TO_KEY_MAPPING,
-    SIMBOT_ACTION_TYPE_TO_MODEL_MAPPING,
     SimBotActionType,
+    SimBotActionTypePayloadModelMap,
 )
 
 
@@ -33,8 +33,8 @@ def test_each_action_type_has_model_mapping() -> None:
 
     for action_type in all_action_types:
         # Verify the action type exists as a key
-        assert action_type in SIMBOT_ACTION_TYPE_TO_MODEL_MAPPING
+        assert action_type in SimBotActionTypePayloadModelMap
 
         # Verify that the model exists
-        model = SIMBOT_ACTION_TYPE_TO_MODEL_MAPPING[action_type]
+        model = SimBotActionTypePayloadModelMap[action_type]
         assert isinstance(model, type(BaseModel))

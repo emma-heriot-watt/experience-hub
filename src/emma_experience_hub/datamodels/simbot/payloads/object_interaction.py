@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class SimBotObjectInteractionObjectAction(BaseModel):
+class SimBotInteractionObject(BaseModel):
     """SimBot object interaction action."""
 
     color_image_index: int = Field(0, alias="colorImageIndex")
@@ -10,7 +10,7 @@ class SimBotObjectInteractionObjectAction(BaseModel):
     name: str
 
 
-class SimBotObjectInteractionAction(BaseModel):
+class SimBotObjectInteractionPayload(BaseModel):
     """SimBot object interaction action, within the correct wrapping."""
 
-    object: SimBotObjectInteractionObjectAction
+    object: SimBotInteractionObject

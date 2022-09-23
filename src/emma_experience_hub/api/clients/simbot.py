@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 from emma_experience_hub.api.clients.pydantic import PydanticClient, PydanticT
 from emma_experience_hub.common import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
-from emma_experience_hub.datamodels.simbot.actions.auxiliary_metadata import (
+from emma_experience_hub.datamodels.simbot.payloads.auxiliary_metadata import (
     SimBotAuxiliaryMetadata,
 )
 

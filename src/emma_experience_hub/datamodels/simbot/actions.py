@@ -1,25 +1,20 @@
 from collections.abc import Mapping
 from enum import Enum
 from types import MappingProxyType
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
-from emma_experience_hub.datamodels.simbot.actions.auxiliary_metadata import (
-    SimBotAuxiliaryMetadataAction,
-)
-from emma_experience_hub.datamodels.simbot.actions.dialog import SimBotDialogAction
-from emma_experience_hub.datamodels.simbot.actions.navigation import (
-    SimBotGotoAction,
-    SimBotLookAction,
-    SimbotMoveAction,
-    SimBotRotateAction,
-)
-from emma_experience_hub.datamodels.simbot.actions.object_interaction import (
-    SimBotObjectInteractionAction,
-)
-from emma_experience_hub.datamodels.simbot.actions.speech_recognition import (
-    SimBotSpeechRecognitionAction,
+from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotAuxiliaryMetadataPayload,
+    SimBotDialogPayload,
+    SimBotGotoPayload,
+    SimBotLookPayload,
+    SimbotMovePayload,
+    SimBotNavigationPayload,
+    SimBotObjectInteractionPayload,
+    SimBotRotatePayload,
+    SimBotSpeechRecognitionPayload,
 )
 
 
@@ -85,30 +80,42 @@ SIMBOT_ACTION_TYPE_TO_KEY_MAPPING: Mapping[SimBotActionType, str] = MappingProxy
     }
 )
 
-SIMBOT_ACTION_TYPE_TO_MODEL_MAPPING: Mapping[SimBotActionType, type[BaseModel]] = MappingProxyType(
+SimBotPayload = Union[
+    SimBotSpeechRecognitionPayload,
+    SimBotAuxiliaryMetadataPayload,
+    SimBotDialogPayload,
+    SimBotGotoPayload,
+    SimbotMovePayload,
+    SimBotRotatePayload,
+    SimBotLookPayload,
+    SimBotObjectInteractionPayload,
+    SimBotNavigationPayload,
+]
+
+SimBotActionTypePayloadModelMap: Mapping[SimBotActionType, type[SimBotPayload]] = MappingProxyType(
     {
         # Sensors
-        "SpeechRecognition": SimBotSpeechRecognitionAction,
-        "GameMetaData": SimBotAuxiliaryMetadataAction,
+        "SpeechRecognition": SimBotSpeechRecognitionPayload,
+        "GameMetaData": SimBotAuxiliaryMetadataPayload,
         # Dialog
-        "Dialog": SimBotDialogAction,
+        "Dialog": SimBotDialogPayload,
         # Navigation
-        "Goto": SimBotGotoAction,
-        "Move": SimbotMoveAction,
-        "Rotate": SimBotRotateAction,
-        "Look": SimBotLookAction,
+        "Goto": SimBotGotoPayload,
+        "Move": SimbotMovePayload,
+        "Rotate": SimBotRotatePayload,
+        "Look": SimBotLookPayload,
         # Object interaction
-        "Pickup": SimBotObjectInteractionAction,
-        "Open": SimBotObjectInteractionAction,
-        "Close": SimBotObjectInteractionAction,
-        "Break": SimBotObjectInteractionAction,
-        "Scan": SimBotObjectInteractionAction,
-        "Examine": SimBotObjectInteractionAction,
-        "Place": SimBotObjectInteractionAction,
-        "Pour": SimBotObjectInteractionAction,
-        "Toggle": SimBotObjectInteractionAction,
-        "Fill": SimBotObjectInteractionAction,
-        "Clean": SimBotObjectInteractionAction,
+        "Pickup": SimBotObjectInteractionPayload,
+        "Open": SimBotObjectInteractionPayload,
+        "Close": SimBotObjectInteractionPayload,
+        "Break": SimBotObjectInteractionPayload,
+        "Scan": SimBotObjectInteractionPayload,
+        "Examine": SimBotObjectInteractionPayload,
+        "Place": SimBotObjectInteractionPayload,
+        "Pour": SimBotObjectInteractionPayload,
+        "Toggle": SimBotObjectInteractionPayload,
+        "Fill": SimBotObjectInteractionPayload,
+        "Clean": SimBotObjectInteractionPayload,
     }
 )
 
@@ -171,37 +178,53 @@ class SimBotActionStatus(BaseModel):
 
 
 class SimBotAction(BaseModel, extra="allow"):
-    """Common SimBot Action which can parse the fields into the specific actions."""
+    """Common SimBot Action which can parse the fields into the specific actions.
+
+    To instantiate the action manually (without using the helper parsers), provide the action
+    payload to the `payload` field.
+
+    The `payload` field will _never_ be exported. However, the correct key for the field --- i.e.,
+    whatever is expected by the response --- will be. This logic is all outlined within the
+    `check_payload_exists_for_all_necessary_keys()` class method.
+    """
 
     type: SimBotActionType
+    payload: SimBotPayload = Field(..., exclude=True)
     status: Optional[SimBotActionStatus] = None
 
     @root_validator(pre=True)
     @classmethod
-    def check_action_details(cls, values: dict[str, Any]) -> dict[str, Any]:  # noqa: WPS110
-        """Check the correct details for the stated action type exist."""
+    def check_payload_exists_for_all_necessary_keys(
+        cls, values: dict[str, Any]  # noqa: WPS110
+    ) -> dict[str, Any]:
+        """Check the payload for the stated action type exist."""
+        # Get the action type
         action_type = values["type"]
-        action_details_key = SIMBOT_ACTION_TYPE_TO_KEY_MAPPING[action_type]
-        action_details = values.get(action_details_key)
 
-        if action_details is None:
+        # Get the correct key for the action payload
+        payload_key = SIMBOT_ACTION_TYPE_TO_KEY_MAPPING[action_type]
+
+        # Get the payload from either the `payload` field or the field for the payload_key
+        payload = values.get("payload", values.get(payload_key))
+
+        if payload is None:
             raise AssertionError(
-                f"For the given action type `{action_type}`, the expected key for the details (`{action_details_key}`) is not found.",
+                f"For the given action type `{action_type}`, the expected key for the payload (`{payload_key}`) is not found.",
                 f"Available keys: {list(values.keys())}",
             )
 
-        # Attempt to parse action details to ensure no errors
-        values[action_details_key] = SIMBOT_ACTION_TYPE_TO_MODEL_MAPPING[action_type].parse_obj(
-            values[action_details_key]
+        # Parse the payload into the correct instance if necessary
+        parsed_payload = (
+            payload
+            if isinstance(payload, BaseModel)
+            else SimBotActionTypePayloadModelMap[action_type].parse_obj(values[payload_key])
         )
 
-        return values
+        # Set the payload for both the fields
+        values[payload_key] = parsed_payload
+        values["payload"] = parsed_payload
 
-    @property
-    def details(self) -> BaseModel:
-        """Get the details for the current action type without needing to know correct key."""
-        attribute_name_for_action = SIMBOT_ACTION_TYPE_TO_KEY_MAPPING[self.type]
-        return getattr(self, attribute_name_for_action)
+        return values
 
     @property
     def is_status_known(self) -> bool:

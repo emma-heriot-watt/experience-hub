@@ -90,7 +90,7 @@ class SimBotAuxiliaryMetadata(BaseModel):
         return {viewpoint.split("_")[0] for viewpoint in self.viewpoints}
 
 
-class SimBotAuxiliaryMetadataAction(SimBotAuxiliaryMetadata):
+class SimBotAuxiliaryMetadataPayload(SimBotAuxiliaryMetadata):
     """SimBot Action for the game metadata, which automatically parses it.
 
     When loading this class, it assumes that the auxiliary metadata file is available for parsing,
@@ -100,7 +100,7 @@ class SimBotAuxiliaryMetadataAction(SimBotAuxiliaryMetadata):
     uri: SimBotAuxiliaryMetadataUri
 
     @classmethod
-    def from_efs_uri(cls, uri: str) -> "SimBotAuxiliaryMetadataAction":
+    def from_efs_uri(cls, uri: str) -> "SimBotAuxiliaryMetadataPayload":
         """Instantiate the action from just the EFS URI."""
         values_dict = cls.load_game_metadata_file(values={"uri": uri})
         return cls(**values_dict)

@@ -2,55 +2,55 @@ from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, PositiveFloat, validator
 
-from emma_experience_hub.datamodels.simbot.actions.object_interaction import (
-    SimBotObjectInteractionObjectAction,
+from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
+    SimBotObjectInteractionPayload,
 )
 
 
-class SimBotGotoObjectAction(SimBotObjectInteractionObjectAction):
+class SimBotGotoObjectPayload(SimBotObjectInteractionPayload):
     """SimBot action for going to an object."""
 
 
-class SimBotGotoRoomAction(BaseModel):
+class SimBotGotoRoomPayload(BaseModel):
     """SimBot action for going to a room."""
 
     office_room: str = Field(..., alias="officeRoom")
 
 
-class SimBotGotoViewpointAction(BaseModel):
+class SimBotGotoViewpointPayload(BaseModel):
     """SimBot action for navigating to a specific viewpoint."""
 
     go_to_point: str = Field(..., alias="goToPoint")
 
 
-class SimBotGotoAction(BaseModel):
+class SimBotGotoPayload(BaseModel):
     """SimBot Goto action."""
 
-    object: Union[SimBotGotoObjectAction, SimBotGotoRoomAction, SimBotGotoViewpointAction]
+    object: Union[SimBotGotoObjectPayload, SimBotGotoRoomPayload, SimBotGotoViewpointPayload]
 
 
-class SimBotLowLevelNavigationAction(BaseModel):
+class SimBotNavigationPayload(BaseModel):
     """Base class for SimBot low-level navigation actions."""
 
     direction: Literal["Forward", "Backward", "Left", "Right", "Up", "Down", "Around"]
     magnitude: PositiveFloat
 
 
-class SimbotMoveAction(SimBotLowLevelNavigationAction):
+class SimbotMovePayload(SimBotNavigationPayload):
     """SimBot action for walking forwards or backwards."""
 
     direction: Literal["Forward", "Backward"]
     magnitude: PositiveFloat
 
 
-class SimBotRotateAction(SimBotLowLevelNavigationAction):
+class SimBotRotatePayload(SimBotNavigationPayload):
     """SimBot action for rotating on the spot (changing heading)."""
 
     direction: Literal["Right", "Left"]
     magnitude: PositiveFloat = Field(min=0, max=359.0, help="Rotation degrees")  # noqa: WPS432
 
 
-class SimBotLookAction(SimBotLowLevelNavigationAction):
+class SimBotLookPayload(SimBotNavigationPayload):
     """SimBot action for looking up and down and around.
 
     For the around action, magnitude should always be set to 100.0. It returns four color images
@@ -61,7 +61,7 @@ class SimBotLookAction(SimBotLowLevelNavigationAction):
     magnitude: PositiveFloat = Field(min=0, max=100, help="Rotation degrees")
 
     @classmethod
-    def create_look_around(cls) -> "SimBotLookAction":
+    def create_look_around(cls) -> "SimBotLookPayload":
         """Create a look around action."""
         return cls(direction="Around", magnitude=100)
 

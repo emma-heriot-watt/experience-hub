@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction
+from emma_experience_hub.datamodels.simbot import SimBotAction
 
 
 class SimBotResponse(BaseModel):
