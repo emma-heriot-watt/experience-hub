@@ -36,9 +36,9 @@
 #   description: Extra attention is needed
 #   color: 95FFA4
 
-# - name: question
-#   description: Further information is requested
-#   color: EE328E
+- name: question
+  description: Further information is requested
+  color: EE328E
 
 # ------------------------------- Improvements ------------------------------- #
 # - name: performance
