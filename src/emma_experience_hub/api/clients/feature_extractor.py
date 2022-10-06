@@ -8,6 +8,7 @@ from numpy.typing import ArrayLike
 from PIL import Image
 from pydantic import AnyHttpUrl
 
+from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 
@@ -15,16 +16,16 @@ from emma_experience_hub.datamodels import EmmaExtractedFeatures
 logger = get_logger("feature_extractor_client")
 
 
-class FeatureExtractorClient:
+class FeatureExtractorClient(Client):
     """API Client for sending requests to the feature extractor server."""
 
     def __init__(
         self,
-        feature_extractor_server_endpoint: AnyHttpUrl,
+        server_endpoint: AnyHttpUrl,
         _single_image_post_arg_name: str = "input_file",
         _multiple_images_post_arg_name: str = "images",
     ) -> None:
-        self._endpoint = feature_extractor_server_endpoint
+        self._endpoint = server_endpoint
 
         # TODO: Is there a better way to store these links?
         self._healthcheck_endpoint = f"{self._endpoint}/ping"
@@ -43,7 +44,7 @@ class FeatureExtractorClient:
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as err:
-            logger.exception(err)
+            logger.exception(err, exc_info=err)
             return False
 
         return True
@@ -76,10 +77,8 @@ class FeatureExtractorClient:
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(err)
-
-            # TODO: Is this the best way to handle an error here?
-            raise SystemExit(err)
+            logger.exception(err, exc_info=err)
+            raise err from None
 
         # Process the response
         raw_response_data: dict[str, ArrayLike] = response.json()
@@ -112,9 +111,7 @@ class FeatureExtractorClient:
             response.raise_for_status()
         except httpx.HTTPError as err:
             logger.exception(err)
-
-            # TODO: Is this the best way to handle an error here?
-            raise SystemExit(err)
+            raise err from None
 
         # Process the response
         raw_response_data: list[dict[str, ArrayLike]] = response.json()

@@ -1,1 +1,6 @@
-from emma_experience_hub.datamodels.emma import EmmaExtractedFeatures
+from emma_experience_hub.datamodels.emma import (
+    DialogueUtterance,
+    EmmaExtractedFeatures,
+    EmmaPolicyRequest,
+    EnvironmentStateTurn,
+)

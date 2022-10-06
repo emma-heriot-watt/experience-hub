@@ -4,7 +4,7 @@ from pathlib import Path
 from pytest_cases import fixture
 
 
-@fixture
+@fixture(scope="session")
 def simbot_fixtures_root(fixtures_root: Path) -> Path:
     """Path to the SimBot fixtures."""
     return fixtures_root.joinpath("simbot/")

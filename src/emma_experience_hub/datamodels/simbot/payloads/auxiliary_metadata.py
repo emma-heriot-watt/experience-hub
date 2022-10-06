@@ -1,3 +1,4 @@
+import logging
 from base64 import b64decode
 from io import BytesIO
 from pathlib import Path
@@ -7,11 +8,8 @@ import orjson
 from PIL import Image
 from pydantic import AnyUrl, BaseModel, Field, FilePath, root_validator
 
-from emma_experience_hub.common import get_logger
 from emma_experience_hub.common.settings import SimBotSettings
-
-
-log = get_logger()
+from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
 
 
 class SimBotAuxiliaryMetadataUri(AnyUrl):
@@ -80,7 +78,7 @@ class SimBotAuxiliaryMetadata(BaseModel):
         we can do this.
         """
         if len(self.robot_info) > 1:
-            log.warning("There is more than one `current_room` within the `robotInfo` field")
+            logging.warning("There is more than one `current_room` within the `robotInfo` field")
 
         return next(iter(self.robot_info)).current_room
 
@@ -90,7 +88,7 @@ class SimBotAuxiliaryMetadata(BaseModel):
         return {viewpoint.split("_")[0] for viewpoint in self.viewpoints}
 
 
-class SimBotAuxiliaryMetadataPayload(SimBotAuxiliaryMetadata):
+class SimBotAuxiliaryMetadataPayload(SimBotPayload, SimBotAuxiliaryMetadata):
     """SimBot Action for the game metadata, which automatically parses it.
 
     When loading this class, it assumes that the auxiliary metadata file is available for parsing,
@@ -109,9 +107,17 @@ class SimBotAuxiliaryMetadataPayload(SimBotAuxiliaryMetadata):
     @classmethod
     def load_game_metadata_file(cls, values: dict[str, Any]) -> dict[str, Any]:  # noqa: WPS110
         """Load the game metadata from the file to fill in the remaining fields."""
+        uri = values.get("uri")
+        if uri is None:
+            raise AssertionError("URI for the metadata file does not exist.")
+
         # Convert the EFS URi to a full path
-        efs_uri = SimBotAuxiliaryMetadataUri(url=values.get("uri"), scheme="efs")
-        metadata_path = efs_uri.resolve_path(SimBotSettings().auxiliary_metadata_dir)
+        efs_uri = (
+            uri
+            if isinstance(uri, SimBotAuxiliaryMetadataUri)
+            else SimBotAuxiliaryMetadataUri(url=str(uri), scheme="efs")
+        )
+        metadata_path = efs_uri.resolve_path(SimBotSettings.from_env().auxiliary_metadata_dir)
 
         # Load the raw metadata and update the values dict
         raw_metadata: dict[str, Any] = orjson.loads(metadata_path.read_bytes())

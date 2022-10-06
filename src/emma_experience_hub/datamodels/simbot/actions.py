@@ -1,7 +1,5 @@
-from collections.abc import Mapping
 from enum import Enum
-from types import MappingProxyType
-from typing import Any, Literal, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
@@ -9,115 +7,194 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotDialogPayload,
     SimBotGotoPayload,
+    SimBotLookAroundPayload,
+    SimBotLookDownPayload,
     SimBotLookPayload,
-    SimbotMovePayload,
-    SimBotNavigationPayload,
+    SimBotLookUpPayload,
+    SimBotMoveBackwardPayload,
+    SimBotMoveForwardPayload,
+    SimBotMovePayload,
     SimBotObjectInteractionPayload,
+    SimBotPayload,
+    SimBotRotateLeftPayload,
     SimBotRotatePayload,
+    SimBotRotateRightPayload,
     SimBotSpeechRecognitionPayload,
 )
 
 
-# List of action types, taken from the example inference server
-SimBotNavigationActionType = Literal[
-    "Goto",
-    "Move",
-    "Rotate",
-    "Look",
-    # "CameraChange",
-]
-SimBotObjectInteractionActionType = Literal[
-    "Pickup",
-    "Open",
-    "Close",
-    "Break",
-    "Scan",
-    "Examine",
-    "Place",
-    "Pour",
-    "Toggle",
-    "Fill",
-    "Clean",
-    # "Burn",
-    # "Slice",
-    # "Throw",
-    # "Use",
-]
-SimBotLanguageActionType = Literal["Dialog", "SpeechRecognition"]
-SimBotOtherActionType = Literal["GameMetaData"]
+class SimBotActionType(Enum):
+    """All action types from the SimBot Arena."""
 
-SimBotActionType = Literal[
-    SimBotNavigationActionType,
-    SimBotObjectInteractionActionType,
-    SimBotLanguageActionType,
-    SimBotOtherActionType,
-]
+    # Navigation
+    Goto = "goto"  # noqa: WPS115
+    Move = "move"  # noqa: WPS115
+    Rotate = "rotation"  # noqa: WPS115
+    Look = "look"  # noqa: WPS115
+    # CameraChange = "camerachange"
 
-SIMBOT_ACTION_TYPE_TO_KEY_MAPPING: Mapping[SimBotActionType, str] = MappingProxyType(
-    {
-        # Sensors
-        "SpeechRecognition": "recognition",
-        "GameMetaData": "metaData",
-        # Dialog
-        "Dialog": "dialog",
-        # Navigation
-        "Goto": "goto",
-        "Move": "move",
-        "Rotate": "rotation",
-        "Look": "look",
-        # Object interaction
-        "Pickup": "pickup",
-        "Open": "open",
-        "Close": "close",
-        "Break": "break",
-        "Scan": "scan",
-        "Examine": "examine",
-        "Place": "place",
-        "Pour": "pour",
-        "Toggle": "toggle",
-        "Fill": "fill",
-        "Clean": "clean",
-    }
-)
+    # Navigation Aliases (commonly used action types)
+    MoveForward = "move forward"  # noqa: WPS115
+    MoveBackward = "move backward"  # noqa: WPS115
+    RotateLeft = "rotate left"  # noqa: WPS115
+    RotateRight = "rotate right"  # noqa: WPS115
+    LookUp = "look up"  # noqa: WPS115
+    LookDown = "look down"  # noqa: WPS115
+    LookAround = "look around"  # noqa: WPS115
 
-SimBotPayload = Union[
-    SimBotSpeechRecognitionPayload,
-    SimBotAuxiliaryMetadataPayload,
-    SimBotDialogPayload,
-    SimBotGotoPayload,
-    SimbotMovePayload,
-    SimBotRotatePayload,
-    SimBotLookPayload,
-    SimBotObjectInteractionPayload,
-    SimBotNavigationPayload,
-]
+    # Object interaction
+    Pickup = "pickup"  # noqa: WPS115
+    Open = "open"  # noqa: WPS115
+    Close = "close"  # noqa: WPS115
+    Break = "break"  # noqa: WPS115
+    Scan = "scan"  # noqa: WPS115
+    Examine = "examine"  # noqa: WPS115
+    Place = "place"  # noqa: WPS115
+    Pour = "pour"  # noqa: WPS115
+    Toggle = "toggle"  # noqa: WPS115
+    Fill = "fill"  # noqa: WPS115
+    Clean = "clean"  # noqa: WPS115
+    # Burn = "burn"
+    # Slice = "slice"
+    # Throw = "throw"
+    # Use = "use"
 
-SimBotActionTypePayloadModelMap: Mapping[SimBotActionType, type[SimBotPayload]] = MappingProxyType(
-    {
-        # Sensors
-        "SpeechRecognition": SimBotSpeechRecognitionPayload,
-        "GameMetaData": SimBotAuxiliaryMetadataPayload,
-        # Dialog
-        "Dialog": SimBotDialogPayload,
-        # Navigation
-        "Goto": SimBotGotoPayload,
-        "Move": SimbotMovePayload,
-        "Rotate": SimBotRotatePayload,
-        "Look": SimBotLookPayload,
-        # Object interaction
-        "Pickup": SimBotObjectInteractionPayload,
-        "Open": SimBotObjectInteractionPayload,
-        "Close": SimBotObjectInteractionPayload,
-        "Break": SimBotObjectInteractionPayload,
-        "Scan": SimBotObjectInteractionPayload,
-        "Examine": SimBotObjectInteractionPayload,
-        "Place": SimBotObjectInteractionPayload,
-        "Pour": SimBotObjectInteractionPayload,
-        "Toggle": SimBotObjectInteractionPayload,
-        "Fill": SimBotObjectInteractionPayload,
-        "Clean": SimBotObjectInteractionPayload,
-    }
-)
+    # Language
+    Dialog = "dialog"  # noqa: WPS115
+    SpeechRecognition = "recognition"  # noqa: WPS115
+
+    # Other
+    GameMetaData = "metaData"  # noqa: WPS115
+
+    @classmethod
+    def navigation(cls) -> list["SimBotActionType"]:
+        """Get all navigation action types from the SimBot Arena."""
+        return [
+            SimBotActionType.Goto,
+            SimBotActionType.Move,
+            SimBotActionType.Rotate,
+            SimBotActionType.Look,
+            SimBotActionType.MoveForward,
+            SimBotActionType.MoveBackward,
+            SimBotActionType.RotateLeft,
+            SimBotActionType.RotateRight,
+            SimBotActionType.LookUp,
+            SimBotActionType.LookDown,
+            SimBotActionType.LookAround,
+        ]
+
+    @classmethod
+    def low_level_navigation(cls) -> list["SimBotActionType"]:
+        """Get all the low-level navigation action types.
+
+        All of these have pre-instantiated payloads too.
+        """
+        return [
+            SimBotActionType.MoveForward,
+            SimBotActionType.MoveBackward,
+            SimBotActionType.RotateLeft,
+            SimBotActionType.RotateRight,
+            SimBotActionType.LookUp,
+            SimBotActionType.LookDown,
+            SimBotActionType.LookAround,
+        ]
+
+    @classmethod
+    def object_interaction(cls) -> list["SimBotActionType"]:
+        """Get all object interaction action types from the SimBot Arena."""
+        return [
+            SimBotActionType.Pickup,
+            SimBotActionType.Open,
+            SimBotActionType.Close,
+            SimBotActionType.Break,
+            SimBotActionType.Scan,
+            SimBotActionType.Examine,
+            SimBotActionType.Place,
+            SimBotActionType.Pour,
+            SimBotActionType.Toggle,
+            SimBotActionType.Fill,
+            SimBotActionType.Clean,
+        ]
+
+    @classmethod
+    def language(cls) -> list["SimBotActionType"]:
+        """Get all language action types from the SimBot Arena."""
+        return [SimBotActionType.Dialog, SimBotActionType.SpeechRecognition]
+
+    @classmethod
+    def action_type_to_payload_model(cls) -> dict[str, type[SimBotPayload]]:
+        """Get a map from each action type to the payload model."""
+        switcher: dict[str, type[SimBotPayload]] = {
+            # Sensors
+            "SpeechRecognition": SimBotSpeechRecognitionPayload,
+            "GameMetaData": SimBotAuxiliaryMetadataPayload,
+            # Dialog
+            "Dialog": SimBotDialogPayload,
+            # Navigation
+            "Goto": SimBotGotoPayload,
+            "Move": SimBotMovePayload,
+            "Rotate": SimBotRotatePayload,
+            "Look": SimBotLookPayload,
+            # Navigation Aliases
+            "MoveForward": SimBotMoveForwardPayload,
+            "MoveBackward": SimBotMoveBackwardPayload,
+            "RotateLeft": SimBotRotateLeftPayload,
+            "RotateRight": SimBotRotateRightPayload,
+            "LookUp": SimBotLookUpPayload,
+            "LookDown": SimBotLookDownPayload,
+            "LookAround": SimBotLookAroundPayload,
+            # Object interaction
+            "Pickup": SimBotObjectInteractionPayload,
+            "Open": SimBotObjectInteractionPayload,
+            "Close": SimBotObjectInteractionPayload,
+            "Break": SimBotObjectInteractionPayload,
+            "Scan": SimBotObjectInteractionPayload,
+            "Examine": SimBotObjectInteractionPayload,
+            "Place": SimBotObjectInteractionPayload,
+            "Pour": SimBotObjectInteractionPayload,
+            "Toggle": SimBotObjectInteractionPayload,
+            "Fill": SimBotObjectInteractionPayload,
+            "Clean": SimBotObjectInteractionPayload,
+        }
+        return switcher
+
+    @classmethod
+    def move_actions(cls) -> set["SimBotActionType"]:
+        """Return all the move forward actions."""
+        return {SimBotActionType.MoveForward, SimBotActionType.MoveBackward}
+
+    @classmethod
+    def look_actions(cls) -> set["SimBotActionType"]:
+        """Return all the look actions."""
+        return {
+            SimBotActionType.LookAround,
+            SimBotActionType.LookDown,
+            SimBotActionType.LookUp,
+        }
+
+    @classmethod
+    def rotate_actions(cls) -> set["SimBotActionType"]:
+        """Return all the rotate actions."""
+        return {SimBotActionType.RotateLeft, SimBotActionType.RotateRight}
+
+    @property
+    def base_type(self) -> "SimBotActionType":
+        """Given a specific type, returns the base Simbot action type."""
+        if self in self.move_actions():
+            return SimBotActionType.Move
+
+        if self in self.look_actions():
+            return SimBotActionType.Look
+
+        if self in self.rotate_actions():
+            return SimBotActionType.Rotate
+
+        return self
+
+    @property
+    def payload_model(self) -> type[SimBotPayload]:
+        """Get the corresponding payload for the SimBot action type."""
+        return self.action_type_to_payload_model()[self.name]
 
 
 class SimBotActionStatusType(Enum):
@@ -146,11 +223,6 @@ class SimBotActionStatusType(Enum):
         """Create a reversed mapping of the enum."""
         return {element.value: element.name for element in cls}
 
-    @classmethod
-    def from_value(cls, value: str) -> "SimBotActionStatusType":  # noqa: WPS110
-        """Instantiate the enum from the value of the enum."""
-        return cls[cls.reverse_mapping()[value]]
-
 
 class SimBotActionStatus(BaseModel):
     """Status of the previous action taken."""
@@ -168,16 +240,15 @@ class SimBotActionStatus(BaseModel):
         If the error type is one of the enum values, convert it to the correct enum name so that it
         will parse properly.
         """
-        reverse_mapping = SimBotActionStatusType.reverse_mapping()
-
-        correct_error_type = (
-            error_type if error_type in reverse_mapping else reverse_mapping[error_type]
+        error_type = (
+            error_type
+            if error_type in SimBotActionStatusType.__members__.keys()
+            else SimBotActionStatusType(error_type).name
         )
+        return error_type
 
-        return correct_error_type
 
-
-class SimBotAction(BaseModel, extra="allow"):
+class SimBotAction(BaseModel):
     """Common SimBot Action which can parse the fields into the specific actions.
 
     To instantiate the action manually (without using the helper parsers), provide the action
@@ -192,20 +263,39 @@ class SimBotAction(BaseModel, extra="allow"):
     payload: SimBotPayload = Field(..., exclude=True)
     status: Optional[SimBotActionStatus] = None
 
+    class Config:
+        """Config for the model."""
+
+        extra = "allow"
+        json_encoders = {
+            SimBotActionType: lambda action_type: action_type.name,
+        }
+
     @root_validator(pre=True)
     @classmethod
     def check_payload_exists_for_all_necessary_keys(
         cls, values: dict[str, Any]  # noqa: WPS110
     ) -> dict[str, Any]:
         """Check the payload for the stated action type exist."""
-        # Get the action type
-        action_type = values["type"]
+        raw_action_type = values.get("type")
+
+        if isinstance(raw_action_type, SimBotActionType):
+            action_type = raw_action_type
+        elif isinstance(raw_action_type, str):
+            try:
+                action_type = SimBotActionType[raw_action_type]
+            except KeyError:
+                action_type = SimBotActionType(raw_action_type)
+        else:
+            raise AssertionError("Unknown action type")
 
         # Get the correct key for the action payload
-        payload_key = SIMBOT_ACTION_TYPE_TO_KEY_MAPPING[action_type]
+        payload_key = action_type.value.strip()
 
         # Get the payload from either the `payload` field or the field for the payload_key
-        payload = values.get("payload", values.get(payload_key))
+        payload: Union[SimBotPayload, dict[str, Any], None] = values.get(
+            "payload", values.get(payload_key)
+        )
 
         if payload is None:
             raise AssertionError(
@@ -216,9 +306,11 @@ class SimBotAction(BaseModel, extra="allow"):
         # Parse the payload into the correct instance if necessary
         parsed_payload = (
             payload
-            if isinstance(payload, BaseModel)
-            else SimBotActionTypePayloadModelMap[action_type].parse_obj(values[payload_key])
+            if isinstance(payload, SimBotPayload)
+            else action_type.payload_model.parse_obj(payload)
         )
+
+        values["type"] = action_type
 
         # Set the payload for both the fields
         values[payload_key] = parsed_payload

@@ -1,7 +1,6 @@
+from emma_experience_hub.api.clients.client import Client
+from emma_experience_hub.api.clients.dynamo_db import DynamoDbClient
+from emma_experience_hub.api.clients.emma_policy import EmmaPolicyClient
 from emma_experience_hub.api.clients.feature_extractor import FeatureExtractorClient
-from emma_experience_hub.api.clients.simbot import (
-    SimBotAuxiliaryMetadataS3Client,
-    SimBotCacheClient,
-    SimBotExtractedFeaturesFileSystemClient,
-)
-from emma_experience_hub.api.clients.simbot_session_db import SimBotSessionDbClient
+from emma_experience_hub.api.clients.profanity_filter import ProfanityFilterClient
+from emma_experience_hub.api.clients.utterance_generator import UtteranceGeneratorClient

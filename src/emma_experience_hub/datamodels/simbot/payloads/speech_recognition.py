@@ -2,6 +2,8 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
+from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
+
 
 class SimBotSpeechRecognitionConfidenceBin(Enum):
     """Bins for the confidence levels from the ASR output."""
@@ -25,7 +27,7 @@ class SimBotSpeechRecognitionToken(BaseModel):
     confidence: SimBotSpeechRecognitionConfidence
 
 
-class SimBotSpeechRecognitionPayload(BaseModel):
+class SimBotSpeechRecognitionPayload(SimBotPayload):
     """Soeech Recognition action from the sensors."""
 
     _token_delimiter: str = " "

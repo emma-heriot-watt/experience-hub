@@ -46,7 +46,7 @@ class SimBotRequest(BaseModel, extra="allow"):
         """Easily get the game metadata."""
         return cast(
             SimBotAuxiliaryMetadataPayload,
-            self._easily_get_action_from_sensors("GameMetaData").payload,
+            self._easily_get_action_from_sensors(SimBotActionType.GameMetaData).payload,
         )
 
     @property
@@ -54,7 +54,7 @@ class SimBotRequest(BaseModel, extra="allow"):
         """Easily get the speech recognition action."""
         return cast(
             SimBotSpeechRecognitionPayload,
-            self._easily_get_action_from_sensors("SpeechRecognition").payload,
+            self._easily_get_action_from_sensors(SimBotActionType.SpeechRecognition).payload,
         )
 
     def _easily_get_action_from_sensors(self, action_type: SimBotActionType) -> SimBotAction:

@@ -1,0 +1,2 @@
+PREDICTED_ACTION_DELIMITER = "."
+MODEL_EOS_TOKEN = "</s>"  # noqa: S105

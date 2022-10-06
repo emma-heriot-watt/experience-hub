@@ -42,6 +42,27 @@ target "base-poetry" {
   }
 }
 
+target "profanity-filter" {
+  dockerfile = "docker/profanity-filter.Dockerfile"
+  tags       = ["${IMAGE_NAME}:profanity-filter"]
+
+  args = {
+    IMAGE_BASE_NAME    = "${IMAGE_NAME}"
+    REMOTE_REPO_URL    = "https://github.com/emma-simbot/profanity-filter"
+    REMOTE_REPO_BRANCH = "master"
+  }
+}
+
+target "nlg" {
+  dockerfile = "docker/emma-nlg.Dockerfile"
+  tags       = ["${IMAGE_NAME}:nlg"]
+
+  args = {
+    IMAGE_BASE_NAME    = "${IMAGE_NAME}"
+    REMOTE_REPO_URL    = "https://github.com/emma-simbot/nlg"
+    REMOTE_REPO_BRANCH = "main"
+  }
+}
 
 group "emma-modules" {
   targets = ["emma-perception", "emma-policy"]

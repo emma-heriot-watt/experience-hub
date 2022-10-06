@@ -55,7 +55,7 @@ def build_emma(
         "base-poetry",
         "emma-perception",
         "emma-policy",
-        "emma-full",
+        # "emma-full",
     ]
 
     for image_target in images_to_build:

@@ -1,0 +1,3 @@
+from emma_experience_hub.pipelines.simbot.nlu import SimBotNLUPipeline
+from emma_experience_hub.pipelines.simbot.request_processing import SimBotRequestProcessingPipeline
+from emma_experience_hub.pipelines.simbot.response_generator import SimBotResponseGeneratorPipeline

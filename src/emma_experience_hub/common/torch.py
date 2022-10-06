@@ -1,14 +1,9 @@
+import logging
 import subprocess
 from decimal import Decimal
 from typing import Optional
 
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.common.settings import Settings
-
-
-log = get_logger()
-
-settings = Settings()
 
 
 def is_cuda_available() -> bool:
@@ -27,7 +22,7 @@ def get_torch_version() -> tuple[str, Optional[str]]:
 
     version = torch.__version__
 
-    log.info(f"Current `torch` verison: {version}")
+    logging.info(f"Current `torch` verison: {version}")
 
     if "+" not in version:
         return version, None
@@ -41,6 +36,8 @@ def get_supported_cuda_version() -> Decimal:
     NVIDIA-SMI seems to be the most consistent version display, so needed to use subprocess to get
     it out.
     """
+    settings = Settings.from_env()
+
     nvidia_smi_process = subprocess.Popen(
         ["nvidia-smi"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
@@ -51,10 +48,10 @@ def get_supported_cuda_version() -> Decimal:
     cuda_version_list = list(filter(None, cuda_version_line.split(" ")))
     cuda_version = float(cuda_version_list[-2])
 
-    log.info(f"Supported CUDA version: {cuda_version}")
+    logging.info(f"Supported CUDA version: {cuda_version}")
 
     if settings.cuda_version_upper_bound < cuda_version:
-        log.warning(
+        logging.warning(
             f"CUDA version is lower than {settings.cuda_version_upper_bound}. ",
             f"Setting CUDA version to {cuda_version}.",
         )

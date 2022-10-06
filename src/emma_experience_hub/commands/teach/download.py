@@ -163,7 +163,7 @@ def _get_available_images_for_edh_instance(
                 instance=edh_instance_id.split(".")[0],
             ),
         )["Contents"]
-        if "driver" in image_prefix["Key"]
+        if "Key" in image_prefix and "driver" in image_prefix["Key"]
     )
 
     # Filter out images which already exist

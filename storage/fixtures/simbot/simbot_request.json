@@ -1,0 +1,44 @@
+{
+	"header": {
+		"predictionRequestId": "21b68cbe-3f3b-11ed-b878-0242ac120002",
+		"sessionId": "amzn1.echo-api.session.1f12bb8c-20eb-4a09-be31-b752f80235d8_3"
+	},
+	"request": {
+		"sensors": [
+			{
+				"type": "SpeechRecognition",
+				"recognition": {
+					"tokens": [
+						{
+							"value": "pick",
+							"confidence": { "score": 0.98, "bin": "HIGH" }
+						},
+						{
+							"value": "up",
+							"confidence": { "score": 0.98, "bin": "HIGH" }
+						},
+						{
+							"value": "the",
+							"confidence": { "score": 0.98, "bin": "HIGH" }
+						},
+						{
+							"value": "cereal",
+							"confidence": { "score": 0.98, "bin": "HIGH" }
+						},
+						{
+							"value": "box",
+							"confidence": { "score": 0.98, "bin": "HIGH" }
+						}
+					]
+				}
+			},
+			{
+				"type": "GameMetaData",
+				"metaData": {
+					"uri": "efs://amzn1.echo-api.session.1f12bb8c-20eb-4a09-be31-b752f80235d8_3/36828c5e53ef4d63ae9b9fb4e9aabf5e_metadata.json"
+				}
+			}
+		],
+		"previousActions": []
+	}
+}

@@ -109,7 +109,7 @@ class SummaryMetrics(BaseModel):
             num_trials=num_trials,
             completed_goal_conditions=completed_goal_conditions,
             total_goal_conditions=total_goal_conditions,
-            total_path_length=total_path_length,
+            # total_path_length=total_path_length,
             plw_success_rate=plw_success_rate,
             plw_goal_condition_success_rate=plw_goal_condition_success_rate,
         )

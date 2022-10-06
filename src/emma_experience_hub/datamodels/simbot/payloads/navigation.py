@@ -1,46 +1,59 @@
 from typing import Any, Literal, Union
 
-from pydantic import BaseModel, Field, PositiveFloat, validator
+from pydantic import Field, PositiveFloat, validator
 
 from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
-    SimBotObjectInteractionPayload,
+    SimBotInteractionObject,
 )
+from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
 
 
-class SimBotGotoObjectPayload(SimBotObjectInteractionPayload):
+class SimBotGotoObjectPayload(SimBotInteractionObject):
     """SimBot action for going to an object."""
 
 
-class SimBotGotoRoomPayload(BaseModel):
+class SimBotGotoRoomPayload(SimBotPayload):
     """SimBot action for going to a room."""
 
     office_room: str = Field(..., alias="officeRoom")
 
 
-class SimBotGotoViewpointPayload(BaseModel):
+class SimBotGotoViewpointPayload(SimBotPayload):
     """SimBot action for navigating to a specific viewpoint."""
 
     go_to_point: str = Field(..., alias="goToPoint")
 
 
-class SimBotGotoPayload(BaseModel):
+class SimBotGotoPayload(SimBotPayload, smart_union=True):
     """SimBot Goto action."""
 
     object: Union[SimBotGotoObjectPayload, SimBotGotoRoomPayload, SimBotGotoViewpointPayload]
 
 
-class SimBotNavigationPayload(BaseModel):
+class SimBotNavigationPayload(SimBotPayload):
     """Base class for SimBot low-level navigation actions."""
 
     direction: Literal["Forward", "Backward", "Left", "Right", "Up", "Down", "Around"]
     magnitude: PositiveFloat
 
 
-class SimbotMovePayload(SimBotNavigationPayload):
+class SimBotMovePayload(SimBotNavigationPayload):
     """SimBot action for walking forwards or backwards."""
 
     direction: Literal["Forward", "Backward"]
-    magnitude: PositiveFloat
+    magnitude: PositiveFloat = 30
+
+
+class SimBotMoveForwardPayload(SimBotMovePayload):
+    """SimBot action for moving forwards."""
+
+    direction: Literal["Forward"] = "Forward"
+
+
+class SimBotMoveBackwardPayload(SimBotMovePayload):
+    """SimBot action for moving backwards."""
+
+    direction: Literal["Backward"] = "Backward"
 
 
 class SimBotRotatePayload(SimBotNavigationPayload):
@@ -48,6 +61,26 @@ class SimBotRotatePayload(SimBotNavigationPayload):
 
     direction: Literal["Right", "Left"]
     magnitude: PositiveFloat = Field(min=0, max=359.0, help="Rotation degrees")  # noqa: WPS432
+
+
+class SimBotRotateLeftPayload(SimBotRotatePayload):
+    """SimBot action for rotating left.
+
+    Defaults to 90deg turn.
+    """
+
+    direction: Literal["Left"] = "Left"
+    magnitude: PositiveFloat = 90
+
+
+class SimBotRotateRightPayload(SimBotRotatePayload):
+    """SimBot action for rotating right.
+
+    Defaults to 90deg turn.
+    """
+
+    direction: Literal["Right"] = "Right"
+    magnitude: PositiveFloat = 90
 
 
 class SimBotLookPayload(SimBotNavigationPayload):
@@ -59,11 +92,6 @@ class SimBotLookPayload(SimBotNavigationPayload):
 
     direction: Literal["Up", "Down", "Around"]
     magnitude: PositiveFloat = Field(min=0, max=100, help="Rotation degrees")
-
-    @classmethod
-    def create_look_around(cls) -> "SimBotLookPayload":
-        """Create a look around action."""
-        return cls(direction="Around", magnitude=100)
 
     @validator("magnitude")
     @classmethod
@@ -84,3 +112,33 @@ class SimBotLookPayload(SimBotNavigationPayload):
             return magnitude
 
         raise AssertionError("Magnitude is not valid. It should be within (0,60) for up/down.")
+
+
+class SimBotLookUpPayload(SimBotLookPayload):
+    """SimBot payload for looking up.
+
+    Default to 30 degrees.
+    """
+
+    direction: Literal["Up"] = "Up"
+    magnitude: PositiveFloat = 30
+
+
+class SimBotLookDownPayload(SimBotLookPayload):
+    """SimBot payload for looking down.
+
+    Default to 30 degrees.
+    """
+
+    direction: Literal["Down"] = "Down"
+    magnitude: PositiveFloat = 30
+
+
+class SimBotLookAroundPayload(SimBotLookPayload):
+    """SimBot payload for looking around.
+
+    Default to 100 degrees field of view
+    """
+
+    direction: Literal["Around"] = "Around"
+    magnitude: PositiveFloat = 100

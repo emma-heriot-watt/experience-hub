@@ -1,11 +1,6 @@
-from concurrent.futures import ThreadPoolExecutor
-
-from emma_experience_hub.api.clients import (
-    FeatureExtractorClient,
-    SimBotCacheClient,
-    SimBotSessionDbClient,
-)
-from emma_experience_hub.common import get_logger
+from emma_experience_hub.api.clients import FeatureExtractorClient
+from emma_experience_hub.api.clients.simbot import SimBotCacheClient, SimBotSessionDbClient
+from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotActionStatus,
@@ -16,10 +11,10 @@ from emma_experience_hub.datamodels.simbot import (
 from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
 
 
-log = get_logger()
+logger = get_logger()
 
 
-class RequestProcessingPipeline:
+class SimBotRequestProcessingPipeline:
     """Process the incoming requests and build the session data."""
 
     def __init__(
@@ -52,6 +47,7 @@ class RequestProcessingPipeline:
         )
 
         # TODO: Does checking cached features exist for all frames lead cause a latency problem?
+        # How can we track the latency of the entire pipeline?
 
         # Check that frames have been extracted for all the turns
         self.validate_extracted_features_for_session(session_history)
@@ -74,18 +70,22 @@ class RequestProcessingPipeline:
         statuses.
         """
         if not action_status:
-            log.warning("Action status is empty. Doing nothing and retuning. ")
+            logger.warning(
+                "Previous action status is empty, therefore cannot update status of previous session turn. Moving on..."
+            )
             return
 
         if turn.actions is None:
-            log.error("The turn should have an action. Is this the right turn?")
+            logger.error("The turn should have an action. Is this the right turn?")
             return
 
         if len(turn.actions) != len(action_status):
-            log.error(
+            logger.error(
                 f"The number of actions with the turn is not equal to the number of statuses available. There are {len(turn.actions)} actions within the turn, but {len(action_status)} statuses."
             )
-            log.warning("Trying to match the available actions to the available statuses anyway.")
+            logger.warning(
+                "Trying to match the available actions to the available statuses anyway."
+            )
 
         # Update the action status for all the turns.
         for idx, status in enumerate(action_status):
@@ -96,8 +96,11 @@ class RequestProcessingPipeline:
 
     def validate_extracted_features_for_session(self, turns: list[SimBotSessionTurn]) -> None:
         """Check existance for all turns, and extract features if they do not exist."""
-        with ThreadPoolExecutor() as pool:
-            pool.map(self._validate_session_turn_features_are_cached, turns)
+        for turn in turns:
+            self._validate_session_turn_features_are_cached(turn)
+
+            # with ThreadPoolExecutor() as pool:
+        # pool.map(self._validate_session_turn_features_are_cached, turns)
 
     def _validate_session_turn_features_are_cached(self, turn: SimBotSessionTurn) -> bool:
         """Validate the session turn and ensure that the features are extracted and cached."""

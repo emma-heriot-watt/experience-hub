@@ -1,0 +1,190 @@
+x-logging: &default-logging
+  driver: loki
+  options:
+    loki-url: https://293100:eyJrIjoiOTFmZDdlZDA0YWQ1MDg5OGI0MTBlNjRjNmVmNjgzYmQyNzRjMTFhYyIsIm4iOiJTaW1Cb3RNZXRyaWNzUHVibGlzaGVyIiwiaWQiOjcxNjc2MX0=@logs-prod-008.grafana.net/loki/api/v1/push
+    loki-pipeline-stages: |
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}'
+          max_wait_time: 3s
+      - regex:
+          expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},d{3}) (?P<message>(?s:.*))$$'
+x-deploy-gpu: &deploy-gpu
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [gpu]
+
+x-model-volume: &model-volume
+  - type: bind
+    source: ../storage/models
+    target: /app/model
+
+version: "3.9"
+
+services:
+  promtail:
+    image: grafana/promtail:master
+    volumes:
+      - /var/log:/var/log
+      - /home/ubuntu/promtail:/etc/promtail
+    command: -config.file=/etc/promtail/config.yaml
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+
+  prometheus:
+    image: bitnami/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./etc/prometheus:/workspace
+    command:
+      - --config.file=/workspace/prometheus.yml
+      - --enable-feature=exemplar-storage
+    depends_on:
+      - loki
+    logging: *default-logging
+
+  tempo:
+    image: grafana/tempo:latest
+    command:
+      [
+        "--target=all",
+        "--storage.trace.backend=local",
+        "--storage.trace.local.path=/var/tempo",
+        "--auth.enabled=false",
+      ]
+    ports:
+      - "14250:14250"
+    depends_on:
+      - loki
+    logging: *default-logging
+
+  profanity_filter:
+    container_name: profanity_filter
+    image: heriot-watt/emma-simbot:profanity-filter
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/ping
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    ports:
+      - "5503:8000"
+    entrypoint: python -m
+    command:
+      - profanity_filter.web
+
+  utterance_generator:
+    container_name: utterance_generator
+    image: heriot-watt/emma-simbot:nlg
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:6000/ping
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    ports:
+      - "5504:6000"
+    entrypoint: python
+    command:
+      - src/emma_nlg/api/controllers/simbot.py
+
+  feature_extractor:
+    container_name: feature_extractor
+    image: heriot-watt/emma-simbot:perception
+    environment:
+      LOG_LEVEL: "debug"
+      DEVICE_ID: "0"
+      CLASSMAP_TYPE: "simbot"
+    ports:
+      - "5500:5500"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:5500/ping
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes: *model-volume
+    deploy: *deploy-gpu
+    entrypoint: python
+    command: src/emma_perception/commands/run_server.py --config_file "src/emma_perception/constants/vinvl_x152c4_simbot.yaml" MODEL.WEIGHT "/app/model/vinvl_vg_x152c4_simbot.pth" MODEL.ROI_HEADS.NMS_FILTER "1" MODEL.ROI_HEADS.SCORE_THRESH "0.2" TEST.IGNORE_BOX_REGRESSION "False"
+
+  intent_extractor:
+    container_name: intent_extractor
+    image: heriot-watt/emma-simbot:policy
+    environment:
+      LOG_LEVEL: debug
+      DEVICE: "cuda:0"
+      MODEL_NAME: "heriot-watt/emma-base"
+      MODEL_CHECKPOINT_PATH: "/app/model/nlu.ckpt"
+    ports:
+      - "5501:6000"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:6000/healthcheck
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes: *model-volume
+    deploy: *deploy-gpu
+    entrypoint: python
+    command: src/emma_policy/commands/run_simbot_nlu.py
+
+  instruction_predictor:
+    container_name: instruction_predictor
+    image: heriot-watt/emma-simbot:policy
+    environment:
+      LOG_LEVEL: debug
+      DEVICE: "cuda:0"
+      MODEL_CHECKPOINT_PATH: "/app/model/simbot_action.ckpt"
+    ports:
+      - "5502:6000"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:6000/healthcheck
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes: *model-volume
+    deploy: *deploy-gpu
+    entrypoint: python
+    command: src/emma_policy/commands/run_simbot_action_api.py
+
+  experience_hub:
+    container_name: experience_hub
+    image: heriot-watt/emma-simbot:experience
+    depends_on:
+      - feature_extractor
+      - intent_extractor
+      - instruction_predictor
+    ports:
+      - "5000:5000"
+    entrypoint:
+      - "/bin/bash"
+    command: uvicorn emma_experience_hub.api.controllers.simbot:app

@@ -1,58 +1,105 @@
-from starlite import Response, State, post
+import boto3
+import uvicorn
+from fastapi import FastAPI, Request, Response, status
+from loguru import logger
 
-from emma_experience_hub.api.clients import (
-    FeatureExtractorClient,
-    SimBotAuxiliaryMetadataS3Client,
-    SimBotExtractedFeaturesFileSystemClient,
+from emma_experience_hub.api.state.simbot import (
+    SimBotControllerClients,
+    SimBotControllerPipelines,
+    SimBotControllerState,
 )
+from emma_experience_hub.common.logging import setup_api_logging
 from emma_experience_hub.common.settings import Settings, SimBotSettings
-from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
-from emma_experience_hub.pipelines import RequestProcessingPipeline
+from emma_experience_hub.datamodels.simbot import SimBotRequest
+from emma_experience_hub.datamodels.simbot.response import SimBotResponse
 
 
-settings = Settings()
+settings = Settings.from_env()
+simbot_settings = SimBotSettings.from_env()
 
 
-def handle_application_startup(state: State) -> None:
+app = FastAPI(debug=True)
+
+# Create an empty version of the state that will not error massively on module load
+state: SimBotControllerState = SimBotControllerState.construct()  # type: ignore[call-arg]
+
+
+@app.on_event("startup")
+async def startup_event() -> None:
     """Handle the startup of the API."""
-    simbot_settings = SimBotSettings()
+    boto3.setup_default_session(profile_name=settings.aws_profile)
 
-    # Start all docker containers
+    clients = SimBotControllerClients.from_simbot_settings(simbot_settings)
+    pipelines = SimBotControllerPipelines.from_controller_clients(clients, simbot_settings)
 
-    # TODO: Start feature extractor API
+    if not clients.healthcheck():
+        # TODO: What to do here?
+        raise NotImplementedError
 
-    # TODO: Start NLU API server
+    state.settings = simbot_settings
+    state.clients = clients
+    state.pipelines = pipelines
 
-    # TODO: Start next action prediction server
-
-    # TODO: Ensure that they are all running
-
-    # TODO: Ensure that they are all accessible
-
-    # TODO: Create all the API pipelines
-    # API Clients
-    state.clients.feature_extractor = FeatureExtractorClient()
-    state.clients.auxiliary_metadata_cache = SimBotAuxiliaryMetadataS3Client(
-        bucket_name=simbot_settings.auxiliary_metadata_s3_bucket,
-        local_backup_root_path=simbot_settings.auxiliary_metadata_dir,
-    )
-    state.clients.extracted_features_cache = SimBotExtractedFeaturesFileSystemClient(
-        root_directory=simbot_settings.extracted_features_dir
-    )
-
-    # Create pipelines
-    state.pipelines.request_processing = RequestProcessingPipeline(
-        feature_extractor_client=state.clients.feature_extractor,
-        auxiliary_metadata_cache_client=state.clients.auxiliary_metadata_cache,
-        extracted_features_cache_client=state.clients.extracted_features_cache,
-    )
-
-    # TODO: Submit log that application is ready
+    logger.info("API for the SimBot Arena is ready.")
 
 
-@post("/predict")
-def handle_request(state: State, reuqest: SimBotRequest) -> Response[SimBotResponse]:
+@app.get("/ping", status_code=status.HTTP_200_OK)
+async def healthcheck(response: Response) -> str:
+    """Perform a healthcheck across all the clients."""
+    try:
+        state.healthcheck()
+    except Exception as err:
+        logger.exception("The API is not currently healthy", exc_info=err)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return "failed"
+
+    return "success"
+
+
+@app.post("/v1/predict", response_model=SimBotResponse)
+async def handle_request_from_simbot_arena(request: Request, response: Response) -> SimBotResponse:
     """Handle a new request from the SimBot API."""
-    response = SimBotResponse()
+    raw_request = await request.json()
 
-    return response.dict(by_alias=True)
+    logger.debug(f"Received request {raw_request}")
+    # Parse the request from the server
+    try:
+        simbot_request = SimBotRequest.parse_obj(raw_request)
+    except Exception as request_err:
+        logger.exception("Unable to parse request", exc_info=request_err)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise request_err
+
+    # Verify the state is healthy
+    try:
+        state.healthcheck()
+    except Exception as state_err:
+        logger.exception("Clients are not currently healthy", exc_info=state_err)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise state_err
+
+    # Run the entire pipeline
+    logger.debug("Running request processing")
+    session = state.pipelines.request_processing.run(simbot_request)
+
+    logger.debug("Running NLU")
+    session = state.pipelines.nlu.run(session)
+
+    logger.debug("Running response generation")
+    session = state.pipelines.response_generation.run(session)
+
+    # Send the new session turn to the server
+    state.clients.session_db.add_session_turn(session.current_turn)
+
+    # Convert the turn to the response
+    simbot_response = session.current_turn.convert_to_simbot_response()
+
+    logger.debug(f"Returning the response {simbot_response.json(by_alias=True)}")
+
+    return simbot_response
+
+
+if __name__ == "__main__":
+    # Run app with uvicorn
+    setup_api_logging(emma_log_level=settings.log_level)
+    uvicorn.run(app, host=simbot_settings.host, port=simbot_settings.port)
