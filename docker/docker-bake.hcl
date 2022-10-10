@@ -18,10 +18,6 @@ variable "POLICY_REPO_BRANCH" {
   default = "main"
 }
 
-group "base-images" {
-  targets = ["base", "base-poetry"]
-}
-
 target "base" {
   dockerfile = "docker/base.Dockerfile"
   tags       = ["${IMAGE_NAME}:base"]
@@ -64,11 +60,7 @@ target "nlg" {
   }
 }
 
-group "emma-modules" {
-  targets = ["emma-perception", "emma-policy"]
-}
-
-target "emma-perception" {
+target "perception" {
   dockerfile = "docker/emma-builder.Dockerfile"
   tags       = ["${IMAGE_NAME}:perception"]
 
@@ -80,7 +72,7 @@ target "emma-perception" {
   }
 }
 
-target "emma-policy" {
+target "policy" {
   dockerfile = "docker/emma-builder.Dockerfile"
   tags       = ["${IMAGE_NAME}:policy"]
 
@@ -89,15 +81,6 @@ target "emma-policy" {
     REMOTE_REPO_BRANCH   = "${POLICY_REPO_BRANCH}"
     IMAGE_BASE_NAME      = "${IMAGE_NAME}"
     TORCH_VERSION_SUFFIX = "${TORCH_VERSION_SUFFIX}"
-  }
-}
-
-target "emma-full" {
-  dockerfile = "docker/emma-full.Dockerfile"
-  tags       = ["${IMAGE_NAME}:full"]
-
-  args = {
-    IMAGE_BASE_NAME = "${IMAGE_NAME}"
   }
 }
 

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import UtteranceGeneratorClient
 from emma_experience_hub.common.logging import get_logger
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
     get_simbot_object_label_to_class_name_map,
@@ -157,7 +158,7 @@ class SimBotActionParams(BaseModel):
         return class_name
 
 
-class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
+class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
     """Parse the correct action from the model output."""
 
     available_room_names: set[str] = get_simbot_room_names()
@@ -191,7 +192,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
 
     def __call__(
         self, decoded_trajectory: str, extracted_features: Optional[EmmaExtractedFeatures] = None
-    ) -> list[SimBotAction]:
+    ) -> SimBotAction:
         """Convert the decoded trajectory to a sequence of SimBot actions."""
         log.debug(f"Decoded trajectory: `{decoded_trajectory}`")
 
@@ -199,30 +200,25 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
 
         # If there is a problem when decoding the action, ask the user for some help.
         if not decoded_actions_list:
-            return [self._return_ask_for_help_action()]
+            return self._return_ask_for_help_action()
 
-        parsed_actions = []
+        parsed_actions: list[SimBotAction] = []
 
         for decoded_action in decoded_actions_list:
-            if decoded_action.endswith(self._eos_token):
-                parsed_actions.append(self._return_end_of_sequence_dialog_action())
-            else:
-                try:
-                    parsed_actions.append(
-                        self._convert_action_to_executable_form(decoded_action, extracted_features)
-                    )
+            try:
+                parsed_actions.append(
+                    self._convert_action_to_executable_form(decoded_action, extracted_features)
+                )
 
-                # If there is a parsing issue, ask the user for help and don't decode any more
-                # actions
-                except Exception:
-                    log.warning("Unable to decode the action: `{decoded_action}`")
-                    # parsed_actions.append(self._return_ask_for_help_action())
-                    # break
+            # If there is a parsing issue, ask the user for help and don't decode any more
+            # actions
+            except Exception:
+                log.warning("Unable to decode the action: `{decoded_action}`")
 
         if not parsed_actions:
-            return [self._return_ask_for_help_action()]
+            return self._return_ask_for_help_action()
 
-        return parsed_actions
+        return parsed_actions[0]
 
     def _separate_decoded_trajectory(self, decoded_trajectory: str) -> list[str]:
         """Split the decoded trajectory string into a list of action strings.
@@ -232,7 +228,12 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
         Also removes any blank strings from the list of actions.
         """
         split_actions = decoded_trajectory.split(self._action_delimiter)
-        return [action.strip() for action in split_actions if action]
+        actions = (action.strip() for action in split_actions if action)
+
+        # Remove the end of trajectory token from any given action.
+        actions = (action.replace(END_OF_TRAJECTORY_TOKEN, "") for action in actions)
+
+        return list(actions)
 
     def _get_simbot_action_from_tokens(
         self, action_tokens: list[str]
@@ -363,16 +364,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
         return SimBotAction(
             type=SimBotActionType.Dialog,
             payload=SimBotDialogPayload(
-                value="Sorry, I'm struggling with this one. Are you able to be more specific please?"
-            ),
-        )
-
-    def _return_end_of_sequence_dialog_action(self) -> SimBotAction:
-        """Return a dialog action when the EOS is received."""
-        return SimBotAction(
-            type=SimBotActionType.Dialog,
-            payload=SimBotDialogPayload(
-                value=self._utterance_generator_client.get_finished_response()
+                value=self._utterance_generator_client.get_raised_exception_response()
             ),
         )
 

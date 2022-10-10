@@ -9,15 +9,7 @@ from pytest_cases import fixture
 class SimBotRequestCases:
     def case_without_previous_actions(self, simbot_game_metadata_dir: Path) -> dict[str, Any]:
         """Example request without any previous actions."""
-        os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(simbot_game_metadata_dir.resolve())
-        os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(simbot_game_metadata_dir.resolve())
-
-        metadata_file_path = next(simbot_game_metadata_dir.iterdir())
-        game_metadata_file_name = metadata_file_path.name
-        if metadata_file_path.is_dir():
-            metadata_file_path = next(metadata_file_path.iterdir())
-            game_metadata_file_name = f"{game_metadata_file_name}/{metadata_file_path.name}"
-
+        self._set_env_vars(simbot_game_metadata_dir)
         request_body = {
             "header": {
                 "predictionRequestId": str(uuid.uuid1()),  # Request ID - unique per request
@@ -38,7 +30,9 @@ class SimBotRequestCases:
                     },
                     {
                         "type": "GameMetaData",
-                        "metaData": {"uri": f"efs://{game_metadata_file_name}"},
+                        "metaData": {
+                            "uri": f"efs://{self._get_metadata_file_name(simbot_game_metadata_dir)}"
+                        },
                     },
                 ],
                 "previousActions": [],
@@ -46,6 +40,82 @@ class SimBotRequestCases:
         }
 
         return request_body
+
+    def case_with_single_previous_action(self, simbot_game_metadata_dir: Path) -> dict[str, Any]:
+        """Example request without single previous action."""
+        self._set_env_vars(simbot_game_metadata_dir)
+        request_body = {
+            "header": {
+                "predictionRequestId": str(uuid.uuid1()),  # Request ID - unique per request
+                "sessionId": "session_19099",  # Session ID - unique per session
+            },
+            "request": {
+                "sensors": [
+                    {
+                        "type": "SpeechRecognition",
+                        "recognition": {
+                            "tokens": [
+                                {
+                                    "value": "turn on the computer.",
+                                    "confidence": {"score": 0.98, "bin": "HIGH"},
+                                },
+                            ]
+                        },
+                    },
+                    {
+                        "type": "GameMetaData",
+                        "metaData": {
+                            "uri": f"efs://{self._get_metadata_file_name(simbot_game_metadata_dir)}"
+                        },
+                    },
+                ],
+                "previousActions": [
+                    {"id": None, "type": "Look", "success": False, "errorType": "InvalidCommand"}
+                ],
+            },
+        }
+
+        return request_body
+
+    def case_followup_without_speech(self, simbot_game_metadata_dir: Path) -> dict[str, Any]:
+        """Example request without receiving any additional speech input."""
+        self._set_env_vars(simbot_game_metadata_dir)
+        request_body = {
+            "header": {
+                "predictionRequestId": str(uuid.uuid1()),  # Request ID - unique per request
+                "sessionId": "session_19099",  # Session ID - unique per session
+            },
+            "request": {
+                "sensors": [
+                    {
+                        "type": "GameMetaData",
+                        "metaData": {
+                            "uri": f"efs://{self._get_metadata_file_name(simbot_game_metadata_dir)}"
+                        },
+                    },
+                ],
+                "previousActions": [
+                    {"id": None, "type": "Look", "success": False, "errorType": "InvalidCommand"}
+                ],
+            },
+        }
+
+        return request_body
+
+    def _set_env_vars(self, simbot_game_metadata_dir: Path) -> None:
+        """Set the necessary environment variables."""
+        os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(simbot_game_metadata_dir.resolve())
+        os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(simbot_game_metadata_dir.resolve())
+
+    def _get_metadata_file_name(self, simbot_game_metadata_dir: Path) -> str:
+        """Get the auxiliary metadata file from the directory."""
+        metadata_file_path = next(simbot_game_metadata_dir.iterdir())
+        game_metadata_file_name = metadata_file_path.name
+        if metadata_file_path.is_dir():
+            metadata_file_path = next(metadata_file_path.iterdir())
+            game_metadata_file_name = f"{game_metadata_file_name}/{metadata_file_path.name}"
+
+        return game_metadata_file_name
 
 
 @fixture(scope="session")

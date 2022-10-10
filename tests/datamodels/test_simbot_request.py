@@ -16,7 +16,9 @@ def test_request_json_parses_without_error(request_body: dict[str, Any]) -> None
     assert parsed_request
 
     assert isinstance(parsed_request.auxiliary_metadata, SimBotAuxiliaryMetadataPayload)
-    assert isinstance(parsed_request.speech_recognition, SimBotSpeechRecognitionPayload)
+
+    if parsed_request.speech_recognition:
+        assert isinstance(parsed_request.speech_recognition, SimBotSpeechRecognitionPayload)
 
 
 @parametrize_with_cases("request_body", cases=SimBotRequestCases)

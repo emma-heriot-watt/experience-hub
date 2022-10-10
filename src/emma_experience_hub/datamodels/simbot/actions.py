@@ -1,3 +1,4 @@
+from contextlib import suppress
 from enum import Enum
 from typing import Any, Optional, Union
 
@@ -227,24 +228,39 @@ class SimBotActionStatusType(Enum):
 class SimBotActionStatus(BaseModel):
     """Status of the previous action taken."""
 
-    id: str
+    id: Optional[str]
     type: SimBotActionType
     success: bool
     error_type: SimBotActionStatusType = Field(..., alias="errorType")
 
+    @validator("type", pre=True)
+    @classmethod
+    def convert_action_type_enum(cls, action_type: str) -> str:
+        """Check the incoming value for the action type and ensure it will be an enum."""
+        # See if the action type is already a value within the enum
+        with suppress(ValueError):
+            return SimBotActionType(action_type).value
+
+        # See if the action type is already a key within the enum
+        with suppress(KeyError):
+            return SimBotActionType[action_type].value
+
+        # Otherwise just return it and let it error if it errors
+        return action_type
+
     @validator("error_type", pre=True)
     @classmethod
     def convert_error_type_enum(cls, error_type: str) -> str:
-        """Check the incoming value for the error type and ensure it will be an enum.
+        """Check the incoming value for the error type and ensure it will be an enum."""
+        # See if the error type is already a value within the enum
+        with suppress(ValueError):
+            return SimBotActionStatusType(error_type).value
 
-        If the error type is one of the enum values, convert it to the correct enum name so that it
-        will parse properly.
-        """
-        error_type = (
-            error_type
-            if error_type in SimBotActionStatusType.__members__.keys()
-            else SimBotActionStatusType(error_type).name
-        )
+        # See if the error type is already a key within the enum
+        with suppress(KeyError):
+            return SimBotActionStatusType[error_type].value
+
+        # Otherwise just return it and let it error if it errors
         return error_type
 
 

@@ -75,21 +75,22 @@ class SimBotRequestProcessingPipeline:
             )
             return
 
-        if turn.actions is None:
+        if turn.action is None:
             logger.error("The turn should have an action. Is this the right turn?")
             return
 
-        if len(turn.actions) != len(action_status):
+        if len(action_status) > 1:
             logger.error(
-                f"The number of actions with the turn is not equal to the number of statuses available. There are {len(turn.actions)} actions within the turn, but {len(action_status)} statuses."
+                f"The number of actions with the turn is not equal to the number of statuses available. There is only 1 action within the turn, but {len(action_status)} statuses."
             )
             logger.warning(
                 "Trying to match the available actions to the available statuses anyway."
             )
 
-        # Update the action status for all the turns.
-        for idx, status in enumerate(action_status):
-            turn.actions[idx].status = status
+        # Update the action status, ensuring we match the right one.
+        for status in action_status:
+            if status.type == turn.action.type.base_type:
+                turn.action.status = status
 
         # Put the updated session turn into the db
         self._session_db_client.put_session_turn(turn)

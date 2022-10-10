@@ -1,5 +1,6 @@
 import itertools
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import suppress
 from datetime import datetime
 from typing import Callable, Optional, cast
 
@@ -11,7 +12,11 @@ from emma_experience_hub.datamodels.emma import (
     EmmaExtractedFeatures,
     EnvironmentStateTurn,
 )
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
+from emma_experience_hub.datamodels.simbot.actions import (
+    SimBotAction,
+    SimBotActionStatus,
+    SimBotActionType,
+)
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
@@ -54,14 +59,13 @@ class SimBotSessionTurn(BaseModel):
     unique_room_names: set[str]
     viewpoints: set[str]
 
-    # TODO: Is this None when there is no utterance from the user?
     speech: Optional[SimBotSpeechRecognitionPayload] = None
 
     # URI to the auxiliary metadata file, as provided by the SimBot Arena
     auxiliary_metadata_uri: SimBotAuxiliaryMetadataUri
 
     intent: Optional[SimBotIntent] = None
-    actions: Optional[list[SimBotAction]] = None
+    action: Optional[SimBotAction] = None
     raw_output: Optional[str] = None
 
     @classmethod
@@ -90,12 +94,25 @@ class SimBotSessionTurn(BaseModel):
         return self.intent is not None and self.intent.type == SimBotIntentType.instruction
 
     @property
-    def has_actions(self) -> bool:
-        """Determine whether or not the turn has generated an action."""
-        return self.actions is not None
+    def is_end_of_trajectory_intent(self) -> bool:
+        """Is the turn at the end of a trajectory?"""
+        return self.intent is not None and self.intent.type == SimBotIntentType.end_of_trajectory
 
     @property
-    def utterances(self) -> list[DialogueUtterance]:  # noqa: WPS231
+    def has_action(self) -> bool:
+        """Determine whether or not the turn has generated an action."""
+        return self.action is not None
+
+    @property
+    def action_status(self) -> Optional[SimBotActionStatus]:
+        """Return the status of the action is available."""
+        if self.action is None or self.action.status is None:
+            return None
+
+        return self.action.status
+
+    @property
+    def utterances(self) -> list[DialogueUtterance]:
         """Get the utterances from the session turn, if any."""
         utterances = []
 
@@ -109,32 +126,31 @@ class SimBotSessionTurn(BaseModel):
                 )
             )
 
-        if self.actions is not None:
-            for action in self.actions:
-                if action.type == SimBotActionType.Dialog:
-                    payload = cast(SimBotDialogPayload, action.payload)
-                    utterances.append(
-                        DialogueUtterance(
-                            utterance=payload.value,
-                            role="agent",
-                            intent=payload.intent.name if payload.intent else None,
-                        )
+        if self.action is not None:
+            if self.action.type == SimBotActionType.Dialog:
+                payload = cast(SimBotDialogPayload, self.action.payload)
+                utterances.append(
+                    DialogueUtterance(
+                        utterance=payload.value,
+                        role="agent",
+                        intent=payload.intent.name if payload.intent else None,
                     )
+                )
 
         return utterances
 
     def convert_to_simbot_response(self) -> SimBotResponse:
         """Convert the session turn to a SimBotResponse, to be returned to the API."""
-        if not self.actions:
+        if not self.action:
             raise AssertionError(
-                "There are no actions to be returned. Have you run the response generator on this?"
+                "There is no action to be returned. Have you run the response generator on this?"
             )
 
         return SimBotResponse(
             sessionId=self.session_id,
             predictionRequestId=self.prediction_request_id,
             objectOutputType="OBJECT_CLASS",
-            actions=self.actions,
+            actions=[self.action],
         )
 
     def load_features(
@@ -200,21 +216,34 @@ class SimBotSession(BaseModel):
         # Determine whether each turn has an instruction intent
         session_turn_has_instruction_intent = [turn.is_instruction_intent for turn in self.turns]
 
+        # Determine whether each turns has a end of trajectory intent
+        session_turn_has_end_of_trajectory_intent = [
+            turn.is_end_of_trajectory_intent for turn in self.turns
+        ]
+
+        # Set the cutoff index to 0, so all turns will be returned
+        turn_cutoff_index = 0
+
         # Get the index of the most recent turn with an instruction index
         # i.e. the last index is the first index from the reversed list
-        try:
-            most_recent_instruction_index = (
+        with suppress(ValueError):
+            turn_cutoff_index = (
                 len(session_turn_has_instruction_intent)
                 - session_turn_has_instruction_intent[::-1].index(True)
                 - 1
             )
-        except ValueError:
-            # This occurs when there are no previous instruction intents, such as in the case when
-            # there are not enough turns. In this case, just return all the turns.
-            return self.turns
 
-        # Return all the turns from the index (including the index)
-        return self.turns[most_recent_instruction_index:]
+        # Check if there are any "end of trajectory" intents after the index
+        if any(session_turn_has_end_of_trajectory_intent[turn_cutoff_index:]):
+            # If there are end of trajectory intents after the index, get the new index as the turn
+            # AFTER the last "end of trajectory" intent
+            with suppress(ValueError):
+                turn_cutoff_index = len(
+                    session_turn_has_end_of_trajectory_intent
+                ) - session_turn_has_end_of_trajectory_intent[::-1].index(True)
+
+        # Return all the turns after the cutoff point
+        return self.turns[turn_cutoff_index:]
 
     def get_dialogue_history(self, turns: list[SimBotSessionTurn]) -> list[DialogueUtterance]:
         """Get a dialogue history from the given turns."""

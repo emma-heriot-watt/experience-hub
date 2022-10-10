@@ -1,6 +1,7 @@
 from emma_experience_hub.api.clients import EmmaPolicyClient, ProfanityFilterClient
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient
 from emma_experience_hub.common.logging import get_logger
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntent,
@@ -32,9 +33,16 @@ class SimBotNLUPipeline:
 
     def run(self, session: SimBotSession) -> SimBotSession:
         """Run the pipeline for the session."""
+        if self._should_respond_with_end_of_trajectory_intent(session):
+            session.current_turn.intent = SimBotIntent(type=SimBotIntentType.end_of_trajectory)
+            return session
+
         # Bypass the NLU pipeline if there is no utterance to extract intent from
         if not session.current_turn.speech:
-            logger.debug("There is no utterance to extract intent from.")
+            logger.debug(
+                "There is no utterance to extract intent from. Assume we just need to act."
+            )
+            session.current_turn.intent = SimBotIntent(type=SimBotIntentType.instruction)
             return session
 
         # Check whether or not the utterance contains profanity
@@ -74,3 +82,26 @@ class SimBotNLUPipeline:
             # TODO: What to do if we cannot determine?
             logger.exception("Unable to check for profanity.", exc_info=err)
             raise err
+
+    def _should_respond_with_end_of_trajectory_intent(self, session: SimBotSession) -> bool:
+        """Detect whether the previous turn contains the end of trajectory."""
+        # If speech is recieved, always handle the speech
+        if session.current_turn.speech:
+            return False
+
+        # For there to be a previous turn, there must be at least 2 of them.
+        if session.num_turns < 2:
+            return False
+
+        previous_turn = session.turns[-2]
+
+        # Ensure that the previous turn was an instruction action
+        if previous_turn.intent and previous_turn.intent.type != SimBotIntentType.instruction:
+            return False
+
+        # Ensure that the previous turn actually contains a raw output
+        if not previous_turn.raw_output:
+            return False
+
+        # Check if the raw output contains the end of trajectory token
+        return END_OF_TRAJECTORY_TOKEN in previous_turn.raw_output

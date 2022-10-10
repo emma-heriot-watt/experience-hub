@@ -30,11 +30,11 @@ class UtteranceGeneratorClient(Client):
 
     def get_finished_response(self) -> str:
         """Generate a response for the `Done` intent."""
-        return self._send_request(f"{self._endpoint}/done")
+        return self._send_request(f"{self._endpoint}/generate/done")
 
     def get_profanity_response(self) -> str:
         """Generate a response handling the profanity intent."""
-        return self._send_request(f"{self._endpoint}/profanity")
+        return self._send_request(f"{self._endpoint}/generate/profanity")
 
     def get_raised_exception_response(self) -> str:
         """Generate a question asking for more help."""
@@ -42,22 +42,28 @@ class UtteranceGeneratorClient(Client):
 
     def get_direction_clarify_question(self) -> str:
         """Generate clarification question for direction."""
-        return self._send_request(f"{self._endpoint}/clarify_direction")
+        return self._send_request(f"{self._endpoint}/generate/clarify_direction")
 
     def get_object_description_clarify_question(self, object_name: Optional[str]) -> str:
         """Generate a clarification question for the object description."""
         request_json = {"object": object_name} if object_name else None
-        return self._send_request(f"{self._endpoint}/clarify_object_description", request_json)
+        return self._send_request(
+            f"{self._endpoint}/generate/clarify_object_description", request_json
+        )
 
     def get_object_location_clarify_question(self, object_name: Optional[str]) -> str:
         """Generate a clarification question for the object location."""
         request_json = {"object": object_name} if object_name else None
-        return self._send_request(f"{self._endpoint}/clarify_object_location", request_json)
+        return self._send_request(
+            f"{self._endpoint}/generate/clarify_object_location", request_json
+        )
 
     def get_object_disambiguation_clarify_question(self, object_name: Optional[str]) -> str:
         """Generate a clarification question for object disambiguation."""
         request_json = {"object": object_name} if object_name else None
-        return self._send_request(f"{self._endpoint}/clarify_object_disambiguation", request_json)
+        return self._send_request(
+            f"{self._endpoint}/generate/clarify_object_disambiguation", request_json
+        )
 
     def _send_request(self, endpoint: str, request_json: Optional[dict[str, str]] = None) -> str:
         if request_json is None:

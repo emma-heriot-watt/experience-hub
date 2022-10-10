@@ -14,7 +14,7 @@ class ProfanityFilterClient(Client):
     def __init__(self, endpoint: AnyHttpUrl) -> None:
         self._endpoint = endpoint
         self._healthcheck_endpoint = f"{self._endpoint}/healthcheck"
-        self._is_profane_endpoint = f"{self._endpoint}/is_profane"
+        self._is_profane_endpoint = f"{self._endpoint}/is-profane"
 
     def healthcheck(self) -> bool:
         """Verify the profanity filter server is healthy."""

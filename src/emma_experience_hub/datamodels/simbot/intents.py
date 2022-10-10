@@ -15,6 +15,7 @@ class SimBotIntentType(Enum):
     clarify_question = "<clarify><question>"
     clarify_answer = "<clarify><answer>"
     profanity = "<profanity>"
+    end_of_trajectory = "<end_of_trajectory>"
 
 
 class SimBotIntent(BaseModel):
@@ -22,4 +23,3 @@ class SimBotIntent(BaseModel):
 
     type: SimBotIntentType
     object_name: Optional[str] = None
-    # confidence: float

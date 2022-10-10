@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Optional, cast
 
 from pydantic import BaseModel, Field
 
@@ -50,12 +50,15 @@ class SimBotRequest(BaseModel, extra="allow"):
         )
 
     @property
-    def speech_recognition(self) -> SimBotSpeechRecognitionPayload:
+    def speech_recognition(self) -> Optional[SimBotSpeechRecognitionPayload]:
         """Easily get the speech recognition action."""
-        return cast(
-            SimBotSpeechRecognitionPayload,
-            self._easily_get_action_from_sensors(SimBotActionType.SpeechRecognition).payload,
-        )
+        try:
+            return cast(
+                SimBotSpeechRecognitionPayload,
+                self._easily_get_action_from_sensors(SimBotActionType.SpeechRecognition).payload,
+            )
+        except Exception:
+            return None
 
     def _easily_get_action_from_sensors(self, action_type: SimBotActionType) -> SimBotAction:
         """Easily get the action for the given action type from the sensors."""

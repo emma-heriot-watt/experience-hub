@@ -84,6 +84,7 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
 
     logger.debug("Running NLU")
     session = state.pipelines.nlu.run(session)
+    logger.debug(f"Current intent: {session.current_turn.intent}")
 
     logger.debug("Running response generation")
     session = state.pipelines.response_generation.run(session)

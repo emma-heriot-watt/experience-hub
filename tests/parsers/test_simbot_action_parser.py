@@ -3,7 +3,11 @@ from typing import Optional
 from pytest_cases import param_fixture, parametrize, parametrize_with_cases
 
 from emma_experience_hub.api.clients import UtteranceGeneratorClient
-from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.constants.model import (
+    END_OF_TRAJECTORY_TOKEN,
+    MODEL_EOS_TOKEN,
+    PREDICTED_ACTION_DELIMITER,
+)
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
     get_simbot_object_label_to_class_name_map,
@@ -155,21 +159,28 @@ class DecodedSimBotTrajectories:
         return low_level_navigation_trajectory.lower(), action
 
 
-@parametrize("include_eos", [True, False], ids=["with_eos", "without_eos"])
+@parametrize(
+    "include_end_of_trajectory",
+    [True, False],
+    ids=["with_end_of_trajectory", "without_end_of_trajectory"],
+)
 @parametrize_with_cases("raw_output,expected_action", cases=DecodedSimBotTrajectories)
 def test_simbot_decoded_actions_are_parsed_correctly(
     raw_output: str,
     expected_action: SimBotAction,
-    include_eos: bool,
+    include_end_of_trajectory: bool,
     utterance_generator_client: UtteranceGeneratorClient,
 ) -> None:
+    # Include the end of trajectory token if desired
+    if include_end_of_trajectory:
+        raw_output = f"{raw_output} {END_OF_TRAJECTORY_TOKEN}"
+
     # Make sure action delimiter is on the end
     if not raw_output.endswith(PREDICTED_ACTION_DELIMITER):
         raw_output += PREDICTED_ACTION_DELIMITER
 
-    # If EOS is desired, include it on the end of the actions
-    if include_eos:
-        raw_output += MODEL_EOS_TOKEN
+    # Add the EOS token
+    raw_output += MODEL_EOS_TOKEN
 
     raw_output = raw_output.lower()
 
@@ -179,8 +190,4 @@ def test_simbot_decoded_actions_are_parsed_correctly(
     parsed_action = action_parser(raw_output)
 
     # Verify the parsed action is correct
-    assert parsed_action[0] == expected_action
-
-    # Verify that there is a dialog action if EOS is included
-    if include_eos:
-        assert parsed_action[-1].type == SimBotActionType.Dialog
+    assert parsed_action == expected_action
