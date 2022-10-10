@@ -25,7 +25,7 @@ class SimBotSettings(BaseSettings):
 
     profanity_filter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5503", scheme="http")
 
-    utterance_generator_url: AnyHttpUrl = AnyHttpUrl(url="https://0.0.0.0:5504", scheme="http")
+    utterance_generator_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5504", scheme="http")
 
     # Action predictor settings
     action_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5502", scheme="http")
