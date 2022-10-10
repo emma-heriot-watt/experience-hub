@@ -13,45 +13,71 @@ constants_absolute_path = Path(__file__).parent.resolve()
 
 
 @lru_cache(maxsize=1)
-def load_arena_definitions() -> dict[str, Any]:
+def get_arena_definitions() -> dict[str, Any]:
     """Load the arena definitions from their file."""
     path = constants_absolute_path.joinpath("simbot", "arena_definitions.json")
     return orjson.loads(path.read_bytes())
 
 
 @lru_cache(maxsize=1)
-def load_simbot_objects_to_indices_map() -> dict[str, int]:
+def get_simbot_objects_to_indices_map(lowercase_keys: bool = False) -> dict[str, int]:
     """Load map of object labels to their index."""
     ignored_objects = ["Unassigned", "TAM Prototype"]
 
-    return {
+    mapping = {
         label: idx
-        for label, idx in load_arena_definitions()["label_to_idx"].items()
+        for label, idx in get_arena_definitions()["label_to_idx"].items()
         if label not in ignored_objects
     }
 
+    if lowercase_keys:
+        mapping = {label.lower(): idx for label, idx in mapping.items()}
+
+    return mapping
+
 
 @lru_cache(maxsize=1)
-def load_simbot_object_id_to_class_name_map() -> dict[str, str]:
+def get_simbot_object_id_to_class_name_map(lowercase_keys: bool = False) -> dict[str, str]:
     """Load map of objects from their Arena ID to the object class name."""
-    return load_arena_definitions()["object_id_to_class_name"]
+    mapping = get_arena_definitions()["object_id_to_class_name"]
+
+    if lowercase_keys:
+        mapping = {label.lower(): output for label, output in mapping.items()}
+
+    return mapping
 
 
 @lru_cache(maxsize=1)
-def load_simbot_object_label_to_class_name_map() -> dict[str, str]:
+def get_simbot_object_label_to_class_name_map(lowercase_keys: bool = False) -> dict[str, str]:
     """Load map of object labels to their class name."""
-    return load_arena_definitions()["label_to_class_name"]
+    mapping = get_arena_definitions()["label_to_class_name"]
+
+    if lowercase_keys:
+        mapping = {label.lower(): output for label, output in mapping.items()}
+
+    return mapping
 
 
 @lru_cache(maxsize=1)
-def load_simbot_room_names() -> set[str]:
+def get_simbot_room_names(lowercase: bool = False) -> set[str]:
     """Load room name identifiers."""
-    return set(load_arena_definitions()["room_names"])
+    room_names = set(get_arena_definitions()["room_names"])
+
+    if lowercase:
+        room_names = {room.lower() for room in room_names}
+
+    return room_names
+
+
+@lru_cache(maxsize=1)
+def get_simbot_room_name_map() -> dict[str, str]:
+    """Map lowercase SimBot room names to their class name."""
+    return {room_name.lower(): room_name for room_name in get_simbot_room_names()}
 
 
 ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
     {
-        SimBotActionType.Goto: {"GoTo", "goto"},
+        SimBotActionType.Goto: {"GoTo", "goto", "Goto"},
         SimBotActionType.MoveForward: {"Move Forward", "move forward"},
         SimBotActionType.MoveBackward: {"Move Backward", "move backward"},
         SimBotActionType.RotateLeft: {"Rotate Left", "rotate left"},

@@ -6,7 +6,8 @@ from emma_experience_hub.api.clients import UtteranceGeneratorClient
 from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
-    load_simbot_object_label_to_class_name_map,
+    get_simbot_object_label_to_class_name_map,
+    get_simbot_room_name_map,
 )
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -40,10 +41,45 @@ class DecodedSimBotTrajectories:
         action = SimBotAction(
             type=SimBotActionType.Goto,
             payload=SimBotGotoPayload(
-                object=SimBotGotoRoomPayload(officeRoom=simbot_room_name),
+                object=SimBotGotoRoomPayload(
+                    officeRoom=get_simbot_room_name_map()[simbot_room_name.lower()]
+                ),
             ),
         )
-        return trajectory, action
+        return trajectory.lower(), action
+
+    def case_with_wrong_actions(
+        self, frame_token_id: Optional[int], visual_token_id: Optional[int]
+    ) -> tuple[str, SimBotAction]:
+        """Be able to parse the wrong actions best as possible.
+
+        Inspired by `cleanoggle sink <frame_token_1>. clean sink <frame_token_2>`.
+        """
+        incorrect_action = "cleanoggle sink"
+        correct_action = "clean sink"
+
+        if frame_token_id:
+            incorrect_action = f"{incorrect_action} <frame_token_{frame_token_id - 1}>"
+            correct_action = f"{correct_action} <frame_token_{frame_token_id}>"
+
+        if visual_token_id:
+            incorrect_action = f"{incorrect_action} <vis_token_{visual_token_id}>"
+            correct_action = f"{correct_action} <vis_token_{visual_token_id}>"
+
+        trajectory = f"{incorrect_action}. {correct_action}."
+
+        action = SimBotAction(
+            type=SimBotActionType.Clean,
+            payload=SimBotObjectInteractionPayload(
+                object=SimBotInteractionObject(
+                    name="sink",
+                    colorImageIndex=frame_token_id if frame_token_id else 0,
+                    mask=None,
+                )
+            ),
+        )
+
+        return trajectory.lower(), action
 
     def case_goto_object(
         self,
@@ -51,8 +87,7 @@ class DecodedSimBotTrajectories:
         frame_token_id: Optional[int],
         visual_token_id: Optional[int],
     ) -> tuple[str, SimBotAction]:
-        trajectory = f"Goto {simbot_object_name}"
-        simbot_object_classname = load_simbot_object_label_to_class_name_map()[simbot_object_name]
+        trajectory = f"Goto {simbot_object_name.lower()}"
 
         if frame_token_id:
             trajectory = f"{trajectory} <frame_token_{frame_token_id}>"
@@ -64,13 +99,13 @@ class DecodedSimBotTrajectories:
             type=SimBotActionType.Goto,
             payload=SimBotGotoPayload(
                 object=SimBotGotoObjectPayload(
-                    name=simbot_object_classname,
+                    name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
                     colorImageIndex=frame_token_id if frame_token_id else 0,
                     mask=None,
                 ),
             ),
         )
-        return trajectory, action
+        return trajectory.lower(), action
 
     def case_object_interaction(
         self,
@@ -80,7 +115,6 @@ class DecodedSimBotTrajectories:
         visual_token_id: Optional[int],
     ) -> tuple[str, SimBotAction]:
         trajectory = f"{simbot_interaction_action} {simbot_object_name}"
-        simbot_object_classname = load_simbot_object_label_to_class_name_map()[simbot_object_name]
 
         if frame_token_id:
             trajectory = f"{trajectory} <frame_token_{frame_token_id}>"
@@ -92,14 +126,14 @@ class DecodedSimBotTrajectories:
             type=SimBotActionType[simbot_interaction_action],
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
-                    name=simbot_object_classname,
+                    name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
                     colorImageIndex=frame_token_id if frame_token_id else 0,
                     mask=None,
                 )
             ),
         )
 
-        return trajectory, action
+        return trajectory.lower(), action
 
     @parametrize(
         "low_level_navigation_trajectory, low_level_navigation_action",
@@ -118,7 +152,7 @@ class DecodedSimBotTrajectories:
             payload=low_level_navigation_action.payload_model(),
         )
 
-        return low_level_navigation_trajectory, action
+        return low_level_navigation_trajectory.lower(), action
 
 
 @parametrize("include_eos", [True, False], ids=["with_eos", "without_eos"])
@@ -136,6 +170,8 @@ def test_simbot_decoded_actions_are_parsed_correctly(
     # If EOS is desired, include it on the end of the actions
     if include_eos:
         raw_output += MODEL_EOS_TOKEN
+
+    raw_output = raw_output.lower()
 
     action_parser = SimBotActionPredictorOutputParser(
         PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client

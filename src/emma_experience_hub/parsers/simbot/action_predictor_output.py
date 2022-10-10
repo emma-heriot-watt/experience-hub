@@ -7,9 +7,10 @@ from emma_experience_hub.api.clients import UtteranceGeneratorClient
 from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
-    load_simbot_object_label_to_class_name_map,
-    load_simbot_objects_to_indices_map,
-    load_simbot_room_names,
+    get_simbot_object_label_to_class_name_map,
+    get_simbot_objects_to_indices_map,
+    get_simbot_room_name_map,
+    get_simbot_room_names,
 )
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
@@ -27,7 +28,7 @@ from emma_experience_hub.datamodels.simbot.payloads.navigation import (
 from emma_experience_hub.parsers.parser import NeuralParser
 
 
-log = get_logger("simbot_action_parser")
+log = get_logger()
 
 
 class CompressSegmentationMask:
@@ -89,20 +90,19 @@ class CompressSegmentationMask:
 class SimBotActionParams(BaseModel):
     """Deconstructed SimBot action from the decoded action trajectory."""
 
-    object_label: Optional[str] = None
-    raw_object_label: Optional[str] = None
+    label: Optional[str] = None
+    raw_label: Optional[str] = None
     object_visual_token: Optional[str] = None
     frame_index: int = 0
-    _object_label_to_classname: dict[str, str] = load_simbot_object_label_to_class_name_map()
 
     @classmethod
     def from_decoded_action_params(  # noqa: WPS231
-        cls, action_params: list[str], simbot_lowercase_label_to_object_label: dict[str, str]
+        cls, action_params: list[str]
     ) -> "SimBotActionParams":
         """Parse the decoded action params from the raw decoded params list."""
-        object_label = None
+        label = None
         object_visual_token = None
-        raw_object_label = None
+        raw_label = None
         frame_index = 0
 
         for action_param in action_params:
@@ -117,44 +117,50 @@ class SimBotActionParams(BaseModel):
             else:
                 # in this case, we're trying to extract the class label which could be composed of
                 # several tokens
-                if raw_object_label is None:
-                    raw_object_label = action_param
+                if raw_label is None:
+                    raw_label = action_param
                 else:
                     # concatenates the previous part of the label with the current one
-                    raw_object_label = " ".join([raw_object_label, action_param])  # type: ignore[unreachable]
+                    raw_label = " ".join([raw_label, action_param])  # type: ignore[unreachable]
 
-        if raw_object_label:
-            object_label = raw_object_label
+        if raw_label:
+            label = raw_label
 
         return cls(
-            object_label=object_label,
-            raw_object_label=raw_object_label,
+            label=label,
+            raw_label=raw_label,
             frame_index=frame_index,
             object_visual_token=object_visual_token,
         )
 
     @property
-    def object_class_name(self) -> str:
+    def class_name(self) -> str:
         """Get a string for the object label, no matter what."""
-        object_label = self.dict().get("object_label")
+        label = self.dict().get("label")
+        if not label:
+            label = self.dict().get("raw_label")
 
-        if not object_label:
-            object_label = self.dict().get("raw_object_label")
+        class_name: Optional[str] = None
 
-        if object_label:
-            object_classname = self._object_label_to_classname.get(object_label, object_label)
-            if not object_classname:
-                object_classname = ""
-        else:
-            object_classname = ""
+        # Check if the label is an object
+        if label:
+            class_name = get_simbot_object_label_to_class_name_map(lowercase_keys=True).get(label)
 
-        return object_classname
+        # Check if the label is a room name
+        if label and not class_name:
+            class_name = get_simbot_room_name_map().get(label)
+
+        # If still nothing, return a blank string.
+        if not class_name:
+            raise AssertionError("Unable to get the class name from the label.")
+
+        return class_name
 
 
 class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
     """Parse the correct action from the model output."""
 
-    available_room_names: set[str] = load_simbot_room_names()
+    available_room_names: set[str] = get_simbot_room_names()
 
     _synonym_to_action_map: dict[str, SimBotActionType] = {
         synonym: action
@@ -162,12 +168,12 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
         for synonym in synonym_set
     }
 
-    _payload_to_action_type: dict[type[SimBotPayload], str] = {
+    _payget_to_action_type: dict[type[SimBotPayload], str] = {
         payload: action_type
         for action_type, payload in SimBotActionType.action_type_to_payload_model().items()
     }
 
-    _object_label_to_idx: dict[str, int] = load_simbot_objects_to_indices_map()
+    _object_label_to_idx: dict[str, int] = get_simbot_objects_to_indices_map()
     _lowercase_label_to_object_label: dict[str, str] = {
         object_label.lower(): object_label for object_label in _object_label_to_idx.keys()
     }
@@ -191,61 +197,32 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
 
         decoded_actions_list = self._separate_decoded_trajectory(decoded_trajectory)
 
+        # If there is a problem when decoding the action, ask the user for some help.
         if not decoded_actions_list:
-            # If there is a problem when decoding the action, ask the user for some help.
-            return [
-                SimBotAction(
-                    type=SimBotActionType.Dialog,
-                    payload=SimBotDialogPayload(
-                        value="Sorry, I'm struggling with this one. Are you able to be more specific please?"
-                    ),
-                )
-            ]
+            return [self._return_ask_for_help_action()]
 
-        if decoded_actions_list[0].endswith(self._eos_token):
-            # if the list is empty it means that we generated only the action delimiter
-            # or if we have an action that ends with EOS
-            # We generate a dialogue action which represents the end
-            return [
-                SimBotAction(
-                    type=SimBotActionType.Dialog,
-                    payload=SimBotDialogPayload(
-                        value=self._utterance_generator_client.get_finished_response()
-                    ),
-                )
-            ]
+        parsed_actions = []
 
-        # Try to decode the first action from the list
-        try:
-            actions = [
-                self._convert_action_to_executable_form(
-                    decoded_actions_list[0], extracted_features
-                )
-            ]
-        except AssertionError:
-            # If there is a problem when decoding the action, ask the user for some help.
-            return [
-                SimBotAction(
-                    type=SimBotActionType.Dialog,
-                    payload=SimBotDialogPayload(
-                        value="Sorry, I'm struggling with this one. Are you able to be more specific please?"
-                    ),
-                )
-            ]
+        for decoded_action in decoded_actions_list:
+            if decoded_action.endswith(self._eos_token):
+                parsed_actions.append(self._return_end_of_sequence_dialog_action())
+            else:
+                try:
+                    parsed_actions.append(
+                        self._convert_action_to_executable_form(decoded_action, extracted_features)
+                    )
 
-        # If there is more than one action, and the next action is a EOS action.
-        # TODO: Improve how this edge case is handled.
-        if len(decoded_actions_list) > 1 and decoded_actions_list[1].endswith(self._eos_token):
-            actions.append(
-                SimBotAction(
-                    type=SimBotActionType.Dialog,
-                    payload=SimBotDialogPayload(
-                        value=self._utterance_generator_client.get_finished_response()
-                    ),
-                )
-            )
+                # If there is a parsing issue, ask the user for help and don't decode any more
+                # actions
+                except Exception:
+                    log.warning("Unable to decode the action: `{decoded_action}`")
+                    # parsed_actions.append(self._return_ask_for_help_action())
+                    # break
 
-        return actions
+        if not parsed_actions:
+            return [self._return_ask_for_help_action()]
+
+        return parsed_actions
 
     def _separate_decoded_trajectory(self, decoded_trajectory: str) -> list[str]:
         """Split the decoded trajectory string into a list of action strings.
@@ -284,7 +261,6 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
 
             index -= 1
 
-        # TODO: The teach-style logic for this edge case doesn't really work
         # If we don't have an action type, then we don't really know what to do at all.
         if parsed_action_name is None:
             raise AssertionError("The action name could not be parsed.")
@@ -311,7 +287,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
             action_tokens
         )
         parsed_simbot_action_params = SimBotActionParams.from_decoded_action_params(
-            simbot_action_params, self._lowercase_label_to_object_label
+            simbot_action_params
         )
 
         if simbot_action_type in SimBotActionType.object_interaction():
@@ -338,11 +314,11 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
         """Return an executable goto action."""
         payload: Union[SimBotGotoRoomPayload, SimBotGotoObjectPayload]
 
-        if parsed_action_params.object_class_name in self.available_room_names:
-            payload = SimBotGotoRoomPayload(officeRoom=parsed_action_params.object_class_name)
+        if parsed_action_params.class_name in self.available_room_names:
+            payload = SimBotGotoRoomPayload(officeRoom=parsed_action_params.class_name)
         else:
             payload = SimBotGotoObjectPayload(
-                name=parsed_action_params.object_class_name,
+                name=parsed_action_params.class_name,
                 colorImageIndex=parsed_action_params.frame_index,
                 # TODO: Uncomment when masks are handled.
                 # mask=self._get_mask_from_visual_token(
@@ -371,7 +347,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
             type=action_type,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
-                    name=parsed_action_params.object_class_name,
+                    name=parsed_action_params.class_name,
                     colorImageIndex=parsed_action_params.frame_index,
                     # TODO: Uncomment when masks are handled.
                     # mask=self._get_mask_from_visual_token(
@@ -379,6 +355,24 @@ class SimBotActionPredictorOutputParser(NeuralParser[list[SimBotAction]]):
                     # ),
                     mask=None,
                 )
+            ),
+        )
+
+    def _return_ask_for_help_action(self) -> SimBotAction:
+        """Return a dialog action when an exception or something unexpected occurs."""
+        return SimBotAction(
+            type=SimBotActionType.Dialog,
+            payload=SimBotDialogPayload(
+                value="Sorry, I'm struggling with this one. Are you able to be more specific please?"
+            ),
+        )
+
+    def _return_end_of_sequence_dialog_action(self) -> SimBotAction:
+        """Return a dialog action when the EOS is received."""
+        return SimBotAction(
+            type=SimBotActionType.Dialog,
+            payload=SimBotDialogPayload(
+                value=self._utterance_generator_client.get_finished_response()
             ),
         )
 
