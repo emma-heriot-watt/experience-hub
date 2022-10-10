@@ -41,7 +41,7 @@ class SimBotMovePayload(SimBotNavigationPayload):
     """SimBot action for walking forwards or backwards."""
 
     direction: Literal["Forward", "Backward"]
-    magnitude: PositiveFloat = 30
+    magnitude: PositiveFloat = 1
 
 
 class SimBotMoveForwardPayload(SimBotMovePayload):
