@@ -213,7 +213,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             # If there is a parsing issue, ask the user for help and don't decode any more
             # actions
             except Exception:
-                log.warning("Unable to decode the action: `{decoded_action}`")
+                log.warning(f"Unable to decode the action: {decoded_action}")
 
         if not parsed_actions:
             return self._return_ask_for_help_action()
