@@ -227,13 +227,13 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         Also removes any blank strings from the list of actions.
         """
-        split_actions = decoded_trajectory.split(self._action_delimiter)
-        actions = (action.strip() for action in split_actions if action)
+        decoded_action_str = decoded_trajectory.replace(self._eos_token, "")
+        split_actions = decoded_action_str.split(self._action_delimiter)
+        actions = [action.strip() for action in split_actions if action]
 
-        # Remove the end of trajectory token from any given action.
-        actions = (action.replace(END_OF_TRAJECTORY_TOKEN, "") for action in actions)
-
-        return list(actions)
+        # Remove the end of trajectory token the final action.
+        actions[-1] = actions[-1].replace(END_OF_TRAJECTORY_TOKEN, "").strip()
+        return actions
 
     def _get_simbot_action_from_tokens(
         self, action_tokens: list[str]
