@@ -56,7 +56,6 @@ isort = "^5.10.1"
 pytest-cases = "^3.6.13"
 pytest-xdist = "^2.5.0"
 pytest-cov = "^3.0.0"
-tbump = "^6.9.0"
 boto3-stubs = { extras = ["essential"], version = "^1.24.80" }
 moto = { extras = ["all"], version = "^4.0.5" }
 pytest-httpx = "^0.21.0"
@@ -75,28 +74,6 @@ combine_as_imports = true
 lines_after_imports = 2
 line_length = 99
 known_first_party = ["emma_*"]
-
-
-[tool.tbump]
-github_url = "https://github.com/emma_simbot/experience_hub/"
-
-[tool.tbump.version]
-current = "0.1.0"
-
-regex = '''
-  (?P<major>\d+)
-  \.
-  (?P<minor>\d+)
-  \.
-  (?P<patch>\d+)
-  '''
-
-[tool.tbump.git]
-message_template = "Bump to {new_version}"
-tag_template = "v{new_version}"
-
-[[tool.tbump.file]]
-src = "pyproject.toml"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
