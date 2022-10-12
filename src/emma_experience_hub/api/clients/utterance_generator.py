@@ -36,6 +36,10 @@ class UtteranceGeneratorClient(Client):
         """Generate a response handling the profanity intent."""
         return self._send_request(f"{self._endpoint}/generate/profanity")
 
+    def get_out_of_domain_response(self) -> str:
+        """Generate a response for out of domain utterances."""
+        return self.get_profanity_response()
+
     def get_raised_exception_response(self) -> str:
         """Generate a question asking for more help."""
         return "Sorry, I'm struggling with this one. Are you able to be more specific please?"

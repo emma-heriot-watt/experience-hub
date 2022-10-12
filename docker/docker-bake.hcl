@@ -49,6 +49,17 @@ target "profanity-filter" {
   }
 }
 
+target "out-of-domain-detector" {
+  dockerfile = "docker/emma-nlg.Dockerfile"
+  tags       = ["${IMAGE_NAME}:ood-detector"]
+
+  args = {
+    IMAGE_BASE_NAME    = "${IMAGE_NAME}"
+    REMOTE_REPO_URL    = "https://github.com/emma-simbot/ood-detection"
+    REMOTE_REPO_BRANCH = "v1.0.1"
+  }
+}
+
 target "nlg" {
   dockerfile = "docker/emma-nlg.Dockerfile"
   tags       = ["${IMAGE_NAME}:nlg"]

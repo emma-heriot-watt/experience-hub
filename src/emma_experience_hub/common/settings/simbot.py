@@ -32,7 +32,7 @@ class SimBotSettings(BaseSettings):
     action_predictor_delimiter: str = "."
     action_predictor_eos_token: str = "</s>"
 
-    open_telemetry_endpoint: AnyHttpUrl = AnyHttpUrl(url="http://tempo:14250", scheme="http")
+    out_of_domain_detector_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5505", scheme="http")
 
     class Config:
         """Config for the settings."""

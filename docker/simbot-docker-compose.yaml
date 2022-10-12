@@ -124,3 +124,28 @@ services:
     deploy: *deploy-gpu
     entrypoint: python
     command: src/emma_policy/commands/run_simbot_action_api.py
+
+  out_of_domain_detector:
+    container_name: out_of_domain_detector
+    image: heriot-watt/emma-simbot:ood-detector
+    environment:
+      LOG_LEVEL: info
+      DEVICE: "cuda:0"
+      EMBEDDING_MODEL: "/app/model/sbert-simbot/"
+      MODEL_CHECKPOINT_PATH: "/app/model/bgm_components2_data-1.joblib"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:6500/healthcheck
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy: *deploy-gpu
+    ports:
+      - "5505:6500"
+    entrypoint: python -m
+    command:
+      - emma_ood_detector.api.ood_detector

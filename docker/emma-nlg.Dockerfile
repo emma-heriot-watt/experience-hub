@@ -7,7 +7,7 @@ ARG REMOTE_REPO_BRANCH
 
 # Only get the dependency files
 WORKDIR ${PYSETUP_PATH}/repo
-RUN git clone -b "${REMOTE_REPO_BRANCH}" --single-branch --depth=1 "${REMOTE_REPO_URL}" . && \
+RUN git clone --branch "${REMOTE_REPO_BRANCH}" --depth=1 "${REMOTE_REPO_URL}" . && \
 	poetry install
 
 # Set the PYTHONPATH

@@ -1,4 +1,8 @@
-from emma_experience_hub.api.clients import EmmaPolicyClient, ProfanityFilterClient
+from emma_experience_hub.api.clients import (
+    EmmaPolicyClient,
+    OutOfDomainDetectorClient,
+    ProfanityFilterClient,
+)
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient
 from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
@@ -22,11 +26,13 @@ class SimBotNLUPipeline:
         self,
         extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
         profanity_filter_client: ProfanityFilterClient,
+        out_of_domain_detector_client: OutOfDomainDetectorClient,
         nlu_intent_client: EmmaPolicyClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
     ) -> None:
         self._extracted_features_cache_client = extracted_features_cache_client
         self._profanity_filter_client = profanity_filter_client
+        self._out_of_domain_detector_client = out_of_domain_detector_client
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
@@ -49,6 +55,12 @@ class SimBotNLUPipeline:
         if self._utterance_contains_profanity(session.current_turn):
             logger.debug("Utterance contains profanity.")
             session.current_turn.intent = SimBotIntent(type=SimBotIntentType.profanity)
+            return session
+
+        # Check whether or not the utterance is out of domain
+        if self._utterance_is_out_of_domain(session.current_turn):
+            logger.debug("Utterance is out of domain.")
+            session.current_turn.intent = SimBotIntent(type=SimBotIntentType.out_of_domain)
             return session
 
         # Extract the intent, store within the session, and return
@@ -81,6 +93,19 @@ class SimBotNLUPipeline:
         except Exception as err:
             # TODO: What to do if we cannot determine?
             logger.exception("Unable to check for profanity.", exc_info=err)
+            raise err
+
+    def _utterance_is_out_of_domain(self, turn: SimBotSessionTurn) -> bool:
+        """Detect whether the utterance is out of domain or not."""
+        # Return False if there is no utterance
+        if turn.speech is None:
+            return False
+
+        try:
+            return self._out_of_domain_detector_client.is_out_of_domain(turn.speech.utterance)
+        except Exception as err:
+            # TODO: What to do if we cannot determine?
+            logger.exception("Unable to check for out of domain utterance.", exc_info=err)
             raise err
 
     def _should_respond_with_end_of_trajectory_intent(self, session: SimBotSession) -> bool:

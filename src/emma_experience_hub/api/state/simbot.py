@@ -6,6 +6,7 @@ from emma_experience_hub.api.clients import (
     Client,
     EmmaPolicyClient,
     FeatureExtractorClient,
+    OutOfDomainDetectorClient,
     ProfanityFilterClient,
     UtteranceGeneratorClient,
 )
@@ -41,6 +42,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     extracted_features_cache: SimBotExtractedFeaturesFileSystemClient
     profanity_filter: ProfanityFilterClient
     utterance_generator: UtteranceGeneratorClient
+    out_of_domain_detector: OutOfDomainDetectorClient
 
     @classmethod
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
@@ -67,6 +69,9 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             profanity_filter=ProfanityFilterClient(endpoint=simbot_settings.profanity_filter_url),
             utterance_generator=UtteranceGeneratorClient(
                 endpoint=simbot_settings.utterance_generator_url
+            ),
+            out_of_domain_detector=OutOfDomainDetectorClient(
+                endpoint=simbot_settings.out_of_domain_detector_url
             ),
         )
 
@@ -111,6 +116,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             nlu=SimBotNLUPipeline(
                 extracted_features_cache_client=clients.extracted_features_cache,
                 profanity_filter_client=clients.profanity_filter,
+                out_of_domain_detector_client=clients.out_of_domain_detector,
                 nlu_intent_client=clients.nlu_intent,
                 nlu_intent_parser=SimBotNLUOutputParser(
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter

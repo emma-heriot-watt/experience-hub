@@ -16,6 +16,7 @@ class SimBotIntentType(Enum):
     clarify_answer = "<clarify><answer>"
     profanity = "<profanity>"
     end_of_trajectory = "<end_of_trajectory>"
+    out_of_domain = "<out_of_domain>"
 
 
 class SimBotIntent(BaseModel):
