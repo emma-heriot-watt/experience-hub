@@ -51,9 +51,11 @@ const config = {
 					{ path: "dist/*.tar.gz", label: "sdist" },
 					{ path: "dist/*.whl", label: "wheel" },
 				],
-				successComment:
-					":tada: This issue has been resolved in version ${nextRelease.version} :tada:\n\nThe release is available on PyPI and GitHub.",
+				successComment: false,
 				failComment: false,
+				releasedLabels: false,
+				failTitle: false,
+				labels: false,
 			},
 		],
 		[
