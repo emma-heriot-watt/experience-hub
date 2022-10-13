@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/emma-simbot/experience-hub/compare/v1.1.0...v1.1.1) (2022-10-13)
+
+
+### Bug Fixes
+
+* Provide num frames in current turn ([#80](https://github.com/emma-simbot/experience-hub/issues/80)) ([1cdd264](https://github.com/emma-simbot/experience-hub/commit/1cdd26488ee8fad20b79824808b1e2fd1f91adc5))
+
 ## [1.1.0](https://github.com/emma-simbot/experience-hub/compare/v1.0.0...v1.1.0) (2022-10-12)
 
 
