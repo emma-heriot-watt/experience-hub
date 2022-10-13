@@ -1,12 +1,11 @@
 name: Tests
 
 on:
+  workflow_dispatch:
+  workflow_call:
   pull_request:
     branches: [main]
     paths-ignore: ["**/*.md", "**/*.rst"]
-  push:
-    branches:
-      - main
 
 env:
   PYTHON_VERSION: 3.9

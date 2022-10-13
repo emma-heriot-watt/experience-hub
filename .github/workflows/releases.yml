@@ -19,15 +19,25 @@ jobs:
       - name: Run Labeler
         uses: crazy-max/ghaction-github-labeler@v4.0.0
 
+  continuous-integration:
+    name: Continuous Integration
+    uses: "./.github/workflows/continuous_integration.yml"
+    secrets: inherit
+
+  tests:
+    name: Tests
+    uses: "./.github/workflows/tests.yml"
+    secrets: inherit
+
   release:
     name: Release
     runs-on: self-hosted
+    needs: [continuous-integration, tests]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false
-          fetch-depth: 0
+          token: ${{ secrets.PAT }}
 
       - name: Setup Git
         env:
@@ -45,7 +55,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: "lts/*"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -78,7 +88,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Perform release
+      - name: Install semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
