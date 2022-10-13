@@ -17,6 +17,26 @@ env:
   MKL_THREADING_LAYER: "GNU"
 
 jobs:
+  changes:
+    name: Check for Python file changes
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    outputs:
+      python: ${{steps.filter.outputs.python}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - 'storage/fixtures/**/*'
+              - 'pyproject.toml'
+              - 'poetry.lock'
+              - '.github/workflows/tests.yml'
+
   python:
     name: Run Python test suite
     defaults:
@@ -24,7 +44,8 @@ jobs:
         shell: bash
 
     runs-on: self-hosted
-    if: ${{ !github.event.pull_request.draft }}
+    needs: [changes]
+    if: ${{needs.changes.outputs.python == 'true' && !github.event.pull_request.draft }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
