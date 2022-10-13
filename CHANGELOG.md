@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.0](https://github.com/emma-simbot/experience-hub/compare/v1.1.2...v1.2.0) (2022-10-13)
+
+
+### Features
+
+* filter utterances when the average confidence of the ASR output is below a threshold ([#82](https://github.com/emma-simbot/experience-hub/issues/82)) ([6af6aaf](https://github.com/emma-simbot/experience-hub/commit/6af6aafba9e6bfd3e11da3a9e29c384e925df7f2))
+
 ## [1.1.2](https://github.com/emma-simbot/experience-hub/compare/v1.1.1...v1.1.2) (2022-10-13)
 
 
