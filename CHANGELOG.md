@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/emma-simbot/experience-hub/compare/v1.2.0...v1.2.1) (2022-10-13)
+
+
+### Bug Fixes
+
+* endpoint for out of domain detector ([#84](https://github.com/emma-simbot/experience-hub/issues/84)) ([f1ade36](https://github.com/emma-simbot/experience-hub/commit/f1ade36d89883e92f4f8c3aea567249fd82e7cbf))
+
 ## [1.2.0](https://github.com/emma-simbot/experience-hub/compare/v1.1.2...v1.2.0) (2022-10-13)
 
 
