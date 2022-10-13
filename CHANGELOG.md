@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/emma-simbot/experience-hub/compare/v1.2.1...v1.2.2) (2022-10-13)
+
+
+### Bug Fixes
+
+* logging properly (with and without api) ([#86](https://github.com/emma-simbot/experience-hub/issues/86)) ([021b2de](https://github.com/emma-simbot/experience-hub/commit/021b2dea2a8ee05cdfed7f02757c374fdf5c90f4))
+
 ## [1.2.1](https://github.com/emma-simbot/experience-hub/compare/v1.2.0...v1.2.1) (2022-10-13)
 
 
