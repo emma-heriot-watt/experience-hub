@@ -1,21 +1,14 @@
 import boto3
 from fastapi import FastAPI, Request, Response, status
 from loguru import logger
-from uvicorn import Config, Server
 
 from emma_experience_hub.api.state.simbot import (
     SimBotControllerClients,
     SimBotControllerPipelines,
     SimBotControllerState,
 )
-from emma_experience_hub.common.logging import setup_logging
 from emma_experience_hub.common.settings import Settings, SimBotSettings
-from emma_experience_hub.datamodels.simbot import SimBotRequest
-from emma_experience_hub.datamodels.simbot.response import SimBotResponse
-
-
-settings = Settings.from_env()
-simbot_settings = SimBotSettings.from_env()
+from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
 
 
 app = FastAPI()
@@ -27,6 +20,9 @@ state: SimBotControllerState = SimBotControllerState.construct()  # type: ignore
 @app.on_event("startup")
 async def startup_event() -> None:
     """Handle the startup of the API."""
+    settings = Settings.from_env()
+    simbot_settings = SimBotSettings.from_env()
+
     boto3.setup_default_session(profile_name=settings.aws_profile)
 
     clients = SimBotControllerClients.from_simbot_settings(simbot_settings)
@@ -103,15 +99,3 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
     logger.debug(f"Returning the response {simbot_response.json(by_alias=True)}")
 
     return simbot_response
-
-
-if __name__ == "__main__":
-    server = Server(
-        Config(
-            "emma_experience_hub.api.controllers.simbot:app",
-            host=simbot_settings.host,
-            port=simbot_settings.port,
-        ),
-    )
-    setup_logging()
-    server.run()

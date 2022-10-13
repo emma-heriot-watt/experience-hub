@@ -65,6 +65,10 @@ pytest-httpx = "^0.21.0"
 emma-datasets = { git = "https://github.com/emma-simbot/datasets" }
 
 
+
+[tool.poetry.group.production.dependencies]
+watchtower = "^3.0.0"
+
 [tool.black]
 line-length = 99
 
