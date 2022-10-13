@@ -153,6 +153,16 @@ class SimBotResponseGeneratorPipeline:
             intent=session.current_turn.intent.type,
         )
 
+    def handle_low_asr_confidence_intent(self, session: SimBotSession) -> tuple[str, SimBotAction]:
+        """Generate a response when the average confidence of the ASR output is too low."""
+        if not session.current_turn.intent:
+            raise AssertionError("The session turn should have an intent.")
+
+        return self._handle_intent_with_dialog(
+            raw_output=self._utterance_generator_client.get_too_low_asr_confidence_response(),
+            intent=session.current_turn.intent.type,
+        )
+
     def _get_response_generator_handler(
         self, intent: SimBotIntent
     ) -> Callable[[SimBotSession], tuple[str, SimBotAction]]:
@@ -166,6 +176,7 @@ class SimBotResponseGeneratorPipeline:
             SimBotIntentType.clarify_disambiguation: self.handle_clarify_disambiguation_intent,
             SimBotIntentType.end_of_trajectory: self.handle_end_of_trajectory_intent,
             SimBotIntentType.out_of_domain: self.handle_out_of_domain_intent,
+            SimBotIntentType.low_asr_confidence: self.handle_low_asr_confidence_intent,
         }
         return switcher[intent.type]
 

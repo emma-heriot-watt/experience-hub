@@ -44,6 +44,10 @@ class UtteranceGeneratorClient(Client):
         """Generate a question asking for more help."""
         return "Sorry, I'm struggling with this one. Are you able to be more specific please?"
 
+    def get_too_low_asr_confidence_response(self) -> str:
+        """Generate response when the ASR confidence is too low."""
+        return "Sorry, I wasn't able to understand what you said. Are you able to repeat that for me please?"
+
     def get_direction_clarify_question(self) -> str:
         """Generate clarification question for direction."""
         return self._send_request(f"{self._endpoint}/generate/clarify_direction")

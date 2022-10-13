@@ -19,6 +19,7 @@ from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
+    SimBotLowASRConfidenceDetector,
     SimBotNLUOutputParser,
 )
 from emma_experience_hub.pipelines.simbot import (
@@ -117,6 +118,9 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 extracted_features_cache_client=clients.extracted_features_cache,
                 profanity_filter_client=clients.profanity_filter,
                 out_of_domain_detector_client=clients.out_of_domain_detector,
+                asr_confidence_filter=SimBotLowASRConfidenceDetector(
+                    avg_confidence_threshold=simbot_settings.asr_avg_confidence_threshold
+                ),
                 nlu_intent_client=clients.nlu_intent,
                 nlu_intent_parser=SimBotNLUOutputParser(
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter

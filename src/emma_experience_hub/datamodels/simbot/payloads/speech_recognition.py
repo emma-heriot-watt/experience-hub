@@ -39,3 +39,8 @@ class SimBotSpeechRecognitionPayload(SimBotPayload):
         """Get the most likely utterance from all the tokens."""
         all_tokens = (token.value for token in self.tokens)
         return self._token_delimiter.join(all_tokens)
+
+    @property
+    def all_confidence_scores(self) -> list[float]:
+        """Get all the confidence scores from all the tokens."""
+        return [token.confidence.score for token in self.tokens]

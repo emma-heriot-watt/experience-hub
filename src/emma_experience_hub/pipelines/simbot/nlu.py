@@ -12,7 +12,8 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
     SimBotSessionTurn,
 )
-from emma_experience_hub.parsers import NeuralParser
+from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
+from emma_experience_hub.parsers import NeuralParser, Parser
 
 
 logger = get_logger()
@@ -28,15 +29,17 @@ class SimBotNLUPipeline:
         out_of_domain_detector_client: OutOfDomainDetectorClient,
         nlu_intent_client: EmmaPolicyClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
+        asr_confidence_filter: Parser[SimBotSpeechRecognitionPayload, bool],
     ) -> None:
         self._extracted_features_cache_client = extracted_features_cache_client
         self._profanity_filter_client = profanity_filter_client
         self._out_of_domain_detector_client = out_of_domain_detector_client
+        self._asr_confidence_filter = asr_confidence_filter
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
 
-    def run(self, session: SimBotSession) -> SimBotSession:
+    def run(self, session: SimBotSession) -> SimBotSession:  # noqa: WPS212
         """Run the pipeline for the session."""
         if self._should_respond_with_end_of_trajectory_intent(session):
             session.current_turn.intent = SimBotIntent(type=SimBotIntentType.end_of_trajectory)
@@ -54,6 +57,12 @@ class SimBotNLUPipeline:
         if self._utterance_contains_profanity(session.current_turn):
             logger.debug("Utterance contains profanity.")
             session.current_turn.intent = SimBotIntent(type=SimBotIntentType.profanity)
+            return session
+
+        # Check whether our confidence is above a certain threshold
+        if not self._asr_confidence_filter(session.current_turn.speech):
+            logger.debug("ASR confidence is too low; therefore we cannot understand the user.")
+            session.current_turn.intent = SimBotIntent(type=SimBotIntentType.low_asr_confidence)
             return session
 
         # Check whether or not the utterance is out of domain

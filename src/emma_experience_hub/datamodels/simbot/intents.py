@@ -17,6 +17,7 @@ class SimBotIntentType(Enum):
     profanity = "<profanity>"
     end_of_trajectory = "<end_of_trajectory>"
     out_of_domain = "<out_of_domain>"
+    low_asr_confidence = "<low_asr_confidence>"
 
     @property
     def is_clarification_question(self) -> bool:
