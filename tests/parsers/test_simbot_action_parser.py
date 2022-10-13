@@ -62,11 +62,11 @@ class DecodedSimBotTrajectories:
         incorrect_action = "cleanoggle sink"
         correct_action = "clean sink"
 
-        if frame_token_id:
-            incorrect_action = f"{incorrect_action} <frame_token_{frame_token_id - 1}>"
-            correct_action = f"{correct_action} <frame_token_{frame_token_id}>"
+        if frame_token_id is not None:
+            incorrect_action = f"{incorrect_action} <frame_token_{frame_token_id+1}>"
+            correct_action = f"{correct_action} <frame_token_{frame_token_id+1}>"
 
-        if visual_token_id:
+        if visual_token_id is not None:
             incorrect_action = f"{incorrect_action} <vis_token_{visual_token_id}>"
             correct_action = f"{correct_action} <vis_token_{visual_token_id}>"
 
@@ -77,7 +77,7 @@ class DecodedSimBotTrajectories:
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name="sink",
-                    colorImageIndex=frame_token_id if frame_token_id else 0,
+                    colorImageIndex=frame_token_id if frame_token_id is not None else 0,
                     mask=None,
                 )
             ),
@@ -93,10 +93,10 @@ class DecodedSimBotTrajectories:
     ) -> tuple[str, SimBotAction]:
         trajectory = f"Goto {simbot_object_name.lower()}"
 
-        if frame_token_id:
-            trajectory = f"{trajectory} <frame_token_{frame_token_id}>"
+        if frame_token_id is not None:
+            trajectory = f"{trajectory} <frame_token_{frame_token_id+1}>"
 
-        if visual_token_id:
+        if visual_token_id is not None:
             trajectory = f"{trajectory} <vis_token_{visual_token_id}>"
 
         action = SimBotAction(
@@ -104,7 +104,7 @@ class DecodedSimBotTrajectories:
             payload=SimBotGotoPayload(
                 object=SimBotGotoObjectPayload(
                     name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
-                    colorImageIndex=frame_token_id if frame_token_id else 0,
+                    colorImageIndex=frame_token_id if frame_token_id is not None else 0,
                     mask=None,
                 ),
             ),
@@ -120,10 +120,10 @@ class DecodedSimBotTrajectories:
     ) -> tuple[str, SimBotAction]:
         trajectory = f"{simbot_interaction_action} {simbot_object_name}"
 
-        if frame_token_id:
-            trajectory = f"{trajectory} <frame_token_{frame_token_id}>"
+        if frame_token_id is not None:
+            trajectory = f"{trajectory} <frame_token_{frame_token_id+1}>"
 
-        if visual_token_id:
+        if visual_token_id is not None:
             trajectory = f"{trajectory} <vis_token_{visual_token_id}>"
 
         action = SimBotAction(
@@ -131,7 +131,7 @@ class DecodedSimBotTrajectories:
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
-                    colorImageIndex=frame_token_id if frame_token_id else 0,
+                    colorImageIndex=frame_token_id if frame_token_id is not None else 0,
                     mask=None,
                 )
             ),

@@ -94,7 +94,7 @@ class SimBotActionParams(BaseModel):
     label: Optional[str] = None
     raw_label: Optional[str] = None
     object_visual_token: Optional[str] = None
-    frame_index: int = 0
+    frame_index: int = 1
 
     @classmethod
     def from_decoded_action_params(  # noqa: WPS231
@@ -104,7 +104,7 @@ class SimBotActionParams(BaseModel):
         label = None
         object_visual_token = None
         raw_label = None
-        frame_index = 0
+        frame_index = 1
 
         for action_param in action_params:
             action_param = action_param.strip()
@@ -320,7 +320,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         else:
             payload = SimBotGotoObjectPayload(
                 name=parsed_action_params.class_name,
-                colorImageIndex=parsed_action_params.frame_index,
+                colorImageIndex=parsed_action_params.frame_index - 1,
                 # TODO: Uncomment when masks are handled.
                 # mask=self._get_mask_from_visual_token(
                 #     parsed_action_params, extracted_features
@@ -349,7 +349,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name=parsed_action_params.class_name,
-                    colorImageIndex=parsed_action_params.frame_index,
+                    colorImageIndex=parsed_action_params.frame_index - 1,
                     # TODO: Uncomment when masks are handled.
                     # mask=self._get_mask_from_visual_token(
                     #     parsed_action_params, extracted_features
