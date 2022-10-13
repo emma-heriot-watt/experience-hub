@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/emma-simbot/experience-hub/compare/v1.1.1...v1.1.2) (2022-10-13)
+
+
+### Bug Fixes
+
+* provide emma services with the correct turns as history ([#79](https://github.com/emma-simbot/experience-hub/issues/79)) ([875eca6](https://github.com/emma-simbot/experience-hub/commit/875eca6d60abbdd07029643f7286aba3bcbdd4c8))
+
 ## [1.1.1](https://github.com/emma-simbot/experience-hub/compare/v1.1.0...v1.1.1) (2022-10-13)
 
 
