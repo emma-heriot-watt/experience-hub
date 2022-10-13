@@ -5,7 +5,6 @@ from emma_experience_hub.api.clients import (
 )
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient
 from emma_experience_hub.common.logging import get_logger
-from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntent,
@@ -71,10 +70,10 @@ class SimBotNLUPipeline:
         """Extract the intent from the given turn."""
         raw_intent = self._nlu_intent_client.generate(
             dialogue_history=session.get_dialogue_history(
-                session.get_turns_from_most_recent_instruction()
+                session.get_turns_since_local_state_reset()
             ),
             environment_state_history=session.get_environment_state_history(
-                session.get_turns_from_most_recent_instruction(),
+                session.get_turns_since_local_state_reset(),
                 self._extracted_features_cache_client.load,
             ),
         )
@@ -118,15 +117,5 @@ class SimBotNLUPipeline:
         if session.num_turns < 2:
             return False
 
-        previous_turn = session.turns[-2]
-
-        # Ensure that the previous turn was an instruction action
-        if previous_turn.intent and previous_turn.intent.type != SimBotIntentType.instruction:
-            return False
-
-        # Ensure that the previous turn actually contains a raw output
-        if not previous_turn.raw_output:
-            return False
-
         # Check if the raw output contains the end of trajectory token
-        return END_OF_TRAJECTORY_TOKEN in previous_turn.raw_output
+        return session.turns[-2].output_contains_end_of_trajectory_token

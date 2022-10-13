@@ -18,6 +18,16 @@ class SimBotIntentType(Enum):
     end_of_trajectory = "<end_of_trajectory>"
     out_of_domain = "<out_of_domain>"
 
+    @property
+    def is_clarification_question(self) -> bool:
+        """Return True if intent is one that triggers a clarification question."""
+        return self in {
+            SimBotIntentType.clarify_direction,
+            SimBotIntentType.clarify_description,
+            SimBotIntentType.clarify_location,
+            SimBotIntentType.clarify_disambiguation,
+        }
+
 
 class SimBotIntent(BaseModel):
     """Model represenating the intent behind the utterance."""

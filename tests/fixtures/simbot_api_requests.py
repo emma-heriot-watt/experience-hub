@@ -1,15 +1,35 @@
 import os
+import random
 import uuid
 from pathlib import Path
 from typing import Any
 
-from pytest_cases import fixture
+from pytest_cases import fixture, parametrize
+
+from emma_experience_hub.datamodels.simbot import SimBotSession, SimBotSessionTurn
+
+
+def _set_env_vars(simbot_game_metadata_dir: Path) -> None:
+    """Set the necessary environment variables."""
+    os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(simbot_game_metadata_dir.resolve())
+    os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(simbot_game_metadata_dir.resolve())
+
+
+def _get_metadata_file_name(simbot_game_metadata_dir: Path) -> str:
+    """Get the auxiliary metadata file from the directory."""
+    metadata_file_path = next(simbot_game_metadata_dir.iterdir())
+    game_metadata_file_name = metadata_file_path.name
+    if metadata_file_path.is_dir():
+        metadata_file_path = next(metadata_file_path.iterdir())
+        game_metadata_file_name = f"{game_metadata_file_name}/{metadata_file_path.name}"
+
+    return game_metadata_file_name
 
 
 class SimBotRequestCases:
     def case_without_previous_actions(self, simbot_game_metadata_dir: Path) -> dict[str, Any]:
         """Example request without any previous actions."""
-        self._set_env_vars(simbot_game_metadata_dir)
+        _set_env_vars(simbot_game_metadata_dir)
         request_body = {
             "header": {
                 "predictionRequestId": str(uuid.uuid1()),  # Request ID - unique per request
@@ -31,7 +51,7 @@ class SimBotRequestCases:
                     {
                         "type": "GameMetaData",
                         "metaData": {
-                            "uri": f"efs://{self._get_metadata_file_name(simbot_game_metadata_dir)}"
+                            "uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}"
                         },
                     },
                 ],
@@ -43,7 +63,7 @@ class SimBotRequestCases:
 
     def case_with_single_previous_action(self, simbot_game_metadata_dir: Path) -> dict[str, Any]:
         """Example request without single previous action."""
-        self._set_env_vars(simbot_game_metadata_dir)
+        _set_env_vars(simbot_game_metadata_dir)
         request_body = {
             "header": {
                 "predictionRequestId": str(uuid.uuid1()),  # Request ID - unique per request
@@ -65,7 +85,7 @@ class SimBotRequestCases:
                     {
                         "type": "GameMetaData",
                         "metaData": {
-                            "uri": f"efs://{self._get_metadata_file_name(simbot_game_metadata_dir)}"
+                            "uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}"
                         },
                     },
                 ],
@@ -79,7 +99,7 @@ class SimBotRequestCases:
 
     def case_followup_without_speech(self, simbot_game_metadata_dir: Path) -> dict[str, Any]:
         """Example request without receiving any additional speech input."""
-        self._set_env_vars(simbot_game_metadata_dir)
+        _set_env_vars(simbot_game_metadata_dir)
         request_body = {
             "header": {
                 "predictionRequestId": str(uuid.uuid1()),  # Request ID - unique per request
@@ -90,7 +110,7 @@ class SimBotRequestCases:
                     {
                         "type": "GameMetaData",
                         "metaData": {
-                            "uri": f"efs://{self._get_metadata_file_name(simbot_game_metadata_dir)}"
+                            "uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}"
                         },
                     },
                 ],
@@ -102,20 +122,439 @@ class SimBotRequestCases:
 
         return request_body
 
-    def _set_env_vars(self, simbot_game_metadata_dir: Path) -> None:
-        """Set the necessary environment variables."""
-        os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(simbot_game_metadata_dir.resolve())
-        os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(simbot_game_metadata_dir.resolve())
 
-    def _get_metadata_file_name(self, simbot_game_metadata_dir: Path) -> str:
-        """Get the auxiliary metadata file from the directory."""
-        metadata_file_path = next(simbot_game_metadata_dir.iterdir())
-        game_metadata_file_name = metadata_file_path.name
-        if metadata_file_path.is_dir():
-            metadata_file_path = next(metadata_file_path.iterdir())
-            game_metadata_file_name = f"{game_metadata_file_name}/{metadata_file_path.name}"
+class SimBotSessionCases:
+    session_id = "amzn1.echo-api.session.3f55df67-01ac-48ad-aa5b-380dcd22b837_5"
+    viewpoints = ["Warehouse_2", "SmallOffice_6", "Reception_4", "Lab2_3", "Lab1_8"]
+    unique_room_names = [
+        "BreakRoom",
+        "Lab2",
+        "Reception",
+        "SmallOffice",
+        "Warehouse",
+        "Lab1",
+        "MainOffice",
+    ]
+    current_room = "Lab1"
+    start_time = "2022-10-10T14:20:{0}.043774"
 
-        return game_metadata_file_name
+    @parametrize(
+        "include_clarify_question_before_act",
+        [False, True],
+        ids=["act_without_clarify_at_start", "act_after_clarify_at_start"],
+    )
+    def case_just_one_action(
+        self,
+        simbot_game_metadata_dir: Path,
+        include_clarify_question_before_act: bool,
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        if include_clarify_question_before_act:
+            turns.append(
+                self._get_clarification_question_turn(simbot_game_metadata_dir, len(turns))
+            )
+
+        turns.append(
+            self._get_look_around_turn(
+                simbot_game_metadata_dir,
+                len(turns),
+                include_speech=include_clarify_question_before_act or not turns,
+                include_end_of_trajectory=False,
+            )
+        )
+
+        return SimBotSession(session_id=self.session_id, turns=turns), len(turns)
+
+    @parametrize(
+        "include_clarify_question_before_act",
+        [False, True],
+        ids=["without_clarify_at_start", "after_clarify_at_start"],
+    )
+    @parametrize("num_actions", [1, 2, 3, 4, 5], idgen="{num_actions}_actions")
+    def case_consecutive_actions_from_one_utterance(
+        self,
+        simbot_game_metadata_dir: Path,
+        num_actions: int,
+        include_clarify_question_before_act: bool,
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        for turn_idx in range(num_actions):
+            # Include clarify question turn if turn idx is 0
+            if include_clarify_question_before_act and turn_idx == 0:
+                turns.append(
+                    self._get_clarification_question_turn(simbot_game_metadata_dir, turn_idx)
+                )
+                continue
+
+            if turn_idx > 0 and turns[turn_idx - 1].is_clarify_intent:
+                turns.append(
+                    self._get_look_around_turn(
+                        simbot_game_metadata_dir,
+                        turn_idx,
+                        include_speech=True,
+                        include_end_of_trajectory=turn_idx == num_actions - 1,
+                    )
+                )
+                continue
+
+            turns.append(
+                self._get_look_around_turn(
+                    simbot_game_metadata_dir,
+                    turn_idx,
+                    include_speech=turn_idx == 0,
+                    include_end_of_trajectory=turn_idx == num_actions - 1,
+                )
+            )
+
+        assert len(turns) == num_actions
+
+        return SimBotSession(session_id=self.session_id, turns=turns), len(turns)
+
+    @parametrize("num_actions", [2, 3, 4, 5], idgen="{num_actions}_actions")
+    def case_consecutive_interrupted_actions_before_returning_dialog(
+        self, simbot_game_metadata_dir: Path, num_actions: int
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        for turn_idx in range(num_actions):
+            turns.append(
+                self._get_goto_sink_turn(
+                    simbot_game_metadata_dir,
+                    turn_idx,
+                    include_speech=True,
+                    include_end_of_trajectory=True,
+                )
+            )
+
+        return SimBotSession(session_id=self.session_id, turns=turns), 1
+
+    @parametrize(
+        "num_actions_before_interruption",
+        [1, 2, 3, 4],
+        idgen="{num_actions_before_interruption}_actions_before_interruption",
+    )
+    @parametrize(
+        "num_actions_since_interruption",
+        [1, 2, 3, 4],
+        idgen="{num_actions_since_interruption}_actions_since_interruption",
+    )
+    def case_interrupted_in_middle_of_action_sequence(
+        self,
+        simbot_game_metadata_dir: Path,
+        num_actions_before_interruption: int,
+        num_actions_since_interruption: int,
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        # Populate with actions before being interrupted
+        for turn_idx_before in range(num_actions_before_interruption):
+            turns.append(
+                self._get_look_around_turn(
+                    simbot_game_metadata_dir,
+                    len(turns),
+                    include_speech=turn_idx_before == 0,
+                    include_end_of_trajectory=False,
+                )
+            )
+
+        for turn_idx_after in range(num_actions_since_interruption):
+            turns.append(
+                self._get_goto_sink_turn(
+                    simbot_game_metadata_dir,
+                    len(turns),
+                    include_speech=turn_idx_after == 0,
+                    include_end_of_trajectory=False,
+                )
+            )
+
+        return (
+            SimBotSession(session_id=self.session_id, turns=turns),
+            num_actions_since_interruption,
+        )
+
+    @parametrize("num_sequences", [2, 3, 4, 5], idgen="{num_sequences}_sequences")
+    def case_consecutive_complete_action_sequences(
+        self, simbot_game_metadata_dir: Path, num_sequences: int
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        for sequence_idx in range(num_sequences):
+            sequence_length = (
+                num_sequences if sequence_idx == num_sequences - 1 else random.randint(1, 4)
+            )
+
+            chosen_action = random.choice([self._get_look_around_turn, self._get_goto_sink_turn])
+
+            for turn_idx in range(sequence_length):
+                turns.append(
+                    chosen_action(
+                        simbot_game_metadata_dir,
+                        len(turns),
+                        include_speech=turn_idx == 0,
+                        include_end_of_trajectory=turn_idx == sequence_length - 1,
+                    )
+                )
+
+            if sequence_idx != num_sequences - 1:
+                turns.append(
+                    self._get_end_of_trajectory_dialog_turn(simbot_game_metadata_dir, len(turns))
+                )
+
+        return SimBotSession(session_id=self.session_id, turns=turns), num_sequences
+
+    @parametrize("num_sequences", [2, 3, 4, 5], idgen="{num_sequences}_sequences")
+    def case_consecutive_complete_clarified_action_sequences(
+        self, simbot_game_metadata_dir: Path, num_sequences: int
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        for sequence_idx in range(num_sequences):
+            sequence_length = (
+                num_sequences if sequence_idx == num_sequences - 1 else random.randint(2, 5)
+            )
+
+            chosen_action = random.choice([self._get_look_around_turn, self._get_goto_sink_turn])
+
+            for turn_idx in range(sequence_length):
+                if turn_idx == 0:
+                    turns.append(
+                        self._get_clarification_question_turn(simbot_game_metadata_dir, len(turns))
+                    )
+                else:
+                    turns.append(
+                        chosen_action(
+                            simbot_game_metadata_dir,
+                            len(turns),
+                            # Include speech after the clarify action
+                            include_speech=turn_idx == 1,
+                            include_end_of_trajectory=turn_idx == sequence_length - 1,
+                        )
+                    )
+
+            if sequence_idx != num_sequences - 1:
+                turns.append(
+                    self._get_end_of_trajectory_dialog_turn(simbot_game_metadata_dir, len(turns))
+                )
+
+        return SimBotSession(session_id=self.session_id, turns=turns), num_sequences
+
+    def case_consecutive_action_sequences_then_clarify_for_next(
+        self, simbot_game_metadata_dir: Path
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = self.case_consecutive_complete_action_sequences(
+            simbot_game_metadata_dir, 2
+        )[0].turns
+
+        # Add end of trajectory turn to end of previous sequences
+        turns.append(self._get_end_of_trajectory_dialog_turn(simbot_game_metadata_dir, len(turns)))
+
+        turns.append(self._get_clarification_question_turn(simbot_game_metadata_dir, len(turns)))
+        turns.append(
+            self._get_look_around_turn(
+                simbot_game_metadata_dir,
+                len(turns),
+                include_speech=True,
+                include_end_of_trajectory=False,
+            )
+        )
+
+        return SimBotSession(session_id=self.session_id, turns=turns), 2
+
+    def _get_look_around_turn(
+        self,
+        simbot_game_metadata_dir: Path,
+        turn_idx: int,
+        include_speech: bool,
+        include_end_of_trajectory: bool,
+    ) -> SimBotSessionTurn:
+        speech = (
+            {
+                "tokens": [
+                    {"value": "go", "confidence": {"score": 0.729, "bin": "HIGH"}},
+                    {"value": "to", "confidence": {"score": 0.844, "bin": "HIGH"}},
+                    {"value": "the", "confidence": {"score": 0.711, "bin": "HIGH"}},
+                    {"value": "sink", "confidence": {"score": 0.315, "bin": "HIGH"}},
+                ]
+            }
+            if include_speech
+            else None
+        )
+
+        raw_output = "look around <stop>.</s>" if include_end_of_trajectory else "look around.</s>"
+
+        return SimBotSessionTurn.parse_obj(
+            {
+                "session_id": "amzn1.echo-api.session.3f55df67-01ac-48ad-aa5b-380dcd22b837_5",
+                "prediction_request_id": str(uuid.uuid1()),
+                "idx": turn_idx,
+                "timestamp": {"start": self.start_time.format(turn_idx), "end": None},
+                "current_room": self.current_room,
+                "unique_room_names": self.unique_room_names,
+                "viewpoints": self.viewpoints,
+                "speech": speech,
+                "auxiliary_metadata_uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}",
+                "intent": {"type": "<act>", "object_name": None},
+                "action": {
+                    "type": "Look",
+                    "look": {"direction": "Around", "magnitude": 100},
+                    "status": None,
+                },
+                "raw_output": raw_output,
+            }
+        )
+
+    def _get_goto_sink_turn(
+        self,
+        simbot_game_metadata_dir: Path,
+        turn_idx: int,
+        include_speech: bool,
+        include_end_of_trajectory: bool,
+    ) -> SimBotSessionTurn:
+        speech = (
+            {
+                "tokens": [
+                    {"value": "go", "confidence": {"score": 0.729, "bin": "HIGH"}},
+                    {"value": "to", "confidence": {"score": 0.844, "bin": "HIGH"}},
+                    {"value": "the", "confidence": {"score": 0.711, "bin": "HIGH"}},
+                    {"value": "sink", "confidence": {"score": 0.315, "bin": "HIGH"}},
+                ]
+            }
+            if include_speech
+            else None
+        )
+
+        raw_output = "goto sink <stop>.</s>" if include_end_of_trajectory else "goto sink.</s>"
+
+        return SimBotSessionTurn.parse_obj(
+            {
+                "session_id": "amzn1.echo-api.session.3f55df67-01ac-48ad-aa5b-380dcd22b837_5",
+                "prediction_request_id": str(uuid.uuid1()),
+                "idx": turn_idx,
+                "timestamp": {"start": self.start_time.format(turn_idx), "end": None},
+                "current_room": self.current_room,
+                "unique_room_names": self.unique_room_names,
+                "viewpoints": self.viewpoints,
+                "speech": speech,
+                "auxiliary_metadata_uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}",
+                "intent": {"type": "<act>", "object_name": None},
+                "action": {
+                    "type": "Goto",
+                    "status": None,
+                    "goto": {"object": {"colorImageIndex": 0, "mask": None, "name": "sink"}},
+                },
+                "raw_output": raw_output,
+            }
+        )
+
+    def _get_clarification_question_turn(
+        self, simbot_game_metadata_dir: Path, turn_idx: int
+    ) -> SimBotSessionTurn:
+        return SimBotSessionTurn.parse_obj(
+            {
+                "session_id": self.session_id,
+                "prediction_request_id": str(uuid.uuid1()),
+                "idx": turn_idx,
+                "timestamp": {"start": self.start_time.format(turn_idx), "end": None},
+                "current_room": self.current_room,
+                "unique_room_names": self.unique_room_names,
+                "viewpoints": self.viewpoints,
+                "speech": {
+                    "tokens": [
+                        {"value": "go", "confidence": {"score": 0.729, "bin": "HIGH"}},
+                        {"value": "to", "confidence": {"score": 0.844, "bin": "HIGH"}},
+                        {"value": "the", "confidence": {"score": 0.711, "bin": "HIGH"}},
+                        {"value": "sink", "confidence": {"score": 0.315, "bin": "HIGH"}},
+                    ]
+                },
+                "auxiliary_metadata_uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}",
+                "intent": {"type": "<clarify><location>", "object_name": None},
+                "action": {
+                    "type": "Dialog",
+                    "status": None,
+                    "dialog": {"value": "where is the sink?"},
+                },
+                "raw_output": "where is the sink?",
+            }
+        )
+
+    def _get_end_of_trajectory_dialog_turn(
+        self, simbot_game_metadata_dir: Path, turn_idx: int
+    ) -> SimBotSessionTurn:
+        return SimBotSessionTurn.parse_obj(
+            {
+                "session_id": self.session_id,
+                "prediction_request_id": str(uuid.uuid1()),
+                "idx": turn_idx,
+                "timestamp": {"start": self.start_time.format(turn_idx), "end": None},
+                "current_room": self.current_room,
+                "unique_room_names": self.unique_room_names,
+                "viewpoints": self.viewpoints,
+                "speech": None,
+                "auxiliary_metadata_uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}",
+                "intent": {"type": "<end_of_trajectory>", "object_name": None},
+                "action": {
+                    "type": "Dialog",
+                    "status": None,
+                    "dialog": {"value": "Done!"},
+                },
+                "raw_output": "Done!",
+            }
+        )
+
+    def _get_clarify_question_then_consecutive_actions(
+        self, simbot_game_metadata_dir: Path, starting_turn_idx: int, num_actions: int
+    ) -> list[SimBotSessionTurn]:
+        turns: list[SimBotSessionTurn] = []
+
+        for turn_idx in range(num_actions):
+            # Include clarify question turn if turn idx is 0
+            if turn_idx == 0:
+                turns.append(
+                    self._get_clarification_question_turn(
+                        simbot_game_metadata_dir, starting_turn_idx + turn_idx
+                    )
+                )
+                continue
+
+            if turn_idx > 0 and turns[turn_idx - 1].is_clarify_intent:
+                turns.append(
+                    self._get_look_around_turn(
+                        simbot_game_metadata_dir,
+                        starting_turn_idx + turn_idx,
+                        include_speech=True,
+                        include_end_of_trajectory=turn_idx == num_actions - 1,
+                    )
+                )
+                continue
+
+            turns.append(
+                self._get_look_around_turn(
+                    simbot_game_metadata_dir,
+                    starting_turn_idx + turn_idx,
+                    include_speech=turn_idx == 0,
+                    include_end_of_trajectory=turn_idx == num_actions - 1,
+                )
+            )
+
+        assert len(turns) == num_actions
+
+        return turns
 
 
 @fixture(scope="session")

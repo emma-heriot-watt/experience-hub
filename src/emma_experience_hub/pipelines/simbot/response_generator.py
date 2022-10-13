@@ -60,10 +60,10 @@ class SimBotResponseGeneratorPipeline:
         """Generate a response for the instruction intent."""
         raw_output = self._instruction_intent_client.generate(
             dialogue_history=session.get_dialogue_history(
-                session.get_turns_from_most_recent_instruction()
+                session.get_turns_since_local_state_reset()
             ),
             environment_state_history=session.get_environment_state_history(
-                session.get_turns_from_most_recent_instruction(),
+                session.get_turns_since_local_state_reset(),
                 self._extracted_features_cache_client.load,
             ),
         )

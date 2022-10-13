@@ -7,6 +7,7 @@ from typing import Callable, Optional, cast
 from pydantic import BaseModel, validator
 
 from emma_experience_hub.common.logging import get_logger
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.datamodels.emma import (
     DialogueUtterance,
     EmmaExtractedFeatures,
@@ -94,6 +95,11 @@ class SimBotSessionTurn(BaseModel):
         return self.intent is not None and self.intent.type == SimBotIntentType.instruction
 
     @property
+    def is_clarify_intent(self) -> bool:
+        """Does the turn result in a clarification question?"""
+        return self.intent is not None and self.intent.type.is_clarification_question
+
+    @property
     def is_end_of_trajectory_intent(self) -> bool:
         """Is the turn at the end of a trajectory?"""
         return self.intent is not None and self.intent.type == SimBotIntentType.end_of_trajectory
@@ -102,6 +108,21 @@ class SimBotSessionTurn(BaseModel):
     def has_action(self) -> bool:
         """Determine whether or not the turn has generated an action."""
         return self.action is not None
+
+    @property
+    def output_contains_end_of_trajectory_token(self) -> bool:
+        """Return True if the raw output contains the special token for end of trajectory.
+
+        This also checks that the raw output was generated from the action prediction model by
+        ensuring that the intent type is an instruction. This is just in case the ASR breaks or
+        something --- we don't want Litte Bobby Tables (https://xkcd.com/327) breaking things.
+        """
+        return (
+            self.intent is not None
+            and self.intent.type == SimBotIntentType.instruction
+            and self.raw_output is not None
+            and END_OF_TRAJECTORY_TOKEN in self.raw_output
+        )
 
     @property
     def action_status(self) -> Optional[SimBotActionStatus]:
@@ -211,36 +232,20 @@ class SimBotSession(BaseModel):
         """
         return self.turns[-1].timestamp.end
 
-    def get_turns_from_most_recent_instruction(self) -> list[SimBotSessionTurn]:
-        """Get all the session turns from the most recent instruction utterance."""
-        # Determine whether each turn has an instruction intent
-        session_turn_has_instruction_intent = [turn.is_instruction_intent for turn in self.turns]
+    def get_turns_since_local_state_reset(self) -> list[SimBotSessionTurn]:
+        """Get all the session turns from the most-recent local state reset.
 
-        # Determine whether each turns has a end of trajectory intent
-        session_turn_has_end_of_trajectory_intent = [
-            turn.is_end_of_trajectory_intent for turn in self.turns
-        ]
+        This can occur after an instruction.
+        """
+        is_cut_off_turn = [self._should_turn_reset_local_state(turn) for turn in self.turns]
 
-        # Set the cutoff index to 0, so all turns will be returned
+        # Set the cutoff index to 0, so all turns will be returned by default
         turn_cutoff_index = 0
 
         # Get the index of the most recent turn with an instruction index
         # i.e. the last index is the first index from the reversed list
         with suppress(ValueError):
-            turn_cutoff_index = (
-                len(session_turn_has_instruction_intent)
-                - session_turn_has_instruction_intent[::-1].index(True)
-                - 1
-            )
-
-        # Check if there are any "end of trajectory" intents after the index
-        if any(session_turn_has_end_of_trajectory_intent[turn_cutoff_index:]):
-            # If there are end of trajectory intents after the index, get the new index as the turn
-            # AFTER the last "end of trajectory" intent
-            with suppress(ValueError):
-                turn_cutoff_index = len(
-                    session_turn_has_end_of_trajectory_intent
-                ) - session_turn_has_end_of_trajectory_intent[::-1].index(True)
+            turn_cutoff_index = len(is_cut_off_turn) - is_cut_off_turn[::-1].index(True) - 1
 
         # Return all the turns after the cutoff point
         return self.turns[turn_cutoff_index:]
@@ -260,6 +265,10 @@ class SimBotSession(BaseModel):
 
         This also loads the extracted features from the cache.
         """
+        # Only keep turns which have been used to change the visual frames
+        instruction_turns = (turn for turn in turns if turn.is_instruction_intent)
+
+        # Use thread pool to load the features from the files, but it will not maintain the order
         environment_history: dict[int, EnvironmentStateTurn] = {}
 
         with ThreadPoolExecutor() as executor:
@@ -267,7 +276,7 @@ class SimBotSession(BaseModel):
                 executor.submit(
                     extracted_features_load_fn, turn.session_id, turn.prediction_request_id
                 ): turn
-                for turn in turns
+                for turn in instruction_turns
             }
 
             for future in as_completed(future_to_session_turn):
@@ -281,3 +290,37 @@ class SimBotSession(BaseModel):
 
         # Ensure the environment history is sorted properly and return them
         return list(dict(sorted(environment_history.items())).values())
+
+    def _should_turn_reset_local_state(self, turn: SimBotSessionTurn) -> bool:
+        """Determine whether the given turn is at the start of a new sequence of actions.
+
+        Essentially, should all the turns before this one be ignored when providing data to the
+        neural services?
+        """
+        conditions = [
+            # If the current turn is at the start of the interaction
+            turn.idx == 0,
+            # If the current turn is the only one
+            len(self.turns) == 1,
+            # If the user has said something that resulted in a clarification question
+            turn.speech is not None and turn.is_clarify_intent,
+            # if the user said something that resulted in the model being able to act directly,
+            # and it did not follow another utterance
+            turn.speech is not None
+            and turn.is_instruction_intent
+            and turn.idx > 0
+            and self.turns[turn.idx - 1].speech is None,
+            # If the user interrupts the action sequence directly after the model predicts an end
+            # of trajectory token but was not able to return a dialog action for it
+            turn.speech is not None
+            and turn.idx > 0
+            and self.turns[turn.idx - 1].output_contains_end_of_trajectory_token,
+            # If the user interrupts the action sequence before we are able to predict the end of
+            # trajectory token
+            turn.speech is not None
+            and turn.idx > 0
+            and not self.turns[turn.idx - 1].output_contains_end_of_trajectory_token
+            and self.turns[turn.idx - 1].is_instruction_intent,
+        ]
+
+        return any(conditions)
