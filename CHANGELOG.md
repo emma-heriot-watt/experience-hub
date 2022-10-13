@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/emma-simbot/experience-hub/compare/v1.2.2...v1.2.3) (2022-10-13)
+
+
+### Bug Fixes
+
+* **docker:** command for running the out of domain detector ([#88](https://github.com/emma-simbot/experience-hub/issues/88)) ([11ff582](https://github.com/emma-simbot/experience-hub/commit/11ff5820f24150f9e6ab5965b648a71be1edc27b))
+
 ## [1.2.2](https://github.com/emma-simbot/experience-hub/compare/v1.2.1...v1.2.2) (2022-10-13)
 
 
