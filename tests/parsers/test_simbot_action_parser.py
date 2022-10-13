@@ -77,7 +77,7 @@ class DecodedSimBotTrajectories:
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name="sink",
-                    colorImageIndex=frame_token_id if frame_token_id is not None else 0,
+                    colorImageIndex=0,  # image index is 0 if no features are provided
                     mask=None,
                 )
             ),
@@ -104,7 +104,7 @@ class DecodedSimBotTrajectories:
             payload=SimBotGotoPayload(
                 object=SimBotGotoObjectPayload(
                     name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
-                    colorImageIndex=frame_token_id if frame_token_id is not None else 0,
+                    colorImageIndex=0,  # image index is 0 if no features are provided
                     mask=None,
                 ),
             ),
@@ -131,7 +131,7 @@ class DecodedSimBotTrajectories:
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
-                    colorImageIndex=frame_token_id if frame_token_id is not None else 0,
+                    colorImageIndex=0,  # image index is 0 if no features are provided
                     mask=None,
                 )
             ),
@@ -191,3 +191,34 @@ def test_simbot_decoded_actions_are_parsed_correctly(
 
     # Verify the parsed action is correct
     assert parsed_action == expected_action
+
+
+@parametrize(
+    "predicted_frame, current_frames, total_frames, expected_frame",
+    [
+        (1, 4, 5, 0),  # error case: predicted frame should be in [2,5]
+        (2, 4, 5, 0),  # get the the 1st of the latest 4 frames
+        (3, 4, 5, 1),  # get the the 2nd of the latest 4 frames
+        (4, 4, 5, 2),  # get the the 3rd of the latest 4 frames
+        (5, 4, 5, 3),  # get the the 4th of the latest 4 frames
+        (5, 1, 5, 0),  # one current frame with total 5 frames, correct prediction (5)
+        (4, 1, 5, 0),  # one current frame with total 5 frames, incorrect prediction (4)
+    ],
+)
+def test_simbot_frame_token_prediction(
+    predicted_frame: int,
+    current_frames: int,
+    total_frames: int,
+    expected_frame: int,
+    utterance_generator_client: UtteranceGeneratorClient,
+) -> None:
+    """Test that the parser returns a valid frame index."""
+    action_parser = SimBotActionPredictorOutputParser(
+        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
+    )
+    predicted_frame = action_parser._get_correct_frame_index(
+        predicted_frame, current_frames, total_frames
+    )
+
+    # Verify the parsed frame is correct
+    assert predicted_frame == expected_frame

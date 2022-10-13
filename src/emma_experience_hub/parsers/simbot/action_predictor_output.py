@@ -191,7 +191,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         self._utterance_generator_client = utterance_generator_client
 
     def __call__(
-        self, decoded_trajectory: str, extracted_features: Optional[EmmaExtractedFeatures] = None
+        self,
+        decoded_trajectory: str,
+        num_frames_in_current_turn: int = 1,
+        extracted_features: Optional[list[EmmaExtractedFeatures]] = None,
     ) -> SimBotAction:
         """Convert the decoded trajectory to a sequence of SimBot actions."""
         log.debug(f"Decoded trajectory: `{decoded_trajectory}`")
@@ -207,7 +210,9 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         for decoded_action in decoded_actions_list:
             try:
                 parsed_actions.append(
-                    self._convert_action_to_executable_form(decoded_action, extracted_features)
+                    self._convert_action_to_executable_form(
+                        decoded_action, num_frames_in_current_turn, extracted_features
+                    )
                 )
 
             # If there is a parsing issue, ask the user for help and don't decode any more
@@ -272,7 +277,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         )
 
     def _convert_action_to_executable_form(
-        self, action_str: str, extracted_features: Optional[EmmaExtractedFeatures]
+        self,
+        action_str: str,
+        num_frames_in_current_turn: int,
+        extracted_features: Optional[list[EmmaExtractedFeatures]],
     ) -> SimBotAction:
         """Convert the decoded action string into an executable form.
 
@@ -293,7 +301,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         if simbot_action_type in SimBotActionType.object_interaction():
             return self._return_object_interaction_simbot_action(
-                simbot_action_type, parsed_simbot_action_params, extracted_features
+                simbot_action_type,
+                parsed_simbot_action_params,
+                num_frames_in_current_turn,
+                extracted_features,
             )
 
         if simbot_action_type in SimBotActionType.low_level_navigation():
@@ -301,7 +312,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         if simbot_action_type == SimBotActionType.Goto:
             return self._return_goto_action(
-                simbot_action_type, parsed_simbot_action_params, extracted_features
+                simbot_action_type,
+                parsed_simbot_action_params,
+                num_frames_in_current_turn,
+                extracted_features,
             )
 
         raise AssertionError("The action type cannot be converted to an executable form.")
@@ -310,7 +324,8 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         self,
         action_type: SimBotActionType,
         parsed_action_params: SimBotActionParams,
-        extracted_features: Optional[EmmaExtractedFeatures],
+        num_frames_in_current_turn: int,
+        extracted_features: Optional[list[EmmaExtractedFeatures]],
     ) -> SimBotAction:
         """Return an executable goto action."""
         payload: Union[SimBotGotoRoomPayload, SimBotGotoObjectPayload]
@@ -318,9 +333,14 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         if parsed_action_params.class_name in self.available_room_names:
             payload = SimBotGotoRoomPayload(officeRoom=parsed_action_params.class_name)
         else:
+            num_total_frames = len(extracted_features) if extracted_features else 1
             payload = SimBotGotoObjectPayload(
                 name=parsed_action_params.class_name,
-                colorImageIndex=parsed_action_params.frame_index - 1,
+                colorImageIndex=self._get_correct_frame_index(
+                    parsed_action_params.frame_index,
+                    num_frames_in_current_turn,
+                    num_total_frames=num_total_frames,
+                ),
                 # TODO: Uncomment when masks are handled.
                 # mask=self._get_mask_from_visual_token(
                 #     parsed_action_params, extracted_features
@@ -341,15 +361,22 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         self,
         action_type: SimBotActionType,
         parsed_action_params: SimBotActionParams,
-        extracted_features: Optional[EmmaExtractedFeatures],
+        num_frames_in_current_turn: int,
+        extracted_features: Optional[list[EmmaExtractedFeatures]],
     ) -> SimBotAction:
         """Return an executable object interaction action."""
+        num_total_frames = len(extracted_features) if extracted_features else 1
+
         return SimBotAction(
             type=action_type,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name=parsed_action_params.class_name,
-                    colorImageIndex=parsed_action_params.frame_index - 1,
+                    colorImageIndex=self._get_correct_frame_index(
+                        parsed_action_params.frame_index,
+                        num_frames_in_current_turn,
+                        num_total_frames=num_total_frames,
+                    ),
                     # TODO: Uncomment when masks are handled.
                     # mask=self._get_mask_from_visual_token(
                     #     parsed_action_params, extracted_features
@@ -369,7 +396,9 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         )
 
     def _get_mask_from_visual_token(
-        self, deconstructed_action: SimBotActionParams, extracted_features: EmmaExtractedFeatures
+        self,
+        deconstructed_action: SimBotActionParams,
+        extracted_features: list[EmmaExtractedFeatures],
     ) -> list[list[int]]:
         """Get the object mask from the visual token."""
         log.warning("Getting the mask from the visual token has not yet been implemented.")
@@ -378,3 +407,22 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         compressed_mask = CompressSegmentationMask()(mask)
         return compressed_mask
+
+    def _get_correct_frame_index(
+        self,
+        parsed_frame_index: int,
+        num_frames_in_current_turn: int,
+        num_total_frames: int,
+    ) -> int:
+        """Get the correct frame index, considering the number of frames in the current turn."""
+        # Get the starting index frame for the current turn
+        start_frame_index = num_total_frames - num_frames_in_current_turn + 1
+        # Get the corrected frame index
+        frame_index = parsed_frame_index - start_frame_index
+        if num_frames_in_current_turn == 1 and frame_index != 0:
+            log.warning(f"Predicted frame index: {frame_index} instead of 0.")
+            frame_index = 0
+        else:
+            # Make sure that the predicted frame index is between 0 and 3.
+            frame_index = min(max(frame_index, 0), 3)
+        return frame_index
