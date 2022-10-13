@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "emma-experience-hub"
-version = "1.2.4"
+version = "1.3.0"
 description = ""
 authors = ["Amit Parekh <7276308+amitkparekh@users.noreply.github.com>"]
 

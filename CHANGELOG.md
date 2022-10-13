@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.0](https://github.com/emma-simbot/experience-hub/compare/v1.2.4...v1.3.0) (2022-10-13)
+
+
+### Features
+
+* make it easier to launch the simbot API from a single command ([#87](https://github.com/emma-simbot/experience-hub/issues/87)) ([a5d37d3](https://github.com/emma-simbot/experience-hub/commit/a5d37d37f1b9039aab9bd89f8b8280f3df357485))
+
 ## [1.2.4](https://github.com/emma-simbot/experience-hub/compare/v1.2.3...v1.2.4) (2022-10-13)
 
 
