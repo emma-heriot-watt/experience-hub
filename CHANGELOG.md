@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.4](https://github.com/emma-simbot/experience-hub/compare/v1.2.3...v1.2.4) (2022-10-13)
+
+
+### Bug Fixes
+
+* only send current turn for intent extraction ([#83](https://github.com/emma-simbot/experience-hub/issues/83)) ([11cee06](https://github.com/emma-simbot/experience-hub/commit/11cee06df811465a550f4c43fae03156493aea76))
+
 ## [1.2.3](https://github.com/emma-simbot/experience-hub/compare/v1.2.2...v1.2.3) (2022-10-13)
 
 
