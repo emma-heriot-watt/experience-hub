@@ -1,10 +1,10 @@
 from typing import Optional, Union
 
 import torch
+from loguru import logger
 from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import UtteranceGeneratorClient
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
@@ -27,9 +27,6 @@ from emma_experience_hub.datamodels.simbot.payloads.navigation import (
     SimBotGotoRoomPayload,
 )
 from emma_experience_hub.parsers.parser import NeuralParser
-
-
-log = get_logger()
 
 
 class CompressSegmentationMask:
@@ -197,7 +194,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         extracted_features: Optional[list[EmmaExtractedFeatures]] = None,
     ) -> SimBotAction:
         """Convert the decoded trajectory to a sequence of SimBot actions."""
-        log.debug(f"Decoded trajectory: `{decoded_trajectory}`")
+        logger.debug(f"Decoded trajectory: `{decoded_trajectory}`")
 
         decoded_actions_list = self._separate_decoded_trajectory(decoded_trajectory)
 
@@ -218,7 +215,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             # If there is a parsing issue, ask the user for help and don't decode any more
             # actions
             except Exception:
-                log.warning(f"Unable to decode the action: {decoded_action}")
+                logger.warning(f"Unable to decode the action: {decoded_action}")
 
         if not parsed_actions:
             return self._return_ask_for_help_action()
@@ -401,7 +398,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         extracted_features: list[EmmaExtractedFeatures],
     ) -> list[list[int]]:
         """Get the object mask from the visual token."""
-        log.warning("Getting the mask from the visual token has not yet been implemented.")
+        logger.warning("Getting the mask from the visual token has not yet been implemented.")
         # TODO: Get the mask from the visual token
         mask = torch.tensor([0])
 
@@ -420,7 +417,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         # Get the corrected frame index
         frame_index = parsed_frame_index - start_frame_index
         if num_frames_in_current_turn == 1 and frame_index != 0:
-            log.warning(f"Predicted frame index: {frame_index} instead of 0.")
+            logger.warning(f"Predicted frame index: {frame_index} instead of 0.")
             frame_index = 0
         else:
             # Make sure that the predicted frame index is between 0 and 3.

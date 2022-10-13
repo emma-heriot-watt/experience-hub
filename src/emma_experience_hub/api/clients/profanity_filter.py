@@ -1,11 +1,8 @@
 import httpx
+from loguru import logger
 from pydantic import AnyHttpUrl
 
 from emma_experience_hub.api.clients.client import Client
-from emma_experience_hub.common.logging import get_logger
-
-
-logger = get_logger("profanity_filter_client")
 
 
 class ProfanityFilterClient(Client):
@@ -23,7 +20,7 @@ class ProfanityFilterClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to perform healthcheck on profanity filter", exc_info=err)
             return False
 
         return True
@@ -35,7 +32,7 @@ class ProfanityFilterClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to detect whether utternace is profrane", exc_info=err)
             raise err from None
 
         return response.json()

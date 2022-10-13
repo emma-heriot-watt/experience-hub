@@ -1,9 +1,7 @@
-from emma_experience_hub.common.logging import get_logger
+from loguru import logger
+
 from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType
 from emma_experience_hub.parsers.parser import NeuralParser
-
-
-log = get_logger("simbot_nlu_parser")
 
 
 class SimBotNLUOutputParser(NeuralParser[SimBotIntent]):
@@ -22,7 +20,7 @@ class SimBotNLUOutputParser(NeuralParser[SimBotIntent]):
             - <clarify><disambiguation> object_name
             - <clarify><location> object_name
         """
-        log.debug(f"NLU output text: `{output_text}`")
+        logger.debug(f"NLU output text: `{output_text}`")
 
         # Split the raw output text by the given delimiter. We assume it's a " " separating the
         # special tokens and the object_name.

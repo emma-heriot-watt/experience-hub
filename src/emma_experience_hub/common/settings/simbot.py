@@ -4,9 +4,14 @@ from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath
 class SimBotSettings(BaseSettings):
     """Settings for the SimBot-related modules."""
 
+    # API
     app_name: str = "EMMA SimBot API"
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000
+
+    # Watchtower
+    watchtower_log_group_name: str = "simbot_challenge"
+    watchtower_log_stream_name: str = "{machine_name}/{logger_name}"
 
     auxiliary_metadata_s3_bucket: str = "emma-simbot-live-bucket"
     auxiliary_metadata_cache_dir: DirectoryPath
@@ -19,7 +24,7 @@ class SimBotSettings(BaseSettings):
 
     feature_extractor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5500", scheme="http")
 
-    # NLU settings
+    # NLU
     nlu_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5501", scheme="http")
     nlu_predictor_intent_type_delimiter: str = " "
 
@@ -27,7 +32,7 @@ class SimBotSettings(BaseSettings):
 
     utterance_generator_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5504", scheme="http")
 
-    # Action predictor settings
+    # Action predictor
     action_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5502", scheme="http")
     action_predictor_delimiter: str = "."
     action_predictor_eos_token: str = "</s>"

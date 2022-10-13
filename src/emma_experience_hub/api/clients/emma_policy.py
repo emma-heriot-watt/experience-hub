@@ -1,16 +1,13 @@
 import httpx
 import orjson
+from loguru import logger
 from pydantic import AnyHttpUrl
 
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import (
     DialogueUtterance,
     EmmaPolicyRequest,
     EnvironmentStateTurn,
 )
-
-
-logger = get_logger()
 
 
 class EmmaPolicyClient:
@@ -29,7 +26,7 @@ class EmmaPolicyClient:
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to perform healtcheck on EMMA policy server", exc_info=err)
             return False
 
         return True
@@ -61,7 +58,7 @@ class EmmaPolicyClient:
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to get response from EMMA policy server", exc_info=err)
             raise err from None
 
         return response.json()

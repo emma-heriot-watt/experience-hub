@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from loguru import logger
 from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import (
@@ -15,7 +16,6 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotExtractedFeaturesFileSystemClient,
     SimBotSessionDbClient,
 )
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
@@ -27,9 +27,6 @@ from emma_experience_hub.pipelines.simbot import (
     SimBotRequestProcessingPipeline,
     SimBotResponseGeneratorPipeline,
 )
-
-
-log = get_logger()
 
 
 class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
@@ -89,7 +86,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 try:
                     future.result()
                 except Exception as err:
-                    log.exception("Failed to verify the healthcheck", exc_info=err)
+                    logger.exception("Failed to verify the healthcheck", exc_info=err)
                     return False
 
         return True

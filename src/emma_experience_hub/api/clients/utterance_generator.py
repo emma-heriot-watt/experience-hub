@@ -1,13 +1,10 @@
 from typing import Optional
 
 import httpx
+from loguru import logger
 from pydantic import AnyHttpUrl
 
 from emma_experience_hub.api.clients.client import Client
-from emma_experience_hub.common.logging import get_logger
-
-
-logger = get_logger("utterance_generator_client")
 
 
 class UtteranceGeneratorClient(Client):
@@ -23,7 +20,7 @@ class UtteranceGeneratorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to perform healthcheck on utterance generator", exc_info=err)
             return False
 
         return True
@@ -82,7 +79,7 @@ class UtteranceGeneratorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to get response from utterance generator", exc_info=err)
             raise err from None
 
         return response.json()

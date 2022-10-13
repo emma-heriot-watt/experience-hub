@@ -17,15 +17,13 @@ from typing import Generic, Optional, TypeVar, Union
 import boto3
 import torch
 from botocore.exceptions import ClientError
+from loguru import logger
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.api.clients.pydantic import PydanticClientMixin, PydanticT
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
 
-
-logger = get_logger()
 
 T = TypeVar("T")
 

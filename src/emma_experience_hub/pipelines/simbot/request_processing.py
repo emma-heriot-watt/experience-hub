@@ -1,6 +1,7 @@
+from loguru import logger
+
 from emma_experience_hub.api.clients import FeatureExtractorClient
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient, SimBotSessionDbClient
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotActionStatus,
@@ -9,9 +10,6 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSessionTurn,
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
-
-
-logger = get_logger()
 
 
 class SimBotRequestProcessingPipeline:

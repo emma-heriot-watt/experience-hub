@@ -1,8 +1,9 @@
 from typing import Callable
 
+from loguru import logger
+
 from emma_experience_hub.api.clients import EmmaPolicyClient, UtteranceGeneratorClient
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
@@ -13,9 +14,6 @@ from emma_experience_hub.datamodels.simbot import (
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotDialogPayload
 from emma_experience_hub.parsers import NeuralParser
-
-
-logger = get_logger()
 
 
 class SimBotResponseGeneratorPipeline:

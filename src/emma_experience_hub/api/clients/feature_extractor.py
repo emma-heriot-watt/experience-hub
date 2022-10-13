@@ -4,16 +4,13 @@ from typing import Union
 import httpx
 import numpy as np
 import torch
+from loguru import logger
 from numpy.typing import ArrayLike
 from PIL import Image
 from pydantic import AnyHttpUrl
 
 from emma_experience_hub.api.clients.client import Client
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
-
-
-logger = get_logger("feature_extractor_client")
 
 
 class FeatureExtractorClient(Client):
@@ -44,7 +41,7 @@ class FeatureExtractorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to perform healthcheck on feature extractor", exc_info=err)
             return False
 
         return True
@@ -77,7 +74,7 @@ class FeatureExtractorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(err, exc_info=err)
+            logger.exception("Unable to extract features for a single image", exc_info=err)
             raise err from None
 
         # Process the response
@@ -110,7 +107,7 @@ class FeatureExtractorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(err)
+            logger.exception("Unable to extract features for multiple images", exc_info=True)
             raise err from None
 
         # Process the response

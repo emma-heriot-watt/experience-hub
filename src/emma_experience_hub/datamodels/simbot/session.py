@@ -4,9 +4,9 @@ from contextlib import suppress
 from datetime import datetime
 from typing import Callable, Optional, cast
 
+from loguru import logger
 from pydantic import BaseModel, validator
 
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.datamodels.emma import (
     DialogueUtterance,
@@ -26,9 +26,6 @@ from emma_experience_hub.datamodels.simbot.payloads import (
 from emma_experience_hub.datamodels.simbot.payloads.dialog import SimBotDialogPayload
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
-
-
-logger = get_logger()
 
 
 class SimBotSessionTurnTimestamp(BaseModel):

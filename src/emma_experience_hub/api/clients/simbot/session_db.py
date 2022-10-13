@@ -3,13 +3,10 @@ from concurrent.futures import ThreadPoolExecutor
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
+from loguru import logger
 
 from emma_experience_hub.api.clients.dynamo_db import DynamoDbClient
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels.simbot import SimBotSessionTurn
-
-
-logger = get_logger()
 
 
 class SimBotSessionDbClient(DynamoDbClient):
@@ -21,7 +18,9 @@ class SimBotSessionDbClient(DynamoDbClient):
 
     def healthcheck(self) -> bool:
         """Verify that the DB can be accessed and that it is ready."""
-        dynamodb_client = boto3.client("dynamodb", region_name=self._resource_region)
+        dynamodb_client = boto3.client(
+            "dynamodb", region_name=self._resource_region  # pyright: ignore
+        )
 
         try:
             dynamodb_client.describe_table(TableName=self._table_name)

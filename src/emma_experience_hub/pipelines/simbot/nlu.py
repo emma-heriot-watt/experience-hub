@@ -1,10 +1,11 @@
+from loguru import logger
+
 from emma_experience_hub.api.clients import (
     EmmaPolicyClient,
     OutOfDomainDetectorClient,
     ProfanityFilterClient,
 )
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient
-from emma_experience_hub.common.logging import get_logger
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntent,
@@ -14,9 +15,6 @@ from emma_experience_hub.datamodels.simbot import (
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
 from emma_experience_hub.parsers import NeuralParser, Parser
-
-
-logger = get_logger()
 
 
 class SimBotNLUPipeline:

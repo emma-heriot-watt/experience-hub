@@ -1,14 +1,14 @@
 import boto3
-import uvicorn
 from fastapi import FastAPI, Request, Response, status
 from loguru import logger
+from uvicorn import Config, Server
 
 from emma_experience_hub.api.state.simbot import (
     SimBotControllerClients,
     SimBotControllerPipelines,
     SimBotControllerState,
 )
-from emma_experience_hub.common.logging import setup_api_logging
+from emma_experience_hub.common.logging import setup_logging
 from emma_experience_hub.common.settings import Settings, SimBotSettings
 from emma_experience_hub.datamodels.simbot import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
@@ -18,7 +18,7 @@ settings = Settings.from_env()
 simbot_settings = SimBotSettings.from_env()
 
 
-app = FastAPI(debug=True)
+app = FastAPI()
 
 # Create an empty version of the state that will not error massively on module load
 state: SimBotControllerState = SimBotControllerState.construct()  # type: ignore[call-arg]
@@ -44,6 +44,7 @@ async def startup_event() -> None:
 
 
 @app.get("/ping", status_code=status.HTTP_200_OK)
+@app.get("/healthcheck", status_code=status.HTTP_200_OK)
 async def healthcheck(response: Response) -> str:
     """Perform a healthcheck across all the clients."""
     try:
@@ -82,12 +83,16 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
     logger.debug("Running request processing")
     session = state.pipelines.request_processing.run(simbot_request)
 
+    if session.current_turn.speech:
+        logger.debug(f"Incoming utterance: `{session.current_turn.speech.utterance}`")
+
     logger.debug("Running NLU")
     session = state.pipelines.nlu.run(session)
-    logger.debug(f"Current intent: {session.current_turn.intent}")
+    logger.debug(f"Current intent: `{session.current_turn.intent}`")
 
     logger.debug("Running response generation")
     session = state.pipelines.response_generation.run(session)
+    logger.debug(f"Raw output response: `{session.current_turn.raw_output}`")
 
     # Send the new session turn to the server
     state.clients.session_db.add_session_turn(session.current_turn)
@@ -101,6 +106,12 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
 
 
 if __name__ == "__main__":
-    # Run app with uvicorn
-    setup_api_logging(emma_log_level=settings.log_level)
-    uvicorn.run(app, host=simbot_settings.host, port=simbot_settings.port)
+    server = Server(
+        Config(
+            "emma_experience_hub.api.controllers.simbot:app",
+            host=simbot_settings.host,
+            port=simbot_settings.port,
+        ),
+    )
+    setup_logging()
+    server.run()
