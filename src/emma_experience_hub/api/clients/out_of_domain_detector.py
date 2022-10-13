@@ -27,7 +27,7 @@ class OutOfDomainDetectorClient(Client):
 
     def is_out_of_domain(self, text: str) -> bool:
         """Return True if the input is out of the domain."""
-        response = httpx.post(f"{self._endpoint}/is_out_of_domain", params={"text": text})
+        response = httpx.post(f"{self._endpoint}/is-out-of-domain", params={"text": text})
 
         try:
             response.raise_for_status()
