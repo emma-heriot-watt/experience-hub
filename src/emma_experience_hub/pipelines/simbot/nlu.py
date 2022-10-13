@@ -77,10 +77,10 @@ class SimBotNLUPipeline:
         """Extract the intent from the given turn."""
         raw_intent = self._nlu_intent_client.generate(
             dialogue_history=session.get_dialogue_history(
-                session.get_turns_since_local_state_reset()
+                [session.current_turn],
             ),
             environment_state_history=session.get_environment_state_history(
-                session.get_turns_since_local_state_reset(),
+                [session.current_turn],
                 self._extracted_features_cache_client.load,
             ),
         )
