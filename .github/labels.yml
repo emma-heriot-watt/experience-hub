@@ -21,11 +21,11 @@
 
 - name: documentation
   description: Documentation changes only
-  color: F695C4
+  color: 8AD9F5
 
 - name: style
   description: Changes that do not affect meaning of code (formatting, etc.)
-  color: FBCA0C
+  color: F9CD8E
 
 - name: refactor
   description: Code change that neither fixes a bug nor adds a feature
@@ -38,11 +38,11 @@
 
 - name: test
   description: Adding missing tests or correcting existing tests
-  color: EE328E
+  color: 34FFB3
 
 - name: build
   description: Changes that affect the build system or external dependencies
-  color: 962EDD
+  color: 8F4FBB
 
 - name: continuous integration
   description: Changes to CI configuration and scripts
@@ -50,11 +50,11 @@
 
 - name: chore
   description: Other changes that don't modify src or test files
-  color: A8D8F0
+  color: d3d3d3
 
 - name: revert
   description: Revert a previous commit
-  color: A8D8F0
+  color: 1e1e1e
 
 - name: backwards incompatible
   description: incompatible changes to how the application works
