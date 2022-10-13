@@ -144,8 +144,9 @@ services:
       retries: 3
       start_period: 30s
     deploy: *deploy-gpu
+    volumes: *model-volume
     ports:
       - "5505:6500"
-    entrypoint: python -m
+    entrypoint: python
     command:
-      - emma_ood_detector.api.ood_detector
+      - src/emma_ood_detection/api/ood_detection_api.py
