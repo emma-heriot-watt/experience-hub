@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/emma-simbot/experience-hub/compare/v1.5.0...v1.6.0) (2022-10-14)
+
+
+### Features
+
+* added support for turnaround action in parser ([#96](https://github.com/emma-simbot/experience-hub/issues/96)) ([8e28185](https://github.com/emma-simbot/experience-hub/commit/8e28185888e2f0f433a8550ea17aea632d3b0134))
+
 ## [1.5.0](https://github.com/emma-simbot/experience-hub/compare/v1.4.1...v1.5.0) (2022-10-14)
 
 
