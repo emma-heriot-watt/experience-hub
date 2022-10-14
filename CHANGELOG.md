@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/emma-simbot/experience-hub/compare/v1.6.0...v1.6.1) (2022-10-14)
+
+
+### Bug Fixes
+
+* lower the asr average threshold to 0.55 (from 0.6) ([#98](https://github.com/emma-simbot/experience-hub/issues/98)) ([519bd03](https://github.com/emma-simbot/experience-hub/commit/519bd039559243b947de549e225de2a8fd6a57ec))
+* stop action parsing error from preventing actions when both special tokens exist ([#97](https://github.com/emma-simbot/experience-hub/issues/97)) ([70944f0](https://github.com/emma-simbot/experience-hub/commit/70944f09118cbddf3a8201d2e2b76b03fd985982))
+
 ## [1.6.0](https://github.com/emma-simbot/experience-hub/compare/v1.5.0...v1.6.0) (2022-10-14)
 
 
