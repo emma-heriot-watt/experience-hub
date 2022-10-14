@@ -152,7 +152,12 @@ class SimBotActionParams(BaseModel):
         if label and not class_name:
             class_name = get_simbot_room_name_map().get(label)
 
-        # If still nothing, return a blank string.
+        # If still nothing, return the raw label provided we have object visual token and the frame
+        # token
+        if label and not class_name and self.frame_index and self.object_visual_token:
+            class_name = label
+
+        # If it is still none, something has gone very wrong
         if not class_name:
             raise AssertionError("Unable to get the class name from the label.")
 

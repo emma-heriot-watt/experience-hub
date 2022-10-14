@@ -1,4 +1,7 @@
-from pytest_cases import parametrize
+from typing import Optional
+
+import pytest
+from pytest_cases import fixture, parametrize
 
 from emma_experience_hub.api.clients import UtteranceGeneratorClient
 from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
@@ -21,6 +24,15 @@ from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
 from emma_experience_hub.parsers.simbot.action_predictor_output import SimBotActionParams
 
 
+@fixture
+def simbot_action_parser(
+    utterance_generator_client: UtteranceGeneratorClient,
+) -> SimBotActionPredictorOutputParser:
+    return SimBotActionPredictorOutputParser(
+        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
+    )
+
+
 @parametrize(
     "include_end_of_trajectory",
     [True, False],
@@ -29,7 +41,7 @@ from emma_experience_hub.parsers.simbot.action_predictor_output import SimBotAct
 def test_simbot_action_parser_room_navigation(
     simbot_room_name: str,
     include_end_of_trajectory: bool,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns room navigation actions."""
@@ -48,10 +60,7 @@ def test_simbot_action_parser_room_navigation(
         ),
     )
 
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
-    parsed_action = action_parser(
+    parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
@@ -71,7 +80,7 @@ def test_simbot_action_parser_room_navigation(
 def test_simbot_action_parser_object_navigation(
     simbot_object_name: str,
     include_end_of_trajectory: bool,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
     frame_token_id: int,
     visual_token_id: int,
     simbot_extracted_features: list[EmmaExtractedFeatures],
@@ -98,10 +107,7 @@ def test_simbot_action_parser_object_navigation(
         ),
     )
 
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
-    parsed_action = action_parser(
+    parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
@@ -137,37 +143,48 @@ def test_simbot_action_parser_object_interaction(
     simbot_interaction_action: str,
     simbot_object_name: str,
     include_end_of_trajectory: bool,
-    utterance_generator_client: UtteranceGeneratorClient,
-    frame_token_id: int,
-    visual_token_id: int,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
+    frame_token_id: Optional[int],
+    visual_token_id: Optional[int],
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object interaction actions actions."""
-    raw_output = (
-        f"{simbot_interaction_action} {simbot_object_name} <frame_token_{frame_token_id}> <vis_token_{visual_token_id}> <stop>.</s>"
-        if include_end_of_trajectory
-        else f"{simbot_interaction_action} {simbot_object_name} <frame_token_{frame_token_id}> <vis_token_{visual_token_id}>.</s>"
-    ).lower()
+    raw_output = f"{simbot_interaction_action} {simbot_object_name}"
+
+    if frame_token_id is not None:
+        raw_output = f"{raw_output} <frame_token_{frame_token_id}>"
+
+    if visual_token_id is not None:
+        raw_output = f"{raw_output} <vis_token_{visual_token_id}>"
+
+    if include_end_of_trajectory:
+        raw_output = f"{raw_output} <stop>"
+
+    raw_output = f"{raw_output}.</s>".lower()
 
     expected_color_image_index = (
-        0 if "sticky" in simbot_object_name.lower() else frame_token_id - 1
+        0
+        if "sticky" in simbot_object_name.lower() or frame_token_id is None
+        else frame_token_id - 1
     )
+
+    try:
+        expected_object_name = get_simbot_object_label_to_class_name_map()[simbot_object_name]
+    except KeyError:
+        expected_object_name = simbot_object_name
 
     expected_action = SimBotAction(
         type=SimBotActionType[simbot_interaction_action],
         payload=SimBotObjectInteractionPayload(
             object=SimBotInteractionObject(
-                name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
+                name=expected_object_name,
                 colorImageIndex=expected_color_image_index,
                 mask=None,
             )
         ),
     )
 
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
-    parsed_action = action_parser(
+    parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
@@ -190,6 +207,37 @@ def test_simbot_action_parser_object_interaction(
     assert parsed_action_type_payload.object.name == expected_action_type_payload.object.name
 
 
+@parametrize("non_parsable_object_name", ["red button", "white board", "chicken banana"])
+@parametrize(
+    "include_end_of_trajectory,frame_token_id,visual_token_id",
+    [
+        [True, 1, 2],
+        [False, 1, 2],
+        [True, 2, 3],
+        [False, 2, 3],
+        pytest.param(False, None, None, marks=[pytest.mark.xfail]),  # noqa: WPS425
+    ],
+)
+def test_still_parses_when_both_special_tokens_are_available(
+    simbot_interaction_action: str,
+    non_parsable_object_name: str,
+    include_end_of_trajectory: bool,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
+    frame_token_id: int,
+    visual_token_id: int,
+    simbot_extracted_features: list[EmmaExtractedFeatures],
+) -> None:
+    return test_simbot_action_parser_object_interaction(
+        simbot_interaction_action=simbot_interaction_action,
+        simbot_object_name=non_parsable_object_name,
+        include_end_of_trajectory=include_end_of_trajectory,
+        simbot_action_parser=simbot_action_parser,
+        frame_token_id=frame_token_id,
+        visual_token_id=visual_token_id,
+        simbot_extracted_features=simbot_extracted_features,
+    )
+
+
 @parametrize(
     "include_end_of_trajectory,frame_token_id,visual_token_id",
     [
@@ -202,7 +250,7 @@ def test_simbot_action_parser_object_interaction(
 def test_simbot_action_parser_visual_token_coordinates(
     simbot_object_name: str,
     include_end_of_trajectory: bool,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
     frame_token_id: int,
     visual_token_id: int,
     simbot_extracted_features: list[EmmaExtractedFeatures],
@@ -214,19 +262,15 @@ def test_simbot_action_parser_visual_token_coordinates(
         else f"goto {simbot_object_name.lower()} <frame_token_{frame_token_id}> <vis_token_{visual_token_id}>.</s>"
     )
 
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
-
-    action_str = action_parser._separate_decoded_trajectory(raw_output)[0]
+    action_str = simbot_action_parser._separate_decoded_trajectory(raw_output)[0]
 
     action_tokens = action_str.strip().split(" ")
-    _, simbot_action_params = action_parser._get_simbot_action_from_tokens(action_tokens)
+    _, simbot_action_params = simbot_action_parser._get_simbot_action_from_tokens(action_tokens)
     parsed_simbot_action_params = SimBotActionParams.from_decoded_action_params(
         simbot_action_params
     )
 
-    _, candidate_coords = action_parser._get_mask_from_visual_token(
+    _, candidate_coords = simbot_action_parser._get_mask_from_visual_token(
         parsed_simbot_action_params, simbot_extracted_features, return_coords=True
     )
 
@@ -248,7 +292,7 @@ def test_simbot_action_parser_visual_token_coordinates(
 def test_simbot_action_parser_low_level_action(
     low_level_navigation_trajectory: str,
     low_level_navigation_action: SimBotActionType,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct low level actions."""
@@ -258,11 +302,7 @@ def test_simbot_action_parser_low_level_action(
         payload=low_level_navigation_action.payload_model(),
     )
 
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
-
-    parsed_action = action_parser(
+    parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
@@ -280,26 +320,20 @@ def test_simbot_action_parser_low_level_action(
 )
 def test_simbot_action_parser_sticky_note(
     raw_output: str,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct low level actions."""
     expected_action = SimBotAction(
         type=SimBotActionType.Examine,
         payload=SimBotObjectInteractionPayload(
-            object=SimBotInteractionObject(color_image_index=0, mask=None, name="stickynote")
+            object=SimBotInteractionObject(colorImageIndex=0, mask=None, name="stickynote")
         ),
         status=None,
         object_output_type="OBJECT_CLASS",
-        examine=SimBotObjectInteractionPayload(
-            object=SimBotInteractionObject(color_image_index=0, mask=None, name="stickynote")
-        ),
-    )
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
     )
 
-    parsed_action = action_parser(
+    parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
@@ -324,13 +358,10 @@ def test_simbot_action_parser_frame_token_prediction(
     current_frames: int,
     total_frames: int,
     expected_frame: int,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
 ) -> None:
     """Test that the parser returns a valid frame index."""
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
-    predicted_frame = action_parser._get_correct_frame_index(
+    predicted_frame = simbot_action_parser._get_correct_frame_index(
         predicted_frame, current_frames, total_frames
     )
 
@@ -344,18 +375,15 @@ def test_simbot_action_parser_frame_token_prediction(
 )
 def test_simbot_turn_around_action(
     raw_output: str,
-    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_action_parser: SimBotActionPredictorOutputParser,
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct low level actions."""
     expected_action = SimBotAction(
         type=SimBotActionType.Rotate, status=None, payload=SimBotTurnAroundPayload()
     )
-    action_parser = SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
 
-    parsed_action = action_parser(
+    parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
