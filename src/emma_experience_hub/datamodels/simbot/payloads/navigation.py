@@ -73,6 +73,16 @@ class SimBotRotateLeftPayload(SimBotRotatePayload):
     magnitude: PositiveFloat = 90
 
 
+class SimBotTurnAroundPayload(SimBotRotateLeftPayload):
+    """SimBot action for turning around.
+
+    Defaults to 180deg turn.
+    """
+
+    direction: Literal["Left"] = "Left"
+    magnitude: PositiveFloat = 180
+
+
 class SimBotRotateRightPayload(SimBotRotatePayload):
     """SimBot action for rotating right.
 

@@ -21,6 +21,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotRotatePayload,
     SimBotRotateRightPayload,
     SimBotSpeechRecognitionPayload,
+    SimBotTurnAroundPayload,
 )
 
 
@@ -42,6 +43,7 @@ class SimBotActionType(Enum):
     LookUp = "look up"  # noqa: WPS115
     LookDown = "look down"  # noqa: WPS115
     LookAround = "look around"  # noqa: WPS115
+    TurnAround = "turn around"  # noqa: WPS115
 
     # Object interaction
     Pickup = "pickup"  # noqa: WPS115
@@ -82,6 +84,7 @@ class SimBotActionType(Enum):
             SimBotActionType.LookUp,
             SimBotActionType.LookDown,
             SimBotActionType.LookAround,
+            SimBotActionType.TurnAround,
         ]
 
     @classmethod
@@ -98,6 +101,7 @@ class SimBotActionType(Enum):
             SimBotActionType.LookUp,
             SimBotActionType.LookDown,
             SimBotActionType.LookAround,
+            SimBotActionType.TurnAround,
         ]
 
     @classmethod
@@ -144,6 +148,7 @@ class SimBotActionType(Enum):
             "LookUp": SimBotLookUpPayload,
             "LookDown": SimBotLookDownPayload,
             "LookAround": SimBotLookAroundPayload,
+            "TurnAround": SimBotTurnAroundPayload,
             # Object interaction
             "Pickup": SimBotObjectInteractionPayload,
             "Open": SimBotObjectInteractionPayload,
@@ -176,7 +181,11 @@ class SimBotActionType(Enum):
     @classmethod
     def rotate_actions(cls) -> set["SimBotActionType"]:
         """Return all the rotate actions."""
-        return {SimBotActionType.RotateLeft, SimBotActionType.RotateRight}
+        return {
+            SimBotActionType.RotateLeft,
+            SimBotActionType.RotateRight,
+            SimBotActionType.TurnAround,
+        }
 
     @property
     def base_type(self) -> "SimBotActionType":

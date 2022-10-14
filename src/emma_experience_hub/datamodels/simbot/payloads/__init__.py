@@ -19,6 +19,7 @@ from emma_experience_hub.datamodels.simbot.payloads.navigation import (
     SimBotRotateLeftPayload,
     SimBotRotatePayload,
     SimBotRotateRightPayload,
+    SimBotTurnAroundPayload,
 )
 from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
     SimBotInteractionObject,

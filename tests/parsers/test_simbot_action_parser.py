@@ -15,6 +15,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoRoomPayload,
     SimBotInteractionObject,
     SimBotObjectInteractionPayload,
+    SimBotTurnAroundPayload,
 )
 from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
 from emma_experience_hub.parsers.simbot.action_predictor_output import SimBotActionParams
@@ -335,3 +336,28 @@ def test_simbot_action_parser_frame_token_prediction(
 
     # Verify the parsed frame is correct
     assert predicted_frame == expected_frame
+
+
+@parametrize(
+    "raw_output",
+    ["turn around <stop>.</s>", "turn around."],
+)
+def test_simbot_turn_around_action(
+    raw_output: str,
+    utterance_generator_client: UtteranceGeneratorClient,
+    simbot_extracted_features: list[EmmaExtractedFeatures],
+) -> None:
+    """Tests that the parser returns correct low level actions."""
+    expected_action = SimBotAction(
+        type=SimBotActionType.Rotate, status=None, payload=SimBotTurnAroundPayload()
+    )
+    action_parser = SimBotActionPredictorOutputParser(
+        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
+    )
+
+    parsed_action = action_parser(
+        raw_output,
+        extracted_features=simbot_extracted_features,
+        num_frames_in_current_turn=len(simbot_extracted_features),
+    )
+    assert parsed_action == expected_action

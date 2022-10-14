@@ -85,6 +85,7 @@ ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
         SimBotActionType.LookUp: {"Look Up", "look up"},
         SimBotActionType.LookDown: {"Look Down", "look down"},
         SimBotActionType.LookAround: {"Look Around", "look around"},
+        SimBotActionType.TurnAround: {"Turn Around", "turn around"},
         SimBotActionType.Pickup: {"PickUp", "pickup"},
         SimBotActionType.Open: {"Open", "open"},
         SimBotActionType.Close: {"Close", "close"},
