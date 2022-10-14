@@ -13,7 +13,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotDialogPayload
-from emma_experience_hub.parsers import NeuralParser
+from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
 
 
 class SimBotResponseGeneratorPipeline:
@@ -24,7 +24,7 @@ class SimBotResponseGeneratorPipeline:
         extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
         utterance_generator_client: UtteranceGeneratorClient,
         instruction_intent_client: EmmaPolicyClient,
-        instruction_intent_response_parser: NeuralParser[SimBotAction],
+        instruction_intent_response_parser: SimBotActionPredictorOutputParser,
     ) -> None:
         self._extracted_features_cache_client = extracted_features_cache_client
 
@@ -56,17 +56,25 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_instruction_intent(self, session: SimBotSession) -> tuple[str, SimBotAction]:
         """Generate a response for the instruction intent."""
+        environment_state_history = session.get_environment_state_history(
+            session.get_turns_since_local_state_reset(),
+            self._extracted_features_cache_client.load,
+        )
         raw_output = self._instruction_intent_client.generate(
             dialogue_history=session.get_dialogue_history(
                 session.get_turns_since_local_state_reset()
             ),
-            environment_state_history=session.get_environment_state_history(
-                session.get_turns_since_local_state_reset(),
-                self._extracted_features_cache_client.load,
-            ),
+            environment_state_history=environment_state_history,
         )
-
-        actions = self._instruction_intent_response_parser(raw_output)
+        # get the flattened list of extracted features from the state history
+        extracted_features = [
+            feats for turn in environment_state_history for feats in turn.features
+        ]
+        actions = self._instruction_intent_response_parser(
+            raw_output,
+            extracted_features=extracted_features,
+            num_frames_in_current_turn=len(environment_state_history[-1].features),
+        )
 
         return raw_output, actions
 

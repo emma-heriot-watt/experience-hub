@@ -172,7 +172,7 @@ class SimBotSessionTurn(BaseModel):
         return SimBotResponse(
             sessionId=self.session_id,
             predictionRequestId=self.prediction_request_id,
-            objectOutputType="OBJECT_CLASS",
+            objectOutputType=self.action.object_output_type,
             actions=[self.action],
         )
 

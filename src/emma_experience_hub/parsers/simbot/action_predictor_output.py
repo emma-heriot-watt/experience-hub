@@ -1,7 +1,8 @@
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 import torch
 from loguru import logger
+from overrides import overrides
 from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import UtteranceGeneratorClient
@@ -27,6 +28,9 @@ from emma_experience_hub.datamodels.simbot.payloads.navigation import (
     SimBotGotoRoomPayload,
 )
 from emma_experience_hub.parsers.parser import NeuralParser
+
+
+ObjectOutputType = Literal["OBJECT_CLASS", "OBJECT_MASK"]
 
 
 class CompressSegmentationMask:
@@ -187,11 +191,12 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         self._utterance_generator_client = utterance_generator_client
 
+    @overrides(check_signature=False)
     def __call__(
         self,
         decoded_trajectory: str,
+        extracted_features: list[EmmaExtractedFeatures],
         num_frames_in_current_turn: int = 1,
-        extracted_features: Optional[list[EmmaExtractedFeatures]] = None,
     ) -> SimBotAction:
         """Convert the decoded trajectory to a sequence of SimBot actions."""
         logger.debug(f"Decoded trajectory: `{decoded_trajectory}`")
@@ -203,7 +208,6 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             return self._return_ask_for_help_action()
 
         parsed_actions: list[SimBotAction] = []
-
         for decoded_action in decoded_actions_list:
             try:
                 parsed_actions.append(
@@ -277,7 +281,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         self,
         action_str: str,
         num_frames_in_current_turn: int,
-        extracted_features: Optional[list[EmmaExtractedFeatures]],
+        extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
         """Convert the decoded action string into an executable form.
 
@@ -317,35 +321,60 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         raise AssertionError("The action type cannot be converted to an executable form.")
 
+    def _prepare_object_payload_params(  # noqa: WPS234
+        self,
+        parsed_action_params: SimBotActionParams,
+        extracted_features: list[EmmaExtractedFeatures],
+        num_frames_in_current_turn: int,
+    ) -> tuple[Optional[list[list[int]]], int, ObjectOutputType]:
+        if parsed_action_params.class_name == "stickynote":
+            mask = None
+            object_output_type = "OBJECT_CLASS"
+            # TODO: are we sure that we want to assume that the sticky note is in frame 0?
+            color_image_index = 0
+        else:
+            num_total_frames = len(extracted_features)
+            color_image_index = self._get_correct_frame_index(
+                parsed_action_params.frame_index,
+                num_frames_in_current_turn,
+                num_total_frames=num_total_frames,
+            )
+            mask = self._get_mask_from_visual_token(parsed_action_params, extracted_features)
+            object_output_type = "OBJECT_MASK"
+
+        return mask, color_image_index, object_output_type  # type: ignore[return-value]
+
     def _return_goto_action(
         self,
         action_type: SimBotActionType,
         parsed_action_params: SimBotActionParams,
         num_frames_in_current_turn: int,
-        extracted_features: Optional[list[EmmaExtractedFeatures]],
+        extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
         """Return an executable goto action."""
         payload: Union[SimBotGotoRoomPayload, SimBotGotoObjectPayload]
 
+        object_output_type: ObjectOutputType = "OBJECT_CLASS"
         if parsed_action_params.class_name in self.available_room_names:
             payload = SimBotGotoRoomPayload(officeRoom=parsed_action_params.class_name)
         else:
-            num_total_frames = len(extracted_features) if extracted_features else 1
-            payload = SimBotGotoObjectPayload(
-                name=parsed_action_params.class_name,
-                colorImageIndex=self._get_correct_frame_index(
-                    parsed_action_params.frame_index,
-                    num_frames_in_current_turn,
-                    num_total_frames=num_total_frames,
-                ),
-                # TODO: Uncomment when masks are handled.
-                # mask=self._get_mask_from_visual_token(
-                #     parsed_action_params, extracted_features
-                # ),
-                mask=None,
+            (mask, color_image_index, object_output_type) = self._prepare_object_payload_params(
+                parsed_action_params=parsed_action_params,
+                num_frames_in_current_turn=num_frames_in_current_turn,
+                extracted_features=extracted_features,
             )
 
-        return SimBotAction(type=action_type, payload=SimBotGotoPayload(object=payload))
+            payload = SimBotGotoObjectPayload(
+                name=parsed_action_params.class_name,
+                colorImageIndex=color_image_index,
+                mask=mask,
+            )
+
+        return SimBotAction(
+            type=action_type,
+            payload=SimBotGotoPayload(object=payload),
+            object_output_type=object_output_type,
+        )
 
     def _return_low_level_navigation_action(self, action_type: SimBotActionType) -> SimBotAction:
         """Return an executable low level navigation action."""
@@ -359,28 +388,24 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         action_type: SimBotActionType,
         parsed_action_params: SimBotActionParams,
         num_frames_in_current_turn: int,
-        extracted_features: Optional[list[EmmaExtractedFeatures]],
+        extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
         """Return an executable object interaction action."""
-        num_total_frames = len(extracted_features) if extracted_features else 1
-
+        (mask, color_image_index, object_output_type) = self._prepare_object_payload_params(
+            parsed_action_params=parsed_action_params,
+            num_frames_in_current_turn=num_frames_in_current_turn,
+            extracted_features=extracted_features,
+        )
         return SimBotAction(
             type=action_type,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     name=parsed_action_params.class_name,
-                    colorImageIndex=self._get_correct_frame_index(
-                        parsed_action_params.frame_index,
-                        num_frames_in_current_turn,
-                        num_total_frames=num_total_frames,
-                    ),
-                    # TODO: Uncomment when masks are handled.
-                    # mask=self._get_mask_from_visual_token(
-                    #     parsed_action_params, extracted_features
-                    # ),
-                    mask=None,
+                    colorImageIndex=color_image_index,
+                    mask=mask,
                 )
             ),
+            object_output_type=object_output_type,
         )
 
     def _return_ask_for_help_action(self) -> SimBotAction:
@@ -392,17 +417,35 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             ),
         )
 
-    def _get_mask_from_visual_token(
+    def _get_mask_from_visual_token(  # noqa: WPS234
         self,
         deconstructed_action: SimBotActionParams,
         extracted_features: list[EmmaExtractedFeatures],
-    ) -> list[list[int]]:
+        return_coords: bool = False,
+    ) -> Union[list[list[int]], tuple[list[list[int]], tuple[float, ...]]]:  # noqa: WPS221
         """Get the object mask from the visual token."""
-        logger.warning("Getting the mask from the visual token has not yet been implemented.")
-        # TODO: Get the mask from the visual token
-        mask = torch.tensor([0])
+        frame_index = deconstructed_action.frame_index
 
+        # frame_index are 1-indexed
+        object_coordinates_bbox = extracted_features[frame_index - 1].bbox_coords
+
+        object_visual_token_str = deconstructed_action.object_visual_token
+        # <vis_token_2>
+        object_visual_token = int(
+            object_visual_token_str.split("_")[-1][:-1]  # type:ignore[union-attr]
+        )
+
+        # visual tokens start are 1-indexed
+        (x_min, y_min, x_max, y_max) = object_coordinates_bbox[object_visual_token - 1].tolist()
+
+        mask = torch.zeros(
+            (extracted_features[frame_index - 1].width, extracted_features[frame_index - 1].height)
+        )
+        # populate the bbox region in the mask with ones
+        mask[int(y_min) : int(y_max) + 1, int(x_min) : int(x_max) + 1] = 1  # noqa: WPS221
         compressed_mask = CompressSegmentationMask()(mask)
+        if return_coords:
+            return compressed_mask, (x_min, y_min, x_max, y_max)
         return compressed_mask
 
     def _get_correct_frame_index(

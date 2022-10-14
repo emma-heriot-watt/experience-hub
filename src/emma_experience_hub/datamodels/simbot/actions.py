@@ -1,6 +1,6 @@
 from contextlib import suppress
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
@@ -278,6 +278,7 @@ class SimBotAction(BaseModel):
     type: SimBotActionType
     payload: SimBotPayload = Field(..., exclude=True)
     status: Optional[SimBotActionStatus] = None
+    object_output_type: Literal["OBJECT_CLASS", "OBJECT_MASK"] = "OBJECT_CLASS"
 
     class Config:
         """Config for the model."""

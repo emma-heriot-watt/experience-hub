@@ -22,6 +22,8 @@ class SimBotResponse(BaseModel):
                 "status": True,
                 # Do not include the intent field for the dialog action
                 "dialog": {"intent"},
+                # Do not include the object_output_type
+                "object_output_type": True,
             },
         },
     )
