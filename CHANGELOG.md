@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/emma-simbot/experience-hub/compare/v1.4.1...v1.5.0) (2022-10-14)
+
+
+### Features
+
+* filter Alexa wake words from the processed utterance ([#95](https://github.com/emma-simbot/experience-hub/issues/95)) ([202ffea](https://github.com/emma-simbot/experience-hub/commit/202ffea89d20b7c49eb761fea0a941bb6ba5616c))
+
 ## [1.4.1](https://github.com/emma-simbot/experience-hub/compare/v1.4.0...v1.4.1) (2022-10-14)
 
 
