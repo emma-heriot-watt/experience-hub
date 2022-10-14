@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/emma-simbot/experience-hub/compare/v1.3.1...v1.4.0) (2022-10-14)
+
+
+### Features
+
+* Get object mask from frame vis tokens ([#85](https://github.com/emma-simbot/experience-hub/issues/85)) ([5362492](https://github.com/emma-simbot/experience-hub/commit/5362492357fb0c8395c2e11325760b2fe4271d62))
+
 ## [1.3.1](https://github.com/emma-simbot/experience-hub/compare/v1.3.0...v1.3.1) (2022-10-14)
 
 
