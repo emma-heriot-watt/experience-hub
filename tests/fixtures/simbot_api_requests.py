@@ -6,7 +6,11 @@ from typing import Any
 
 from pytest_cases import fixture, parametrize
 
-from emma_experience_hub.datamodels.simbot import SimBotSession, SimBotSessionTurn
+from emma_experience_hub.datamodels.simbot import (
+    SimBotIntentType,
+    SimBotSession,
+    SimBotSessionTurn,
+)
 
 
 def _set_env_vars(simbot_game_metadata_dir: Path) -> None:
@@ -282,6 +286,98 @@ class SimBotSessionCases:
             num_actions_since_interruption,
         )
 
+    @parametrize(
+        "num_actions_before_non_actionble_utterance",
+        [1, 2],
+        idgen="{num_actions_before_non_actionble_utterance}_actions_before_non_actionable_utterance",
+    )
+    @parametrize(
+        "num_actions_since_non_actionable_utterance",
+        [1, 2],
+        idgen="{num_actions_since_non_actionable_utterance}_actions_since_non_actionable_utterance",
+    )
+    @parametrize(
+        "num_consecutive_non_actionable_utterances",
+        [1, 2],
+        idgen="{num_consecutive_non_actionable_utterances}_consecutive_non_actionable_utterances",
+    )
+    @parametrize(
+        "is_first_non_actionable_utterance_an_interruption",
+        [True, False],
+        ids=[
+            "is_interrupted_by_non_actionable_utterance",
+            "not_interrupted_by_non_actionable_utterance",
+        ],
+    )
+    @parametrize(
+        "is_clarify_after_non_actionable_utterances",
+        [True, False],
+        ids=[
+            "clarify_after_non_actionable_utterances",
+            "not_clarify_after_non_actionable_utterance",
+        ],
+    )
+    def case_separated_by_non_actionable_utterance(
+        self,
+        simbot_game_metadata_dir: Path,
+        num_actions_before_non_actionble_utterance: int,
+        num_actions_since_non_actionable_utterance: int,
+        num_consecutive_non_actionable_utterances: int,
+        is_first_non_actionable_utterance_an_interruption: bool,
+        is_clarify_after_non_actionable_utterances: bool,
+    ) -> tuple[SimBotSession, int]:
+        _set_env_vars(simbot_game_metadata_dir)
+
+        turns: list[SimBotSessionTurn] = []
+
+        # Populate with actions before being interrupted
+        for turn_idx_before in range(num_actions_before_non_actionble_utterance):
+            turns.append(
+                self._get_look_around_turn(
+                    simbot_game_metadata_dir,
+                    len(turns),
+                    include_speech=turn_idx_before == 0,
+                    # Include the end of trajectory if desired by test
+                    include_end_of_trajectory=is_first_non_actionable_utterance_an_interruption
+                    and turn_idx_before == num_actions_before_non_actionble_utterance - 1,
+                )
+            )
+
+        if not is_first_non_actionable_utterance_an_interruption:
+            turns.append(
+                self._get_end_of_trajectory_dialog_turn(simbot_game_metadata_dir, len(turns))
+            )
+
+        for _ in range(num_consecutive_non_actionable_utterances):
+            turns.append(self._get_non_actionable_turn(simbot_game_metadata_dir, len(turns)))
+
+        turns_after_interruption = []
+        if is_clarify_after_non_actionable_utterances:
+            turns_after_interruption = self._get_clarify_question_then_consecutive_actions(
+                simbot_game_metadata_dir,
+                len(turns),
+                num_actions_since_non_actionable_utterance,
+            )
+        else:
+            turns_after_interruption = [
+                self._get_goto_sink_turn(
+                    simbot_game_metadata_dir,
+                    len(turns),
+                    include_speech=turn_idx_after == 0,
+                    include_end_of_trajectory=False,
+                )
+                for turn_idx_after in range(num_actions_since_non_actionable_utterance)
+            ]
+
+        turns.extend(turns_after_interruption)
+
+        assert turns_after_interruption
+
+        return (
+            SimBotSession(session_id=self.session_id, turns=turns),
+            len(turns_after_interruption),
+        )
+
     @parametrize("num_sequences", [2, 3, 4, 5], idgen="{num_sequences}_sequences")
     def case_consecutive_complete_action_sequences(
         self, simbot_game_metadata_dir: Path, num_sequences: int
@@ -514,6 +610,44 @@ class SimBotSessionCases:
                     "dialog": {"value": "Done!"},
                 },
                 "raw_output": "Done!",
+            }
+        )
+
+    def _get_non_actionable_turn(
+        self, simbot_game_metadata_dir: Path, turn_idx: int
+    ) -> SimBotSessionTurn:
+        all_non_actionable_intents = [
+            intent for intent in SimBotIntentType if not intent.is_actionable
+        ]
+
+        speech = {
+            "tokens": [
+                {"value": "blah", "confidence": {"score": 0.729, "bin": "HIGH"}},
+                {"value": "blah", "confidence": {"score": 0.844, "bin": "HIGH"}},
+            ]
+        }
+
+        return SimBotSessionTurn.parse_obj(
+            {
+                "session_id": self.session_id,
+                "prediction_request_id": str(uuid.uuid1()),
+                "idx": turn_idx,
+                "timestamp": {"start": self.start_time.format(turn_idx), "end": None},
+                "current_room": self.current_room,
+                "unique_room_names": self.unique_room_names,
+                "viewpoints": self.viewpoints,
+                "speech": speech,
+                "auxiliary_metadata_uri": f"efs://{_get_metadata_file_name(simbot_game_metadata_dir)}",
+                "intent": {
+                    "type": random.choice(all_non_actionable_intents).value,
+                    "object_name": None,
+                },
+                "action": {
+                    "type": "Dialog",
+                    "status": None,
+                    "dialog": {"value": "Sorry, I don't understand."},
+                },
+                "raw_output": "Sorry, I don't understand.",
             }
         )
 

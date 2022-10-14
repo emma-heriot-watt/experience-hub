@@ -102,6 +102,11 @@ class SimBotSessionTurn(BaseModel):
         return self.intent is not None and self.intent.type == SimBotIntentType.end_of_trajectory
 
     @property
+    def is_actionable_intent(self) -> bool:
+        """Is the incoming utterance an actionable intent?"""
+        return self.intent is not None and self.intent.type.is_actionable
+
+    @property
     def has_action(self) -> bool:
         """Determine whether or not the turn has generated an action."""
         return self.action is not None
@@ -318,6 +323,10 @@ class SimBotSession(BaseModel):
             and turn.idx > 0
             and not self.turns[turn.idx - 1].output_contains_end_of_trajectory_token
             and self.turns[turn.idx - 1].is_instruction_intent,
+            # If the current turn comes after the previous turn was a non-actionable intent
+            turn.speech is not None
+            and turn.idx > 0
+            and not self.turns[turn.idx - 1].is_actionable_intent,
         ]
 
         return any(conditions)

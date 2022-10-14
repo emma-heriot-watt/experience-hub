@@ -27,7 +27,19 @@ class SimBotIntentType(Enum):
             SimBotIntentType.clarify_description,
             SimBotIntentType.clarify_location,
             SimBotIntentType.clarify_disambiguation,
+            SimBotIntentType.clarify_question,
         }
+
+    @property
+    def is_actionable(self) -> bool:
+        """Return True if the intent is one we can act on.
+
+        We can act on instructions and clarifcation QA's.
+        """
+        return (
+            self in {SimBotIntentType.instruction, SimBotIntentType.clarify_answer}
+            or self.is_clarification_question
+        )
 
 
 class SimBotIntent(BaseModel):
