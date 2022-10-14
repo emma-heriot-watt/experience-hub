@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/emma-simbot/experience-hub/compare/v1.3.0...v1.3.1) (2022-10-14)
+
+
+### Bug Fixes
+
+* providing correct turns after non-actionable utterances  ([#92](https://github.com/emma-simbot/experience-hub/issues/92)) ([a13bffd](https://github.com/emma-simbot/experience-hub/commit/a13bffdf64eef02a7cb98549ce6dd61612b95044))
+
 ## [1.3.0](https://github.com/emma-simbot/experience-hub/compare/v1.2.4...v1.3.0) (2022-10-13)
 
 
