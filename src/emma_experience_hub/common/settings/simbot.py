@@ -34,7 +34,7 @@ class SimBotSettings(BaseSettings):
 
     out_of_domain_detector_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5505", scheme="http")
 
-    asr_avg_confidence_threshold: float = 0.6
+    asr_avg_confidence_threshold: float = 0.55
 
     class Config:
         """Config for the settings."""
