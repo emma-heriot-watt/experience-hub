@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/emma-simbot/experience-hub/compare/v1.4.0...v1.4.1) (2022-10-14)
+
+
+### Bug Fixes
+
+* increase the default ASR average confidence threshold ([#94](https://github.com/emma-simbot/experience-hub/issues/94)) ([1a1d6a2](https://github.com/emma-simbot/experience-hub/commit/1a1d6a2fb74dd9284ef16e07ee0c72929060868e))
+
 ## [1.4.0](https://github.com/emma-simbot/experience-hub/compare/v1.3.1...v1.4.0) (2022-10-14)
 
 
