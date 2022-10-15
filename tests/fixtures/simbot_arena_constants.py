@@ -50,6 +50,12 @@ simbot_object_name = param_fixture(
     scope="session",
 )
 
+simbot_non_parsable_object_name = param_fixture(
+    "simbot_non_parsable_object_name",
+    ["red button", "white board", "chicken banana"],
+    scope="session",
+)
+
 simbot_interaction_action = param_fixture(
     "simbot_interaction_action",
     [action.name for action in SimBotActionType.object_interaction()],
