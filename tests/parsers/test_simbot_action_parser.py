@@ -115,11 +115,18 @@ def test_simbot_action_parser_object_navigation(
 
     # Check if everything is identical except the compressed mask
     assert parsed_action.type == expected_action.type
+
+    assert isinstance(parsed_action.payload, SimBotGotoPayload)
+    assert isinstance(expected_action.payload, SimBotGotoPayload)
+
+    assert isinstance(parsed_action.payload.object, SimBotGotoObjectPayload)
+    assert isinstance(expected_action.payload.object, SimBotGotoObjectPayload)
+
     assert (
         parsed_action.payload.object.color_image_index
-        == expected_action.payload.object.color_image_index  # type: ignore[attr-defined]
+        == expected_action.payload.object.color_image_index
     )
-    assert parsed_action.payload.object.name == expected_action.payload.object.name  # type: ignore[attr-defined]
+    assert parsed_action.payload.object.name == expected_action.payload.object.name
 
     parsed_action_type_payload = getattr(parsed_action, parsed_action.type.name.lower())
     expected_action_type_payload = getattr(expected_action, expected_action.type.name.lower())
@@ -192,11 +199,18 @@ def test_simbot_action_parser_object_interaction(
 
     # Check if everything is identical except the compressed mask
     assert parsed_action.type == expected_action.type
+
+    assert isinstance(parsed_action.payload, SimBotGotoPayload)
+    assert isinstance(expected_action.payload, SimBotGotoPayload)
+
+    assert isinstance(parsed_action.payload.object, SimBotGotoObjectPayload)
+    assert isinstance(expected_action.payload.object, SimBotGotoObjectPayload)
+
     assert (
         parsed_action.payload.object.color_image_index
-        == expected_action.payload.object.color_image_index  # type: ignore[attr-defined]
+        == expected_action.payload.object.color_image_index
     )
-    assert parsed_action.payload.object.name == expected_action.payload.object.name  # type: ignore[attr-defined]
+    assert parsed_action.payload.object.name == expected_action.payload.object.name
 
     parsed_action_type_payload = getattr(parsed_action, parsed_action.type.name.lower())
     expected_action_type_payload = getattr(expected_action, expected_action.type.name.lower())
