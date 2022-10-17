@@ -60,6 +60,17 @@ target "out-of-domain-detector" {
   }
 }
 
+target "placeholder-button-detector" {
+  dockerfile = "docker/emma-nlg.Dockerfile"
+  tags       = ["${IMAGE_NAME}:button-detector"]
+
+  args = {
+    IMAGE_BASE_NAME    = "${IMAGE_NAME}"
+    REMOTE_REPO_URL    = "https://github.com/emma-simbot/color-matcher"
+    REMOTE_REPO_BRANCH = "main"
+  }
+}
+
 target "nlg" {
   dockerfile = "docker/emma-nlg.Dockerfile"
   tags       = ["${IMAGE_NAME}:nlg"]

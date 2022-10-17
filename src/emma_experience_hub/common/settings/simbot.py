@@ -36,6 +36,8 @@ class SimBotSettings(BaseSettings):
 
     asr_avg_confidence_threshold: float = 0.55
 
+    button_detector_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5506", scheme="http")
+
     class Config:
         """Config for the settings."""
 

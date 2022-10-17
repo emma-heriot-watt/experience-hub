@@ -12,6 +12,7 @@ from emma_experience_hub.api.clients import (
     UtteranceGeneratorClient,
 )
 from emma_experience_hub.api.clients.simbot import (
+    PlaceholderVisionClient,
     SimBotAuxiliaryMetadataS3Client,
     SimBotExtractedFeaturesFileSystemClient,
     SimBotSessionDbClient,
@@ -41,6 +42,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     profanity_filter: ProfanityFilterClient
     utterance_generator: UtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
+    button_detector: PlaceholderVisionClient
 
     @classmethod
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
@@ -71,6 +73,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url
             ),
+            button_detector=PlaceholderVisionClient(endpoint=simbot_settings.button_detector_url),
         )
 
     def healthcheck(self) -> bool:
@@ -132,6 +135,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     utterance_generator_client=clients.utterance_generator,
                 ),
                 utterance_generator_client=clients.utterance_generator,
+                button_detector_client=clients.button_detector,
             ),
         )
 

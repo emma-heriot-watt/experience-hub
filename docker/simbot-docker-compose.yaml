@@ -150,3 +150,28 @@ services:
     entrypoint: python
     command:
       - src/emma_ood_detection/api/ood_detection_api.py
+
+  placeholder_button_detector:
+    container_name: placeholder_button_detector
+    image: heriot-watt/emma-simbot:button-detector
+    environment:
+      LOG_LEVEL: info
+      DEVICE: "cuda:0"
+      MODEL_CHECKPOINT_PATH: "/app/model/vision_model_21.pth"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:6500/healthcheck
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy: *deploy-gpu
+    volumes: *model-volume
+    ports:
+      - "5506:5506"
+    entrypoint: python
+    command:
+      - src/emma_color_matcher/api/color_matcher_api.py

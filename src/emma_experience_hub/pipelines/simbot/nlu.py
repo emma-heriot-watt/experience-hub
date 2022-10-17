@@ -6,6 +6,7 @@ from emma_experience_hub.api.clients import (
     ProfanityFilterClient,
 )
 from emma_experience_hub.api.clients.simbot import SimBotCacheClient
+from emma_experience_hub.constants.simbot import get_simbot_is_press_button_verbs
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntent,
@@ -36,6 +37,7 @@ class SimBotNLUPipeline:
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
+        self._is_press_button_verbs = get_simbot_is_press_button_verbs()
 
     def run(self, session: SimBotSession) -> SimBotSession:  # noqa: WPS212
         """Run the pipeline for the session."""
@@ -67,6 +69,11 @@ class SimBotNLUPipeline:
         if self._utterance_is_out_of_domain(session.current_turn):
             logger.debug("Utterance is out of domain.")
             session.current_turn.intent = SimBotIntent(type=SimBotIntentType.out_of_domain)
+            return session
+
+        if self._utterance_is_press_button(session.current_turn):
+            logger.debug("Utterance is to press the button.")
+            session.current_turn.intent = SimBotIntent(type=SimBotIntentType.press_button)
             return session
 
         # Extract the intent, store within the session, and return
@@ -126,3 +133,15 @@ class SimBotNLUPipeline:
 
         # Check if the raw output contains the end of trajectory token
         return session.turns[-2].output_contains_end_of_trajectory_token
+
+    def _utterance_is_press_button(self, turn: SimBotSessionTurn) -> bool:
+        """Detect whether the utterance is for pressing the buttom.
+
+        Adopted from https://github.com/emma-simbot/simbot-ml-toolbox/blob/8a697b32b47794f37b4dc481753f7e66de358efb/action_model/placeholder_model.py#L165-L579
+        """
+        is_press_button = False
+        if turn.speech is not None:
+            utterance = turn.speech.utterance.lower()
+            if "button" in utterance:
+                is_press_button = any([verb in utterance for verb in self._is_press_button_verbs])
+        return is_press_button

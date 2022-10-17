@@ -3,7 +3,7 @@ from typing import Callable
 from loguru import logger
 
 from emma_experience_hub.api.clients import EmmaPolicyClient, UtteranceGeneratorClient
-from emma_experience_hub.api.clients.simbot import SimBotCacheClient
+from emma_experience_hub.api.clients.simbot import PlaceholderVisionClient, SimBotCacheClient
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
@@ -12,7 +12,12 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
 )
-from emma_experience_hub.datamodels.simbot.payloads import SimBotDialogPayload
+from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotAuxiliaryMetadataPayload,
+    SimBotDialogPayload,
+    SimBotInteractionObject,
+    SimBotObjectInteractionPayload,
+)
 from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
 
 
@@ -23,12 +28,14 @@ class SimBotResponseGeneratorPipeline:
         self,
         extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
         utterance_generator_client: UtteranceGeneratorClient,
+        button_detector_client: PlaceholderVisionClient,
         instruction_intent_client: EmmaPolicyClient,
         instruction_intent_response_parser: SimBotActionPredictorOutputParser,
     ) -> None:
         self._extracted_features_cache_client = extracted_features_cache_client
 
         self._utterance_generator_client = utterance_generator_client
+        self._button_detector_client = button_detector_client
 
         self._instruction_intent_client = instruction_intent_client
         self._instruction_intent_response_parser = instruction_intent_response_parser
@@ -169,6 +176,35 @@ class SimBotResponseGeneratorPipeline:
             intent=session.current_turn.intent.type,
         )
 
+    def handle_press_button_intent(self, session: SimBotSession) -> tuple[str, SimBotAction]:
+        """Generate a response when we want to press a button."""
+        if not session.current_turn.intent:
+            raise AssertionError("The session turn should have an intent.")
+
+        if not session.current_turn.speech:
+            raise AssertionError("The session turn should have an utterance for this intent.")
+
+        raw_output = "press button <stop>.</s>"
+
+        output = SimBotAction(
+            type=SimBotActionType.Toggle,
+            payload=SimBotObjectInteractionPayload(
+                object=SimBotInteractionObject(
+                    colorImageIndex=0,
+                    mask=self._button_detector_client.get_object_mask_from_image(
+                        raw_utterance=session.current_turn.speech.utterance,
+                        # Load the image from the turn's auxiliary metadata file
+                        image=SimBotAuxiliaryMetadataPayload.from_efs_uri(
+                            session.current_turn.auxiliary_metadata_uri
+                        ).images[0],
+                    ),
+                    name="button",
+                )
+            ),
+        )
+
+        return raw_output, output
+
     def _get_response_generator_handler(
         self, intent: SimBotIntent
     ) -> Callable[[SimBotSession], tuple[str, SimBotAction]]:
@@ -183,6 +219,7 @@ class SimBotResponseGeneratorPipeline:
             SimBotIntentType.end_of_trajectory: self.handle_end_of_trajectory_intent,
             SimBotIntentType.out_of_domain: self.handle_out_of_domain_intent,
             SimBotIntentType.low_asr_confidence: self.handle_low_asr_confidence_intent,
+            SimBotIntentType.press_button: self.handle_press_button_intent,
         }
         return switcher[intent.type]
 

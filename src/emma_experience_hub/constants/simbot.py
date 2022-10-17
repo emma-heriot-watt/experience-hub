@@ -75,6 +75,12 @@ def get_simbot_room_name_map() -> dict[str, str]:
     return {room_name.lower(): room_name for room_name in get_simbot_room_names()}
 
 
+@lru_cache(maxsize=1)
+def get_simbot_is_press_button_verbs() -> list[str]:
+    """Get the SimBot button verbs used for the button intent."""
+    return ["press", "activate", "hit", "switch", "toggle", "push"]
+
+
 ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
     {
         SimBotActionType.Goto: {"GoTo", "goto", "Goto"},

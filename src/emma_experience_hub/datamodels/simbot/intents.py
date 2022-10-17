@@ -18,6 +18,7 @@ class SimBotIntentType(Enum):
     end_of_trajectory = "<end_of_trajectory>"
     out_of_domain = "<out_of_domain>"
     low_asr_confidence = "<low_asr_confidence>"
+    press_button = "<press_button>"
 
     @property
     def is_clarification_question(self) -> bool:
