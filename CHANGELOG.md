@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.0](https://github.com/emma-simbot/experience-hub/compare/v1.6.1...v1.7.0) (2022-10-17)
+
+
+### Features
+
+* integrate a client to get the button mask from the placeholder vision model ([#103](https://github.com/emma-simbot/experience-hub/issues/103)) ([248b099](https://github.com/emma-simbot/experience-hub/commit/248b0992e145eb533b21d5ff736d4277ea40440d))
+
 ## [1.6.1](https://github.com/emma-simbot/experience-hub/compare/v1.6.0...v1.6.1) (2022-10-14)
 
 
