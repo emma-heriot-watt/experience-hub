@@ -56,7 +56,7 @@ target "out-of-domain-detector" {
   args = {
     IMAGE_BASE_NAME    = "${IMAGE_NAME}"
     REMOTE_REPO_URL    = "https://github.com/emma-simbot/ood-detection"
-    REMOTE_REPO_BRANCH = "v1.0.1"
+    REMOTE_REPO_BRANCH = "v1.0.3"
   }
 }
 
