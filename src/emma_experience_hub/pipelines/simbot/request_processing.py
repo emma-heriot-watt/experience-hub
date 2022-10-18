@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from loguru import logger
 
 from emma_experience_hub.api.clients import FeatureExtractorClient
@@ -95,11 +97,8 @@ class SimBotRequestProcessingPipeline:
 
     def validate_extracted_features_for_session(self, turns: list[SimBotSessionTurn]) -> None:
         """Check existance for all turns, and extract features if they do not exist."""
-        for turn in turns:
-            self._validate_session_turn_features_are_cached(turn)
-
-            # with ThreadPoolExecutor() as pool:
-        # pool.map(self._validate_session_turn_features_are_cached, turns)
+        with ThreadPoolExecutor() as pool:
+            pool.map(self._validate_session_turn_features_are_cached, turns)
 
     def _validate_session_turn_features_are_cached(self, turn: SimBotSessionTurn) -> bool:
         """Validate the session turn and ensure that the features are extracted and cached."""
