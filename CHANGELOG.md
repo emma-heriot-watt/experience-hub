@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.2](https://github.com/emma-simbot/experience-hub/compare/v1.7.1...v1.7.2) (2022-10-18)
+
+
+### Bug Fixes
+
+* include the new action error type ([#107](https://github.com/emma-simbot/experience-hub/issues/107)) ([f22fb7d](https://github.com/emma-simbot/experience-hub/commit/f22fb7d566f2ea6193dacdd73cfe8d9ec1f925f1))
+
 ## [1.7.1](https://github.com/emma-simbot/experience-hub/compare/v1.7.0...v1.7.1) (2022-10-18)
 
 
