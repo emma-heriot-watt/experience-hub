@@ -359,7 +359,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         """Return an executable goto action."""
         payload: Union[SimBotGotoRoomPayload, SimBotGotoObjectPayload]
 
-        object_output_type: ObjectOutputType = "OBJECT_CLASS"
+        object_output_type: ObjectOutputType = "OBJECT_MASK"
         if parsed_action_params.class_name in self.available_room_names:
             payload = SimBotGotoRoomPayload(officeRoom=parsed_action_params.class_name)
         else:

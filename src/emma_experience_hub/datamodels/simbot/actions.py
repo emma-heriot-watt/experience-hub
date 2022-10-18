@@ -288,7 +288,7 @@ class SimBotAction(BaseModel):
     type: SimBotActionType
     payload: SimBotPayload = Field(..., exclude=True)
     status: Optional[SimBotActionStatus] = None
-    object_output_type: Literal["OBJECT_CLASS", "OBJECT_MASK"] = "OBJECT_CLASS"
+    object_output_type: Literal["OBJECT_CLASS", "OBJECT_MASK"] = "OBJECT_MASK"
 
     class Config:
         """Config for the model."""
