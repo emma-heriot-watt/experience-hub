@@ -8,6 +8,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=DL3013
 RUN curl -sSL https://install.python-poetry.org | python3 - \
+	&& poetry self add 'poethepoet[poetry_plugin]' \
 	&& python -m venv "$VIRTUAL_ENV" \
 	&& pip install -U pip --no-cache-dir \
 	# Setuptools v59.5.0 used because torch/lightining version used requires it
