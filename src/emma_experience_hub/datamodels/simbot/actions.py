@@ -227,6 +227,7 @@ class SimBotActionStatusType(Enum):
     no_free_hand = "NoFreeHand"
     invalid_command = "InvalidCommand"
     object_not_picked_up = "ObjectNotPickedUp"
+    incorrect_action_format = "IncorrectActionFormat"
 
     @classmethod
     def reverse_mapping(cls) -> dict[str, str]:
