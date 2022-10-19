@@ -64,12 +64,12 @@ class SimBotResponseGeneratorPipeline:
         session.current_turn.raw_output = raw_output
         session.current_turn.actions = actions
 
-        # Ensure that all the actions are indexed correctly before returning
-        self._update_action_ids_for_turn(session.current_turn)
-
         if END_OF_TRAJECTORY_TOKEN in raw_output:
             _, end_of_trajectory_dialog_action = self.handle_end_of_trajectory_intent(session)
             actions.extend(end_of_trajectory_dialog_action)
+
+        # Ensure that all the actions are indexed correctly before returning
+        self._update_action_ids_for_turn(session.current_turn)
 
         return session
 
