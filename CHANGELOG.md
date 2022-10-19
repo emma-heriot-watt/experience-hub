@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.4](https://github.com/emma-simbot/experience-hub/compare/v1.7.3...v1.7.4) (2022-10-19)
+
+
+### Bug Fixes
+
+* param error to set server endpoint for placeholder vision client ([da2deb8](https://github.com/emma-simbot/experience-hub/commit/da2deb8afb876c05f378489796fc947fc983b2f2))
+
 ## [1.7.3](https://github.com/emma-simbot/experience-hub/compare/v1.7.2...v1.7.3) (2022-10-18)
 
 
