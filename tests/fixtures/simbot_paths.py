@@ -17,5 +17,6 @@ def simbot_game_metadata_dir(simbot_fixtures_root: Path) -> Path:
 
     # Add to environment variables to handle Settings
     os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(metadata_dir.resolve())
+    os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(metadata_dir.resolve())
 
     return metadata_dir

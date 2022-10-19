@@ -92,6 +92,7 @@ def test_simbot_action_parser_room_navigation(
     )
 
     expected_action = SimBotAction(
+        id=0,
         type=SimBotActionType.Goto,
         payload=SimBotGotoPayload(
             object=SimBotGotoRoomPayload(
@@ -138,6 +139,7 @@ def test_simbot_action_parser_object_navigation(
         )
 
     expected_action = SimBotAction(
+        id=0,
         type=SimBotActionType.Goto,
         payload=SimBotGotoPayload(
             object=SimBotGotoObjectPayload(
@@ -210,6 +212,7 @@ def test_simbot_action_parser_object_interaction(
         expected_object_name = simbot_object_name
 
     expected_action = SimBotAction(
+        id=0,
         type=SimBotActionType[simbot_interaction_action],
         payload=SimBotObjectInteractionPayload(
             object=SimBotInteractionObject(
@@ -328,6 +331,7 @@ def test_simbot_action_parser_low_level_action(
     """Tests that the parser returns correct low level actions."""
     raw_output = f"{low_level_navigation_trajectory} <stop>.</s>"
     expected_action = SimBotAction(
+        id=0,
         type=low_level_navigation_action.base_type,
         payload=low_level_navigation_action.payload_model(),
     )
@@ -355,12 +359,12 @@ def test_simbot_action_parser_sticky_note(
 ) -> None:
     """Tests that the parser returns correct low level actions."""
     expected_action = SimBotAction(
+        id=0,
         type=SimBotActionType.Examine,
         payload=SimBotObjectInteractionPayload(
             object=SimBotInteractionObject(colorImageIndex=0, mask=None, name="stickynote")
         ),
         status=None,
-        object_output_type="OBJECT_CLASS",
     )
 
     parsed_action = simbot_action_parser(
@@ -410,7 +414,7 @@ def test_simbot_turn_around_action(
 ) -> None:
     """Tests that the parser returns correct low level actions."""
     expected_action = SimBotAction(
-        type=SimBotActionType.Rotate, status=None, payload=SimBotTurnAroundPayload()
+        id=0, type=SimBotActionType.Rotate, status=None, payload=SimBotTurnAroundPayload()
     )
 
     parsed_action = simbot_action_parser(

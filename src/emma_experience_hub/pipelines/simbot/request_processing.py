@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import suppress
 
 from loguru import logger
 
@@ -75,22 +76,25 @@ class SimBotRequestProcessingPipeline:
             )
             return
 
-        if turn.action is None:
+        if turn.actions is None:
             logger.error("The turn should have an action. Is this the right turn?")
             return
 
-        if len(action_status) > 1:
+        if len(action_status) != len(turn.actions):
             logger.error(
-                f"The number of actions with the turn is not equal to the number of statuses available. There is only 1 action within the turn, but {len(action_status)} statuses."
+                f"The number of actions with the turn is not equal to the number of statuses available. There are {len(turn.actions)} actions within the turn, but {len(action_status)} statuses."
             )
             logger.warning(
                 "Trying to match the available actions to the available statuses anyway."
             )
 
         # Update the action status, ensuring we match the right one.
-        for status in action_status:
-            if status.type == turn.action.type.base_type:
-                turn.action.status = status
+        action_status_id_map = {status.id: status for status in action_status}
+
+        with suppress(KeyError):
+            for action in turn.actions:
+                if action.id is not None:
+                    action.status = action_status_id_map[action.id]
 
         # Put the updated session turn into the db
         self._session_db_client.put_session_turn(turn)

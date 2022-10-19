@@ -1,11 +1,10 @@
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, overload
 
 import torch
 from loguru import logger
 from overrides import overrides
 from pydantic import BaseModel
 
-from emma_experience_hub.api.clients import UtteranceGeneratorClient
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
@@ -17,20 +16,15 @@ from emma_experience_hub.constants.simbot import (
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
-    SimBotDialogPayload,
-    SimBotInteractionObject,
-    SimBotObjectInteractionPayload,
-    SimBotPayload,
-)
-from emma_experience_hub.datamodels.simbot.payloads.navigation import (
     SimBotGotoObjectPayload,
     SimBotGotoPayload,
     SimBotGotoRoomPayload,
+    SimBotInteractionObject,
+    SimBotObjectInteractionPayload,
+    SimBotObjectMaskType,
+    SimBotPayload,
 )
 from emma_experience_hub.parsers.parser import NeuralParser
-
-
-ObjectOutputType = Literal["OBJECT_CLASS", "OBJECT_MASK"]
 
 
 class CompressSegmentationMask:
@@ -44,10 +38,10 @@ class CompressSegmentationMask:
     def __init__(self) -> None:
         self.run_idx = 0
         self.run_length = 0
-        self.compressed_mask: list[list[int]] = []
+        self.compressed_mask: SimBotObjectMaskType = []
         self.current_run = False
 
-    def __call__(self, mask: torch.Tensor) -> list[list[int]]:
+    def __call__(self, mask: torch.Tensor) -> SimBotObjectMaskType:
         """Compress the mask."""
         self.reset()
 
@@ -89,12 +83,17 @@ class CompressSegmentationMask:
         self.run_length = 0
 
 
+def extract_index_from_special_token(token: str) -> int:
+    """Extract the token index from the special token."""
+    return int(token.strip().split("_")[-1].replace(">", ""))
+
+
 class SimBotActionParams(BaseModel):
     """Deconstructed SimBot action from the decoded action trajectory."""
 
     label: Optional[str] = None
     raw_label: Optional[str] = None
-    object_visual_token: Optional[str] = None
+    object_index: Optional[int] = None
     frame_index: int = 1
 
     @classmethod
@@ -103,7 +102,7 @@ class SimBotActionParams(BaseModel):
     ) -> "SimBotActionParams":
         """Parse the decoded action params from the raw decoded params list."""
         label = None
-        object_visual_token = None
+        object_index = None
         raw_label = None
         frame_index = 1
 
@@ -111,10 +110,10 @@ class SimBotActionParams(BaseModel):
             action_param = action_param.strip()
 
             if action_param.startswith("<vis_token") and action_param.endswith(">"):
-                object_visual_token = action_param
+                object_index = extract_index_from_special_token(action_param)
 
             elif action_param.startswith("<frame") and action_param.endswith(">"):
-                frame_index = int(action_param.strip().split("_")[-1].replace(">", ""))
+                frame_index = extract_index_from_special_token(action_param)
 
             else:
                 # in this case, we're trying to extract the class label which could be composed of
@@ -132,8 +131,13 @@ class SimBotActionParams(BaseModel):
             label=label,
             raw_label=raw_label,
             frame_index=frame_index,
-            object_visual_token=object_visual_token,
+            object_index=object_index,
         )
+
+    @property
+    def has_both_frame_and_object_indices(self) -> bool:
+        """Return True if both frame and object indicies are known."""
+        return self.object_index is not None and self.frame_index is not None
 
     @property
     def class_name(self) -> str:
@@ -154,7 +158,7 @@ class SimBotActionParams(BaseModel):
 
         # If still nothing, return the raw label provided we have object visual token and the frame
         # token
-        if label and not class_name and self.frame_index and self.object_visual_token:
+        if label and not class_name and self.has_both_frame_and_object_indices:
             class_name = label
 
         # If it is still none, something has gone very wrong
@@ -185,16 +189,9 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         object_label.lower(): object_label for object_label in _object_label_to_idx.keys()
     }
 
-    def __init__(
-        self,
-        action_delimiter: str,
-        eos_token: str,
-        utterance_generator_client: UtteranceGeneratorClient,
-    ) -> None:
+    def __init__(self, action_delimiter: str, eos_token: str) -> None:
         self._eos_token = eos_token
         self._action_delimiter = action_delimiter
-
-        self._utterance_generator_client = utterance_generator_client
 
     @overrides(check_signature=False)
     def __call__(
@@ -210,7 +207,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         # If there is a problem when decoding the action, ask the user for some help.
         if not decoded_actions_list:
-            return self._return_ask_for_help_action()
+            raise AssertionError("Could not decoded any actions from the trajectory")
 
         parsed_actions: list[SimBotAction] = []
         for decoded_action in decoded_actions_list:
@@ -227,7 +224,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
                 logger.warning(f"Unable to decode the action: {decoded_action}")
 
         if not parsed_actions:
-            return self._return_ask_for_help_action()
+            raise AssertionError("Could not parse any actions from the trajectory")
 
         return parsed_actions[0]
 
@@ -326,28 +323,27 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         raise AssertionError("The action type cannot be converted to an executable form.")
 
-    def _prepare_object_payload_params(  # noqa: WPS234
+    def _prepare_object_payload_params(
         self,
         parsed_action_params: SimBotActionParams,
         extracted_features: list[EmmaExtractedFeatures],
         num_frames_in_current_turn: int,
-    ) -> tuple[Optional[list[list[int]]], int, ObjectOutputType]:
+    ) -> tuple[Optional[SimBotObjectMaskType], int]:
         if parsed_action_params.class_name == "stickynote":
-            mask = None
-            object_output_type = "OBJECT_CLASS"
             # TODO: are we sure that we want to assume that the sticky note is in frame 0?
-            color_image_index = 0
-        else:
-            num_total_frames = len(extracted_features)
-            color_image_index = self._get_correct_frame_index(
-                parsed_action_params.frame_index,
-                num_frames_in_current_turn,
-                num_total_frames=num_total_frames,
-            )
-            mask = self._get_mask_from_visual_token(parsed_action_params, extracted_features)
-            object_output_type = "OBJECT_MASK"
+            return None, 0
 
-        return mask, color_image_index, object_output_type  # type: ignore[return-value]
+        color_image_index = self._get_correct_frame_index(
+            parsed_action_params.frame_index,
+            num_frames_in_current_turn,
+            num_total_frames=len(extracted_features),
+        )
+        mask = self._get_mask_from_visual_token(
+            deconstructed_action=parsed_action_params,
+            extracted_features=extracted_features,
+        )
+
+        return mask, color_image_index
 
     def _return_goto_action(
         self,
@@ -359,11 +355,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         """Return an executable goto action."""
         payload: Union[SimBotGotoRoomPayload, SimBotGotoObjectPayload]
 
-        object_output_type: ObjectOutputType = "OBJECT_MASK"
         if parsed_action_params.class_name in self.available_room_names:
             payload = SimBotGotoRoomPayload(officeRoom=parsed_action_params.class_name)
         else:
-            (mask, color_image_index, object_output_type) = self._prepare_object_payload_params(
+            mask, color_image_index = self._prepare_object_payload_params(
                 parsed_action_params=parsed_action_params,
                 num_frames_in_current_turn=num_frames_in_current_turn,
                 extracted_features=extracted_features,
@@ -376,14 +371,15 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             )
 
         return SimBotAction(
+            id=0,
             type=action_type,
             payload=SimBotGotoPayload(object=payload),
-            object_output_type=object_output_type,
         )
 
     def _return_low_level_navigation_action(self, action_type: SimBotActionType) -> SimBotAction:
         """Return an executable low level navigation action."""
         return SimBotAction(
+            id=0,
             type=action_type.base_type,
             payload=action_type.payload_model(),
         )
@@ -396,12 +392,13 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
         """Return an executable object interaction action."""
-        (mask, color_image_index, object_output_type) = self._prepare_object_payload_params(
+        mask, color_image_index = self._prepare_object_payload_params(
             parsed_action_params=parsed_action_params,
             num_frames_in_current_turn=num_frames_in_current_turn,
             extracted_features=extracted_features,
         )
         return SimBotAction(
+            id=0,
             type=action_type,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
@@ -410,47 +407,64 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
                     mask=mask,
                 )
             ),
-            object_output_type=object_output_type,
         )
 
-    def _return_ask_for_help_action(self) -> SimBotAction:
-        """Return a dialog action when an exception or something unexpected occurs."""
-        return SimBotAction(
-            type=SimBotActionType.Dialog,
-            payload=SimBotDialogPayload(
-                value=self._utterance_generator_client.get_raised_exception_response()
-            ),
-        )
+    @overload
+    def _get_mask_from_visual_token(
+        self,
+        deconstructed_action: SimBotActionParams,
+        extracted_features: list[EmmaExtractedFeatures],
+        return_coords: Literal[False] = False,
+    ) -> SimBotObjectMaskType:
+        ...  # noqa: WPS428
 
-    def _get_mask_from_visual_token(  # noqa: WPS234
+    @overload
+    def _get_mask_from_visual_token(
+        self,
+        deconstructed_action: SimBotActionParams,
+        extracted_features: list[EmmaExtractedFeatures],
+        return_coords: Literal[True],
+    ) -> tuple[SimBotObjectMaskType, tuple[float, ...]]:
+        ...  # noqa: WPS428
+
+    def _get_mask_from_visual_token(
         self,
         deconstructed_action: SimBotActionParams,
         extracted_features: list[EmmaExtractedFeatures],
         return_coords: bool = False,
-    ) -> Union[list[list[int]], tuple[list[list[int]], tuple[float, ...]]]:  # noqa: WPS221
+    ) -> Union[SimBotObjectMaskType, tuple[SimBotObjectMaskType, tuple[float, ...]]]:
         """Get the object mask from the visual token."""
-        frame_index = deconstructed_action.frame_index
+        if not deconstructed_action.object_index:
+            raise AssertionError(
+                "Cannot get the visual token from the deconstructed action because it does not exist."
+            )
 
-        # frame_index are 1-indexed
-        object_coordinates_bbox = extracted_features[frame_index - 1].bbox_coords
+        # Get the bbox coordinates for the correct frame index
+        object_coordinates_bbox = extracted_features[
+            deconstructed_action.frame_index - 1
+        ].bbox_coords
 
-        object_visual_token_str = deconstructed_action.object_visual_token
-        # <vis_token_2>
-        object_visual_token = int(
-            object_visual_token_str.split("_")[-1][:-1]  # type:ignore[union-attr]
-        )
+        # Get the coordinates for the specified object
+        (x_min, y_min, x_max, y_max) = object_coordinates_bbox[
+            deconstructed_action.object_index - 1
+        ].tolist()
 
-        # visual tokens start are 1-indexed
-        (x_min, y_min, x_max, y_max) = object_coordinates_bbox[object_visual_token - 1].tolist()
-
+        # Create an empty mask for the object
         mask = torch.zeros(
-            (extracted_features[frame_index - 1].width, extracted_features[frame_index - 1].height)
+            (
+                extracted_features[deconstructed_action.frame_index - 1].width,
+                extracted_features[deconstructed_action.frame_index - 1].height,
+            )
         )
-        # populate the bbox region in the mask with ones
+
+        # Populate the bbox region in the mask
         mask[int(y_min) : int(y_max) + 1, int(x_min) : int(x_max) + 1] = 1  # noqa: WPS221
+
         compressed_mask = CompressSegmentationMask()(mask)
+
         if return_coords:
             return compressed_mask, (x_min, y_min, x_max, y_max)
+
         return compressed_mask
 
     def _get_correct_frame_index(
@@ -462,6 +476,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         """Get the correct frame index, considering the number of frames in the current turn."""
         # Get the starting index frame for the current turn
         start_frame_index = num_total_frames - num_frames_in_current_turn + 1
+
         # Get the corrected frame index
         frame_index = parsed_frame_index - start_frame_index
         if num_frames_in_current_turn == 1 and frame_index != 0:

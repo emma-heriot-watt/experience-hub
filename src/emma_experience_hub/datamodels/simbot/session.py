@@ -13,17 +13,14 @@ from emma_experience_hub.datamodels.emma import (
     EmmaExtractedFeatures,
     EnvironmentStateTurn,
 )
-from emma_experience_hub.datamodels.simbot.actions import (
-    SimBotAction,
-    SimBotActionStatus,
-    SimBotActionType,
-)
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
+    SimBotDialogPayload,
+    SimBotObjectOutputType,
     SimBotSpeechRecognitionPayload,
 )
-from emma_experience_hub.datamodels.simbot.payloads.dialog import SimBotDialogPayload
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
 
@@ -63,7 +60,7 @@ class SimBotSessionTurn(BaseModel):
     auxiliary_metadata_uri: SimBotAuxiliaryMetadataUri
 
     intent: Optional[SimBotIntent] = None
-    action: Optional[SimBotAction] = None
+    actions: Optional[list[SimBotAction]] = None
     raw_output: Optional[str] = None
 
     @classmethod
@@ -82,11 +79,6 @@ class SimBotSessionTurn(BaseModel):
         )
 
     @property
-    def has_intent(self) -> bool:
-        """Determine whether or not the turn has an extracted intent."""
-        return self.intent is not None
-
-    @property
     def is_instruction_intent(self) -> bool:
         """Is the turn an instruction?"""
         return self.intent is not None and self.intent.type == SimBotIntentType.instruction
@@ -97,19 +89,9 @@ class SimBotSessionTurn(BaseModel):
         return self.intent is not None and self.intent.type.is_clarification_question
 
     @property
-    def is_end_of_trajectory_intent(self) -> bool:
-        """Is the turn at the end of a trajectory?"""
-        return self.intent is not None and self.intent.type == SimBotIntentType.end_of_trajectory
-
-    @property
     def is_actionable_intent(self) -> bool:
         """Is the incoming utterance an actionable intent?"""
         return self.intent is not None and self.intent.type.is_actionable
-
-    @property
-    def has_action(self) -> bool:
-        """Determine whether or not the turn has generated an action."""
-        return self.action is not None
 
     @property
     def output_contains_end_of_trajectory_token(self) -> bool:
@@ -127,17 +109,42 @@ class SimBotSessionTurn(BaseModel):
         )
 
     @property
-    def action_status(self) -> Optional[SimBotActionStatus]:
-        """Return the status of the action is available."""
-        if self.action is None or self.action.status is None:
+    def object_output_type(self) -> Optional[SimBotObjectOutputType]:
+        """Get the object output type used by the actions.
+
+        If there are more than one type in the list, we have a problem.
+        """
+        if not self.actions:
             return None
 
-        return self.action.status
+        output_types = {
+            action.object_output_type
+            for action in self.actions
+            if action.object_output_type is not None
+        }
+
+        if not output_types:
+            return None
+
+        if len(output_types) > 1:
+            raise AssertionError(
+                "There is more than one output type in this list. That will breka the response. We should not be returning more than one object-related interaction action per turn."
+            )
+
+        return next(iter(output_types))
+
+    @property
+    def all_actions_are_successful(self) -> bool:
+        """Return the status of the action is available."""
+        if self.actions is None:
+            return False
+
+        return all([action.is_successful for action in self.actions])
 
     @property
     def utterances(self) -> list[DialogueUtterance]:
         """Get the utterances from the session turn, if any."""
-        utterances = []
+        utterances: list[DialogueUtterance] = []
 
         # If there is a user utterance, add it first.
         if self.speech is not None:
@@ -149,9 +156,13 @@ class SimBotSessionTurn(BaseModel):
                 )
             )
 
-        if self.action is not None:
-            if self.action.type == SimBotActionType.Dialog:
-                payload = cast(SimBotDialogPayload, self.action.payload)
+        if self.actions is not None:
+            dialog_actions = (
+                action for action in self.actions if action.type == SimBotActionType.Dialog
+            )
+
+            for action in dialog_actions:
+                payload = cast(SimBotDialogPayload, action.payload)
                 utterances.append(
                     DialogueUtterance(
                         utterance=payload.value,
@@ -164,16 +175,23 @@ class SimBotSessionTurn(BaseModel):
 
     def convert_to_simbot_response(self) -> SimBotResponse:
         """Convert the session turn to a SimBotResponse, to be returned to the API."""
-        if not self.action:
+        if not self.actions:
             raise AssertionError(
                 "There is no action to be returned. Have you run the response generator on this?"
             )
 
+        # Default to OBJECT_MASK as the object output type if there is None
+        object_output_type = (
+            self.object_output_type
+            if self.object_output_type
+            else SimBotObjectOutputType.object_mask
+        )
+
         return SimBotResponse(
             sessionId=self.session_id,
             predictionRequestId=self.prediction_request_id,
-            objectOutputType=self.action.object_output_type,
-            actions=[self.action],
+            objectOutputType=object_output_type,
+            actions=self.actions,
         )
 
     def load_features(

@@ -134,7 +134,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 instruction_intent_response_parser=SimBotActionPredictorOutputParser(
                     action_delimiter=simbot_settings.action_predictor_delimiter,
                     eos_token=simbot_settings.action_predictor_eos_token,
-                    utterance_generator_client=clients.utterance_generator,
                 ),
                 utterance_generator_client=clients.utterance_generator,
                 button_detector_client=clients.button_detector,

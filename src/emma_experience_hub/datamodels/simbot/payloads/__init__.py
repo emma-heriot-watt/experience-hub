@@ -24,6 +24,8 @@ from emma_experience_hub.datamodels.simbot.payloads.navigation import (
 from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
     SimBotInteractionObject,
     SimBotObjectInteractionPayload,
+    SimBotObjectMaskType,
+    SimBotObjectOutputType,
 )
 from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
 from emma_experience_hub.datamodels.simbot.payloads.speech_recognition import (

@@ -86,6 +86,8 @@ max-string-usages = 10
 max-annotation-complexity = 4
 min-name-length = 1
 max-try-body-length = 2
+exps-for-one-empty-line = 1
+show-violation-links = true
 format = wemake
 
 # Black enforces double quotes.

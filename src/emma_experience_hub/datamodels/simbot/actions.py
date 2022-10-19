@@ -1,6 +1,6 @@
 from contextlib import suppress
 from enum import Enum
-from typing import Any, Literal, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
@@ -8,6 +8,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotDialogPayload,
     SimBotGotoPayload,
+    SimBotInteractionObject,
     SimBotLookAroundPayload,
     SimBotLookDownPayload,
     SimBotLookPayload,
@@ -16,6 +17,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotMoveForwardPayload,
     SimBotMovePayload,
     SimBotObjectInteractionPayload,
+    SimBotObjectOutputType,
     SimBotPayload,
     SimBotRotateLeftPayload,
     SimBotRotatePayload,
@@ -68,6 +70,11 @@ class SimBotActionType(Enum):
 
     # Other
     GameMetaData = "metaData"  # noqa: WPS115
+
+    @classmethod
+    def sensors(cls) -> list["SimBotActionType"]:
+        """Action types which are recieved from the environment."""
+        return [SimBotActionType.SpeechRecognition, SimBotActionType.GameMetaData]
 
     @classmethod
     def navigation(cls) -> list["SimBotActionType"]:
@@ -238,7 +245,7 @@ class SimBotActionStatusType(Enum):
 class SimBotActionStatus(BaseModel):
     """Status of the previous action taken."""
 
-    id: Optional[str]
+    id: int
     type: SimBotActionType
     success: bool
     error_type: SimBotActionStatusType = Field(..., alias="errorType")
@@ -285,10 +292,10 @@ class SimBotAction(BaseModel):
     `check_payload_exists_for_all_necessary_keys()` class method.
     """
 
+    id: Optional[int] = None
     type: SimBotActionType
     payload: SimBotPayload = Field(..., exclude=True)
     status: Optional[SimBotActionStatus] = None
-    object_output_type: Literal["OBJECT_CLASS", "OBJECT_MASK"] = "OBJECT_MASK"
 
     class Config:
         """Config for the model."""
@@ -345,6 +352,23 @@ class SimBotAction(BaseModel):
 
         return values
 
+    @root_validator
+    @classmethod
+    def check_id_exists_for_non_sensor_actions(
+        cls,
+        values: dict[str, Any],  # noqa: WPS110
+    ) -> dict[str, Any]:
+        """Check that the action has an ID if it is not one of the sensor actions."""
+        if values["type"] in SimBotActionType.sensors():
+            return values
+
+        action_id = values.get("id")
+
+        if action_id is None:
+            raise AssertionError("Action ID should not be None for the given action type.")
+
+        return values
+
     @property
     def is_status_known(self) -> bool:
         """Do we know the outcome of the action?"""
@@ -357,3 +381,12 @@ class SimBotAction(BaseModel):
             return self.status.success
 
         return False
+
+    @property
+    def object_output_type(self) -> Optional[SimBotObjectOutputType]:
+        """Return the object output type used by the action."""
+        if isinstance(self.payload, (SimBotGotoPayload, SimBotObjectInteractionPayload)):
+            if isinstance(self.payload.object, SimBotInteractionObject):
+                return self.payload.object.object_output_type
+
+        return None
