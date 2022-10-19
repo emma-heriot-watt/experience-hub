@@ -23,6 +23,9 @@ from emma_experience_hub.datamodels.simbot.payloads import (
 from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
 
 
+ResponseGeneratorHandlerReturnType = tuple[str, list[SimBotAction]]
+
+
 class SimBotResponseGeneratorPipeline:
     """Generate a response for latest session turn."""
 
@@ -70,7 +73,9 @@ class SimBotResponseGeneratorPipeline:
 
         return session
 
-    def handle_instruction_intent(self, session: SimBotSession) -> tuple[str, list[SimBotAction]]:
+    def handle_instruction_intent(
+        self, session: SimBotSession
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response for the instruction intent."""
         environment_state_history = session.get_environment_state_history(
             session.get_turns_since_local_state_reset(),
@@ -107,7 +112,9 @@ class SimBotResponseGeneratorPipeline:
 
         return raw_output, actions
 
-    def handle_profanity_intent(self, session: SimBotSession) -> tuple[str, list[SimBotAction]]:
+    def handle_profanity_intent(
+        self, session: SimBotSession
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response for the profanity intent."""
         return self._handle_intent_with_dialog(
             self._utterance_generator_client.get_profanity_response(), SimBotIntentType.profanity
@@ -115,7 +122,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_clarify_direction_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response for the clarify direction intent."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -127,7 +134,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_clarify_description_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response for the clarify description intent."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -141,7 +148,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_clarify_location_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response for the clarify location intent."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -155,7 +162,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_clarify_disambiguation_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response for the clarify disambiguation intent."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -169,7 +176,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_end_of_trajectory_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response when the previous turn was the end of the action trajectory."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -181,7 +188,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_out_of_domain_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response when the utterance is out of the domain."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -193,7 +200,7 @@ class SimBotResponseGeneratorPipeline:
 
     def handle_low_asr_confidence_intent(
         self, session: SimBotSession
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response when the average confidence of the ASR output is too low."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -203,7 +210,9 @@ class SimBotResponseGeneratorPipeline:
             intent=session.current_turn.intent.type,
         )
 
-    def handle_press_button_intent(self, session: SimBotSession) -> tuple[str, list[SimBotAction]]:
+    def handle_press_button_intent(
+        self, session: SimBotSession
+    ) -> ResponseGeneratorHandlerReturnType:
         """Generate a response when we want to press a button."""
         if not session.current_turn.intent:
             raise AssertionError("The session turn should have an intent.")
@@ -234,10 +243,10 @@ class SimBotResponseGeneratorPipeline:
 
     def _get_response_generator_handler(
         self, intent: SimBotIntent
-    ) -> Callable[[SimBotSession], tuple[str, list[SimBotAction]]]:
+    ) -> Callable[[SimBotSession], ResponseGeneratorHandlerReturnType]:
         """Get the correct handler to generate a response for the given intent."""
         switcher: dict[
-            SimBotIntentType, Callable[[SimBotSession], tuple[str, list[SimBotAction]]]
+            SimBotIntentType, Callable[[SimBotSession], ResponseGeneratorHandlerReturnType]
         ] = {
             SimBotIntentType.instruction: self.handle_instruction_intent,
             SimBotIntentType.profanity: self.handle_profanity_intent,
@@ -254,7 +263,7 @@ class SimBotResponseGeneratorPipeline:
 
     def _handle_intent_with_dialog(
         self, raw_output: str, intent: SimBotIntentType
-    ) -> tuple[str, list[SimBotAction]]:
+    ) -> ResponseGeneratorHandlerReturnType:
         """Create the return payload for dialog responses.
 
         Basically, just reduce the boilerplate.

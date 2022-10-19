@@ -3,7 +3,6 @@ from typing import Optional
 import pytest
 from pytest_cases import fixture, param_fixture, param_fixtures, parametrize
 
-from emma_experience_hub.api.clients import UtteranceGeneratorClient
 from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
@@ -25,12 +24,8 @@ from emma_experience_hub.parsers.simbot.action_predictor_output import SimBotAct
 
 
 @fixture
-def simbot_action_parser(
-    utterance_generator_client: UtteranceGeneratorClient,
-) -> SimBotActionPredictorOutputParser:
-    return SimBotActionPredictorOutputParser(
-        PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN, utterance_generator_client
-    )
+def simbot_action_parser() -> SimBotActionPredictorOutputParser:
+    return SimBotActionPredictorOutputParser(PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN)
 
 
 include_end_of_trajectory = param_fixture(
