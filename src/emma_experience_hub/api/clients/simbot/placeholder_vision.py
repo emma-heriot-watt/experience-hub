@@ -13,7 +13,7 @@ class PlaceholderVisionClient(FeatureExtractorClient):
     """Run the placeholder vision client."""
 
     def __init__(self, endpoint: AnyHttpUrl) -> None:
-        self._endpoint = endpoint
+        super().__init__(endpoint)
 
     def healthcheck(self) -> bool:
         """Verify the service is healthy."""
