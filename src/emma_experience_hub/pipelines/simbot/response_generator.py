@@ -223,6 +223,7 @@ class SimBotResponseGeneratorPipeline:
         raw_output = "press button <stop>.</s>"
 
         output = SimBotAction(
+            id=0,
             type=SimBotActionType.Toggle,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
