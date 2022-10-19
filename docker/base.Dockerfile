@@ -19,7 +19,7 @@ ENV PYTHONUNBUFFERED=1 \
 	PYSETUP_PATH="/opt/pysetup" \
 	VIRTUAL_ENV="/opt/pysetup/.venv"
 
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV PATH="$VIRTUAL_ENV/bin:$POETRY_HOME/bin:$PATH"
 
 RUN apt-get update -qq \
 	&& apt-get upgrade -y --no-install-recommends \
