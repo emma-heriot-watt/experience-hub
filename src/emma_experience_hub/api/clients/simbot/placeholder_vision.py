@@ -12,9 +12,6 @@ from emma_experience_hub.api.clients.feature_extractor import FeatureExtractorCl
 class PlaceholderVisionClient(FeatureExtractorClient):
     """Run the placeholder vision client."""
 
-    def __init__(self, endpoint: AnyHttpUrl) -> None:
-        super().__init__(endpoint)
-
     def healthcheck(self) -> bool:
         """Verify the service is healthy."""
         return self._run_healthcheck(f"{self._endpoint}/healthcheck")
