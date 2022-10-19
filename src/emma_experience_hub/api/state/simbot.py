@@ -73,7 +73,9 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url
             ),
-            button_detector=PlaceholderVisionClient(endpoint=simbot_settings.button_detector_url),
+            button_detector=PlaceholderVisionClient(
+                server_endpoint=simbot_settings.button_detector_url
+            ),
         )
 
     def healthcheck(self) -> bool:

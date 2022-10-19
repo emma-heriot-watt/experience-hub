@@ -4,7 +4,6 @@ import httpx
 from loguru import logger
 from numpy.typing import ArrayLike
 from PIL import Image
-from pydantic import AnyHttpUrl
 
 from emma_experience_hub.api.clients.feature_extractor import FeatureExtractorClient
 
