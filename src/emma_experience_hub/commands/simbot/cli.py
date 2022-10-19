@@ -6,7 +6,7 @@ from loguru import logger
 from uvicorn import Config, Server
 
 from emma_experience_hub.common.logging import setup_logging
-from emma_experience_hub.common.settings import SimBotSettings
+from emma_experience_hub.common.settings import Settings, SimBotSettings
 
 
 app = typer.Typer(
@@ -43,6 +43,7 @@ def run_inference_server(
     os.environ["SIMBOT_EXTRACTED_FEATURES_DIR"] = str(extracted_features_dir)
 
     simbot_settings = SimBotSettings.from_env()
+    settings = Settings.from_env()
 
     server = Server(
         Config(
@@ -60,8 +61,10 @@ def run_inference_server(
 
             logger.add(
                 watchtower.CloudWatchLogHandler(
+                    boto3_profile_name=settings.aws_profile,
                     log_group_name=simbot_settings.watchtower_log_group_name,
                     log_stream_name=simbot_settings.watchtower_log_stream_name,
+                    send_interval=5,
                 )
             )
         except ModuleNotFoundError:
