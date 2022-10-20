@@ -113,6 +113,11 @@ def test_simbot_action_parser_object_navigation(
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object navigation actions."""
+    if visual_token_id is None or frame_token_id is None:
+        pytest.skip(
+            "We are no longer attempting to parse object-related actions when no visual token is present. Stop the test here."
+        )
+
     raw_output = _build_raw_output(
         "goto",
         simbot_object_name,
@@ -126,12 +131,6 @@ def test_simbot_action_parser_object_navigation(
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
     )
-
-    if visual_token_id is None and "sticky" not in simbot_object_name.lower():
-        assert parsed_action.type == SimBotActionType.Dialog
-        pytest.skip(
-            "We are no longer attempting to parse object-related actions when no visual token is present. Stop the test here."
-        )
 
     expected_action = SimBotAction(
         id=0,
@@ -181,6 +180,11 @@ def test_simbot_action_parser_object_interaction(
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object interaction actions actions."""
+    if visual_token_id is None or frame_token_id is None:
+        pytest.skip(
+            "We are no longer attempting to parse object-related actions when no visual token is present. Stop the test here."
+        )
+
     raw_output = _build_raw_output(
         simbot_interaction_action,
         simbot_object_name,
@@ -194,12 +198,6 @@ def test_simbot_action_parser_object_interaction(
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
     )
-
-    if visual_token_id is None and "sticky" not in simbot_object_name.lower():
-        assert parsed_action.type == SimBotActionType.Dialog
-        pytest.skip(
-            "We are no longer attempting to parse object-related actions when no visual token is present. Stop the test here."
-        )
 
     try:
         expected_object_name = get_simbot_object_label_to_class_name_map()[simbot_object_name]
