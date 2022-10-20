@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.0](https://github.com/emma-simbot/experience-hub/compare/v1.7.4...v1.8.0) (2022-10-20)
+
+
+### Features
+
+* send the done dialog action when the stop token is decoded ([#101](https://github.com/emma-simbot/experience-hub/issues/101)) ([37ae9fb](https://github.com/emma-simbot/experience-hub/commit/37ae9fb4c02b0dcddbfd46b201024bca4015b084))
+
+
+### Bug Fixes
+
+* move when action ids are updated to the end of the pipeline ([33fd981](https://github.com/emma-simbot/experience-hub/commit/33fd981deb66b8d44c96287e6747e4d1bef7c5b0))
+* provide the simbot id to action returned by the press button intent ([ade93ba](https://github.com/emma-simbot/experience-hub/commit/ade93bad19985f84680e90c0078d47e2eda084ac))
+* watchtower logging ([f4d4963](https://github.com/emma-simbot/experience-hub/commit/f4d4963ebb83e6fbff807670bf2bccff199a4f7a))
+
 ## [1.7.4](https://github.com/emma-simbot/experience-hub/compare/v1.7.3...v1.7.4) (2022-10-19)
 
 
