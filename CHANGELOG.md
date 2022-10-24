@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/emma-simbot/experience-hub/compare/v1.8.0...v1.8.1) (2022-10-24)
+
+
+### Bug Fixes
+
+* ensure turns without an intent are included when getting the environment state history ([#112](https://github.com/emma-simbot/experience-hub/issues/112)) ([17cd399](https://github.com/emma-simbot/experience-hub/commit/17cd399dbfb9d9fbebb4e5bfbbc9b53dc35ff07b))
+
 ## [1.8.0](https://github.com/emma-simbot/experience-hub/compare/v1.7.4...v1.8.0) (2022-10-20)
 
 
