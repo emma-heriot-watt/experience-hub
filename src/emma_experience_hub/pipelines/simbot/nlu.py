@@ -91,7 +91,7 @@ class SimBotNLUPipeline:
         )
         intent = self._nlu_intent_parser(raw_intent)
         logger.info(f"Extracted intent from turn: {intent}")
-        return SimBotIntent(type=SimBotIntentType.instruction)
+        return intent
 
     def _utterance_contains_profanity(self, turn: SimBotSessionTurn) -> bool:
         """Detect whether the turn has profanity in it."""
