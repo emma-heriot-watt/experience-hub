@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.2](https://github.com/emma-simbot/experience-hub/compare/v1.8.1...v1.8.2) (2022-10-24)
+
+
+### Bug Fixes
+
+* **NLU pipeline:** return the intent parsed by the NLU, instead of just act ([fd0e3bf](https://github.com/emma-simbot/experience-hub/commit/fd0e3bf2afff443fbadb11d9a654390d8cfc22a3))
+
 ## [1.8.1](https://github.com/emma-simbot/experience-hub/compare/v1.8.0...v1.8.1) (2022-10-24)
 
 
