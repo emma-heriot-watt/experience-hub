@@ -1,4 +1,5 @@
 import itertools
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import suppress
 from datetime import datetime
@@ -286,7 +287,8 @@ class SimBotSession(BaseModel):
         This also loads the extracted features from the cache.
         """
         # Only keep turns which have been used to change the visual frames
-        instruction_turns = (turn for turn in turns if turn.is_instruction_intent)
+        # OR which do not have an intent
+        relevant_turns = self._filter_turns_for_those_with_unique_features(turns)
 
         # Use thread pool to load the features from the files, but it will not maintain the order
         environment_history: dict[int, EnvironmentStateTurn] = {}
@@ -296,7 +298,7 @@ class SimBotSession(BaseModel):
                 executor.submit(
                     extracted_features_load_fn, turn.session_id, turn.prediction_request_id
                 ): turn
-                for turn in instruction_turns
+                for turn in relevant_turns
             }
 
             for future in as_completed(future_to_session_turn):
@@ -310,6 +312,19 @@ class SimBotSession(BaseModel):
 
         # Ensure the environment history is sorted properly and return them
         return list(dict(sorted(environment_history.items())).values())
+
+    def _filter_turns_for_those_with_unique_features(
+        self, turns: list[SimBotSessionTurn]
+    ) -> Iterator[SimBotSessionTurn]:
+        """Filter the provided turns to ensure that each is unique for the local state.
+
+        There are two main conditions where this holds true:
+            - During action prediction, we only want the turns where there are instruction intents,
+              meaning that it is all the turns after the clarification question dialogue.
+            - During the NLU pipeline, we are only caring about the turns without an intent, which
+              SHOULD only be the current turn.
+        """
+        return (turn for turn in turns if turn.is_instruction_intent or turn.intent is None)
 
     def _should_turn_reset_local_state(self, turn: SimBotSessionTurn) -> bool:
         """Determine whether the given turn is at the start of a new sequence of actions.
