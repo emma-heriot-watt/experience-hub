@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.3](https://github.com/emma-simbot/experience-hub/compare/v1.8.2...v1.8.3) (2022-10-25)
+
+
+### Bug Fixes
+
+* send emma policy model the correct intents ([#114](https://github.com/emma-simbot/experience-hub/issues/114)) ([e107140](https://github.com/emma-simbot/experience-hub/commit/e1071407ba769d1bc8189ea3d7fe8e1a5549d7a0))
+
 ## [1.8.2](https://github.com/emma-simbot/experience-hub/compare/v1.8.1...v1.8.2) (2022-10-24)
 
 
