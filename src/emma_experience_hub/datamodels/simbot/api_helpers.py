@@ -22,7 +22,8 @@ def update_simbot_intents_for_emma_policy(  # noqa: WPS231
             end_of_chain = False
 
         if not utterance.intent:
-            raise ValueError("Utterance intent is None. This shouldn't be the case!")
+            updated_utterances.append(utterance)
+            continue
 
         intent = SimBotIntentType[utterance.intent]
 
