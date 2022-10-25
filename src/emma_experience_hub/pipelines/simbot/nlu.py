@@ -13,6 +13,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
     SimBotSessionTurn,
+    update_simbot_intents_for_emma_policy,
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
 from emma_experience_hub.parsers import NeuralParser, Parser
@@ -83,7 +84,9 @@ class SimBotNLUPipeline:
     def extract_intent(self, session: SimBotSession) -> SimBotIntent:
         """Extract the intent from the given turn."""
         raw_intent = self._nlu_intent_client.generate(
-            dialogue_history=session.current_turn.utterances,
+            dialogue_history=update_simbot_intents_for_emma_policy(
+                session.current_turn.utterances
+            ),
             environment_state_history=session.get_environment_state_history(
                 [session.current_turn],
                 self._extracted_features_cache_client.load,

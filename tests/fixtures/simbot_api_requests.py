@@ -612,7 +612,7 @@ class SimBotSessionCases:
                         "id": 1,
                         "type": "Dialog",
                         "status": None,
-                        "dialog": {"value": "where is the sink?"},
+                        "dialog": {"value": "where is the sink?", "intent": "<clarify><question>"},
                     }
                 ],
                 "raw_output": "where is the sink?",
@@ -653,7 +653,10 @@ class SimBotSessionCases:
                         "id": 1,
                         "type": "Dialog",
                         "status": None,
-                        "dialog": {"value": "Sorry, I don't understand."},
+                        "dialog": {
+                            "value": "Sorry, I don't understand.",
+                            "intent": "<low_asr_confidence>",
+                        },
                     }
                 ],
                 "raw_output": "Sorry, I don't understand.",
@@ -705,7 +708,7 @@ class SimBotSessionCases:
                 "id": 2,
                 "type": "Dialog",
                 "status": None,
-                "dialog": {"value": "Done!"},
+                "dialog": {"value": "Done!", "intent": "<end_of_trajectory>"},
             }
         )
 

@@ -13,6 +13,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
     SimBotSessionTurn,
+    update_simbot_intents_for_emma_policy,
 )
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
@@ -82,8 +83,8 @@ class SimBotResponseGeneratorPipeline:
             self._extracted_features_cache_client.load,
         )
         raw_output = self._instruction_intent_client.generate(
-            dialogue_history=session.get_dialogue_history(
-                session.get_turns_since_local_state_reset()
+            dialogue_history=update_simbot_intents_for_emma_policy(
+                session.get_dialogue_history(session.get_turns_since_local_state_reset()),
             ),
             environment_state_history=environment_state_history,
         )
@@ -184,7 +185,7 @@ class SimBotResponseGeneratorPipeline:
         # Default to the "done" response
         raw_output = self._utterance_generator_client.get_finished_response()
 
-        return self._handle_intent_with_dialog(raw_output, session.current_turn.intent.type)
+        return self._handle_intent_with_dialog(raw_output, SimBotIntentType.end_of_trajectory)
 
     def handle_out_of_domain_intent(
         self, session: SimBotSession
