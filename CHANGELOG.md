@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.4](https://github.com/emma-simbot/experience-hub/compare/v1.8.3...v1.8.4) (2022-10-25)
+
+
+### Bug Fixes
+
+* handles case when utterance.intent is `None` ([#115](https://github.com/emma-simbot/experience-hub/issues/115)) ([5c0677f](https://github.com/emma-simbot/experience-hub/commit/5c0677fa80286233e5be0d7b0c7608c5c26d07eb))
+
 ## [1.8.3](https://github.com/emma-simbot/experience-hub/compare/v1.8.2...v1.8.3) (2022-10-25)
 
 
