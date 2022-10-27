@@ -13,7 +13,6 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
     SimBotSessionTurn,
-    update_simbot_intents_for_emma_policy,
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
 from emma_experience_hub.parsers import NeuralParser, Parser
@@ -21,6 +20,8 @@ from emma_experience_hub.parsers import NeuralParser, Parser
 
 class SimBotNLUPipeline:
     """Process the latest session turn and return the intent."""
+
+    _disable_clarification_intents: bool = True
 
     def __init__(
         self,
@@ -84,9 +85,7 @@ class SimBotNLUPipeline:
     def extract_intent(self, session: SimBotSession) -> SimBotIntent:
         """Extract the intent from the given turn."""
         raw_intent = self._nlu_intent_client.generate(
-            dialogue_history=update_simbot_intents_for_emma_policy(
-                session.current_turn.utterances
-            ),
+            dialogue_history=session.current_turn.utterances,
             environment_state_history=session.get_environment_state_history(
                 [session.current_turn],
                 self._extracted_features_cache_client.load,
@@ -94,6 +93,11 @@ class SimBotNLUPipeline:
         )
         intent = self._nlu_intent_parser(raw_intent)
         logger.info(f"Extracted intent from turn: {intent}")
+
+        if self._disable_clarification_intents:
+            logger.info("Clarification questions are disabled, returning the `<act>` intent.")
+            return SimBotIntent(type=SimBotIntentType.instruction)
+
         return intent
 
     def _utterance_contains_profanity(self, turn: SimBotSessionTurn) -> bool:
