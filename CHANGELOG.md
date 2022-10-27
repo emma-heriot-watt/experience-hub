@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.6](https://github.com/emma-simbot/experience-hub/compare/v1.8.5...v1.8.6) (2022-10-27)
+
+
+### Bug Fixes
+
+* handles when no buttons are detected ([#118](https://github.com/emma-simbot/experience-hub/issues/118)) ([b1aa2dd](https://github.com/emma-simbot/experience-hub/commit/b1aa2dd8eab47a45a81b1302288b6f6d4c484e15))
+
 ## [1.8.5](https://github.com/emma-simbot/experience-hub/compare/v1.8.4...v1.8.5) (2022-10-27)
 
 
