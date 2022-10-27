@@ -41,6 +41,12 @@ class UtteranceGeneratorClient(Client):
         """Generate a question asking for more help."""
         return "Sorry, I'm struggling with this one. Are you able to be more specific please?"
 
+    def get_raised_exception_for_lack_of_buttons(self) -> str:
+        """Generate a response when the placeholder model failed to detect buttons."""
+        return (
+            "Sorry, I can't see a button in front of me. Can you tell me how to move closer to it?"
+        )
+
     def get_too_low_asr_confidence_response(self) -> str:
         """Generate response when the ASR confidence is too low."""
         return "Sorry, I wasn't able to understand what you said. Are you able to repeat that for me please?"

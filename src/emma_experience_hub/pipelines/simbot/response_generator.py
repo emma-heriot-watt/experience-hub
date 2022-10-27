@@ -221,6 +221,28 @@ class SimBotResponseGeneratorPipeline:
             raise AssertionError("The session turn should have an utterance for this intent.")
 
         raw_output = "press button <stop>.</s>"
+        predicted_mask = self._button_detector_client.get_object_mask_from_image(
+            raw_utterance=session.current_turn.speech.utterance,
+            # Load the image from the turn's auxiliary metadata file
+            # we always use the image in the front view
+            image=SimBotAuxiliaryMetadataPayload.from_efs_uri(
+                session.current_turn.auxiliary_metadata_uri
+            ).images[0],
+        )
+        non_empty_mask = predicted_mask and predicted_mask[0]
+
+        if not non_empty_mask:
+            actions = [
+                SimBotAction(
+                    id=0,
+                    type=SimBotActionType.Dialog,
+                    payload=SimBotDialogPayload(
+                        value=self._utterance_generator_client.get_raised_exception_for_lack_of_buttons()
+                    ),
+                )
+            ]
+
+            return raw_output, actions
 
         output = SimBotAction(
             id=0,
@@ -228,13 +250,7 @@ class SimBotResponseGeneratorPipeline:
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     colorImageIndex=0,
-                    mask=self._button_detector_client.get_object_mask_from_image(
-                        raw_utterance=session.current_turn.speech.utterance,
-                        # Load the image from the turn's auxiliary metadata file
-                        image=SimBotAuxiliaryMetadataPayload.from_efs_uri(
-                            session.current_turn.auxiliary_metadata_uri
-                        ).images[0],
-                    ),
+                    mask=predicted_mask,
                     name="button",
                 )
             ),
