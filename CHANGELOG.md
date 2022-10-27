@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.5](https://github.com/emma-simbot/experience-hub/compare/v1.8.4...v1.8.5) (2022-10-27)
+
+
+### Bug Fixes
+
+* remove the previous api helpers for simbot intents ([#117](https://github.com/emma-simbot/experience-hub/issues/117)) ([2262ab0](https://github.com/emma-simbot/experience-hub/commit/2262ab09d4bc430df0be3d8ca3ea5c4576b04ca8))
+
 ## [1.8.4](https://github.com/emma-simbot/experience-hub/compare/v1.8.3...v1.8.4) (2022-10-25)
 
 
