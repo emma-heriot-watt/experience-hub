@@ -9,22 +9,6 @@ from pydantic import BaseModel
 from rich.progress import Progress
 
 
-class ModelMetadata(BaseModel):
-    """Metadata for the model."""
-
-    s3_url: CloudPath
-    version: str
-
-    @property
-    def file_safe_version(self) -> str:
-        """Get the version without any unsafe characters."""
-        return self.version.replace(".", "")
-
-    def download_model(self, output_dir: Path) -> None:
-        """Download the given model file."""
-        self.s3_url.download_to(output_dir)
-
-
 class ServiceMetadata(BaseModel):
     """Metadata for the services that we use."""
 
@@ -32,28 +16,31 @@ class ServiceMetadata(BaseModel):
 
     name: str
     image_repository_uri: str
-    model: Optional[ModelMetadata] = None
+    image_version: str
+    model_url: Optional[CloudPath] = None
+
+    @property
+    def file_safe_version(self) -> str:
+        """Get the version without any unsafe characters."""
+        return self.image_version.replace(".", "")
 
     @property
     def image(self) -> str:
         """Get the URI for the docker image."""
-        if self.model:
-            return f"{self.image_repository_uri}:{self.model.version}"
-
-        return f"{self.image_repository_uri}:{self._default_image_version}"
+        return f"{self.image_repository_uri}:{self.image_version}"
 
     @property
     def model_file_name(self) -> str:
         """Get the model file name for the service."""
-        if self.model:
-            return f"{self.name}-{self.model.file_safe_version}"
+        if self.model_url:
+            return f"{self.name}-{self.file_safe_version}"
 
         return self.name
 
     def download_model(self, output_dir: Path, force: bool = False) -> None:
         """Download the model, if it's needed."""
         # Do nothing if there is no model
-        if not self.model:
+        if not self.model_url:
             return None
 
         # Do nothing if the model exists and we are not forcing download
@@ -61,7 +48,7 @@ class ServiceMetadata(BaseModel):
             return None
 
         # Download the model and rename it
-        return self.model.download_model(output_dir.joinpath(self.model_file_name))
+        self.model_url.download_to(output_dir.joinpath(self.model_file_name))
 
     def model_exists(self, output_dir: Path) -> bool:
         """Return True if the model already exists."""
@@ -76,17 +63,6 @@ class ServiceRegistry(BaseModel):
     image_env_var_suffix: str = "IMAGE"
     model_name_env_var_suffix: str = "MODEL"
     env_var_delimiter: str = "_"
-
-    def __getitem__(self, index: int) -> ServiceMetadata:
-        """Get metadata using the list index."""
-        return self.services[index]
-
-    def get_from_name(self, service_name: str) -> ServiceMetadata:
-        """Get repository metadata from the repository name."""
-        metadata_iterator = (
-            metadata for metadata in self.services if metadata.name == service_name
-        )
-        return next(metadata_iterator)
 
     def download_all_models(self, output_dir: Path, force: bool = False) -> None:
         """Download all the models."""
