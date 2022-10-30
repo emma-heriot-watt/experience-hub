@@ -12,8 +12,6 @@ from rich.progress import Progress
 class ServiceMetadata(BaseModel):
     """Metadata for the services that we use."""
 
-    _default_image_version: str = "latest"
-
     name: str
     image_repository_uri: str
     image_version: str
