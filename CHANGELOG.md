@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.0](https://github.com/emma-simbot/experience-hub/compare/v1.8.6...v1.9.0) (2022-10-30)
+
+
+### Features
+
+* include service registry to automatically pull and run correct services ([#121](https://github.com/emma-simbot/experience-hub/issues/121)) ([2c813e4](https://github.com/emma-simbot/experience-hub/commit/2c813e47b835e11d078e80dbd8172c79856bc3ac))
+
 ## [1.8.6](https://github.com/emma-simbot/experience-hub/compare/v1.8.5...v1.8.6) (2022-10-27)
 
 
