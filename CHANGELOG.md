@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.0](https://github.com/emma-simbot/experience-hub/compare/v1.9.0...v1.10.0) (2022-10-30)
+
+
+### Features
+
+* remove intent from `DialogueUtterance` datamodel ([#122](https://github.com/emma-simbot/experience-hub/issues/122)) ([3f1a90a](https://github.com/emma-simbot/experience-hub/commit/3f1a90a5ac4cad057a2a131dcfe30b16da2e6b62))
+
 ## [1.9.0](https://github.com/emma-simbot/experience-hub/compare/v1.8.6...v1.9.0) (2022-10-30)
 
 
