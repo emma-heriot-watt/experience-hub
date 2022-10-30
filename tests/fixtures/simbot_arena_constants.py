@@ -4,10 +4,10 @@ from typing import Any
 import torch
 from pytest_cases import param_fixture
 
+from emma_common.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.constants.simbot import (  # get_simbot_object_label_to_class_name_map,
     get_simbot_room_names,
 )
-from emma_experience_hub.datamodels.emma import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.actions import SimBotActionType
 
 
