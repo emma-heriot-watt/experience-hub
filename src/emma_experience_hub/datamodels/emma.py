@@ -46,7 +46,6 @@ class DialogueUtterance(BaseModel):
 
     utterance: str
     role: Literal["user", "agent"]
-    intent: Optional[str] = None
 
 
 class EnvironmentStateTurn(BaseModel):

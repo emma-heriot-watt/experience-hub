@@ -149,13 +149,7 @@ class SimBotSessionTurn(BaseModel):
 
         # If there is a user utterance, add it first.
         if self.speech is not None:
-            utterances.append(
-                DialogueUtterance(
-                    utterance=self.speech.utterance,
-                    role="user",
-                    intent=self.intent.type.name if self.intent else None,
-                )
-            )
+            utterances.append(DialogueUtterance(utterance=self.speech.utterance, role="user"))
 
         if self.actions is not None:
             dialog_actions = (
@@ -164,13 +158,7 @@ class SimBotSessionTurn(BaseModel):
 
             for action in dialog_actions:
                 payload = cast(SimBotDialogPayload, action.payload)
-                utterances.append(
-                    DialogueUtterance(
-                        utterance=payload.value,
-                        role="agent",
-                        intent=payload.intent.name if payload.intent else None,
-                    )
-                )
+                utterances.append(DialogueUtterance(utterance=payload.value, role="agent"))
 
         return utterances
 
