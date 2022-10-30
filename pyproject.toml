@@ -42,7 +42,9 @@ orjson = "^3.8.0"
 fastapi = { extras = ["all"], version = "^0.85.0" }
 typer = "^0.6.1"
 pydantic = { extras = ["dotenv"], version = "^1.10.2" }
-loguru = "^0.6.0"
+cloudpathlib = {extras = ["s3"], version = "^0.10.0"}
+convert-case = "^1.1.1"
+emma-common = {git = "https://github.com/emma-simbot/common"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
@@ -59,6 +61,7 @@ pytest-cov = "^3.0.0"
 boto3-stubs = { extras = ["essential"], version = "^1.24.80" }
 moto = { extras = ["all"], version = "^4.0.5" }
 pytest-httpx = "^0.21.0"
+types-pyyaml = "^6.0.12.1"
 
 
 [tool.poetry.group.teach.dependencies]

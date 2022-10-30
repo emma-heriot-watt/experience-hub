@@ -1,12 +1,15 @@
 import os
+import subprocess
 from pathlib import Path
 
 import typer
+import yaml
 from loguru import logger
 from uvicorn import Config, Server
 
-from emma_experience_hub.common.logging import setup_logging
+from emma_common.logging import setup_rich_logging
 from emma_experience_hub.common.settings import Settings, SimBotSettings
+from emma_experience_hub.datamodels import ServiceRegistry
 
 
 app = typer.Typer(
@@ -18,8 +21,57 @@ app = typer.Typer(
 
 
 @app.command()
-def run_inference_server(
-    auxiliary_metadata_dir: str = typer.Option(
+def run_background_services(
+    registry_path: Path = typer.Option(
+        Path("storage/registry/simbot/production.yaml"),
+        help="Location of the registry .yaml file",
+        exists=True,
+        file_okay=True,
+    ),
+    compose_file_path: Path = typer.Option(
+        Path("docker/simbot-docker-compose.yaml"),
+        help="Location of the compose definition file.",
+        exists=True,
+        file_okay=True,
+    ),
+    download_models: bool = typer.Option(
+        default=True, help="Download all models for the services if necessary."
+    ),
+    run_in_background: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--run-in-background",
+        "-d",
+        is_flag=True,
+        help="Run the services in the background.",
+    ),
+) -> None:
+    """Run all the services for SimBot inference."""
+    # Load the registry for the services
+    service_registry = ServiceRegistry.parse_obj(yaml.safe_load(registry_path.read_bytes()))
+
+    # Set env vars for the services
+    service_registry.update_all_env_vars()
+
+    if download_models:
+        # Create model storage dir
+        model_storage_dir = Path("storage/models/")
+        model_storage_dir.mkdir(exist_ok=True, parents=True)
+
+        # Download models
+        service_registry.download_all_models(model_storage_dir)
+
+    # Build the run command
+    run_command = "up"
+    if run_in_background:
+        run_command = f"{run_command} -d"
+
+    # Run services
+    subprocess.run(f"docker compose -f {compose_file_path} {run_command}", shell=True, check=True)
+
+
+@app.command()
+def run_controller_api(
+    auxiliary_metadata_dir: Path = typer.Option(
         ...,
         help="Local directory to source metadata from the Arena.",
     ),
@@ -53,7 +105,7 @@ def run_inference_server(
         ),
     )
 
-    setup_logging()
+    setup_rich_logging(rich_traceback_show_locals=False)
 
     if log_to_cloudwatch:
         try:
@@ -73,6 +125,31 @@ def run_inference_server(
             )
 
     server.run()
+
+
+@app.command()
+def run_production_server() -> None:
+    """Run all the services in the background and start the server.
+
+    This command should only be run on the EC2 instance, where the relevant EFS directories have
+    already been setup.
+    """
+    logger.warning(
+        "This command will likely only work properly on the production EC2 instance AMI. This is because it directly refers to paths according to how the AMI has been set-up. If you are running on the EC2 instance, you can ignore this warning."
+    )
+
+    run_background_services(
+        registry_path=Path("storage/registry/simbot/production.yaml"),
+        compose_file_path=Path("docker/simbot-docker-compose.yaml"),
+        download_models=True,
+        run_in_background=True,
+    )
+    run_controller_api(
+        auxiliary_metadata_dir=Path("../auxiliary_metadata"),
+        auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),
+        extracted_features_dir=Path("../cache/features"),
+        log_to_cloudwatch=True,
+    )
 
 
 if __name__ == "__main__":

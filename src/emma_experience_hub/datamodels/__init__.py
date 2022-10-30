@@ -4,3 +4,4 @@ from emma_experience_hub.datamodels.emma import (
     EmmaPolicyRequest,
     EnvironmentStateTurn,
 )
+from emma_experience_hub.datamodels.registry import ServiceRegistry

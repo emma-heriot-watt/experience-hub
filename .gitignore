@@ -527,3 +527,4 @@ cython_debug/
 storage/*
 !storage/fixtures/
 !storage/.gitkeep
+!storage/registry/

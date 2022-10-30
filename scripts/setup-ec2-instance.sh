@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
-# ---------------------------- Setup GitHub creds ---------------------------- #
-GITHUB_PERSONAL_ACCESS_TOKEN=${1:-$GITHUB_PAT}
+GITHUB_PAT=$1
 
-git config --global url."https://${GITHUB_PERSONAL_ACCESS_TOKEN}@github.com/".insteadOf "https://github.com/"
+# ---------------------------- Install GitHub CLI ---------------------------- #
+type -p curl >/dev/null || sudo apt install curl -y
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg &&
+	sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg &&
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null &&
+	sudo apt update &&
+	sudo apt install gh -y
+
+gh auth login --with-token "${GITHUB_PAT}"
 
 # ---------------------- Install pyenv for python sanity --------------------- #
 curl https://pyenv.run | bash
@@ -78,6 +85,10 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 sudo ./aws/install
 
+# ------------------------------- Login to AWS ------------------------------- #
+aws configure --profile TeamProfile
+# TODO: Configure profile
+
 # ---------------------------- Install NFS common ---------------------------- #
 sudo apt-get -y install nfs-common
 
@@ -108,18 +119,12 @@ echo "fs-0bfa9bdb8b799cb84:/ /home/ubuntu/emma/auxiliary_metadata efs _netdev,no
 git clone https://github.com/emma-simbot/experience-hub experience-hub &&
 	cd experience-hub || exit
 
-# -------------------------- Build all Docker images ------------------------- #
-sudo GITHUB_PAT="$GITHUB_PERSONAL_ACCESS_TOKEN" docker buildx bake -f docker/docker-bake.hcl base
-sudo docker buildx bake -f docker/docker-bake.hcl base-poetry
-sudo docker buildx bake --set '*.args.TORCH_VERSION_SUFFIX=+cu113' -f docker/docker-bake.hcl profanity-filter out-of-domain-detector placeholder-button-detector nlg perception policy
+# -------------------------- Prepare Experience hub -------------------------- #
+pyenv install
+poetry env use "$(pyenv which python)"
 
-# ------------------------------ Download models ----------------------------- #
-mkdir -p storage/models
-aws s3 cp s3://emma-simbot/model/checkpoints/vinvl_vg_x152c4_simbot.pth ./storage/models
-aws s3 cp s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v2_bsz512_lr1e-4.ckpt ./storage/models
-aws s3 cp s3://emma-simbot/model/checkpoints/simbot_nlu/nlu_with_low_level.ckpt ./storage/models
-aws s3 cp s3://emma-simbot/perception/amazon-simbot-vision-model/vision_model_21.pth ./storage/models
-aws s3 cp s3://emma-simbot/model/checkpoints/simbot_ood/ ./storage/models --recursive
+# ----------------------------- Authenticate ECR ----------------------------- #
+aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 020417957102.dkr.ecr.us-east-1.amazonaws.com
 
 # ------------------------------- Restart shell ------------------------------ #
 exec "$SHELL"

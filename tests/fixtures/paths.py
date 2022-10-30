@@ -5,9 +5,15 @@ from pytest_cases import fixture
 
 
 @fixture(scope="session")
-def fixtures_root() -> Path:
+def storage_root() -> Path:
+    """Path to the storages root."""
+    return Path(__file__).parent.parent.parent.joinpath("storage/")
+
+
+@fixture(scope="session")
+def fixtures_root(storage_root: Path) -> Path:
     """Path to the fixtures storage root."""
-    return Path(__file__).parent.parent.parent.joinpath("storage", "fixtures/")
+    return storage_root.joinpath("fixtures/")
 
 
 @fixture(scope="session")

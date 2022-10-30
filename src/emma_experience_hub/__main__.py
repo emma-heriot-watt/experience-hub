@@ -1,6 +1,6 @@
 import typer
 
-from emma_experience_hub.commands.build_emma import build_emma
+from emma_experience_hub.commands.simbot.cli import app as simbot_cli
 
 
 # from emma_experience_hub.commands.teach import app as teach_cli
@@ -13,7 +13,7 @@ app = typer.Typer(
 )
 
 
-app.command()(build_emma)
+app.add_typer(simbot_cli, name="simbot")
 
 # app.add_typer(teach_cli, name="teach")
 
