@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/emma-simbot/experience-hub/compare/v1.10.1...v1.10.2) (2022-10-31)
+
+
+### Bug Fixes
+
+* service registry file for production simbot services ([1df4a28](https://github.com/emma-simbot/experience-hub/commit/1df4a282d2febb55174339341d8cc890c4171044))
+
 ## [1.10.1](https://github.com/emma-simbot/experience-hub/compare/v1.10.0...v1.10.1) (2022-10-31)
 
 
