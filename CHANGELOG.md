@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.3](https://github.com/emma-simbot/experience-hub/compare/v1.10.2...v1.10.3) (2022-10-31)
+
+
+### Bug Fixes
+
+* healthcheck urls for simbot docker compose ([85a68b1](https://github.com/emma-simbot/experience-hub/commit/85a68b1499885696cb59f34db906c245cbc80477))
+
 ## [1.10.2](https://github.com/emma-simbot/experience-hub/compare/v1.10.1...v1.10.2) (2022-10-31)
 
 
