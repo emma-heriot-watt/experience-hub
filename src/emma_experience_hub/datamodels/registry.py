@@ -39,11 +39,11 @@ class ServiceMetadata(BaseModel):
         """Download the model, if it's needed."""
         # Do nothing if there is no model
         if not self.model_url:
-            return None
+            return
 
         # Do nothing if the model exists and we are not forcing download
         if self.model_exists(output_dir) and not force:
-            return None
+            return
 
         # Download the model and rename it
         self.model_url.download_to(output_dir.joinpath(self.model_file_name))
