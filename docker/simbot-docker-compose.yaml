@@ -24,7 +24,7 @@ services:
     container_name: profanity_filter
     image: "${PROFANITY_FILTER_IMAGE}"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthcheck"]
       <<: *healthcheck-defaults
     ports:
       - "5503:8000"
@@ -36,7 +36,7 @@ services:
     container_name: utterance_generator
     image: "${UTTERANCE_GENERATOR_IMAGE}"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:6000/healthcheck"]
       <<: *healthcheck-defaults
     ports:
       - "5504:6000"
@@ -105,7 +105,7 @@ services:
       EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
       MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components2_data-1.joblib"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6500/ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:6500/healthcheck"]
       <<: *healthcheck-defaults
     deploy: *deploy-gpu
     volumes: *model-volume
@@ -123,7 +123,7 @@ services:
       DEVICE: "cuda:0"
       MODEL_CHECKPOINT_PATH: "/app/model/${PLACEHOLDER_BUTTON_DETECTOR_MODEL}"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5506/ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:5506/healthcheck"]
       <<: *healthcheck-defaults
     deploy: *deploy-gpu
     volumes: *model-volume
