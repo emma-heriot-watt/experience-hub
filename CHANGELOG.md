@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.1](https://github.com/emma-simbot/experience-hub/compare/v1.10.0...v1.10.1) (2022-10-31)
+
+
+### Bug Fixes
+
+* add image versions to the service, not the model ([7f56bc9](https://github.com/emma-simbot/experience-hub/commit/7f56bc9f80c6ed52d4ea032020815f25f0ede797))
+
 ## [1.10.0](https://github.com/emma-simbot/experience-hub/compare/v1.9.0...v1.10.0) (2022-10-30)
 
 
