@@ -28,9 +28,10 @@ async def startup_event() -> None:
     clients = SimBotControllerClients.from_simbot_settings(simbot_settings)
     pipelines = SimBotControllerPipelines.from_controller_clients(clients, simbot_settings)
 
-    if not clients.healthcheck():
-        # TODO: What to do here?
-        raise NotImplementedError
+    # Check clients every 15 seconds for 100 attempts (=1500s=25mins), which is ridiculously long
+    # because ECR can take up to 300secs to download all the images
+    if not clients.healthcheck(attempts=100, interval=15):  # noqa: WPS432
+        raise AssertionError("Clients failed to respond to healthchecks.")
 
     state.settings = simbot_settings
     state.clients = clients
@@ -46,7 +47,7 @@ async def healthcheck(response: Response) -> str:
     try:
         state.healthcheck()
     except Exception as err:
-        logger.exception("The API is not currently healthy", exc_info=err)
+        logger.error("The API is not currently healthy", exc_info=err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "failed"
 

@@ -1,4 +1,8 @@
+import signal
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Event
+from time import sleep
+from typing import Any
 
 from loguru import logger
 from pydantic import BaseModel
@@ -32,6 +36,8 @@ from emma_experience_hub.pipelines.simbot import (
 
 class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     """All the clients for the SimBot Controller API."""
+
+    _exit = Event()
 
     feature_extractor: FeatureExtractorClient
     nlu_intent: EmmaPolicyClient
@@ -79,7 +85,43 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             ),
         )
 
-    def healthcheck(self) -> bool:
+    def healthcheck(self, attempts: int = 1, interval: int = 0) -> bool:
+        """Perform healthcheck, with retry intervals.
+
+        To disable retries, just set the number of attempts to 1.
+        """
+        self._prepare_exit_signal()
+
+        healthcheck_flag = False
+
+        for attempt in range(attempts):
+            healthcheck_flag = self._healthcheck_all_clients()
+
+            # If the healthcheck flag is all good, break from the loop
+            if healthcheck_flag or self._exit.is_set():
+                break
+
+            # Otherwise, report a failed attempt
+            logger.error(f"Healthcheck attempt {attempt}/{attempts} failed.")
+
+            # If attempt is not the last one, sleep for interval and go again
+            if attempt < attempts - 1:
+                logger.debug(f"Waiting for {interval} seconds and then trying again.")
+                sleep(interval)
+
+        return healthcheck_flag
+
+    def _prepare_exit_signal(self) -> None:
+        """Prepare the exit signal to handle KeyboardInterrupt events."""
+        for sig in ("TERM", "HUP", "INT"):
+            signal.signal(getattr(signal, f"SIG{sig}"), self._break_from_sleep)
+
+    def _break_from_sleep(self, signum: int, _frame: Any) -> None:
+        """Break from the sleep."""
+        logger.info("Interrupted. Shutting down...")
+        self._exit.set()
+
+    def _healthcheck_all_clients(self) -> bool:
         """Check all the clients are healthy and running."""
         with ThreadPoolExecutor() as pool:
             clients: list[Client] = list(self.dict().values())
@@ -91,8 +133,8 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             for future in as_completed(healthcheck_futures):
                 try:
                     future.result()
-                except Exception as err:
-                    logger.exception("Failed to verify the healthcheck", exc_info=err)
+                except Exception:
+                    logger.error("Failed to verify the healthcheck")
                     return False
 
         return True
@@ -149,6 +191,6 @@ class SimBotControllerState(BaseModel, arbitrary_types_allowed=True):
     clients: SimBotControllerClients
     pipelines: SimBotControllerPipelines
 
-    def healthcheck(self) -> bool:
+    def healthcheck(self, attempts: int = 1, interval: int = 0) -> bool:
         """Check the healthy of all the connected services."""
-        return self.clients.healthcheck()
+        return self.clients.healthcheck(attempts, interval)
