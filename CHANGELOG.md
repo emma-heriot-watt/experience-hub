@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.0](https://github.com/emma-simbot/experience-hub/compare/v1.10.3...v1.11.0) (2022-11-01)
+
+
+### Features
+
+* refactor cache clients to use `cloudpathlib` instead ([#127](https://github.com/emma-simbot/experience-hub/issues/127)) ([8e6dbc7](https://github.com/emma-simbot/experience-hub/commit/8e6dbc7d8bcf8ba32413f19ffb7bb8adadabad8f)), closes [#120](https://github.com/emma-simbot/experience-hub/issues/120)
+
 ## [1.10.3](https://github.com/emma-simbot/experience-hub/compare/v1.10.2...v1.10.3) (2022-10-31)
 
 
