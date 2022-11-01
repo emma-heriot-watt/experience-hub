@@ -81,7 +81,7 @@ def run_controller_api(
         writable=True,
         exists=True,
     ),
-    extracted_features_dir: Path = typer.Option(
+    extracted_features_cache_dir: Path = typer.Option(
         ...,
         help="Local directory to store cache the extracted features in.",
         writable=True,
@@ -90,9 +90,9 @@ def run_controller_api(
     log_to_cloudwatch: bool = typer.Option(default=False, help="Send logs to CloudWatch"),
 ) -> None:
     """Run the inference server."""
-    os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(auxiliary_metadata_cache_dir)
     os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(auxiliary_metadata_dir)
-    os.environ["SIMBOT_EXTRACTED_FEATURES_DIR"] = str(extracted_features_dir)
+    os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(auxiliary_metadata_cache_dir)
+    os.environ["SIMBOT_EXTRACTED_FEATURES_CACHE_DIR"] = str(extracted_features_cache_dir)
 
     simbot_settings = SimBotSettings.from_env()
     settings = Settings.from_env()
@@ -147,7 +147,7 @@ def run_production_server() -> None:
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
         auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),
-        extracted_features_dir=Path("../cache/features"),
+        extracted_features_cache_dir=Path("../cache/features"),
         log_to_cloudwatch=True,
     )
 

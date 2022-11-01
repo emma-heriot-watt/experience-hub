@@ -13,8 +13,8 @@ from emma_experience_hub.api.clients import (
 )
 from emma_experience_hub.api.clients.simbot import (
     PlaceholderVisionClient,
-    SimBotAuxiliaryMetadataS3Client,
-    SimBotExtractedFeaturesFileSystemClient,
+    SimBotAuxiliaryMetadataClient,
+    SimBotExtractedFeaturesClient,
     SimBotSessionDbClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
@@ -37,8 +37,8 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     nlu_intent: EmmaPolicyClient
     action_predictor: EmmaPolicyClient
     session_db: SimBotSessionDbClient
-    auxiliary_metadata_cache: SimBotAuxiliaryMetadataS3Client
-    extracted_features_cache: SimBotExtractedFeaturesFileSystemClient
+    auxiliary_metadata_cache: SimBotAuxiliaryMetadataClient
+    extracted_features_cache: SimBotExtractedFeaturesClient
     profanity_filter: ProfanityFilterClient
     utterance_generator: UtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
@@ -55,12 +55,13 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 resource_region=simbot_settings.session_db_region,
                 table_name=simbot_settings.session_db_memory_table_name,
             ),
-            auxiliary_metadata_cache=SimBotAuxiliaryMetadataS3Client(
-                bucket_name=simbot_settings.auxiliary_metadata_s3_bucket,
-                local_backup_root_path=simbot_settings.auxiliary_metadata_cache_dir,
+            auxiliary_metadata_cache=SimBotAuxiliaryMetadataClient(
+                bucket_name=simbot_settings.simbot_cache_s3_bucket,
+                local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
             ),
-            extracted_features_cache=SimBotExtractedFeaturesFileSystemClient(
-                root_directory=simbot_settings.extracted_features_dir
+            extracted_features_cache=SimBotExtractedFeaturesClient(
+                bucket_name=simbot_settings.simbot_cache_s3_bucket,
+                local_cache_dir=simbot_settings.extracted_features_cache_dir,
             ),
             nlu_intent=EmmaPolicyClient(server_endpoint=simbot_settings.nlu_predictor_url),
             action_predictor=EmmaPolicyClient(

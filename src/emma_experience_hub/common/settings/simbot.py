@@ -10,11 +10,12 @@ class SimBotSettings(BaseSettings):
     watchtower_log_group_name: str = "simbot_challenge"
     watchtower_log_stream_name: str = "{machine_name}/{logger_name}"
 
-    auxiliary_metadata_s3_bucket: str = "emma-simbot-live-challenge"
-    auxiliary_metadata_cache_dir: DirectoryPath
-    auxiliary_metadata_dir: DirectoryPath
+    simbot_cache_s3_bucket: str = "emma-simbot-live-challenge"
 
-    extracted_features_dir: DirectoryPath
+    auxiliary_metadata_dir: DirectoryPath
+    auxiliary_metadata_cache_dir: DirectoryPath
+
+    extracted_features_cache_dir: DirectoryPath
 
     session_db_memory_table_name: str = "SIMBOT_MEMORY_TABLE"
     session_db_region: str = "us-east-1"

@@ -8,15 +8,13 @@ There are both Pydantic and non-Pydantic base classes so that clients can be com
 The main classes that should be used are the ones at the bottom of this module. All the generics
 are just there for keep things separated and clear.
 """
-
-
 from io import BytesIO
 from pathlib import Path
 from typing import Generic, Optional, TypeVar, Union
 
-import boto3
 import torch
 from botocore.exceptions import ClientError
+from cloudpathlib import S3Client, S3Path
 from loguru import logger
 
 from emma_experience_hub.api.clients.client import Client
@@ -29,71 +27,28 @@ T = TypeVar("T")
 
 
 class SimBotCacheClient(Client, Generic[T]):
-    """Base client for interfacing with the SimBot cache stores."""
+    """Cache client for SimBot data.
 
-    def check_exist(self, session_id: str, prediction_request_id: str) -> bool:
-        """Check whether or not it exists."""
-        raise NotImplementedError
-
-    def save(self, data: T, session_id: str, prediction_request_id: str) -> None:
-        """Store the data."""
-        raise NotImplementedError
-
-    def load(self, session_id: str, prediction_request_id: str) -> T:
-        """Load the data."""
-        raise NotImplementedError
-
-
-class SimBotFileSystemClient(SimBotCacheClient[T]):
-    """Base client for caching SimBot data on the file system.
-
-    The `suffix` class variable must be instantiated by any subclasses.
+    All data is automatially cached on S3.
     """
 
     suffix: str
 
-    def __init__(self, root_directory: Path) -> None:
-        # Ensure the root directory exists
-        root_directory.mkdir(parents=True, exist_ok=True)
-
-        self.root = root_directory
-
-    def healthcheck(self) -> bool:
-        """Verify that the file system exists and is a directory."""
-        return all([self.root.exists(), self.root.is_dir()])
-
-    def check_exist(self, session_id: str, prediction_request_id: str) -> bool:
-        """Check whether or not the file exists."""
-        return self._create_path(session_id, prediction_request_id).exists()
-
-    def _create_path(self, session_id: str, prediction_request_id: str) -> Path:
-        """Create the path for sourcing the data."""
-        path = self.root.joinpath(session_id, f"{str(prediction_request_id)}.{self.suffix}")
-
-        # Ensure that the destination directory exists
-        path.parent.mkdir(parents=True, exist_ok=True)
-
-        return path
-
-
-class SimBotS3Client(SimBotCacheClient[T]):
-    """Base client for caching SimBot data on S3.
-
-    The `suffix` class variable must be instantiated by any subclasses.
-    """
-
-    suffix: str
-
-    def __init__(self, bucket_name: str, object_prefix: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        bucket_name: str,
+        object_prefix: Optional[str] = None,
+        local_cache_dir: Optional[Path] = None,
+    ) -> None:
         self.bucket = bucket_name
         self.prefix = object_prefix if object_prefix is not None else ""
 
-        self._s3 = boto3.client("s3")
+        self._s3 = S3Client(local_cache_dir=local_cache_dir)
 
     def healthcheck(self) -> bool:
         """Verify that the S3 bucket is available and accessible."""
         try:
-            self._s3.head_bucket(Bucket=self.bucket)
+            self._s3.client.head_bucket(Bucket=self.bucket)
         except ClientError as err:
             logger.exception("Failed to get S3 bucket", exc_info=err)
             return False
@@ -101,54 +56,38 @@ class SimBotS3Client(SimBotCacheClient[T]):
         return True
 
     def check_exist(self, session_id: str, prediction_request_id: str) -> bool:
-        """Check whether the object already exists on S3."""
-        object_key = self._build_object_name(session_id, prediction_request_id)
+        """Check whether or not the file exists."""
+        return self._create_path(session_id, prediction_request_id).exists()
 
-        try:
-            self._s3.head_object(Bucket=self.bucket, Key=object_key)
-        except ClientError:
-            return False
+    def save(self, data: T, session_id: str, prediction_request_id: str) -> None:
+        """Save the data, converting from the object to bytes."""
+        raise NotImplementedError()
 
-        return True
+    def load(self, session_id: str, prediction_request_id: str) -> T:
+        """Load the data, converting from bytes to the object."""
+        raise NotImplementedError()
 
-    def _download(self, object_key: str) -> bytes:
-        """Download a file object from S3, directly into the memory."""
-        # Create the buffer that will store the bytes
-        data_buffer = BytesIO()
+    def _save_bytes(self, data: bytes, session_id: str, prediction_request_id: str) -> None:
+        """Save the data."""
+        destination_path = self._create_path(session_id, prediction_request_id)
+        destination_path.write_bytes(data)
 
-        # Download data into the buffer.
-        try:
-            self._s3.download_fileobj(Bucket=self.bucket, Key=object_key, Fileobj=data_buffer)
-        except ClientError as err:
-            logger.exception("Failed to download object from S3", exc_info=err)
+    def _load_bytes(self, session_id: str, prediction_request_id: str) -> bytes:
+        """Load the data."""
+        path = self._create_path(session_id, prediction_request_id)
+        return path.read_bytes()
 
-        # Return the bytes
-        return data_buffer.getvalue()
-
-    def _upload(self, data: bytes, object_key: str) -> None:
-        """Upload a file object to S3, directly from the memory.
-
-        Onus for handling exceptions should be on the users of this class.
-        """
-        data_buffer = BytesIO(data)
-
-        try:
-            self._s3.upload_fileobj(Fileobj=data_buffer, Bucket=self.bucket, Key=object_key)
-        except ClientError as err:
-            logger.exception("Failed to upload object from S3", exc_info=err)
-
-    def _build_object_name(self, session_id: str, prediction_request_id: str) -> str:
+    def _create_path(self, session_id: str, prediction_request_id: str) -> S3Path:
         """Build the name of the object, including the default prefix."""
         object_name = "/".join(
             [self.prefix, session_id, f"{str(prediction_request_id)}.{self.suffix}"]
-        )
-        return object_name.lstrip("/")
+        ).lstrip("/")
+
+        return self._s3.CloudPath(f"s3://{self.bucket}/{object_name}")
 
 
-class SimBotPydanticFileSystemClient(
-    PydanticClientMixin[PydanticT], SimBotFileSystemClient[PydanticT]
-):
-    """Cache Pydantic models for SimBot on the file system.
+class SimBotPydanticCacheClient(PydanticClientMixin[PydanticT], SimBotCacheClient[PydanticT]):
+    """Cache Pydantic models for SimBot.
 
     Subclasses MUST have included the class variables: `suffix` and `model`.
     """
@@ -163,110 +102,23 @@ class SimBotPydanticFileSystemClient(
         if not isinstance(data, bytes):
             data = self._pydantic_to_bytes(data)
 
-        destination_path = self._create_path(session_id, prediction_request_id)
-        destination_path.write_bytes(data)
+        return self._save_bytes(data, session_id, prediction_request_id)
 
     def load(self, session_id: str, prediction_request_id: str) -> PydanticT:
         """Load the data from the file system."""
-        path = self._create_path(session_id, prediction_request_id)
-        data_as_bytes = path.read_bytes()
-        logger.debug(self.model)
+        data_as_bytes = self._load_bytes(session_id, prediction_request_id)
         parsed_model = self._pydantic_from_bytes(data_as_bytes)
         return parsed_model
 
 
-class SimBotPydanticS3Client(PydanticClientMixin[PydanticT], SimBotS3Client[PydanticT]):
-    """Cache Pydantic models for SimBot on S3.
-
-    Subclasses MUST have included the class variables: `suffix` and `model`.
-    """
-
-    model: type[PydanticT]
-    suffix: str
-
-    def __init__(
-        self,
-        bucket_name: str,
-        object_prefix: Optional[str] = None,
-        local_backup_root_path: Optional[Path] = None,
-    ) -> None:
-        super().__init__(bucket_name, object_prefix)
-
-        if local_backup_root_path is not None:
-            self._local_backup = SimBotPydanticFileSystemClient[PydanticT](local_backup_root_path)
-            # Transfer class variables to the local backup client
-            self._local_backup.suffix = self.suffix
-            self._local_backup.model = self.model
-
-    @property
-    def local_backup_client(self) -> Optional[SimBotPydanticFileSystemClient[PydanticT]]:
-        """Get the client for saving the data locally too."""
-        try:
-            return self._local_backup
-        except UnboundLocalError:
-            return None
-
-    def healthcheck(self) -> bool:
-        """Verify access to both S3 and local backup if provided."""
-        checks = [SimBotS3Client.healthcheck(self)]
-
-        if self.local_backup_client is not None:
-            checks.append(SimBotFileSystemClient.healthcheck(self._local_backup))
-
-        return all(checks)
-
-    def check_exist(self, session_id: str, prediction_request_id: str) -> bool:
-        """Check if the data exists.
-
-        Return True if it exists on S3 or locally (if local backup is enabled).
-        """
-        data_exists_on_s3 = super().check_exist(session_id, prediction_request_id)
-
-        data_exists_locally: bool = False
-        if self.local_backup_client is not None:
-            data_exists_locally = self.local_backup_client.check_exist(
-                session_id, prediction_request_id
-            )
-
-        return data_exists_on_s3 or data_exists_locally
-
-    def save(self, data: PydanticT, session_id: str, prediction_request_id: str) -> None:
-        """Save the data to S3."""
-        data_bytes = self._pydantic_to_bytes(data)
-        object_key = self._build_object_name(session_id, prediction_request_id)
-        self._upload(data=data_bytes, object_key=object_key)
-
-        if self.local_backup_client is not None:
-            self.local_backup_client.save(data, session_id, prediction_request_id)
-
-    def load(self, session_id: str, prediction_request_id: str) -> PydanticT:
-        """Load data from S3."""
-        # Check if the data exists locally first because that will e faster
-        if self.local_backup_client is not None:
-            if self.local_backup_client.check_exist(session_id, prediction_request_id):
-                return self.local_backup_client.load(session_id, prediction_request_id)
-
-        # if it doesn't exist locally, download from S3
-        object_key = self._build_object_name(session_id, prediction_request_id)
-        data_as_bytes = self._download(object_key)
-        parsed_file = self._pydantic_from_bytes(data_as_bytes)
-
-        # If it doesn't exist locally, save it locally
-        if self.local_backup_client is not None:
-            if not self.local_backup_client.check_exist(session_id, prediction_request_id):
-                self.local_backup_client.save(data_as_bytes, session_id, prediction_request_id)
-
-        return parsed_file
-
-
-class SimBotAuxiliaryMetadataS3Client(SimBotPydanticS3Client[SimBotAuxiliaryMetadataPayload]):
+class SimBotAuxiliaryMetadataClient(SimBotPydanticCacheClient[SimBotAuxiliaryMetadataPayload]):
     """Cache auxiliary metadata on S3."""
 
     model = SimBotAuxiliaryMetadataPayload
     suffix = "json"
 
 
-class SimBotExtractedFeaturesFileSystemClient(SimBotFileSystemClient[list[EmmaExtractedFeatures]]):
+class SimBotExtractedFeaturesClient(SimBotCacheClient[list[EmmaExtractedFeatures]]):
     """Cache extracted features on the File system."""
 
     suffix = "pt"
@@ -278,16 +130,22 @@ class SimBotExtractedFeaturesFileSystemClient(SimBotFileSystemClient[list[EmmaEx
 
         Convert the features into a dictioanry to serialize it into a single object.
         """
+        # Prepare the data
         data_as_dict = {idx: instance.dict() for idx, instance in enumerate(data)}
-        path = self._create_path(session_id, prediction_request_id)
-        torch.save(data_as_dict, path)
+
+        # Save with torch
+        data_buffer = BytesIO()
+        torch.save(data_as_dict, data_buffer)
+
+        # Write data
+        self._save_bytes(data_buffer.getvalue(), session_id, prediction_request_id)
 
     def load(self, session_id: str, prediction_request_id: str) -> list[EmmaExtractedFeatures]:
         """Load the extracted features from a single file."""
-        path = self._create_path(session_id, prediction_request_id)
-
-        # Load the raw data from the path using torch.
-        raw_data: dict[int, dict[str, torch.Tensor]] = torch.load(path)
+        # Load the raw data using torch.
+        raw_data: dict[int, dict[str, torch.Tensor]] = torch.load(
+            BytesIO(self._load_bytes(session_id, prediction_request_id))
+        )
 
         # Sort the raw data by key to ensure the list is built in the correct order.
         sorted_raw_data = sorted(raw_data.items())
