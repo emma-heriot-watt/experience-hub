@@ -21,7 +21,7 @@ from emma_experience_hub.parsers import NeuralParser, Parser
 class SimBotNLUPipeline:
     """Process the latest session turn and return the intent."""
 
-    _disable_clarification_intents: bool = True
+    _disable_clarification_intents: bool = False
 
     def __init__(
         self,
