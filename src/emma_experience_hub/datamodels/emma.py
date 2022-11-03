@@ -41,3 +41,8 @@ class EmmaPolicyRequest(BaseModel):
             torch.Tensor: lambda tensor: tensor.tolist(),
             "Tensor": lambda tensor: tensor.tolist(),
         }
+
+    @property
+    def num_images(self) -> int:
+        """Get the number of images being send to the model."""
+        return sum([len(turn.features) for turn in self.environment_history])

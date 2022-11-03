@@ -383,6 +383,11 @@ class SimBotAction(BaseModel):
         return False
 
     @property
+    def is_dialog_action(self) -> bool:
+        """Return True if this action is a dialog action."""
+        return self.type == SimBotActionType.Dialog
+
+    @property
     def object_output_type(self) -> Optional[SimBotObjectOutputType]:
         """Return the object output type used by the action."""
         if isinstance(self.payload, (SimBotGotoPayload, SimBotObjectInteractionPayload)):

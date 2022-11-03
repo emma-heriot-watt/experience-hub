@@ -40,6 +40,9 @@ class EmmaPolicyClient:
         emma_policy_request = EmmaPolicyRequest(
             environment_history=environment_state_history, dialogue_history=dialogue_history
         )
+        logger.debug(f"Sending {emma_policy_request.num_images} images.")
+
+        logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
 
         response = httpx.post(
             self._generate_endpoint,

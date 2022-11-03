@@ -1,3 +1,5 @@
+from typing import Optional
+
 from loguru import logger
 
 from emma_experience_hub.api.clients import (
@@ -21,7 +23,7 @@ from emma_experience_hub.parsers import NeuralParser, Parser
 class SimBotNLUPipeline:
     """Process the latest session turn and return the intent."""
 
-    _disable_clarification_intents: bool = False
+    _disable_clarification_intents: bool = True
 
     def __init__(
         self,
@@ -43,6 +45,13 @@ class SimBotNLUPipeline:
 
     def run(self, session: SimBotSession) -> SimBotSession:  # noqa: WPS212
         """Run the pipeline for the session."""
+        # If we have arena errors from the actions we performed, give feedback for them
+        action_status_intent = self._try_convert_action_status_to_intent(session)
+        if action_status_intent:
+            logger.debug("Received error status from arena and will provide feedback for it.")
+            session.current_turn.intent = SimBotIntent(type=action_status_intent)
+            return session
+
         if self._should_respond_with_end_of_trajectory_intent(session):
             session.current_turn.intent = SimBotIntent(type=SimBotIntentType.end_of_trajectory)
             return session
@@ -150,3 +159,25 @@ class SimBotNLUPipeline:
             if "button" in utterance:
                 is_press_button = any([verb in utterance for verb in self._is_press_button_verbs])
         return is_press_button
+
+    def _try_convert_action_status_to_intent(
+        self, session: SimBotSession
+    ) -> Optional[SimBotIntentType]:
+        """Return True if we should provide feedback from the returned actions from the arena."""
+        # If there is no previous turn
+        if not session.previous_turn:
+            return None
+
+        # If all previous actions were successful
+        if session.previous_turn.all_actions_are_successful:
+            return None
+
+        # If we do not have the last action status from the previous turn
+        if not session.previous_turn.last_action_status_type:
+            return None
+
+        # If we are unable to convert the action status to one of the intents we handle
+        try:
+            return SimBotIntentType[session.previous_turn.last_action_status_type.name]
+        except (ValueError, KeyError):
+            return None

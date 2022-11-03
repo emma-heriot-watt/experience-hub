@@ -76,6 +76,44 @@ class UtteranceGeneratorClient(Client):
             f"{self._endpoint}/generate/clarify_object_disambiguation", request_json
         )
 
+    def get_feedback_for_already_holding_object(self) -> str:
+        """Generate feedback for the already_holding_object error."""
+        return "I am already holding the object?"
+
+    def get_feedback_for_receptacle_is_full(self) -> str:
+        """Generate feedback for the receptacle_is_full error."""
+        return "It looks like the receptacle is full."
+
+    def get_feedback_for_receptacle_is_closed(self) -> str:
+        """Generate feedback for the receptacle_is_closed error."""
+        return "Sorry, I can't do that because the receptacle is closed."
+
+    def get_feedback_for_target_inaccessible(self) -> str:
+        """Generate feedback for the target_inaccessible error."""
+        return "Sorry, I can't access that object currently."
+
+    def get_feedback_for_target_out_of_range(self) -> str:
+        """Generate feedback for the target_out_of_range error."""
+        return "That object is currently too far away. Could you help me get closer to it?"
+
+    def get_feedback_for_object_overloaded(self) -> str:
+        """Generate feedback for the object_overloaded error."""
+        return "Hmm, it seems like it is currently overloaded. I think we need to fix that first?"
+
+    def get_feedback_for_object_unpowered(self) -> str:
+        """Generate feedback for the object_unpowered error."""
+        return (
+            "Hmm, it seems like it's not currently powered. I think we need to handle that first?"
+        )
+
+    def get_feedback_for_no_free_hand(self) -> str:
+        """Generate feedback for the no_free_hand error."""
+        return "Sorry, I'm already holding something and I can't hold anything else. We should put down what I am holding first."
+
+    def get_feedback_for_object_not_picked_up(self) -> str:
+        """Generate feedback for the object_not_picked_up error."""
+        return "Sorry, I wasn't able to pick up the object."
+
     def _send_request(self, endpoint: str, request_json: Optional[dict[str, str]] = None) -> str:
         if request_json is None:
             response = httpx.post(endpoint)

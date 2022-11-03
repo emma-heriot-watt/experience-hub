@@ -20,6 +20,17 @@ class SimBotIntentType(Enum):
     low_asr_confidence = "<low_asr_confidence>"
     press_button = "<press_button>"
 
+    # Arena Error Types
+    already_holding_object = "<feedback><negative><already_holding_object>"
+    receptacle_is_full = "<feedback><negative><receptacle_is_full>"
+    receptacle_is_closed = "<feedback><negative><receptacle_is_closed>"
+    target_inaccessible = "<feedback><negative><target_inaccessible>"
+    target_out_of_range = "<feedback><negative><target_out_of_range>"
+    object_overloaded = "<feedback><negative><object_overloaded>"
+    object_unpowered = "<feedback><negative><object_unpowered>"
+    no_free_hand = "<feedback><negative><no_free_hand>"
+    object_not_picked_up = "<feedback><negative><object_not_picked_up>"
+
     @property
     def is_clarification_question(self) -> bool:
         """Return True if intent is one that triggers a clarification question."""
@@ -47,6 +58,21 @@ class SimBotIntentType(Enum):
             or self.is_instruction
             or self.is_clarification_question
         )
+
+    @property
+    def is_arena_error(self) -> bool:
+        """Return True if the Enum is one of the Arena error types."""
+        return self in {
+            SimBotIntentType.already_holding_object,
+            SimBotIntentType.receptacle_is_full,
+            SimBotIntentType.receptacle_is_closed,
+            SimBotIntentType.target_inaccessible,
+            SimBotIntentType.target_out_of_range,
+            SimBotIntentType.object_overloaded,
+            SimBotIntentType.object_unpowered,
+            SimBotIntentType.no_free_hand,
+            SimBotIntentType.object_not_picked_up,
+        }
 
 
 class SimBotIntent(BaseModel):

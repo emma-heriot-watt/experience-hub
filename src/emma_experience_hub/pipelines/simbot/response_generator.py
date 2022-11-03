@@ -64,9 +64,12 @@ class SimBotResponseGeneratorPipeline:
         session.current_turn.raw_output = raw_output
         session.current_turn.actions = actions
 
-        if END_OF_TRAJECTORY_TOKEN in raw_output:
-            _, end_of_trajectory_dialog_action = self.handle_end_of_trajectory_intent(session)
-            actions.extend(end_of_trajectory_dialog_action)
+        if not session.current_turn.actions_contain_dialog:
+            # TODO: This is hacky and might not hold for compositional actions with multiple passes
+            # through the loop. This should no longer been needed after the intent reworking
+            if END_OF_TRAJECTORY_TOKEN in raw_output.split(".")[0]:
+                _, end_of_trajectory_dialog_action = self.handle_end_of_trajectory_intent(session)
+                actions.extend(end_of_trajectory_dialog_action)
 
         # Ensure that all the actions are indexed correctly before returning
         self._update_action_ids_for_turn(session.current_turn)
@@ -258,6 +261,44 @@ class SimBotResponseGeneratorPipeline:
 
         return raw_output, [output]
 
+    def handle_arena_action_error_status(
+        self, session: SimBotSession
+    ) -> tuple[str, list[SimBotAction]]:
+        """Handle when the arena has provided us with an error type."""
+        if not session.current_turn.intent:
+            raise AssertionError("The session turn should have an intent.")
+
+        utterance = self._utterance_generator_client.get_raised_exception_response()
+
+        if session.current_turn.intent.type == SimBotIntentType.already_holding_object:
+            utterance = self._utterance_generator_client.get_feedback_for_already_holding_object()
+
+        if session.current_turn.intent.type == SimBotIntentType.receptacle_is_full:
+            utterance = self._utterance_generator_client.get_feedback_for_receptacle_is_full()
+
+        if session.current_turn.intent.type == SimBotIntentType.receptacle_is_closed:
+            utterance = self._utterance_generator_client.get_feedback_for_receptacle_is_closed()
+
+        if session.current_turn.intent.type == SimBotIntentType.target_inaccessible:
+            utterance = self._utterance_generator_client.get_feedback_for_target_inaccessible()
+
+        if session.current_turn.intent.type == SimBotIntentType.target_out_of_range:
+            utterance = self._utterance_generator_client.get_feedback_for_target_out_of_range()
+
+        if session.current_turn.intent.type == SimBotIntentType.object_overloaded:
+            utterance = self._utterance_generator_client.get_feedback_for_object_overloaded()
+
+        if session.current_turn.intent.type == SimBotIntentType.object_unpowered:
+            utterance = self._utterance_generator_client.get_feedback_for_object_unpowered()
+
+        if session.current_turn.intent.type == SimBotIntentType.no_free_hand:
+            utterance = self._utterance_generator_client.get_feedback_for_no_free_hand()
+
+        if session.current_turn.intent.type == SimBotIntentType.object_not_picked_up:
+            utterance = self._utterance_generator_client.get_feedback_for_object_not_picked_up()
+
+        return self._handle_intent_with_dialog(utterance, session.current_turn.intent.type)
+
     def _get_response_generator_handler(
         self, intent: SimBotIntent
     ) -> Callable[[SimBotSession], ResponseGeneratorHandlerReturnType]:
@@ -275,6 +316,15 @@ class SimBotResponseGeneratorPipeline:
             SimBotIntentType.out_of_domain: self.handle_out_of_domain_intent,
             SimBotIntentType.low_asr_confidence: self.handle_low_asr_confidence_intent,
             SimBotIntentType.press_button: self.handle_press_button_intent,
+            SimBotIntentType.already_holding_object: self.handle_arena_action_error_status,
+            SimBotIntentType.receptacle_is_full: self.handle_arena_action_error_status,
+            SimBotIntentType.receptacle_is_closed: self.handle_arena_action_error_status,
+            SimBotIntentType.target_inaccessible: self.handle_arena_action_error_status,
+            SimBotIntentType.target_out_of_range: self.handle_arena_action_error_status,
+            SimBotIntentType.object_overloaded: self.handle_arena_action_error_status,
+            SimBotIntentType.object_unpowered: self.handle_arena_action_error_status,
+            SimBotIntentType.no_free_hand: self.handle_arena_action_error_status,
+            SimBotIntentType.object_not_picked_up: self.handle_arena_action_error_status,
         }
         return switcher[intent.type]
 

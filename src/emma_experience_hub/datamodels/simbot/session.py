@@ -14,7 +14,11 @@ from emma_experience_hub.datamodels.emma import (
     EmmaExtractedFeatures,
     EnvironmentStateTurn,
 )
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
+from emma_experience_hub.datamodels.simbot.actions import (
+    SimBotAction,
+    SimBotActionStatusType,
+    SimBotActionType,
+)
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
@@ -106,7 +110,8 @@ class SimBotSessionTurn(BaseModel):
             self.intent is not None
             and self.intent.type == SimBotIntentType.instruction
             and self.raw_output is not None
-            and END_OF_TRAJECTORY_TOKEN in self.raw_output
+            # TODO: This is hacky but should no longer be needed after the intent rework
+            and END_OF_TRAJECTORY_TOKEN in self.raw_output.split(".")[0]
         )
 
     @property
@@ -141,6 +146,36 @@ class SimBotSessionTurn(BaseModel):
             return False
 
         return all([action.is_successful for action in self.actions])
+
+    @property
+    def actions_contain_dialog(self) -> bool:
+        """Return True if the actions contain dialog."""
+        if self.actions is None:
+            return False
+
+        # Get all actions within the current turn that have dialog
+        actions_with_dialog = [action for action in self.actions if action.is_dialog_action]
+
+        return bool(actions_with_dialog)
+
+    @property
+    def last_action_status_type(self) -> Optional[SimBotActionStatusType]:
+        """Get the action status type from the very last action performed.
+
+        The assumption here is that the status we get will tell us how the action failed.
+        """
+        if not self.actions:
+            return None
+
+        # get statuses from actions
+        statuses = [action.status for action in self.actions if action.status]
+
+        # Return None if there are no statuses for the actions
+        if not statuses:
+            return None
+
+        # Return the last error we encountered
+        return statuses[-1].error_type
 
     @property
     def utterances(self) -> list[DialogueUtterance]:
@@ -228,6 +263,14 @@ class SimBotSession(BaseModel):
         return self.turns[-1]
 
     @property
+    def previous_turn(self) -> Optional[SimBotSessionTurn]:
+        """Get the previous turn, if it exists."""
+        try:
+            return self.turns[-2]
+        except IndexError:
+            return None
+
+    @property
     def start_time(self) -> datetime:
         """Get the datetime of when the session started."""
         return self.turns[0].timestamp.start
@@ -291,9 +334,14 @@ class SimBotSession(BaseModel):
 
             for future in as_completed(future_to_session_turn):
                 turn = future_to_session_turn[future]
+                # TODO: This is the hacky thing I've added in multiple other places to make
+                # sure we are sending the right thing to the model. This should be fixed
+                # with the new intent rework and remove all the hacks again!
+                raw_output = turn.raw_output.split(".")[0] if turn.raw_output else None
                 try:
                     environment_history[turn.idx] = EnvironmentStateTurn(
-                        features=future.result(), output=turn.raw_output
+                        features=future.result(),
+                        output=f"{raw_output}." if raw_output else None,
                     )
                 except Exception as err:
                     logger.exception("Unable to get features for the turn", exc_info=err)
