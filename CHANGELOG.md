@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.0](https://github.com/emma-simbot/experience-hub/compare/v1.12.1...v1.13.0) (2022-11-03)
+
+
+### Features
+
+* add simple feedback for errors from the arena ([#131](https://github.com/emma-simbot/experience-hub/issues/131)) ([14e8e40](https://github.com/emma-simbot/experience-hub/commit/14e8e40dd506a3a63a3ad9eb9631d5e2afb837a2))
+
 ## [1.12.1](https://github.com/emma-simbot/experience-hub/compare/v1.12.0...v1.12.1) (2022-11-01)
 
 
