@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0](https://github.com/emma-simbot/experience-hub/compare/v2.0.0...v3.0.0) (2022-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* **datamodels:** support changes for arena v3 (#137)
+
+### Features
+
+* **datamodels:** support changes for arena v3 ([#137](https://github.com/emma-simbot/experience-hub/issues/137)) ([324559c](https://github.com/emma-simbot/experience-hub/commit/324559c2492a25fdac74dd107ebbf1258dbd277d)), closes [#133](https://github.com/emma-simbot/experience-hub/issues/133) [#134](https://github.com/emma-simbot/experience-hub/issues/134)
+
 ## [2.0.0](https://github.com/emma-simbot/experience-hub/compare/v1.13.0...v2.0.0) (2022-11-14)
 
 
