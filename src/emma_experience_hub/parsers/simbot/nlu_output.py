@@ -32,4 +32,4 @@ class SimBotNLUOutputParser(NeuralParser[SimBotIntent]):
         # If it exists, get the object name from the right-side of the template
         object_name = " ".join(split_parts[1:]) if len(split_parts) > 1 else None
 
-        return SimBotIntent(type=intent_type, object_name=object_name)
+        return SimBotIntent(type=intent_type, entity=object_name)

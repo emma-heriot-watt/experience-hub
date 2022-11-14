@@ -1,4 +1,4 @@
-from typing import Any, Literal, Union
+from typing import Any, Literal, Optional, Union
 
 from pydantic import Field, PositiveFloat, validator
 
@@ -17,6 +17,11 @@ class SimBotGotoRoomPayload(SimBotPayload):
 
     office_room: str = Field(..., alias="officeRoom")
 
+    @property
+    def entity_name(self) -> str:
+        """Get the name of the entity."""
+        return self.office_room
+
 
 class SimBotGotoViewpointPayload(SimBotPayload):
     """SimBot action for navigating to a specific viewpoint."""
@@ -28,6 +33,11 @@ class SimBotGotoPayload(SimBotPayload, smart_union=True):
     """SimBot Goto action."""
 
     object: Union[SimBotGotoObjectPayload, SimBotGotoRoomPayload, SimBotGotoViewpointPayload]
+
+    @property
+    def entity_name(self) -> Optional[str]:
+        """Get the name of the entity."""
+        return self.object.entity_name
 
 
 class SimBotNavigationPayload(SimBotPayload):

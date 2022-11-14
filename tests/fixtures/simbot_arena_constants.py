@@ -1,20 +1,24 @@
-import itertools
-from typing import Any
-
 import torch
 from pytest_cases import param_fixture
 
 from emma_common.datamodels import EmmaExtractedFeatures
-from emma_experience_hub.constants.simbot import (  # get_simbot_object_label_to_class_name_map,
-    get_simbot_room_names,
-)
-from emma_experience_hub.datamodels.simbot.actions import SimBotActionType
+from emma_experience_hub.datamodels.simbot import SimBotActionType
 
 
-def create_placeholder_features_frames() -> list[dict[str, Any]]:
+def create_placeholder_features_frames() -> list[EmmaExtractedFeatures]:
     frame1 = {
-        "bbox_features": torch.tensor([[1, 2, 3], [4, 5, 6]]),
-        "bbox_coords": torch.tensor([[25, 42, 74, 80], [12, 35, 24, 56]]),
+        "bbox_features": torch.tensor(
+            [
+                [1, 2, 3],
+                [4, 5, 6],
+            ]
+        ),
+        "bbox_coords": torch.tensor(
+            [
+                [25, 42, 74, 80],
+                [12, 35, 24, 56],
+            ]
+        ),
         "bbox_probas": torch.tensor([[0.35, 0.2, 0.25, 0.2], [0.2, 0.35, 0.25, 0.2]]),
         "cnn_features": torch.tensor([1, 2]),
         "class_labels": ["label1", "label2"],
@@ -33,14 +37,7 @@ def create_placeholder_features_frames() -> list[dict[str, Any]]:
         "width": 300,
         "height": 300,
     }
-    return [frame1, frame2]
-
-
-simbot_room_name = param_fixture(
-    "simbot_room_name",
-    sorted(itertools.chain(get_simbot_room_names(), get_simbot_room_names(lowercase=True))),
-    scope="session",
-)
+    return [EmmaExtractedFeatures.parse_obj(frame1), EmmaExtractedFeatures.parse_obj(frame2)]
 
 
 simbot_object_name = param_fixture(
@@ -64,5 +61,6 @@ simbot_interaction_action = param_fixture(
 
 simbot_extracted_features = param_fixture(
     "simbot_extracted_features",
-    [[EmmaExtractedFeatures.parse_obj(frame) for frame in create_placeholder_features_frames()]],
+    [create_placeholder_features_frames()],
+    scope="session",
 )

@@ -4,10 +4,13 @@ from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotDialogPayload,
+    SimBotGotoObjectPayload,
     SimBotGotoPayload,
+    SimBotGotoRoomPayload,
     SimBotInteractionObject,
     SimBotLookAroundPayload,
     SimBotLookDownPayload,
@@ -101,6 +104,9 @@ class SimBotActionType(Enum):
         All of these have pre-instantiated payloads too.
         """
         return [
+            SimBotActionType.Move,
+            SimBotActionType.Rotate,
+            SimBotActionType.Look,
             SimBotActionType.MoveForward,
             SimBotActionType.MoveBackward,
             SimBotActionType.RotateLeft,
@@ -170,6 +176,15 @@ class SimBotActionType(Enum):
             "Clean": SimBotObjectInteractionPayload,
         }
         return switcher
+
+    @classmethod
+    def from_payload_model(cls, payload_model: SimBotPayload) -> "SimBotActionType":
+        """Get the correct action type from the provided payload."""
+        switcher = {
+            payload_model: SimBotActionType[action_type_name]
+            for action_type_name, payload_model in SimBotActionType.action_type_to_payload_model().items()
+        }
+        return switcher[type(payload_model)]
 
     @classmethod
     def move_actions(cls) -> set["SimBotActionType"]:
@@ -245,7 +260,7 @@ class SimBotActionStatusType(Enum):
 class SimBotActionStatus(BaseModel):
     """Status of the previous action taken."""
 
-    id: int
+    id: int = Field(ge=0)
     type: SimBotActionType
     success: bool
     error_type: SimBotActionStatusType = Field(..., alias="errorType")
@@ -292,10 +307,13 @@ class SimBotAction(BaseModel):
     `check_payload_exists_for_all_necessary_keys()` class method.
     """
 
-    id: Optional[int] = None
+    id: Optional[int] = Field(ge=0)
     type: SimBotActionType
     payload: SimBotPayload = Field(..., exclude=True)
     status: Optional[SimBotActionStatus] = None
+
+    # The raw output that resulted in the current payload
+    raw_output: Optional[str] = None
 
     class Config:
         """Config for the model."""
@@ -377,15 +395,40 @@ class SimBotAction(BaseModel):
     @property
     def is_successful(self) -> bool:
         """Is the action successful?"""
-        if self.status is not None:
-            return self.status.success
-
-        return False
+        return self.status.success if self.status is not None else False
 
     @property
-    def is_dialog_action(self) -> bool:
-        """Return True if this action is a dialog action."""
-        return self.type == SimBotActionType.Dialog
+    def is_goto_room(self) -> bool:
+        """Is the action for navigating to a room?"""
+        return (
+            self.type == SimBotActionType.Goto
+            and isinstance(self.payload, SimBotGotoPayload)
+            and isinstance(self.payload.object, SimBotGotoRoomPayload)
+        )
+
+    @property
+    def is_goto_object(self) -> bool:
+        """Is the action for navigating to an object?"""
+        return (
+            self.type == SimBotActionType.Goto
+            and isinstance(self.payload, SimBotGotoPayload)
+            and isinstance(self.payload.object, SimBotGotoObjectPayload)
+        )
+
+    @property
+    def is_low_level_navigation(self) -> bool:
+        """Is the action for a low-level navigation movement?"""
+        return self.type in SimBotActionType.low_level_navigation()
+
+    @property
+    def is_object_interaction(self) -> bool:
+        """Is the action for interacting with an object?"""
+        return self.type in SimBotActionType.object_interaction()
+
+    @property
+    def is_end_of_trajectory(self) -> bool:
+        """Does the raw output contain the end-of-trajectory token?"""
+        return self.raw_output is not None and END_OF_TRAJECTORY_TOKEN in self.raw_output
 
     @property
     def object_output_type(self) -> Optional[SimBotObjectOutputType]:
@@ -394,4 +437,5 @@ class SimBotAction(BaseModel):
             if isinstance(self.payload.object, SimBotInteractionObject):
                 return self.payload.object.object_output_type
 
-        return None
+        # Otherwise, return the default
+        return SimBotObjectOutputType.default()

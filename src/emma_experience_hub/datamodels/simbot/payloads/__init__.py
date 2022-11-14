@@ -1,6 +1,7 @@
 from emma_experience_hub.datamodels.simbot.payloads.auxiliary_metadata import (
     SimBotAuxiliaryMetadata,
     SimBotAuxiliaryMetadataPayload,
+    SimBotAuxiliaryMetadataRobotInfo,
     SimBotAuxiliaryMetadataUri,
 )
 from emma_experience_hub.datamodels.simbot.payloads.dialog import SimBotDialogPayload

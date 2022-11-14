@@ -1,11 +1,17 @@
-from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath
+from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, Field
 
 
 class SimBotSettings(BaseSettings):
     """Settings for the SimBot-related modules."""
 
+    # Feature flags
+    disable_clarification_questions: bool = True
+    disable_clarification_confirmation: bool = True
+
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000
+
+    aws_profile: str = Field(default="TeamProfile", env="aws_profile")
 
     watchtower_log_group_name: str = "simbot_challenge"
     watchtower_log_stream_name: str = "{machine_name}/{logger_name}"

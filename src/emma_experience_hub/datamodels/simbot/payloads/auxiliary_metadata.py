@@ -1,4 +1,3 @@
-import logging
 from base64 import b64decode
 from io import BytesIO
 from pathlib import Path
@@ -54,8 +53,9 @@ class SimBotAuxiliaryMetadata(BaseModel):
     """SimBot Image data provided for each request made."""
 
     encoded_images: dict[int, str] = Field(..., alias="colorImages")
-    robot_info: list[SimBotAuxiliaryMetadataRobotInfo] = Field(..., alias="robotInfo", min_items=1)
-    viewpoints: set[str] = Field(..., alias="viewPoints")
+    # TODO: Disabled due to Arena v3 changes
+    # robot_info: list[SimBotAuxiliaryMetadataRobotInfo] = Field(..., alias="robotInfo", min_items=1)
+    # viewpoints: set[str] = Field(..., alias="viewPoints")
 
     @property
     def images(self) -> list[Image.Image]:
@@ -70,22 +70,22 @@ class SimBotAuxiliaryMetadata(BaseModel):
         ]
         return decoded_images
 
-    @property
-    def current_room(self) -> str:
-        """Get the robot's current room.
+    # @property
+    # def current_room(self) -> str:
+    #     """Get the robot's current room.
 
-        According to their source code, there is only going to be one item in this list. Therefore,
-        we can do this.
-        """
-        if len(self.robot_info) > 1:
-            logging.warning("There is more than one `current_room` within the `robotInfo` field")
+    #     According to their source code, there is only going to be one item in this list. Therefore,
+    #     we can do this.
+    #     """
+    #     if len(self.robot_info) > 1:
+    #         logger.warning("There is more than one `current_room` within the `robotInfo` field")
 
-        return next(iter(self.robot_info)).current_room
+    #     return next(iter(self.robot_info)).current_room
 
-    @property
-    def unique_room_names(self) -> set[str]:
-        """Get the unique room names from the list of viewpoints."""
-        return {viewpoint.split("_")[0] for viewpoint in self.viewpoints}
+    # @property
+    # def unique_room_names(self) -> set[str]:
+    #     """Get the unique room names from the list of viewpoints."""
+    #     return {viewpoint.split("_")[0] for viewpoint in self.viewpoints}
 
 
 class SimBotAuxiliaryMetadataPayload(SimBotPayload, SimBotAuxiliaryMetadata):

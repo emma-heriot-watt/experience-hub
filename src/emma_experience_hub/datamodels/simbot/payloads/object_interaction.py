@@ -16,23 +16,19 @@ class SimBotObjectOutputType(Enum):
     object_mask = "OBJECT_MASK"
 
     @classmethod
-    def get_type_from_args(
-        cls, mask: Optional[SimBotObjectMaskType], name: Optional[str]
-    ) -> "SimBotObjectOutputType":
+    def default(cls) -> "SimBotObjectOutputType":
+        """Get the default type."""
+        return SimBotObjectOutputType.object_mask
+
+    @classmethod
+    def get_type_from_args(cls, name: Optional[str]) -> "SimBotObjectOutputType":
         """Automatically return the correct type given the parameters."""
         # Manual override if stickynote
         if name is not None and "sticky" in name.lower():
             return SimBotObjectOutputType.object_class
 
-        if mask is not None:
-            return SimBotObjectOutputType.object_mask
-
-        if name is not None:
-            return SimBotObjectOutputType.object_class
-
-        raise AssertionError(
-            "Unable to automatically get the object output type from the arguments the combination is not supported."
-        )
+        # Otherwise return mask
+        return SimBotObjectOutputType.default()
 
 
 class SimBotInteractionObject(BaseModel):
@@ -45,10 +41,20 @@ class SimBotInteractionObject(BaseModel):
     @property
     def object_output_type(self) -> SimBotObjectOutputType:
         """Get the correct object output type from the given args."""
-        return SimBotObjectOutputType.get_type_from_args(self.mask, self.name)
+        return SimBotObjectOutputType.get_type_from_args(self.name)
+
+    @property
+    def entity_name(self) -> str:
+        """Get the name of the entity."""
+        return self.name
 
 
 class SimBotObjectInteractionPayload(SimBotPayload):
     """SimBot object interaction action, within the correct wrapping."""
 
     object: SimBotInteractionObject
+
+    @property
+    def entity_name(self) -> str:
+        """Get the name of the entity."""
+        return self.object.name

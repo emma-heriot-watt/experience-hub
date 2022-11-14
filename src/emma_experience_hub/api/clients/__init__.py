@@ -4,4 +4,3 @@ from emma_experience_hub.api.clients.emma_policy import EmmaPolicyClient
 from emma_experience_hub.api.clients.feature_extractor import FeatureExtractorClient
 from emma_experience_hub.api.clients.out_of_domain_detector import OutOfDomainDetectorClient
 from emma_experience_hub.api.clients.profanity_filter import ProfanityFilterClient
-from emma_experience_hub.api.clients.utterance_generator import UtteranceGeneratorClient

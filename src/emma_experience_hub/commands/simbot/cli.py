@@ -8,7 +8,7 @@ from loguru import logger
 from uvicorn import Config, Server
 
 from emma_common.logging import setup_rich_logging
-from emma_experience_hub.common.settings import Settings, SimBotSettings
+from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
 
 
@@ -95,11 +95,10 @@ def run_controller_api(
     os.environ["SIMBOT_EXTRACTED_FEATURES_CACHE_DIR"] = str(extracted_features_cache_dir)
 
     simbot_settings = SimBotSettings.from_env()
-    settings = Settings.from_env()
 
     server = Server(
         Config(
-            "emma_experience_hub.api.controllers.simbot:app",
+            "emma_experience_hub.api.simbot:app",
             host=simbot_settings.host,
             port=simbot_settings.port,
         ),
@@ -113,7 +112,7 @@ def run_controller_api(
 
             logger.add(
                 watchtower.CloudWatchLogHandler(
-                    boto3_profile_name=settings.aws_profile,
+                    boto3_profile_name=simbot_settings.aws_profile,
                     log_group_name=simbot_settings.watchtower_log_group_name,
                     log_stream_name=simbot_settings.watchtower_log_stream_name,
                     send_interval=5,

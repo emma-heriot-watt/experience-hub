@@ -76,10 +76,6 @@ class SimBotRequestProcessingPipeline:
             )
             return
 
-        if turn.actions is None:
-            logger.error("The turn should have an action. Is this the right turn?")
-            return
-
         if len(action_status) != len(turn.actions):
             logger.error(
                 f"The number of actions with the turn is not equal to the number of statuses available. There are {len(turn.actions)} actions within the turn, but {len(action_status)} statuses."

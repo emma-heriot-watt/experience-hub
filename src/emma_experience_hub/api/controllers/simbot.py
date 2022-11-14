@@ -1,102 +1,317 @@
-import boto3
-from fastapi import FastAPI, Request, Response, status
+import signal
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Event
+from time import sleep
+from typing import Any
+
 from loguru import logger
+from pydantic import BaseModel
 
-from emma_experience_hub.api.state.simbot import (
-    SimBotControllerClients,
-    SimBotControllerPipelines,
-    SimBotControllerState,
+from emma_experience_hub.api.clients import (
+    Client,
+    EmmaPolicyClient,
+    FeatureExtractorClient,
+    OutOfDomainDetectorClient,
+    ProfanityFilterClient,
 )
-from emma_experience_hub.common.settings import Settings, SimBotSettings
-from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
+from emma_experience_hub.api.clients.simbot import (
+    PlaceholderVisionClient,
+    SimBotAuxiliaryMetadataClient,
+    SimBotExtractedFeaturesClient,
+    SimBotSessionDbClient,
+    SimBotUtteranceGeneratorClient,
+)
+from emma_experience_hub.common.settings import SimBotSettings
+from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse, SimBotSession
+from emma_experience_hub.parsers.simbot import (
+    SimBotActionPredictorOutputParser,
+    SimBotLowASRConfidenceDetector,
+    SimBotNLUOutputParser,
+)
+from emma_experience_hub.pipelines.simbot import (
+    SimBotAgentActionGenerationPipeline,
+    SimBotAgentIntentSelectionPipeline,
+    SimBotAgentLanguageGenerationPipeline,
+    SimBotEnvironmentIntentExtractionPipeline,
+    SimBotRequestProcessingPipeline,
+    SimBotUserIntentExtractionPipeline,
+    SimBotUserUtteranceVerificationPipeline,
+)
 
 
-app = FastAPI()
+class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
+    """All the clients for the SimBot Controller API."""
 
-# Create an empty version of the state that will not error massively on module load
-state: SimBotControllerState = SimBotControllerState.construct()  # type: ignore[call-arg]
+    _exit = Event()
+
+    feature_extractor: FeatureExtractorClient
+    nlu_intent: EmmaPolicyClient
+    action_predictor: EmmaPolicyClient
+    session_db: SimBotSessionDbClient
+    auxiliary_metadata_cache: SimBotAuxiliaryMetadataClient
+    extracted_features_cache: SimBotExtractedFeaturesClient
+    profanity_filter: ProfanityFilterClient
+    utterance_generator: SimBotUtteranceGeneratorClient
+    out_of_domain_detector: OutOfDomainDetectorClient
+    button_detector: PlaceholderVisionClient
+
+    @classmethod
+    def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
+        """Instantiate all the clients from the SimBot settings."""
+        return cls(
+            feature_extractor=FeatureExtractorClient(
+                server_endpoint=simbot_settings.feature_extractor_url
+            ),
+            session_db=SimBotSessionDbClient(
+                resource_region=simbot_settings.session_db_region,
+                table_name=simbot_settings.session_db_memory_table_name,
+            ),
+            auxiliary_metadata_cache=SimBotAuxiliaryMetadataClient(
+                bucket_name=simbot_settings.simbot_cache_s3_bucket,
+                local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
+            ),
+            extracted_features_cache=SimBotExtractedFeaturesClient(
+                bucket_name=simbot_settings.simbot_cache_s3_bucket,
+                local_cache_dir=simbot_settings.extracted_features_cache_dir,
+            ),
+            nlu_intent=EmmaPolicyClient(server_endpoint=simbot_settings.nlu_predictor_url),
+            action_predictor=EmmaPolicyClient(
+                server_endpoint=simbot_settings.action_predictor_url
+            ),
+            profanity_filter=ProfanityFilterClient(endpoint=simbot_settings.profanity_filter_url),
+            utterance_generator=SimBotUtteranceGeneratorClient(
+                endpoint=simbot_settings.utterance_generator_url
+            ),
+            out_of_domain_detector=OutOfDomainDetectorClient(
+                endpoint=simbot_settings.out_of_domain_detector_url
+            ),
+            button_detector=PlaceholderVisionClient(
+                server_endpoint=simbot_settings.button_detector_url
+            ),
+        )
+
+    def healthcheck(self, attempts: int = 1, interval: int = 0) -> bool:
+        """Perform healthcheck, with retry intervals.
+
+        To disable retries, just set the number of attempts to 1.
+        """
+        self._prepare_exit_signal()
+
+        healthcheck_flag = False
+
+        for attempt in range(attempts):
+            healthcheck_flag = self._healthcheck_all_clients()
+
+            # If the healthcheck flag is all good, break from the loop
+            if healthcheck_flag or self._exit.is_set():
+                break
+
+            # Otherwise, report a failed attempt
+            logger.error(f"Healthcheck attempt {attempt}/{attempts} failed.")
+
+            # If attempt is not the last one, sleep for interval and go again
+            if attempt < attempts - 1:
+                logger.debug(f"Waiting for {interval} seconds and then trying again.")
+                sleep(interval)
+
+        return healthcheck_flag
+
+    def _prepare_exit_signal(self) -> None:
+        """Prepare the exit signal to handle KeyboardInterrupt events."""
+        for sig in ("TERM", "HUP", "INT"):
+            signal.signal(getattr(signal, f"SIG{sig}"), self._break_from_sleep)
+
+    def _break_from_sleep(self, signum: int, _frame: Any) -> None:
+        """Break from the sleep."""
+        logger.info("Interrupted. Shutting down...")
+        self._exit.set()
+
+    def _healthcheck_all_clients(self) -> bool:
+        """Check all the clients are healthy and running."""
+        with ThreadPoolExecutor() as pool:
+            clients: list[Client] = list(self.dict().values())
+            # TODO: Should there be a timeout on the healthcheck for each client?
+            #       If yes: how should timeouts be handled?
+            #       If not: what if it hangs?
+            healthcheck_futures = [pool.submit(client.healthcheck) for client in clients]
+
+            for future in as_completed(healthcheck_futures):
+                try:
+                    future.result()
+                except Exception:
+                    logger.error("Failed to verify the healthcheck")
+                    return False
+
+        return True
 
 
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Handle the startup of the API."""
-    settings = Settings.from_env()
-    simbot_settings = SimBotSettings.from_env()
+class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
+    """All the pipelines used by the SimBot Controller API."""
 
-    boto3.setup_default_session(profile_name=settings.aws_profile)
+    request_processing: SimBotRequestProcessingPipeline
+    user_utterance_verifier: SimBotUserUtteranceVerificationPipeline
+    user_intent_extractor: SimBotUserIntentExtractionPipeline
+    environment_intent_extractor: SimBotEnvironmentIntentExtractionPipeline
+    agent_intent_selector: SimBotAgentIntentSelectionPipeline
+    agent_action_generator: SimBotAgentActionGenerationPipeline
+    agent_language_generator: SimBotAgentLanguageGenerationPipeline
 
-    clients = SimBotControllerClients.from_simbot_settings(simbot_settings)
-    pipelines = SimBotControllerPipelines.from_controller_clients(clients, simbot_settings)
+    @classmethod
+    def from_clients(
+        cls, clients: SimBotControllerClients, simbot_settings: SimBotSettings
+    ) -> "SimBotControllerPipelines":
+        """Create the pipelines from the clients."""
+        return cls(
+            request_processing=SimBotRequestProcessingPipeline(
+                feature_extractor_client=clients.feature_extractor,
+                auxiliary_metadata_cache_client=clients.auxiliary_metadata_cache,
+                extracted_features_cache_client=clients.extracted_features_cache,
+                session_db_client=clients.session_db,
+            ),
+            user_utterance_verifier=SimBotUserUtteranceVerificationPipeline(
+                profanity_filter_client=clients.profanity_filter,
+                low_asr_confidence_detector=SimBotLowASRConfidenceDetector(
+                    avg_confidence_threshold=simbot_settings.asr_avg_confidence_threshold
+                ),
+                out_of_domain_detector_client=clients.out_of_domain_detector,
+            ),
+            user_intent_extractor=SimBotUserIntentExtractionPipeline(
+                _disable_clarification_questions=simbot_settings.disable_clarification_questions,
+                _disable_clarification_confirmation=simbot_settings.disable_clarification_confirmation,
+            ),
+            environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
+            agent_intent_selector=SimBotAgentIntentSelectionPipeline(
+                extracted_features_cache_client=clients.extracted_features_cache,
+                nlu_intent_client=clients.nlu_intent,
+                nlu_intent_parser=SimBotNLUOutputParser(
+                    intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
+                ),
+                _disable_clarification_questions=simbot_settings.disable_clarification_questions,
+            ),
+            agent_action_generator=SimBotAgentActionGenerationPipeline(
+                extracted_features_cache_client=clients.extracted_features_cache,
+                button_detector_client=clients.button_detector,
+                action_predictor_client=clients.action_predictor,
+                action_predictor_response_parser=SimBotActionPredictorOutputParser(
+                    action_delimiter=simbot_settings.action_predictor_delimiter,
+                    eos_token=simbot_settings.action_predictor_eos_token,
+                ),
+            ),
+            agent_language_generator=SimBotAgentLanguageGenerationPipeline(
+                utterance_generator_client=clients.utterance_generator,
+            ),
+        )
 
-    # Check clients every 15 seconds for 100 attempts (=1500s=25mins), which is ridiculously long
-    # because ECR can take up to 300secs to download all the images
-    if not clients.healthcheck(attempts=100, interval=15):  # noqa: WPS432
-        raise AssertionError("Clients failed to respond to healthchecks.")
 
-    state.settings = simbot_settings
-    state.clients = clients
-    state.pipelines = pipelines
+class SimBotController:
+    """Inference pipeline for the live SimBot Challenge."""
 
-    logger.info("API for the SimBot Arena is ready.")
+    def __init__(
+        self,
+        settings: SimBotSettings,
+        clients: SimBotControllerClients,
+        pipelines: SimBotControllerPipelines,
+    ) -> None:
+        self.settings = settings
+        self.clients = clients
+        self.pipelines = pipelines
 
+    @classmethod
+    def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotController":
+        """Instantiate the controller from the settings."""
+        clients = SimBotControllerClients.from_simbot_settings(simbot_settings)
+        pipelines = SimBotControllerPipelines.from_clients(clients, simbot_settings)
 
-@app.get("/ping", status_code=status.HTTP_200_OK)
-@app.get("/healthcheck", status_code=status.HTTP_200_OK)
-async def healthcheck(response: Response) -> str:
-    """Perform a healthcheck across all the clients."""
-    try:
-        state.healthcheck()
-    except Exception as err:
-        logger.error("The API is not currently healthy", exc_info=err)
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return "failed"
+        return cls(settings=simbot_settings, clients=clients, pipelines=pipelines)
 
-    return "success"
+    def healthcheck(self, attempts: int = 1, interval: int = 0) -> bool:
+        """Check the healthy of all the connected services."""
+        return self.clients.healthcheck(attempts, interval)
 
+    def handle_request_from_simbot_arena(self, request: SimBotRequest) -> SimBotResponse:
+        """Handle an incoming request from the SimBot arena."""
+        session = self.load_session_from_request(request)
+        session = self.extract_intent_from_user_utterance(session)
+        session = self.extract_intent_from_environment_feedback(session)
+        session = self.decide_what_the_agent_should_do(session)
+        session = self.generate_interaction_action_if_needed(session)
+        session = self.generate_language_action_if_needed(session)
 
-@app.post("/v1/predict", response_model=SimBotResponse)
-async def handle_request_from_simbot_arena(request: Request, response: Response) -> SimBotResponse:
-    """Handle a new request from the SimBot API."""
-    raw_request = await request.json()
+        self._upload_session_turn_to_database(session)
 
-    logger.debug(f"Received request {raw_request}")
-    # Parse the request from the server
-    try:
-        simbot_request = SimBotRequest.parse_obj(raw_request)
-    except Exception as request_err:
-        logger.exception("Unable to parse request", exc_info=request_err)
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        raise request_err
+        return session.current_turn.convert_to_simbot_response()
 
-    # Verify the state is healthy
-    try:
-        state.healthcheck()
-    except Exception as state_err:
-        logger.exception("Clients are not currently healthy", exc_info=state_err)
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        raise state_err
+    def load_session_from_request(self, simbot_request: SimBotRequest) -> SimBotSession:
+        """Load the entire session from the given request."""
+        logger.debug("Running request processing")
+        return self.pipelines.request_processing.run(simbot_request)
 
-    # Run the entire pipeline
-    logger.debug("Running request processing")
-    session = state.pipelines.request_processing.run(simbot_request)
+    def extract_intent_from_user_utterance(self, session: SimBotSession) -> SimBotSession:
+        """Determine what the user wants us to do, if anything."""
+        # If the user did not say anything, do nothing.
+        if not session.current_turn.speech:
+            return session
 
-    if session.current_turn.speech:
-        logger.debug(f"Incoming utterance: `{session.current_turn.speech.utterance}`")
+        logger.info(f"[REQUEST] Utterance: `{session.current_turn.speech.utterance}`")
 
-    logger.debug("Running NLU")
-    session = state.pipelines.nlu.run(session)
-    logger.debug(f"Current intent: `{session.current_turn.intent}`")
+        # Verify user utterance is valid
+        session.current_turn.intent.user = self.pipelines.user_utterance_verifier.run(
+            session.current_turn.speech
+        )
 
-    logger.debug("Running response generation")
-    session = state.pipelines.response_generation.run(session)
-    logger.debug(f"Raw output response: `{session.current_turn.raw_output}`")
+        # If the user has an intent --- i.e. it is not valid --- do not overwrite it.
+        if session.current_turn.intent.user is not None:
+            return session
 
-    # Send the new session turn to the server
-    state.clients.session_db.add_session_turn(session.current_turn)
+        # If the utterance is valid, extract the intent from it.
+        logger.debug("Extracting intent from user input...")
+        session.current_turn.intent.user = self.pipelines.user_intent_extractor.run(session)
 
-    # Convert the turn to the response
-    simbot_response = session.current_turn.convert_to_simbot_response()
+        logger.info(f"[INTENT] User: `{session.current_turn.intent.user}`")
+        return session
 
-    logger.debug(f"Returning the response {simbot_response.json(by_alias=True)}")
+    def extract_intent_from_environment_feedback(self, session: SimBotSession) -> SimBotSession:
+        """Determine what feedback from the environment tells us to do, if anything."""
+        logger.debug("Extracting intent from the environment...")
+        session.current_turn.intent.environment = self.pipelines.environment_intent_extractor.run(
+            session
+        )
 
-    return simbot_response
+        logger.info(f"[INTENT] Environment: `{session.current_turn.intent.environment}`")
+        return session
+
+    def decide_what_the_agent_should_do(self, session: SimBotSession) -> SimBotSession:
+        """Decide what the agent should do next."""
+        logger.debug("Selecting agent intent...")
+        session.current_turn.intent.agent = self.pipelines.agent_intent_selector.run(session)
+
+        logger.info(f"[INTENT] Agent: `{session.current_turn.intent.agent}`")
+        return session
+
+    def generate_interaction_action_if_needed(self, session: SimBotSession) -> SimBotSession:
+        """Generate an interaction action for the agent to perform, if needed."""
+        if not session.current_turn.intent.should_generate_interaction_action:
+            logger.debug(
+                "Agent does not need to generate an interaction action for the given intent."
+            )
+            return session
+
+        logger.debug("Generating interaction action...")
+        session.current_turn.actions.interaction = self.pipelines.agent_action_generator.run(
+            session
+        )
+
+        logger.info(f"[ACTION] Interaction: `{session.current_turn.actions.interaction}`")
+        return session
+
+    def generate_language_action_if_needed(self, session: SimBotSession) -> SimBotSession:
+        """Generate a language action if needed."""
+        logger.debug("Generating utterance for the turn (if needed)...")
+        session.current_turn.actions.dialog = self.pipelines.agent_language_generator.run(session)
+
+        logger.info(f"[ACTION] Dialog: `{session.current_turn.actions.dialog}`")
+        return session
+
+    def _upload_session_turn_to_database(self, session: SimBotSession) -> None:
+        """Upload the current session turn to the database."""
+        self.clients.session_db.add_session_turn(session.current_turn)

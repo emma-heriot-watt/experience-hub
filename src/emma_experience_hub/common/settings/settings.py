@@ -13,7 +13,6 @@ class Settings(BaseSettings):
     # remote_perception_checkpoint_uri: AnyUrl
     # remote_policy_checkpoint_uri: AnyUrl
     cuda_version_upper_bound: float = 11.3
-    aws_profile: str = "TeamProfile"
 
     # Repository directories
     # perception_repo_root: DirectoryPath
