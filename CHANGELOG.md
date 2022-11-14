@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://github.com/emma-simbot/experience-hub/compare/v3.0.0...v3.0.1) (2022-11-14)
+
+
+### Bug Fixes
+
+* condition when checking whether the agent generated an action ([#139](https://github.com/emma-simbot/experience-hub/issues/139)) ([b525708](https://github.com/emma-simbot/experience-hub/commit/b525708dd85cb5b86a212f7d6028e9fadc0dbda7))
+
 ## [3.0.0](https://github.com/emma-simbot/experience-hub/compare/v2.0.0...v3.0.0) (2022-11-14)
 
 
