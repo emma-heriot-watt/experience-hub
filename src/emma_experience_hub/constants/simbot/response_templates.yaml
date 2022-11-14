@@ -1,0 +1,95 @@
+profanity:
+  - Sorry, I can't help with that.
+
+out_of_domain:
+  - Sorry, I can't help with that.
+
+low_asr_confidence:
+  - Sorry, I didn't catch that. Can you repeat that please?
+  - Sorry, I wasn't able to understand what you said. Are you able to repeat that?
+  - Sorry, I couldn't understand what you said. Are you able to repeat that?
+
+clarify_description:
+  - What does the {entity} look like?
+  - What does the {entity} like?
+  - Can you tell me how that {entity} looks like?
+  - Could you describe how the {entity} looks like?
+
+clarify_direction:
+  - Which direction should I turn to?
+  - Which way do I need to turn?
+  - Which way do I go now?
+
+clarify_disambiguation:
+  - Which {entity} are you referring to?
+  - Which {entity} do you mean?
+  - Which {entity} are you talking about?
+
+clarify_location:
+  - Where is the {entity}?
+  - Where is the {entity} located?
+  - In what place is the {entity}?
+  - Where can I find the {entity}?
+  - Where is the {entity} you are referring to?
+
+clarify_confirmation:
+  - Are you sure you want me to {action} the {entity}?
+  - Just to check, would you like me to {action} the {entity}?
+
+generic_success:
+  - Done!
+  - Done, what's next?
+  - What should I do next?
+  - What should I do now?
+
+object_interaction_success:
+  - Done, what's next?
+
+low_level_navigation_success:
+  - Okay
+  - Done
+
+goto_room_success:
+  - I'm in the {entity}!
+
+goto_object_success:
+  - Okay
+  - Done
+  - Okay, what next?
+
+generic_failure:
+  - Sorry, I'm struggling with this one. Are you able to be more specific?
+  - Sorry, I'm struggling with this one. Can you be more specific?
+
+unsupported_action:
+  - Sorry, I cannot {action} the {entity}.
+
+unsupported_navigation:
+  - Sorry, I'm not able to go to there.
+
+already_holding_object:
+  - I am already holding that {entity}?
+
+receptacle_is_full:
+  - It looks like the {entity} is full.
+
+receptacle_is_closed:
+  - I can't do that because the {entity} is closed.
+
+target_inaccessible:
+  - Sorry, I can't access that {entity}
+
+target_out_of_range:
+  - The {entity} is too far away. Could you help me get closer to it?
+
+object_overloaded:
+  - Hmm, it seems like it is currently overloaded. I think we need to fix that first?
+
+object_unpowered:
+  - Hmm, it seems like it's not currently powered. I think we need to handle that first?
+
+no_free_hand:
+  - I'm already holding something and I can't hold anything else. We should put down what I am holding first.
+
+object_not_picked_up:
+  - Sorry, I wasn't able to pick up the {entity}.

@@ -6,7 +6,6 @@ from pytest_cases import fixture
 from pytest_httpx import HTTPXMock
 
 from emma_experience_hub.api.clients import ProfanityFilterClient
-from emma_experience_hub.api.clients.simbot import SimBotUtteranceGeneratorClient
 
 
 @fixture(scope="session")
@@ -18,17 +17,3 @@ def profanity_filter_client(httpx_mock: HTTPXMock) -> Generator[ProfanityFilterC
 
     httpx_mock.add_callback(custom_response)
     yield ProfanityFilterClient(endpoint=AnyHttpUrl(url="http://localhost", scheme="http"))
-
-
-@fixture
-def utterance_generator_client(
-    httpx_mock: HTTPXMock,
-) -> Generator[SimBotUtteranceGeneratorClient, None, None]:
-    def custom_response(request: httpx.Request) -> httpx.Response:  # noqa: WPS430
-        return httpx.Response(status_code=200, json="utterance_go_here")
-
-    httpx_mock.add_callback(custom_response)
-    assert httpx.post("http://localhost").json() == "utterance_go_here"
-    yield SimBotUtteranceGeneratorClient(
-        endpoint=AnyHttpUrl(url="http://localhost", scheme="http")
-    )

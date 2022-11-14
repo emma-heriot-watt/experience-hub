@@ -80,8 +80,8 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 server_endpoint=simbot_settings.action_predictor_url
             ),
             profanity_filter=ProfanityFilterClient(endpoint=simbot_settings.profanity_filter_url),
-            utterance_generator=SimBotUtteranceGeneratorClient(
-                endpoint=simbot_settings.utterance_generator_url
+            utterance_generator=SimBotUtteranceGeneratorClient.from_templates_file(
+                simbot_settings.response_templates
             ),
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url

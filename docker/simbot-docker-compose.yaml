@@ -32,18 +32,6 @@ services:
     command:
       - profanity_filter.web
 
-  utterance_generator:
-    container_name: utterance_generator
-    image: "${UTTERANCE_GENERATOR_IMAGE}"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6000/healthcheck"]
-      <<: *healthcheck-defaults
-    ports:
-      - "5504:6000"
-    entrypoint: python
-    command:
-      - src/emma_nlg/api/controllers/simbot.py
-
   feature_extractor:
     container_name: feature_extractor
     image: "${FEATURE_EXTRACTOR_IMAGE}"
