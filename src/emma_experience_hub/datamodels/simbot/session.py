@@ -1,13 +1,13 @@
 from collections.abc import Iterator
 from datetime import datetime
 from functools import cached_property
-from typing import Callable, Optional, cast
+from typing import Optional, cast
 
 from overrides import overrides
 from pydantic import BaseModel, Field, root_validator, validator
 
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
-from emma_experience_hub.datamodels.emma import DialogueUtterance, EmmaExtractedFeatures
+from emma_experience_hub.datamodels.emma import DialogueUtterance
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -226,16 +226,6 @@ class SimBotSessionTurn(BaseModel):
             objectOutputType=self.actions.object_output_type,
             actions=self.actions.to_list(),
         )
-
-    def load_features(
-        self, load_fn: Callable[[str, str], list[EmmaExtractedFeatures]]
-    ) -> list[EmmaExtractedFeatures]:
-        """Load the features for the given turn.
-
-        Provide the field with the `load` method from the cache client and it should return the
-        features.
-        """
-        return load_fn(self.session_id, str(self.prediction_request_id))
 
 
 class SimBotSession(BaseModel):

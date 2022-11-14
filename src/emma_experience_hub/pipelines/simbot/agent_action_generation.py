@@ -6,7 +6,7 @@ from typing import Callable, Optional
 from loguru import logger
 
 from emma_experience_hub.api.clients import EmmaPolicyClient
-from emma_experience_hub.api.clients.simbot import PlaceholderVisionClient, SimBotCacheClient
+from emma_experience_hub.api.clients.simbot import PlaceholderVisionClient, SimBotFeaturesClient
 from emma_experience_hub.datamodels import (
     DialogueUtterance,
     EmmaExtractedFeatures,
@@ -36,12 +36,12 @@ class SimBotAgentActionGenerationPipeline:
 
     def __init__(
         self,
-        extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
+        features_client: SimBotFeaturesClient,
         button_detector_client: PlaceholderVisionClient,
         action_predictor_client: EmmaPolicyClient,
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
     ) -> None:
-        self._extracted_features_cache_client = extracted_features_cache_client
+        self._features_client = features_client
 
         self._button_detector_client = button_detector_client
 
@@ -74,7 +74,7 @@ class SimBotAgentActionGenerationPipeline:
         turns_within_interaction_window = session.get_turns_within_interaction_window()
         environment_state_history = self._get_environment_state_history(
             turns_within_interaction_window,
-            self._extracted_features_cache_client.load,
+            self._features_client.get_features,
         )
         dialogue_history = self._get_dialogue_history(turns_within_interaction_window)
         raw_action_prediction = self._action_predictor_client.generate(
@@ -151,7 +151,7 @@ class SimBotAgentActionGenerationPipeline:
     def _get_environment_state_history(
         self,
         turns: list[SimBotSessionTurn],
-        extracted_features_load_fn: Callable[[str, str], list[EmmaExtractedFeatures]],
+        extracted_features_load_fn: Callable[[SimBotSessionTurn], list[EmmaExtractedFeatures]],
     ) -> list[EnvironmentStateTurn]:
         """Get the environment state history from a set of turns.
 
@@ -171,10 +171,7 @@ class SimBotAgentActionGenerationPipeline:
         with ThreadPoolExecutor() as executor:
             # On submitting, the future can be used a key to map to the session turn it came from
             future_to_turn: dict[Future[list[EmmaExtractedFeatures]], SimBotSessionTurn] = {
-                executor.submit(
-                    extracted_features_load_fn, turn.session_id, turn.prediction_request_id
-                ): turn
-                for turn in relevant_turns
+                executor.submit(extracted_features_load_fn, turn): turn for turn in relevant_turns
             }
 
             for future in as_completed(future_to_turn):

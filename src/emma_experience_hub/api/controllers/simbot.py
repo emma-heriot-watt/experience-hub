@@ -18,6 +18,7 @@ from emma_experience_hub.api.clients.simbot import (
     PlaceholderVisionClient,
     SimBotAuxiliaryMetadataClient,
     SimBotExtractedFeaturesClient,
+    SimBotFeaturesClient,
     SimBotSessionDbClient,
     SimBotUtteranceGeneratorClient,
 )
@@ -44,12 +45,10 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
 
     _exit = Event()
 
-    feature_extractor: FeatureExtractorClient
+    features: SimBotFeaturesClient
     nlu_intent: EmmaPolicyClient
     action_predictor: EmmaPolicyClient
     session_db: SimBotSessionDbClient
-    auxiliary_metadata_cache: SimBotAuxiliaryMetadataClient
-    extracted_features_cache: SimBotExtractedFeaturesClient
     profanity_filter: ProfanityFilterClient
     utterance_generator: SimBotUtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
@@ -59,20 +58,22 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
         """Instantiate all the clients from the SimBot settings."""
         return cls(
-            feature_extractor=FeatureExtractorClient(
-                server_endpoint=simbot_settings.feature_extractor_url
+            features=SimBotFeaturesClient(
+                auxiliary_metadata_cache_client=SimBotAuxiliaryMetadataClient(
+                    bucket_name=simbot_settings.simbot_cache_s3_bucket,
+                    local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
+                ),
+                feature_extractor_client=FeatureExtractorClient(
+                    endpoint=simbot_settings.feature_extractor_url
+                ),
+                features_cache_client=SimBotExtractedFeaturesClient(
+                    bucket_name=simbot_settings.simbot_cache_s3_bucket,
+                    local_cache_dir=simbot_settings.extracted_features_cache_dir,
+                ),
             ),
             session_db=SimBotSessionDbClient(
                 resource_region=simbot_settings.session_db_region,
                 table_name=simbot_settings.session_db_memory_table_name,
-            ),
-            auxiliary_metadata_cache=SimBotAuxiliaryMetadataClient(
-                bucket_name=simbot_settings.simbot_cache_s3_bucket,
-                local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
-            ),
-            extracted_features_cache=SimBotExtractedFeaturesClient(
-                bucket_name=simbot_settings.simbot_cache_s3_bucket,
-                local_cache_dir=simbot_settings.extracted_features_cache_dir,
             ),
             nlu_intent=EmmaPolicyClient(server_endpoint=simbot_settings.nlu_predictor_url),
             action_predictor=EmmaPolicyClient(
@@ -85,9 +86,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url
             ),
-            button_detector=PlaceholderVisionClient(
-                server_endpoint=simbot_settings.button_detector_url
-            ),
+            button_detector=PlaceholderVisionClient(endpoint=simbot_settings.button_detector_url),
         )
 
     def healthcheck(self, attempts: int = 1, interval: int = 0) -> bool:
@@ -163,9 +162,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
         """Create the pipelines from the clients."""
         return cls(
             request_processing=SimBotRequestProcessingPipeline(
-                feature_extractor_client=clients.feature_extractor,
-                auxiliary_metadata_cache_client=clients.auxiliary_metadata_cache,
-                extracted_features_cache_client=clients.extracted_features_cache,
                 session_db_client=clients.session_db,
             ),
             user_utterance_verifier=SimBotUserUtteranceVerificationPipeline(
@@ -181,7 +177,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             ),
             environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
             agent_intent_selector=SimBotAgentIntentSelectionPipeline(
-                extracted_features_cache_client=clients.extracted_features_cache,
+                features_client=clients.features,
                 nlu_intent_client=clients.nlu_intent,
                 nlu_intent_parser=SimBotNLUOutputParser(
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
@@ -189,7 +185,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 _disable_clarification_questions=simbot_settings.disable_clarification_questions,
             ),
             agent_action_generator=SimBotAgentActionGenerationPipeline(
-                extracted_features_cache_client=clients.extracted_features_cache,
+                features_client=clients.features,
                 button_detector_client=clients.button_detector,
                 action_predictor_client=clients.action_predictor,
                 action_predictor_response_parser=SimBotActionPredictorOutputParser(

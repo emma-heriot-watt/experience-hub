@@ -1,8 +1,8 @@
 from loguru import logger
 
 from emma_experience_hub.api.clients import EmmaPolicyClient
-from emma_experience_hub.api.clients.simbot import SimBotCacheClient
-from emma_experience_hub.datamodels import EmmaExtractedFeatures, EnvironmentStateTurn
+from emma_experience_hub.api.clients.simbot import SimBotFeaturesClient
+from emma_experience_hub.datamodels import EnvironmentStateTurn
 from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType, SimBotSession
 from emma_experience_hub.parsers import NeuralParser
 
@@ -16,12 +16,12 @@ class SimBotAgentIntentSelectionPipeline:
 
     def __init__(
         self,
-        extracted_features_cache_client: SimBotCacheClient[list[EmmaExtractedFeatures]],
+        features_client: SimBotFeaturesClient,
         nlu_intent_client: EmmaPolicyClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
         _disable_clarification_questions: bool = False,
     ) -> None:
-        self._extracted_features_cache_client = extracted_features_cache_client
+        self._features_client = features_client
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
@@ -81,9 +81,7 @@ class SimBotAgentIntentSelectionPipeline:
             dialogue_history=session.current_turn.utterances,
             environment_state_history=[
                 EnvironmentStateTurn(
-                    features=self._extracted_features_cache_client.load(
-                        session.current_turn.session_id, session.current_turn.prediction_request_id
-                    ),
+                    features=self._features_client.get_features(session.current_turn)
                 )
             ],
         )
