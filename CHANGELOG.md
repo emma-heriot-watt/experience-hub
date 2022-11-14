@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.0](https://github.com/emma-simbot/experience-hub/compare/v3.1.0...v3.2.0) (2022-11-14)
+
+
+### Features
+
+* migrate the response templates from the nlg repo ([#140](https://github.com/emma-simbot/experience-hub/issues/140)) ([f01ed30](https://github.com/emma-simbot/experience-hub/commit/f01ed303bef22ccd9565837532c9597902f6ebe2)), closes [#136](https://github.com/emma-simbot/experience-hub/issues/136)
+
 ## [3.1.0](https://github.com/emma-simbot/experience-hub/compare/v3.0.1...v3.1.0) (2022-11-14)
 
 
