@@ -103,5 +103,6 @@ ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
         SimBotActionType.Toggle: {"Toggle", "toggle"},
         SimBotActionType.Fill: {"Fill", "fill"},
         SimBotActionType.Clean: {"Clean", "clean"},
+        SimBotActionType.Highlight: {"Highlight", "highlight"},
     }
 )

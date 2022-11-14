@@ -62,6 +62,7 @@ class SimBotActionType(Enum):
     Toggle = "toggle"  # noqa: WPS115
     Fill = "fill"  # noqa: WPS115
     Clean = "clean"  # noqa: WPS115
+    Highlight = "highlight"  # noqa: WPS115
     # Burn = "burn"
     # Slice = "slice"
     # Throw = "throw"
@@ -132,6 +133,7 @@ class SimBotActionType(Enum):
             SimBotActionType.Toggle,
             SimBotActionType.Fill,
             SimBotActionType.Clean,
+            SimBotActionType.Highlight,
         ]
 
     @classmethod
@@ -174,6 +176,7 @@ class SimBotActionType(Enum):
             "Toggle": SimBotObjectInteractionPayload,
             "Fill": SimBotObjectInteractionPayload,
             "Clean": SimBotObjectInteractionPayload,
+            "Highlight": SimBotObjectInteractionPayload,
         }
         return switcher
 

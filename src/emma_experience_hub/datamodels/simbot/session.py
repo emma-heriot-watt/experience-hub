@@ -6,6 +6,7 @@ from typing import Callable, Optional, cast
 from overrides import overrides
 from pydantic import BaseModel, Field, root_validator, validator
 
+from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.emma import DialogueUtterance, EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
@@ -138,6 +139,26 @@ class SimBotSessionTurnActions(BaseModel, validate_assignment=True):
         return actions_list
 
 
+class SimBotSessionTurnEnvironment(BaseModel):
+    """Get environment information for the robot and any relevant locations."""
+
+    current_room: str
+    current_position: Position
+    current_rotation: RotationQuaternion
+
+    unique_room_names: set[str]
+    viewpoints: dict[str, Position]
+
+    @property
+    def viewpoints_in_current_room(self) -> dict[str, Position]:
+        """Only return the viewpoints within the same room the agent is in."""
+        return {
+            viewpoint_name: viewpoint_location
+            for viewpoint_name, viewpoint_location in self.viewpoints.items()
+            if viewpoint_name.startswith(self.current_room)
+        }
+
+
 class SimBotSessionTurn(BaseModel):
     """Current turn for a SimBot game session."""
 
@@ -147,16 +168,12 @@ class SimBotSessionTurn(BaseModel):
 
     timestamp: SimBotSessionTurnTimestamp
 
-    # TODO: Disabled due to Arena v3 changes
-    # current_room: str
-    # unique_room_names: set[str]
-    # viewpoints: set[str]
-
     speech: Optional[SimBotSpeechRecognitionPayload] = None
 
     # URI to the auxiliary metadata file, as provided by the SimBot Arena
     auxiliary_metadata_uri: SimBotAuxiliaryMetadataUri
 
+    environment: SimBotSessionTurnEnvironment
     intent: SimBotSessionTurnIntent
     actions: SimBotSessionTurnActions
 
@@ -168,11 +185,15 @@ class SimBotSessionTurn(BaseModel):
             prediction_request_id=request.header.prediction_request_id,
             idx=idx,
             timestamp=SimBotSessionTurnTimestamp(),
-            # current_room=request.auxiliary_metadata.current_room,
-            # unique_room_names=request.auxiliary_metadata.unique_room_names,
-            # viewpoints=request.auxiliary_metadata.viewpoints,
             speech=request.speech_recognition,
             auxiliary_metadata_uri=request.auxiliary_metadata.uri,
+            environment=SimBotSessionTurnEnvironment(
+                unique_room_names=request.auxiliary_metadata.unique_room_names,
+                viewpoints=request.auxiliary_metadata.viewpoints,
+                current_room=request.auxiliary_metadata.current_room,
+                current_position=request.auxiliary_metadata.current_position,
+                current_rotation=request.auxiliary_metadata.current_rotation,
+            ),
             intent=SimBotSessionTurnIntent(),
             actions=SimBotSessionTurnActions(),
         )
