@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.0](https://github.com/emma-simbot/experience-hub/compare/v3.0.1...v3.1.0) (2022-11-14)
+
+
+### Features
+
+* only extract features when we need them ([#138](https://github.com/emma-simbot/experience-hub/issues/138)) ([85e2f12](https://github.com/emma-simbot/experience-hub/commit/85e2f1254cdcfcf7f34166836f779bbcf54f717b)), closes [#135](https://github.com/emma-simbot/experience-hub/issues/135)
+
 ## [3.0.1](https://github.com/emma-simbot/experience-hub/compare/v3.0.0...v3.0.1) (2022-11-14)
 
 
