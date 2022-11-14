@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/emma-simbot/experience-hub/compare/v1.13.0...v2.0.0) (2022-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* decouple intent and action prediction into multiple pipelines (#133)
+
+### Features
+
+* decouple intent and action prediction into multiple pipelines ([#133](https://github.com/emma-simbot/experience-hub/issues/133)) ([51ccd84](https://github.com/emma-simbot/experience-hub/commit/51ccd84e6e26aa2be93f3d336ad789aa95bdd0a6))
+
 ## [1.13.0](https://github.com/emma-simbot/experience-hub/compare/v1.12.1...v1.13.0) (2022-11-03)
 
 
