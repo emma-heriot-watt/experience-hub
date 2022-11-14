@@ -58,7 +58,7 @@ class SimBotAgentLanguageGenerationPipeline:
         """Handle dialog generation if a valid action was not generated."""
         agent_not_failed_action_prediction = (
             session.current_turn.intent.should_generate_interaction_action
-            and session.current_turn.actions.interaction is None
+            and session.current_turn.actions.interaction is not None
         )
         if agent_not_failed_action_prediction:
             return None
