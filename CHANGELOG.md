@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/emma-simbot/experience-hub/compare/v3.5.0...v3.5.1) (2022-11-15)
+
+
+### Bug Fixes
+
+* make sure new action status types have intents for them ([9bb75ba](https://github.com/emma-simbot/experience-hub/commit/9bb75ba27e746f0178af7d7f2f528dd3b56da02f))
+
 ## [3.5.0](https://github.com/emma-simbot/experience-hub/compare/v3.4.1...v3.5.0) (2022-11-15)
 
 
