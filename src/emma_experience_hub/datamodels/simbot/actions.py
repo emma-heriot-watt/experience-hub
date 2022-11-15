@@ -250,15 +250,14 @@ class SimBotActionStatusType(Enum):
     target_inaccessible = "TargetInaccessible"
     killed_by_hazard = "KilledByHazard"
     target_out_of_range = "TargetOutOfRange"
-    alternative_navigation_used = "AlternativeNavigationUsed"
-    interrupted_by_new_command_batch = "InterruptedByNewCommandBatch"
-    raycast_missed = "RaycastMissed"
+    alternate_navigation_used = "AlternateNavigationUsed"
     object_unpowered = "ObjectUnpowered"
     object_overloaded = "ObjectOverloaded"
-    no_free_hand = "NoFreeHand"
     invalid_command = "InvalidCommand"
     object_not_picked_up = "ObjectNotPickedUp"
-    incorrect_action_format = "IncorrectActionFormat"
+    arena_unavailable = "ArenaUnavailable"
+    invalid_action_format = "InvalidActionFormat"
+    action_execution_error = "ActionExecutionError"
 
     @classmethod
     def reverse_mapping(cls) -> dict[str, str]:

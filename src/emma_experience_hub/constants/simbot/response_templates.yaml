@@ -66,21 +66,30 @@ unsupported_action:
 
 unsupported_navigation:
   - Sorry, I'm not able to go to there.
+  - Sorry, i'm not able to get to the {entity}.
 
 already_holding_object:
-  - I am already holding that {entity}?
+  - I'm already holding something and I can't hold anything else. We should put down what I am holding first.
+  - I can only hold one thing at a time.
 
 receptacle_is_full:
   - It looks like the {entity} is full.
+  - There is no space on the {entity} to put it.
 
 receptacle_is_closed:
   - I can't do that because the {entity} is closed.
 
 target_inaccessible:
-  - Sorry, I can't access that {entity}
+  - Sorry, I can't access that {entity} from here. Can you provide me an instruction so it's in my view?
+
+killed_by_hazard:
+  - I am dead.
 
 target_out_of_range:
   - The {entity} is too far away. Could you help me get closer to it?
+
+alternate_navigation_used:
+  - I couldn't go there but I got as close as I could. I hope that's okay!
 
 object_overloaded:
   - Hmm, it seems like it is currently overloaded. I think we need to fix that first?
@@ -88,8 +97,8 @@ object_overloaded:
 object_unpowered:
   - Hmm, it seems like it's not currently powered. I think we need to handle that first?
 
-no_free_hand:
-  - I'm already holding something and I can't hold anything else. We should put down what I am holding first.
-
 object_not_picked_up:
-  - Sorry, I wasn't able to pick up the {entity}.
+  - I'm not holding the {entity}.
+
+arena_unavailable:
+  - Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?
