@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.4.0](https://github.com/emma-simbot/experience-hub/compare/v3.3.0...v3.4.0) (2022-11-15)
+
+
+### Features
+
+* support updated arena error types ([#143](https://github.com/emma-simbot/experience-hub/issues/143)) ([7b43747](https://github.com/emma-simbot/experience-hub/commit/7b437477131cd1533df4c7a65c92c93c5cb557e2))
+
 ## [3.3.0](https://github.com/emma-simbot/experience-hub/compare/v3.2.0...v3.3.0) (2022-11-15)
 
 
