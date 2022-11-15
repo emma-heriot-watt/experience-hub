@@ -48,11 +48,14 @@ class SimBotIntentType(Enum):
     receptacle_is_full = "<failure><receptacle_is_full>"
     receptacle_is_closed = "<failure><receptacle_is_closed>"
     target_inaccessible = "<failure><target_inaccessible>"
+    killed_by_hazard = "<failure><killed_by_hazard>"
     target_out_of_range = "<failure><target_out_of_range>"
+    alternate_navigation_used = "<failure><alternate_navigation_used>"
     object_overloaded = "<failure><object_overloaded>"
     object_unpowered = "<failure><object_unpowered>"
-    no_free_hand = "<failure><no_free_hand>"
+    invalid_command = "<failure><invalid_command>"
     object_not_picked_up = "<failure><object_not_picked_up>"
+    arena_unavailable = "<failure><arena_unavailable>"
 
     @property
     def is_invalid_user_utterance(self) -> bool:
@@ -85,10 +88,12 @@ class SimBotIntentType(Enum):
             SimBotIntentType.receptacle_is_full,
             SimBotIntentType.receptacle_is_closed,
             SimBotIntentType.target_inaccessible,
+            SimBotIntentType.killed_by_hazard,
             SimBotIntentType.target_out_of_range,
+            SimBotIntentType.alternate_navigation_used,
             SimBotIntentType.object_overloaded,
             SimBotIntentType.object_unpowered,
-            SimBotIntentType.no_free_hand,
+            SimBotIntentType.invalid_command,
             SimBotIntentType.object_not_picked_up,
         }
 
