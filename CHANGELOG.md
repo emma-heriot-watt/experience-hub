@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.0](https://github.com/emma-simbot/experience-hub/compare/v3.4.1...v3.5.0) (2022-11-15)
+
+
+### Features
+
+* use synonyms for action and room names ([#145](https://github.com/emma-simbot/experience-hub/issues/145)) ([3ed883c](https://github.com/emma-simbot/experience-hub/commit/3ed883ce9c6667aad7cd8b9c00d8b7c031fa77e8)), closes [#144](https://github.com/emma-simbot/experience-hub/issues/144)
+
 ## [3.4.1](https://github.com/emma-simbot/experience-hub/compare/v3.4.0...v3.4.1) (2022-11-15)
 
 
