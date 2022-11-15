@@ -1,6 +1,3 @@
-from typing import Optional
-
-from emma_experience_hub.datamodels.simbot.intents import SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
 
 
@@ -11,4 +8,3 @@ class SimBotDialogPayload(SimBotPayload):
     """
 
     value: str  # noqa: WPS110
-    intent: Optional[SimBotIntentType] = None

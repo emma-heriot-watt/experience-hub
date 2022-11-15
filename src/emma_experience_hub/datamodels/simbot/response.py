@@ -15,10 +15,8 @@ class SimBotResponse(BaseModel):
         max_items=5,
         exclude={
             "__all__": {
-                # Do not include the status field
+                # Do not include the field
                 "status": True,
-                # Do not include the intent field for the dialog action
-                "dialog": {"intent"},
                 "raw_output": True,
             },
         },
