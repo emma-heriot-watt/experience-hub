@@ -95,6 +95,7 @@ class SimBotIntentType(Enum):
             SimBotIntentType.object_unpowered,
             SimBotIntentType.invalid_command,
             SimBotIntentType.object_not_picked_up,
+            SimBotIntentType.arena_unavailable,
         }
 
     @property
