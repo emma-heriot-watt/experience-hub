@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, root_validator, validator
 
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.emma import DialogueUtterance
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
@@ -207,7 +207,8 @@ class SimBotSessionTurn(BaseModel):
         if self.speech is not None:
             utterances.append(DialogueUtterance(utterance=self.speech.utterance, role="user"))
 
-        if self.actions.dialog is not None:
+        # Do not include lightweight dialog actions within the utterances!
+        if self.actions.dialog is not None and self.actions.dialog.type == SimBotActionType.Dialog:
             payload = cast(SimBotDialogPayload, self.actions.dialog.payload)
             utterances.append(DialogueUtterance(utterance=payload.value, role="agent"))
 

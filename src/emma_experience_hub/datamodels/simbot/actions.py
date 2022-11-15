@@ -70,6 +70,7 @@ class SimBotActionType(Enum):
 
     # Language
     Dialog = "dialog"  # noqa: WPS115
+    LightweightDialog = "lightweightDialog"  # noqa: WPS115
     SpeechRecognition = "recognition"  # noqa: WPS115
 
     # Other
@@ -139,7 +140,11 @@ class SimBotActionType(Enum):
     @classmethod
     def language(cls) -> list["SimBotActionType"]:
         """Get all language action types from the SimBot Arena."""
-        return [SimBotActionType.Dialog, SimBotActionType.SpeechRecognition]
+        return [
+            SimBotActionType.Dialog,
+            SimBotActionType.LightweightDialog,
+            SimBotActionType.SpeechRecognition,
+        ]
 
     @classmethod
     def action_type_to_payload_model(cls) -> dict[str, type[SimBotPayload]]:
@@ -150,6 +155,7 @@ class SimBotActionType(Enum):
             "GameMetaData": SimBotAuxiliaryMetadataPayload,
             # Dialog
             "Dialog": SimBotDialogPayload,
+            "LightweightDialog": SimBotDialogPayload,
             # Navigation
             "Goto": SimBotGotoPayload,
             "Move": SimBotMovePayload,
@@ -427,6 +433,11 @@ class SimBotAction(BaseModel):
     def is_object_interaction(self) -> bool:
         """Is the action for interacting with an object?"""
         return self.type in SimBotActionType.object_interaction()
+
+    @property
+    def is_dialog(self) -> bool:
+        """Is the action a dialog action?"""
+        return self.type in SimBotActionType.language()
 
     @property
     def is_end_of_trajectory(self) -> bool:
