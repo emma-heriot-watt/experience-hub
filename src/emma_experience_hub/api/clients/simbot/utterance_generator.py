@@ -1,16 +1,21 @@
 import random
+from contextlib import suppress
 from pathlib import Path
+from typing import Optional
 
 import yaml
-from convert_case import lower_case
 from loguru import logger
 
 from emma_experience_hub.api.clients.client import Client
-from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType
+from emma_experience_hub.constants.simbot import ACTION_SYNONYMS, ROOM_SYNONYNMS
+from emma_experience_hub.datamodels.simbot import SimBotActionType, SimBotIntent, SimBotIntentType
 
 
 class SimBotUtteranceGeneratorClient(Client):
     """Generate utterances for various intents."""
+
+    _default_action = "perform that action on"
+    _default_entity = "object"
 
     def __init__(self, templates: dict[SimBotIntentType, list[str]]) -> None:
         self._templates = templates
@@ -36,19 +41,32 @@ class SimBotUtteranceGeneratorClient(Client):
         return True
 
     def generate_from_intent(self, intent: SimBotIntent) -> str:
-        """Generate a response from the template.
-
-        Importantly, we use `lower_case` from `convert-case` to convert slot values to lowercase,
-        so that any PascalCase or camelCase are converted properly.
-
-        For example:
-        - "MainOffice" -> "main office"
-        - "pickUp" -> "pick up"
-        """
+        """Generate a response from the template."""
         logger.debug(f"Generating utterance for intent {intent}")
         template = random.choice(self._templates[intent.type])
 
         return template.format(
-            action=lower_case(intent.action) if intent.action else "perform that action on",
-            entity=lower_case(intent.entity) if intent.entity else "object",
+            action=self._get_action_name(intent.action),
+            entity=self._get_entity_name(intent.entity),
         )
+
+    def _get_action_name(self, action_type: Optional[SimBotActionType]) -> str:
+        """Return one of the synonyms for the action type."""
+        if not action_type:
+            return self._default_action
+
+        with suppress(KeyError):
+            return random.choice(list(ACTION_SYNONYMS[action_type]))
+
+        return self._default_action
+
+    def _get_entity_name(self, entity: Optional[str]) -> str:
+        """Return a synonym for the entity name if possible."""
+        if not entity:
+            return self._default_entity
+
+        with suppress(KeyError):
+            return ROOM_SYNONYNMS[entity]
+
+        # Return itself if there were no synonyms for it
+        return entity

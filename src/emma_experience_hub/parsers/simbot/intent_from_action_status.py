@@ -48,5 +48,5 @@ class SimBotIntentFromActionStatusParser(Parser[SimBotSessionTurn, Optional[SimB
         return SimBotIntent(
             type=intent_type,
             entity=erroneous_action.payload.entity_name,
-            action=erroneous_action.type.value,
+            action=erroneous_action.type,
         )

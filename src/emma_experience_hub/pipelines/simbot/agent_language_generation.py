@@ -98,7 +98,7 @@ class SimBotAgentLanguageGenerationPipeline:
         intent = SimBotIntent(
             type=SimBotIntentType.goto_room_success,
             entity=interaction_action.payload.entity_name,
-            action=interaction_action.type.value,
+            action=interaction_action.type,
         )
         return self._generate_from_intent(intent)
 
@@ -109,7 +109,7 @@ class SimBotAgentLanguageGenerationPipeline:
         intent = SimBotIntent(
             type=SimBotIntentType.goto_object_success,
             entity=interaction_action.payload.entity_name,
-            action=interaction_action.type.value,
+            action=interaction_action.type,
         )
         return self._generate_from_intent(intent)
 
@@ -119,7 +119,7 @@ class SimBotAgentLanguageGenerationPipeline:
         """Generate dialog for low-level navigation actions."""
         intent = SimBotIntent(
             type=SimBotIntentType.low_level_navigation_success,
-            action=interaction_action.type.value,
+            action=interaction_action.type,
         )
         return self._generate_from_intent(intent)
 
@@ -130,7 +130,7 @@ class SimBotAgentLanguageGenerationPipeline:
         intent = SimBotIntent(
             type=SimBotIntentType.low_level_navigation_success,
             entity=interaction_action.payload.entity_name,
-            action=interaction_action.type.value,
+            action=interaction_action.type,
         )
         return self._generate_from_intent(intent)
 

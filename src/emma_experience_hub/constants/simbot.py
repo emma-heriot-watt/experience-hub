@@ -106,3 +106,15 @@ ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
         SimBotActionType.Highlight: {"Highlight", "highlight"},
     }
 )
+
+ROOM_SYNONYNMS: Mapping[str, str] = MappingProxyType(
+    {
+        "BreakRoom": "break room",
+        "Lab1": "robotics lab",
+        "Lab2": "quantum lab",
+        "MainOffice": "main office",
+        "Reception": "reception",
+        "SmallOffice": "small office",
+        "Warehouse": "warehouse",
+    }
+)
