@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.2](https://github.com/emma-simbot/experience-hub/compare/v3.5.1...v3.5.2) (2022-11-15)
+
+
+### Bug Fixes
+
+* add `arena_unavailable` error to the list of environment errors ([70adfc3](https://github.com/emma-simbot/experience-hub/commit/70adfc38588bbf626773230f197f324efd308d16))
+
 ## [3.5.1](https://github.com/emma-simbot/experience-hub/compare/v3.5.0...v3.5.1) (2022-11-15)
 
 
