@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.4.1](https://github.com/emma-simbot/experience-hub/compare/v3.4.0...v3.4.1) (2022-11-15)
+
+
+### Bug Fixes
+
+* do not include intent type in dialog payload ([2614119](https://github.com/emma-simbot/experience-hub/commit/2614119b83054bf0725cbef71ba35b01c0b75bb5))
+
 ## [3.4.0](https://github.com/emma-simbot/experience-hub/compare/v3.3.0...v3.4.0) (2022-11-15)
 
 
