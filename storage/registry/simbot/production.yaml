@@ -11,13 +11,13 @@ services:
 
   - name: intent_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.1.2-cu113
+    image_version: 1.5.1-cu113
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/nlu_with_improved_ambiguous_low_level.ckpt
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.1.2-cu113
+    image_version: 1.5.1-cu113
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v3_bsz512_lr1e-4_0.5_speaker_tokens.ckpt
 
@@ -29,13 +29,9 @@ services:
 
   - name: placeholder_button_detector
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/color-matcher
-    image_version: 1.0.1-cu113
+    image_version: 1.0.2-cu113
 
     model_url: s3://emma-simbot/perception/amazon-simbot-vision-model/vision_model_21.pth
-
-  - name: utterance_generator
-    image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/nlg
-    image_version: 1.0.0
 
   - name: profanity_filter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/profanity-filter
