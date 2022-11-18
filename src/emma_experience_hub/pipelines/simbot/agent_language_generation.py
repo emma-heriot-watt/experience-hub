@@ -52,7 +52,9 @@ class SimBotAgentLanguageGenerationPipeline:
             return None
 
         # Otherwise, provide that intent to the utterance generator
-        return self._generate_from_intent(session.current_turn.intent.agent)
+        return self._generate_from_intent(
+            session.current_turn.intent.agent, use_lightweight_dialog=False
+        )
 
     def handle_failed_action_prediction(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Handle dialog generation if a valid action was not generated."""
@@ -64,7 +66,7 @@ class SimBotAgentLanguageGenerationPipeline:
             return None
 
         intent = SimBotIntent(type=SimBotIntentType.generic_failure)
-        return self._generate_from_intent(intent)
+        return self._generate_from_intent(intent, use_lightweight_dialog=False)
 
     def handle_successful_action_prediction(
         self, session: SimBotSession
@@ -79,31 +81,45 @@ class SimBotAgentLanguageGenerationPipeline:
         if not interaction_action.is_end_of_trajectory:
             return None
 
+        # We should use the lightweight dialog if the utterance queue is not empty, since we are
+        # going to act after this
+        is_utterance_queue_not_empty = bool(session.current_state.utterance_queue)
+
         if interaction_action.is_goto_room:
-            return self.handle_goto_room_action(interaction_action)
+            return self.handle_goto_room_action(
+                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
+            )
 
         if interaction_action.is_goto_object:
-            return self.handle_goto_object_action(interaction_action)
+            return self.handle_goto_object_action(
+                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
+            )
 
         if interaction_action.is_low_level_navigation:
-            return self.handle_low_level_navigation_action(interaction_action)
+            return self.handle_low_level_navigation_action(
+                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
+            )
 
         if interaction_action.is_object_interaction:
-            return self.handle_object_interaction_action(interaction_action)
+            return self.handle_object_interaction_action(
+                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
+            )
 
         raise AssertionError("All predicted action types should have been handled?")
 
-    def handle_goto_room_action(self, interaction_action: SimBotAction) -> Optional[SimBotAction]:
+    def handle_goto_room_action(
+        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
+    ) -> Optional[SimBotAction]:
         """Generate dialog for goto room actions."""
         intent = SimBotIntent(
             type=SimBotIntentType.goto_room_success,
             entity=interaction_action.payload.entity_name,
             action=interaction_action.type,
         )
-        return self._generate_from_intent(intent)
+        return self._generate_from_intent(intent, use_lightweight_dialog)
 
     def handle_goto_object_action(
-        self, interaction_action: SimBotAction
+        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
     ) -> Optional[SimBotAction]:
         """Generate dialog for goto object actions."""
         intent = SimBotIntent(
@@ -111,20 +127,20 @@ class SimBotAgentLanguageGenerationPipeline:
             entity=interaction_action.payload.entity_name,
             action=interaction_action.type,
         )
-        return self._generate_from_intent(intent)
+        return self._generate_from_intent(intent, use_lightweight_dialog)
 
     def handle_low_level_navigation_action(
-        self, interaction_action: SimBotAction
+        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
     ) -> Optional[SimBotAction]:
         """Generate dialog for low-level navigation actions."""
         intent = SimBotIntent(
             type=SimBotIntentType.low_level_navigation_success,
             action=interaction_action.type,
         )
-        return self._generate_from_intent(intent)
+        return self._generate_from_intent(intent, use_lightweight_dialog)
 
     def handle_object_interaction_action(
-        self, interaction_action: SimBotAction
+        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
     ) -> Optional[SimBotAction]:
         """Generate dialog for object interaction actions."""
         intent = SimBotIntent(
@@ -132,14 +148,18 @@ class SimBotAgentLanguageGenerationPipeline:
             entity=interaction_action.payload.entity_name,
             action=interaction_action.type,
         )
-        return self._generate_from_intent(intent)
+        return self._generate_from_intent(intent, use_lightweight_dialog)
 
-    def _generate_from_intent(self, intent: SimBotIntent) -> SimBotAction:
+    def _generate_from_intent(
+        self, intent: SimBotIntent, use_lightweight_dialog: bool
+    ) -> SimBotAction:
         """Generate the utterance from the intent and return the dialog action."""
         utterance = self._utterance_generator_client.generate_from_intent(intent)
         return SimBotAction(
             id=0,
             raw_output=utterance,
-            type=SimBotActionType.Dialog,
+            type=SimBotActionType.LightweightDialog
+            if use_lightweight_dialog
+            else SimBotActionType.Dialog,
             payload=SimBotDialogPayload(value=utterance, intent=intent.type),
         )

@@ -1,3 +1,4 @@
+from collections import deque
 from collections.abc import Iterator
 from datetime import datetime
 from functools import cached_property
@@ -14,10 +15,10 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
     SimBotDialogPayload,
     SimBotObjectOutputType,
-    SimBotSpeechRecognitionPayload,
 )
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
+from emma_experience_hub.datamodels.simbot.speech import SimBotUserSpeech
 
 
 class SimBotSessionTurnTimestamp(BaseModel):
@@ -159,6 +160,15 @@ class SimBotSessionTurnEnvironment(BaseModel):
         }
 
 
+class SimBotSessionTurnState(BaseModel, validate_assignment=True):
+    """Track the state of the session within the turn.
+
+    The queue is a list of utterances which the model can use to predict successive actions from.
+    """
+
+    utterance_queue: deque[str] = Field(default_factory=deque)
+
+
 class SimBotSessionTurn(BaseModel):
     """Current turn for a SimBot game session."""
 
@@ -168,7 +178,7 @@ class SimBotSessionTurn(BaseModel):
 
     timestamp: SimBotSessionTurnTimestamp
 
-    speech: Optional[SimBotSpeechRecognitionPayload] = None
+    speech: Optional[SimBotUserSpeech] = None
 
     # URI to the auxiliary metadata file, as provided by the SimBot Arena
     auxiliary_metadata_uri: SimBotAuxiliaryMetadataUri
@@ -176,16 +186,22 @@ class SimBotSessionTurn(BaseModel):
     environment: SimBotSessionTurnEnvironment
     intent: SimBotSessionTurnIntent
     actions: SimBotSessionTurnActions
+    state: SimBotSessionTurnState
 
     @classmethod
     def new_from_simbot_request(cls, request: SimBotRequest, idx: int) -> "SimBotSessionTurn":
         """Create a session turn from a SimBotRequest."""
+        speech = (
+            SimBotUserSpeech.from_speech_recognition_payload(request.speech_recognition)
+            if request.speech_recognition
+            else None
+        )
         return cls(
             session_id=request.header.session_id,
             prediction_request_id=request.header.prediction_request_id,
             idx=idx,
             timestamp=SimBotSessionTurnTimestamp(),
-            speech=request.speech_recognition,
+            speech=speech,
             auxiliary_metadata_uri=request.auxiliary_metadata.uri,
             environment=SimBotSessionTurnEnvironment(
                 unique_room_names=request.auxiliary_metadata.unique_room_names,
@@ -196,6 +212,7 @@ class SimBotSessionTurn(BaseModel):
             ),
             intent=SimBotSessionTurnIntent(),
             actions=SimBotSessionTurnActions(),
+            state=SimBotSessionTurnState(),
         )
 
     @property
@@ -297,6 +314,11 @@ class SimBotSession(BaseModel):
             return self.valid_turns[-2]
         except IndexError:
             return None
+
+    @property
+    def current_state(self) -> SimBotSessionTurnState:
+        """Return the state from the most current turn."""
+        return self.current_turn.state
 
     def get_turns_within_interaction_window(self) -> list[SimBotSessionTurn]:
         """Get all the turns within the local interaction window.

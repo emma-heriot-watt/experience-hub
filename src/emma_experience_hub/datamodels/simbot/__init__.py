@@ -13,3 +13,4 @@ from emma_experience_hub.datamodels.simbot.session import (
     SimBotSessionTurnActions,
     SimBotSessionTurnIntent,
 )
+from emma_experience_hub.datamodels.simbot.speech import SimBotUserSpeech

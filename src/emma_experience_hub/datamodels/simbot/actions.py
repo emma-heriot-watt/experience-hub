@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
-from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotDialogPayload,
@@ -394,6 +394,27 @@ class SimBotAction(BaseModel):
             raise AssertionError("Action ID should not be None for the given action type.")
 
         return values
+
+    @validator("raw_output")
+    @classmethod
+    def ensure_raw_output_ends_in_action_delimiter(
+        cls,
+        raw_output: Optional[str],
+        values: dict[str, Any],  # noqa: WPS110
+    ) -> Optional[str]:
+        """Ensure the raw output ends in the output delimiter, if it exists."""
+        action_type: Optional[SimBotActionType] = values.get("type")
+
+        # If the action type does not exist or the action type is a dialog one
+        if not action_type or action_type in SimBotActionType.language():
+            return None
+
+        # If the raw output exists, make sure it ends in the predicted action delimiter
+        if raw_output and not raw_output.endswith(PREDICTED_ACTION_DELIMITER):
+            return f"{raw_output}{PREDICTED_ACTION_DELIMITER}"
+
+        # Otherwise return None
+        return None
 
     @property
     def is_status_known(self) -> bool:

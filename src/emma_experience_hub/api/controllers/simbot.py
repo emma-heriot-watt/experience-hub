@@ -23,7 +23,13 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotUtteranceGeneratorClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
-from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse, SimBotSession
+from emma_experience_hub.datamodels.simbot import (
+    SimBotIntentType,
+    SimBotRequest,
+    SimBotResponse,
+    SimBotSession,
+    SimBotUserSpeech,
+)
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotLowASRConfidenceDetector,
@@ -227,6 +233,8 @@ class SimBotController:
     def handle_request_from_simbot_arena(self, request: SimBotRequest) -> SimBotResponse:
         """Handle an incoming request from the SimBot arena."""
         session = self.load_session_from_request(request)
+        session = self._clear_queue_if_needed(session)
+        session = self.get_utterance_from_queue_if_needed(session)
         session = self.extract_intent_from_user_utterance(session)
         session = self.extract_intent_from_environment_feedback(session)
         session = self.decide_what_the_agent_should_do(session)
@@ -240,7 +248,16 @@ class SimBotController:
     def load_session_from_request(self, simbot_request: SimBotRequest) -> SimBotSession:
         """Load the entire session from the given request."""
         logger.debug("Running request processing")
-        return self.pipelines.request_processing.run(simbot_request)
+        session = self.pipelines.request_processing.run(simbot_request)
+
+        # Verify user utterance is valid
+        if simbot_request.speech_recognition:
+            user_intent = self.pipelines.user_utterance_verifier.run(
+                simbot_request.speech_recognition
+            )
+            session.current_turn.intent.user = user_intent
+
+        return session
 
     def extract_intent_from_user_utterance(self, session: SimBotSession) -> SimBotSession:
         """Determine what the user wants us to do, if anything."""
@@ -250,20 +267,24 @@ class SimBotController:
 
         logger.info(f"[REQUEST] Utterance: `{session.current_turn.speech.utterance}`")
 
-        # Verify user utterance is valid
-        session.current_turn.intent.user = self.pipelines.user_utterance_verifier.run(
-            session.current_turn.speech
-        )
-
         # If the user has an intent --- i.e. it is not valid --- do not overwrite it.
-        if session.current_turn.intent.user is not None:
+        if session.current_turn.intent.user:
             return session
 
         # If the utterance is valid, extract the intent from it.
         logger.debug("Extracting intent from user input...")
-        session.current_turn.intent.user = self.pipelines.user_intent_extractor.run(session)
+        user_intent = self.pipelines.user_intent_extractor.run(session)
 
-        logger.info(f"[INTENT] User: `{session.current_turn.intent.user}`")
+        logger.info(f"[INTENT] User: `{user_intent}`")
+
+        # If the user wants us to act, reset the queue
+        if user_intent is not None and user_intent == SimBotIntentType.act:
+            logger.debug(
+                "User has given us a new instruction to act on. Therefore, reset the queue."
+            )
+            session.current_state.utterance_queue.clear()
+
+        session.current_turn.intent.user = user_intent
         return session
 
     def extract_intent_from_environment_feedback(self, session: SimBotSession) -> SimBotSession:
@@ -274,6 +295,29 @@ class SimBotController:
         )
 
         logger.info(f"[INTENT] Environment: `{session.current_turn.intent.environment}`")
+        return session
+
+    def get_utterance_from_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
+        """Check the queue to see if there is an utterance that needs to be handled."""
+        should_get_utterance_from_queue = [
+            # Do not overwrite existing user speech
+            not session.current_turn.speech,
+            # Do not overwrite existing user intent
+            not session.current_turn.intent.user,
+            # Queue must not be empty
+            session.current_state.utterance_queue,
+            # Previous action must end in end-of-trajectory token
+            session.previous_turn
+            and session.previous_turn.actions.interaction
+            and session.previous_turn.actions.interaction.is_end_of_trajectory,
+        ]
+
+        # Pop the utterance from the queue and add it to the turn
+        if all(should_get_utterance_from_queue):
+            session.current_turn.speech = SimBotUserSpeech(
+                utterance=session.current_state.utterance_queue.pop()
+            )
+
         return session
 
     def decide_what_the_agent_should_do(self, session: SimBotSession) -> SimBotSession:
@@ -311,3 +355,10 @@ class SimBotController:
     def _upload_session_turn_to_database(self, session: SimBotSession) -> None:
         """Upload the current session turn to the database."""
         self.clients.session_db.add_session_turn(session.current_turn)
+
+    def _clear_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
+        """Clear the queue if the user has provided us with a new instruction."""
+        if session.current_turn.speech:
+            session.current_state.utterance_queue.clear()
+
+        return session

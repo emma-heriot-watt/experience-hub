@@ -32,7 +32,15 @@ class SimBotRequestProcessingPipeline:
             SimBotSessionTurn.new_from_simbot_request(request, idx=len(session_history))
         )
 
-        return SimBotSession(session_id=request.header.session_id, turns=session_history)
+        # Instantiate the session from the turns
+        session = SimBotSession(session_id=request.header.session_id, turns=session_history)
+
+        # Set the state of the current turn to be the same as the previous turn, since that is
+        # where we start from.
+        if session.previous_turn:
+            session.current_turn.state = session.previous_turn.state.copy(deep=True)
+
+        return session
 
     def get_session_history(self, session_id: str) -> list[SimBotSessionTurn]:
         """Get the history for the session.

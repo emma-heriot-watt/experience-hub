@@ -7,6 +7,7 @@ from loguru import logger
 
 from emma_experience_hub.api.clients import EmmaPolicyClient
 from emma_experience_hub.api.clients.simbot import PlaceholderVisionClient, SimBotFeaturesClient
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels import (
     DialogueUtterance,
     EmmaExtractedFeatures,
@@ -102,7 +103,7 @@ class SimBotAgentActionGenerationPipeline:
         if not session.current_turn.speech:
             raise AssertionError("The session turn should have an utterance for this intent.")
 
-        raw_output = "press button <stop>.</s>"
+        raw_output = f"toggle button {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
         predicted_mask = self._button_detector_client.get_object_mask_from_image(
             raw_utterance=session.current_turn.speech.utterance,
             # Load the image from the turn's auxiliary metadata file
