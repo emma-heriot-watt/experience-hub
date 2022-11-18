@@ -112,6 +112,15 @@ class SimBotSessionTurnActions(BaseModel, validate_assignment=True):
         if not output_types:
             return SimBotObjectOutputType.default()
 
+        is_examine_sticky_note = (
+            len(output_types) > 1
+            and self.interaction is not None
+            and self.interaction.type == SimBotActionType.Examine
+        )
+
+        if is_examine_sticky_note:
+            return SimBotObjectOutputType.object_class
+
         if len(output_types) > 1:
             raise AssertionError(
                 "There is more than one output type in this list. That will breka the response. We should not be returning more than one object-related interaction action per turn."
