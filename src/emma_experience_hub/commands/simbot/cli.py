@@ -115,7 +115,7 @@ def run_controller_api(
                     boto3_profile_name=simbot_settings.aws_profile,
                     log_group_name=simbot_settings.watchtower_log_group_name,
                     log_stream_name=simbot_settings.watchtower_log_stream_name,
-                    send_interval=5,
+                    send_interval=1,
                 )
             )
         except ModuleNotFoundError:
