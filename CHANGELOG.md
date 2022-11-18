@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.3](https://github.com/emma-simbot/experience-hub/compare/v3.5.2...v3.5.3) (2022-11-18)
+
+
+### Bug Fixes
+
+* **cli:** send logs to cloudwatch every minute ([29316ae](https://github.com/emma-simbot/experience-hub/commit/29316ae66c5bbc92f750f94dd432f4ceb23abbe9))
+
 ## [3.5.2](https://github.com/emma-simbot/experience-hub/compare/v3.5.1...v3.5.2) (2022-11-15)
 
 
