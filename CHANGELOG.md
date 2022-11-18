@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/emma-simbot/experience-hub/compare/v3.5.3...v4.0.0) (2022-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* track state across turns and be able to act on the queue (#148)
+
+### Features
+
+* track state across turns and be able to act on the queue ([#148](https://github.com/emma-simbot/experience-hub/issues/148)) ([dddd11f](https://github.com/emma-simbot/experience-hub/commit/dddd11f78a7b61049f374841d6c48339fec6ede7))
+
 ## [3.5.3](https://github.com/emma-simbot/experience-hub/compare/v3.5.2...v3.5.3) (2022-11-18)
 
 
