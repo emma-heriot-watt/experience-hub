@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/emma-simbot/experience-hub/compare/v4.0.0...v4.0.1) (2022-11-21)
+
+
+### Bug Fixes
+
+* added extra check for sticky note ([#152](https://github.com/emma-simbot/experience-hub/issues/152)) ([69d5fcb](https://github.com/emma-simbot/experience-hub/commit/69d5fcb7bc6a28406a8876563e0ca5ca969061f9))
+* upgraded perception with correct classmap ([#157](https://github.com/emma-simbot/experience-hub/issues/157)) ([2992168](https://github.com/emma-simbot/experience-hub/commit/2992168ed328e1856bbbfecb211872e31557ff20))
+
 ## [4.0.0](https://github.com/emma-simbot/experience-hub/compare/v3.5.3...v4.0.0) (2022-11-18)
 
 
