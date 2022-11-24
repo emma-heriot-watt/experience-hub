@@ -58,6 +58,7 @@ class SimBotIntentType(Enum):
     invalid_command = "<failure><invalid_command>"
     object_not_picked_up = "<failure><object_not_picked_up>"
     arena_unavailable = "<failure><arena_unavailable>"
+    action_execution_error = "<failure><action_execution_error>"
 
     @property
     def is_invalid_user_utterance(self) -> bool:
@@ -98,6 +99,7 @@ class SimBotIntentType(Enum):
             SimBotIntentType.invalid_command,
             SimBotIntentType.object_not_picked_up,
             SimBotIntentType.arena_unavailable,
+            SimBotIntentType.action_execution_error,
         }
 
     @property

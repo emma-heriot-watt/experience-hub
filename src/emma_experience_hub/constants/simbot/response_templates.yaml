@@ -102,3 +102,6 @@ object_not_picked_up:
 
 arena_unavailable:
   - Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?
+
+action_execution_error:
+  - Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?
