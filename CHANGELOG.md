@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.0](https://github.com/emma-simbot/experience-hub/compare/v4.0.1...v5.0.0) (2022-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* Handle value change for `SimBotIntentType.act` (#151)
+
+### Features
+
+* Handle value change for `SimBotIntentType.act` ([#151](https://github.com/emma-simbot/experience-hub/issues/151)) ([b0448fe](https://github.com/emma-simbot/experience-hub/commit/b0448fe772fd3e35fefe997c12b400405a2a03ce)), closes [#150](https://github.com/emma-simbot/experience-hub/issues/150)
+
 ## [4.0.1](https://github.com/emma-simbot/experience-hub/compare/v4.0.0...v4.0.1) (2022-11-21)
 
 
