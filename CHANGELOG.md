@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/emma-simbot/experience-hub/compare/v5.0.0...v5.0.1) (2022-11-24)
+
+
+### Bug Fixes
+
+* added support for action execution error ([#158](https://github.com/emma-simbot/experience-hub/issues/158)) ([754e240](https://github.com/emma-simbot/experience-hub/commit/754e240eb9aba1fd60d5927c467bc4a567ed167d))
+
 ## [5.0.0](https://github.com/emma-simbot/experience-hub/compare/v4.0.1...v5.0.0) (2022-11-24)
 
 
