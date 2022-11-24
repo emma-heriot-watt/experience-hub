@@ -198,6 +198,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     action_delimiter=simbot_settings.action_predictor_delimiter,
                     eos_token=simbot_settings.action_predictor_eos_token,
                 ),
+                _disable_search_actions=simbot_settings.disable_search_actions,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(
                 utterance_generator_client=clients.utterance_generator,

@@ -11,6 +11,8 @@ class SimBotIntentType(Enum):
 
     # Actionable
     act = "<act>"
+    act_low_level = "<act><low_level>"
+    act_search = "<act><search>"
     act_previous = "<act><previous>"
     press_button = "<act><press_button>"
 
@@ -114,6 +116,8 @@ class SimBotIntentType(Enum):
         """Return True if the intent is a type of instruction."""
         return self in {
             SimBotIntentType.act,
+            SimBotIntentType.act_low_level,
+            SimBotIntentType.act_search,
             SimBotIntentType.act_previous,
             SimBotIntentType.press_button,
         }

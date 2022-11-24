@@ -9,6 +9,7 @@ class SimBotSettings(BaseSettings):
     # Feature flags
     disable_clarification_questions: bool = True
     disable_clarification_confirmation: bool = True
+    disable_search_actions: bool = True
 
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000

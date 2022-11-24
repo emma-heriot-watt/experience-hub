@@ -20,7 +20,10 @@ class DecodedNLUOutputs:
     _entity: str = "mug"
 
     def case_act(self) -> tuple[str, SimBotIntent]:
-        return "<act>", SimBotIntent(type=SimBotIntentType.act)
+        return "<act><low_level>", SimBotIntent(type=SimBotIntentType.act_low_level)
+
+    def case_search(self) -> tuple[str, SimBotIntent]:
+        return "<act><search>", SimBotIntent(type=SimBotIntentType.act_search)
 
     def case_clarify_direction(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
         output = "<clarify><direction>"

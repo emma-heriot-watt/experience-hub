@@ -43,7 +43,7 @@ class SimBotAgentIntentSelectionPipeline:
             return session.current_turn.intent.environment
 
         # Otherwise, let the agent act
-        return SimBotIntent(type=SimBotIntentType.act)
+        return SimBotIntent(type=SimBotIntentType.act_low_level)
 
     def extract_intent_from_user_utterance(
         self, user_intent: SimBotIntentType, session: SimBotSession
@@ -62,7 +62,7 @@ class SimBotAgentIntentSelectionPipeline:
         if user_intent == SimBotIntentType.clarify_answer:
             # TODO: We can change this logic here to determine whether or not we should ask more
             #       questions or just act, if we want to start handling multi-turn dialogue
-            return SimBotIntent(type=SimBotIntentType.act)
+            return SimBotIntent(type=SimBotIntentType.act_low_level)
 
         # In all other cases, just return the intent as the agent _should_ know how to act.
         return SimBotIntent(type=user_intent)
@@ -74,8 +74,10 @@ class SimBotAgentIntentSelectionPipeline:
         information.
         """
         if self._disable_clarification_questions:
-            logger.info("Clarification questions are disabled; returning the `<act>` intent.")
-            return SimBotIntent(type=SimBotIntentType.act)
+            logger.info(
+                "Clarification questions are disabled; returning the `<act><low_level>` intent."
+            )
+            return SimBotIntent(type=SimBotIntentType.act_low_level)
 
         raw_intent = self._nlu_intent_client.generate(
             dialogue_history=session.current_turn.utterances,
