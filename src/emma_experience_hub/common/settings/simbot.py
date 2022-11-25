@@ -17,7 +17,7 @@ class SimBotSettings(BaseSettings):
     aws_profile: str = Field(default="TeamProfile", env="aws_profile")
 
     watchtower_log_group_name: str = "simbot_challenge"
-    watchtower_log_stream_name: str = "{machine_name}/{logger_name}"
+    watchtower_log_stream_name: str = "{machine_name}/{logger_name}/{process_id}"
 
     simbot_cache_s3_bucket: str = "emma-simbot-live-challenge"
 

@@ -109,19 +109,24 @@ def run_controller_api(
     if log_to_cloudwatch:
         try:
             import watchtower  # noqa: WPS433
-
-            logger.add(
-                watchtower.CloudWatchLogHandler(
-                    boto3_profile_name=simbot_settings.aws_profile,
-                    log_group_name=simbot_settings.watchtower_log_group_name,
-                    log_stream_name=simbot_settings.watchtower_log_stream_name,
-                    send_interval=1,
-                )
-            )
         except ModuleNotFoundError:
             logger.warning(
                 "Watchtower package not found. Ensure you have installed the package with `poetry install --with production`."
             )
+        else:
+            log_handler = watchtower.CloudWatchLogHandler(
+                boto3_profile_name=simbot_settings.aws_profile,
+                log_stream_name=simbot_settings.watchtower_log_stream_name,
+                log_group_name=simbot_settings.watchtower_log_group_name,
+                send_interval=1,
+            )
+            log_handler.formatter.add_log_record_attrs = [
+                "levelname",
+                "funcName",
+                "lineno",
+                "process",
+            ]
+            logger.add(log_handler)
 
     server.run()
 
