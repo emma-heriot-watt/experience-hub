@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/emma-simbot/experience-hub/compare/v5.0.1...v5.0.2) (2022-11-25)
+
+
+### Bug Fixes
+
+* put disable search action flag in the agent intent selection pipeline ([08fb882](https://github.com/emma-simbot/experience-hub/commit/08fb882c7c5ca64d34d5b24fa58d31610727c31d))
+* remove disable search action flag within agent action generation pipeline ([ff8b803](https://github.com/emma-simbot/experience-hub/commit/ff8b8030200b1f7b4d1b5de36f57d8d372faacd1))
+
 ## [5.0.1](https://github.com/emma-simbot/experience-hub/compare/v5.0.0...v5.0.1) (2022-11-24)
 
 
