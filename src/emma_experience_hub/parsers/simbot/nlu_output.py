@@ -30,6 +30,11 @@ class SimBotNLUOutputParser(NeuralParser[SimBotIntent]):
         # Get the intent type from the left-side of the template.
         intent_type = SimBotIntentType(split_parts[0])
 
+        # Manually replace `<act>` with `<act><low_level>`
+        # TODO: This should be deleted once the new NLU model is ready
+        if intent_type == SimBotIntentType.act:
+            intent_type = SimBotIntentType.act_low_level
+
         # If it exists, get the object name from the right-side of the template
         object_name = " ".join(split_parts[1:]) if len(split_parts) > 1 else None
 
