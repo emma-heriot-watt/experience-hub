@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.0](https://github.com/emma-simbot/experience-hub/compare/v5.0.2...v5.1.0) (2022-11-25)
+
+
+### Features
+
+* improve the logging format for OpenSearch ([#162](https://github.com/emma-simbot/experience-hub/issues/162)) ([945a222](https://github.com/emma-simbot/experience-hub/commit/945a222dad608b28ab74f088b3d347f066e3ed10))
+
 ## [5.0.2](https://github.com/emma-simbot/experience-hub/compare/v5.0.1...v5.0.2) (2022-11-25)
 
 
