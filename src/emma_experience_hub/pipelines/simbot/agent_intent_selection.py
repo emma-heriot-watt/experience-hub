@@ -20,6 +20,7 @@ class SimBotAgentIntentSelectionPipeline:
         nlu_intent_client: EmmaPolicyClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
         _disable_clarification_questions: bool = False,
+        _disable_search_actions: bool = False,
     ) -> None:
         self._features_client = features_client
 
@@ -27,6 +28,7 @@ class SimBotAgentIntentSelectionPipeline:
         self._nlu_intent_parser = nlu_intent_parser
 
         self._disable_clarification_questions = _disable_clarification_questions
+        self._disable_search_actions = _disable_search_actions
 
     def run(self, session: SimBotSession) -> SimBotIntent:
         """Decide that the agent should do next."""
@@ -73,12 +75,6 @@ class SimBotAgentIntentSelectionPipeline:
         This is primarily used to determine whether the agent should act or ask for more
         information.
         """
-        if self._disable_clarification_questions:
-            logger.info(
-                "Clarification questions are disabled; returning the `<act><low_level>` intent."
-            )
-            return SimBotIntent(type=SimBotIntentType.act_low_level)
-
         raw_intent = self._nlu_intent_client.generate(
             dialogue_history=session.current_turn.utterances,
             environment_state_history=[
@@ -90,5 +86,15 @@ class SimBotAgentIntentSelectionPipeline:
 
         intent = self._nlu_intent_parser(raw_intent)
         logger.debug(f"Extracted intent from turn: {intent}")
+
+        if self._disable_clarification_questions and intent.type.is_clarification_question:
+            logger.info(
+                "Clarification questions are disabled; returning the `<act><low_level>` intent."
+            )
+            return SimBotIntent(type=SimBotIntentType.act_low_level)
+
+        if self._disable_search_actions and intent.type == SimBotIntentType.act_search:
+            logger.info("Search actions are disabled; returning the `<act><low_level>` intent.")
+            return SimBotIntent(type=SimBotIntentType.act_low_level)
 
         return intent

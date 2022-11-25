@@ -189,6 +189,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
                 ),
                 _disable_clarification_questions=simbot_settings.disable_clarification_questions,
+                _disable_search_actions=simbot_settings.disable_search_actions,
             ),
             agent_action_generator=SimBotAgentActionGenerationPipeline(
                 features_client=clients.features,
