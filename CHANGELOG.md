@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.0](https://github.com/emma-simbot/experience-hub/compare/v5.1.1...v5.2.0) (2022-11-25)
+
+
+### Features
+
+* contextualise CloudWatch logs with identifiers for OpenSearch ([#164](https://github.com/emma-simbot/experience-hub/issues/164)) ([7a16dfc](https://github.com/emma-simbot/experience-hub/commit/7a16dfcde06321480beb7f38f4c13e746b146a75))
+
 ## [5.1.1](https://github.com/emma-simbot/experience-hub/compare/v5.1.0...v5.1.1) (2022-11-25)
 
 
