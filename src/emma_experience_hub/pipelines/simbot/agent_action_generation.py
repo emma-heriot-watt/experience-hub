@@ -41,7 +41,6 @@ class SimBotAgentActionGenerationPipeline:
         button_detector_client: PlaceholderVisionClient,
         action_predictor_client: EmmaPolicyClient,
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
-        _disable_search_actions: bool = False,
     ) -> None:
         self._features_client = features_client
 
@@ -49,16 +48,11 @@ class SimBotAgentActionGenerationPipeline:
 
         self._action_predictor_client = action_predictor_client
         self._action_predictor_response_parser = action_predictor_response_parser
-        self._disable_search_actions = _disable_search_actions
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action to perform on the environment."""
         if not session.current_turn.intent.agent:
             raise AssertionError("The agent should have an intent before calling this pipeline.")
-
-        if self._disable_search_actions:
-            logger.debug("Search is disabled; skipping action generation.")
-            return None
 
         try:
             action_intent_handler = self._get_action_intent_handler(
