@@ -315,6 +315,9 @@ class SimBotController:
 
         # Pop the utterance from the queue and add it to the turn
         if all(should_get_utterance_from_queue):
+            logger.info(
+                f"[REQUEST]: Get utterance from the session queue ({len(session.current_state.utterance_queue) - 1} remaining"
+            )
             session.current_turn.speech = SimBotUserSpeech(
                 utterance=session.current_state.utterance_queue.pop()
             )
@@ -360,6 +363,7 @@ class SimBotController:
     def _clear_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Clear the queue if the user has provided us with a new instruction."""
         if session.current_turn.speech:
+            logger.debug("[REQUEST]: Received utterance from user; clearing the utterance queue")
             session.current_state.utterance_queue.clear()
 
         return session
