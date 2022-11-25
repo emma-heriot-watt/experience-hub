@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/emma-simbot/experience-hub/compare/v5.1.0...v5.1.1) (2022-11-25)
+
+
+### Bug Fixes
+
+* manually change parsed intent type if it predicts the old act intent ([#163](https://github.com/emma-simbot/experience-hub/issues/163)) ([dfa7d4b](https://github.com/emma-simbot/experience-hub/commit/dfa7d4b1830d26ac323f91b15f794f3ca55981e7))
+
 ## [5.1.0](https://github.com/emma-simbot/experience-hub/compare/v5.0.2...v5.1.0) (2022-11-25)
 
 
