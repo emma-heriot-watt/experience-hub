@@ -126,7 +126,7 @@ def run_controller_api(
                 "lineno",
                 "process",
             ]
-            logger.add(log_handler)
+            logger.add(log_handler, format="{message} | {extra}")
 
     server.run()
 

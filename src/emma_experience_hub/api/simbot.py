@@ -2,7 +2,7 @@ from typing import Literal
 
 import boto3
 from fastapi import FastAPI, Request, Response, status
-from loguru import logger
+from loguru import Contextualizer, logger
 
 from emma_experience_hub.api.controllers import SimBotController
 from emma_experience_hub.common.settings import SimBotSettings
@@ -12,6 +12,14 @@ from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
 app = FastAPI(title="SimBot Challenge Inference")
 
 state: dict[Literal["controller"], SimBotController] = {}
+
+
+def _create_logger_context(request: SimBotRequest) -> Contextualizer:
+    """Contextualise the logger for the current request."""
+    return logger.contextualize(
+        session_id=request.header.session_id,
+        prediction_request_id=request.header.prediction_request_id,
+    )
 
 
 @app.on_event("startup")
@@ -51,7 +59,6 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
     """Handle a new request from the SimBot API."""
     raw_request = await request.json()
 
-    logger.info(f"Received request {raw_request}")
     # Parse the request from the server
     try:
         simbot_request = SimBotRequest.parse_obj(raw_request)
@@ -68,8 +75,13 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         raise state_err
 
-    # Handle the request
-    simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
+    with _create_logger_context(simbot_request):
+        # Log the incoming request
+        logger.info(f"Received request: {simbot_request.json(by_alias=True)}")
 
-    logger.info(f"Returning the response {simbot_response.json(by_alias=True)}")
-    return simbot_response
+        # Handle the request
+        simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
+
+        # Return response
+        logger.info(f"Returning the response {simbot_response.json(by_alias=True)}")
+        return simbot_response
