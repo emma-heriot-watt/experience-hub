@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from typing import Literal
 
 import boto3
+import loguru
 from fastapi import FastAPI, Request, Response, status
-from loguru import Contextualizer, logger
+from loguru import logger
 
 from emma_experience_hub.api.controllers import SimBotController
 from emma_experience_hub.common.settings import SimBotSettings
@@ -14,7 +17,7 @@ app = FastAPI(title="SimBot Challenge Inference")
 state: dict[Literal["controller"], SimBotController] = {}
 
 
-def _create_logger_context(request: SimBotRequest) -> Contextualizer:
+def _create_logger_context(request: SimBotRequest) -> loguru.Contextualizer:
     """Contextualise the logger for the current request."""
     return logger.contextualize(
         session_id=request.header.session_id,
@@ -77,7 +80,7 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
 
     with _create_logger_context(simbot_request):
         # Log the incoming request
-        logger.info(f"Received request: {simbot_request.json(by_alias=True)}")
+        logger.info(f"Received request: {raw_request}")
 
         # Handle the request
         simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
