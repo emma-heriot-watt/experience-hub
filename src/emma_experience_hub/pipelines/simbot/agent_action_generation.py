@@ -1,6 +1,3 @@
-import itertools
-from collections.abc import Iterator
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from typing import Callable, Optional
 
 from loguru import logger
@@ -8,18 +5,12 @@ from loguru import logger
 from emma_experience_hub.api.clients import EmmaPolicyClient
 from emma_experience_hub.api.clients.simbot import PlaceholderVisionClient, SimBotFeaturesClient
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
-from emma_experience_hub.datamodels import (
-    DialogueUtterance,
-    EmmaExtractedFeatures,
-    EnvironmentStateTurn,
-)
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
     SimBotActionType,
     SimBotIntent,
     SimBotIntentType,
     SimBotSession,
-    SimBotSessionTurn,
 )
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
@@ -73,11 +64,13 @@ class SimBotAgentActionGenerationPipeline:
     def handle_act_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action when we want to just act."""
         turns_within_interaction_window = session.get_turns_within_interaction_window()
-        environment_state_history = self._get_environment_state_history(
+        environment_state_history = session.get_environment_state_history_from_turns(
             turns_within_interaction_window,
             self._features_client.get_features,
         )
-        dialogue_history = self._get_dialogue_history(turns_within_interaction_window)
+        dialogue_history = session.get_dialogue_history_from_session_turns(
+            turns_within_interaction_window
+        )
         raw_action_prediction = self._action_predictor_client.generate(
             dialogue_history=dialogue_history, environment_state_history=environment_state_history
         )
@@ -143,50 +136,3 @@ class SimBotAgentActionGenerationPipeline:
         }
 
         return switcher[intent.type]
-
-    def _get_dialogue_history(self, turns: list[SimBotSessionTurn]) -> list[DialogueUtterance]:
-        """Get a dialogue history from the given turns."""
-        utterances_lists = (turn.utterances for turn in turns)
-        dialogue_history = list(itertools.chain.from_iterable(utterances_lists))
-        return dialogue_history
-
-    def _get_environment_state_history(
-        self,
-        turns: list[SimBotSessionTurn],
-        extracted_features_load_fn: Callable[[SimBotSessionTurn], list[EmmaExtractedFeatures]],
-    ) -> list[EnvironmentStateTurn]:
-        """Get the environment state history from a set of turns.
-
-        Since we use the threadpool to load features, it does not naturally maintain the order.
-        Therefore for each turn submitted, we also track its index to ensure the returned features
-        are ordered.
-        """
-        # Only keep turns which have been used to change the visual frames
-        relevant_turns: Iterator[SimBotSessionTurn] = (
-            turn
-            for turn in turns
-            if turn.intent.agent and turn.intent.agent.type == SimBotIntentType.act_low_level
-        )
-
-        environment_history: dict[int, EnvironmentStateTurn] = {}
-
-        with ThreadPoolExecutor() as executor:
-            # On submitting, the future can be used a key to map to the session turn it came from
-            future_to_turn: dict[Future[list[EmmaExtractedFeatures]], SimBotSessionTurn] = {
-                executor.submit(extracted_features_load_fn, turn): turn for turn in relevant_turns
-            }
-
-            for future in as_completed(future_to_turn):
-                turn = future_to_turn[future]
-                raw_output = (
-                    turn.actions.interaction.raw_output if turn.actions.interaction else None
-                )
-                try:
-                    environment_history[turn.idx] = EnvironmentStateTurn(
-                        features=future.result(), output=raw_output
-                    )
-                except Exception as err:
-                    logger.exception("Unable to get features for the turn", exc_info=err)
-
-        # Ensure the environment history is sorted properly and return them
-        return list(dict(sorted(environment_history.items())).values())

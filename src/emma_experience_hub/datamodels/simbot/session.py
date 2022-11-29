@@ -1,13 +1,20 @@
+import itertools
 from collections.abc import Iterator
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from functools import cached_property
-from typing import Optional, cast
+from typing import Callable, Optional, cast
 
+from loguru import logger
 from overrides import overrides
 from pydantic import BaseModel, Field, root_validator, validator
 
+from emma_experience_hub.datamodels import (
+    DialogueUtterance,
+    EmmaExtractedFeatures,
+    EnvironmentStateTurn,
+)
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
-from emma_experience_hub.datamodels.emma import DialogueUtterance
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -176,6 +183,7 @@ class SimBotSessionTurnState(BaseModel, validate_assignment=True):
     """
 
     utterance_queue: SimBotQueue[str] = SimBotQueue[str]()
+    find_queue: SimBotQueue[SimBotAction] = SimBotQueue[SimBotAction]()
 
 
 class SimBotSessionTurn(BaseModel):
@@ -349,3 +357,53 @@ class SimBotSession(BaseModel):
         turns_within_window.reverse()
 
         return turns_within_window
+
+    @staticmethod
+    def get_dialogue_history_from_session_turns(  # noqa: WPS602
+        turns: list[SimBotSessionTurn],
+    ) -> list[DialogueUtterance]:
+        """Get a dialogue history from the given turns."""
+        utterances_lists = (turn.utterances for turn in turns)
+        dialogue_history = list(itertools.chain.from_iterable(utterances_lists))
+        return dialogue_history
+
+    @staticmethod
+    def get_environment_state_history_from_turns(  # noqa: WPS602
+        turns: list[SimBotSessionTurn],
+        extracted_features_load_fn: Callable[[SimBotSessionTurn], list[EmmaExtractedFeatures]],
+    ) -> list[EnvironmentStateTurn]:
+        """Get the environment state history from a set of turns.
+
+        Since we use the threadpool to load features, it does not naturally maintain the order.
+        Therefore for each turn submitted, we also track its index to ensure the returned features
+        are ordered.
+        """
+        # Only keep turns which have been used to change the visual frames
+        relevant_turns: Iterator[SimBotSessionTurn] = (
+            turn
+            for turn in turns
+            if turn.intent.agent and turn.intent.agent.type == SimBotIntentType.act_low_level
+        )
+
+        environment_history: dict[int, EnvironmentStateTurn] = {}
+
+        with ThreadPoolExecutor() as executor:
+            # On submitting, the future can be used a key to map to the session turn it came from
+            future_to_turn: dict[Future[list[EmmaExtractedFeatures]], SimBotSessionTurn] = {
+                executor.submit(extracted_features_load_fn, turn): turn for turn in relevant_turns
+            }
+
+            for future in as_completed(future_to_turn):
+                turn = future_to_turn[future]
+                raw_output = (
+                    turn.actions.interaction.raw_output if turn.actions.interaction else None
+                )
+                try:
+                    environment_history[turn.idx] = EnvironmentStateTurn(
+                        features=future.result(), output=raw_output
+                    )
+                except Exception as err:
+                    logger.exception("Unable to get features for the turn", exc_info=err)
+
+        # Ensure the environment history is sorted properly and return them
+        return list(dict(sorted(environment_history.items())).values())
