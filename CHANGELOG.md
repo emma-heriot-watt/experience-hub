@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.0](https://github.com/emma-simbot/experience-hub/compare/v5.2.1...v5.3.0) (2022-11-29)
+
+
+### Features
+
+* add a new queue to track things in the state ([#165](https://github.com/emma-simbot/experience-hub/issues/165)) ([950b3f7](https://github.com/emma-simbot/experience-hub/commit/950b3f7a8141dec0dc35fa7ee7cc058dde547545))
+
 ## [5.2.1](https://github.com/emma-simbot/experience-hub/compare/v5.2.0...v5.2.1) (2022-11-29)
 
 
