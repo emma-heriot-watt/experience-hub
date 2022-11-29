@@ -33,6 +33,13 @@ class SimBotIntentType(Enum):
     # Clarification answer from the user
     clarify_answer = "<clarify><answer>"
 
+    # Feedback for search
+    search_found_object = "<search><found_object>"
+    search_not_found_object = "<search><not_found_object>"
+    search_look_around = "<search><look_around>"
+    search_goto_viewpoint = "<search><goto_viewpoint>"
+    search_goto_room = "<search><goto_room>"
+
     # Feedback for success
     generic_success = "<success><generic>"
     object_interaction_success = "<success><object_interaction>"
@@ -122,6 +129,17 @@ class SimBotIntentType(Enum):
             SimBotIntentType.act_search,
             SimBotIntentType.act_previous,
             SimBotIntentType.press_button,
+        }
+
+    @property
+    def is_search_feedback(self) -> bool:
+        """Return True if the intent is used for providing feedback during search sub-routine."""
+        return self in {
+            SimBotIntentType.search_found_object,
+            SimBotIntentType.search_not_found_object,
+            SimBotIntentType.search_look_around,
+            SimBotIntentType.search_goto_viewpoint,
+            SimBotIntentType.search_goto_room,
         }
 
 
