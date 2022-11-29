@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.0](https://github.com/emma-simbot/experience-hub/compare/v5.4.0...v5.5.0) (2022-11-29)
+
+
+### Features
+
+* **intents:** add intents for feedback during search loop ([#170](https://github.com/emma-simbot/experience-hub/issues/170)) ([9ab7250](https://github.com/emma-simbot/experience-hub/commit/9ab72500a7d7fccd01829dbadb7c3e223685e692))
+
 ## [5.4.0](https://github.com/emma-simbot/experience-hub/compare/v5.3.0...v5.4.0) (2022-11-29)
 
 
