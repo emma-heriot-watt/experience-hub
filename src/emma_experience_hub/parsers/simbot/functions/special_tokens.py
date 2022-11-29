@@ -1,11 +1,19 @@
-from typing import Literal, Union, overload
+from typing import Literal, Optional, Union, overload
 
 import torch
 from loguru import logger
+from pydantic import BaseModel, Field
 
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectMaskType
 from emma_experience_hub.parsers.simbot.functions.masks import compress_segmentation_mask
+
+
+class SimBotSceneObjectTokens(BaseModel):
+    """Token IDs when we find an object in the scene."""
+
+    frame_index: int = Field(default=1, gt=0)
+    object_index: Optional[int] = Field(default=None, gt=0)
 
 
 def extract_index_from_special_token(token: str) -> int:

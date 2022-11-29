@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN
 from emma_experience_hub.constants.simbot import (
@@ -10,6 +10,7 @@ from emma_experience_hub.constants.simbot import (
 )
 from emma_experience_hub.datamodels.simbot import SimBotActionType
 from emma_experience_hub.parsers.simbot.functions.special_tokens import (
+    SimBotSceneObjectTokens,
     extract_index_from_special_token,
 )
 
@@ -66,8 +67,7 @@ class SimBotDeconstructedAction(BaseModel):
     label: Optional[str] = None
     raw_label: Optional[str] = None
 
-    object_index: Optional[int] = Field(default=None, gt=0)
-    frame_index: int = Field(default=1, gt=0)
+    special_tokens: SimBotSceneObjectTokens
 
     @classmethod
     def from_raw_action(cls, raw_action: str) -> "SimBotDeconstructedAction":
@@ -116,9 +116,20 @@ class SimBotDeconstructedAction(BaseModel):
             action_type=action_type,
             label=label,
             raw_label=raw_label,
-            frame_index=frame_index,
-            object_index=object_index,
+            special_tokens=SimBotSceneObjectTokens(
+                frame_index=frame_index, object_index=object_index
+            ),
         )
+
+    @property
+    def object_index(self) -> Optional[int]:
+        """Get the parsed object index."""
+        return self.special_tokens.object_index
+
+    @property
+    def frame_index(self) -> int:
+        """Get the parsed frame index."""
+        return self.special_tokens.frame_index
 
     @property
     def class_name(self) -> str:
