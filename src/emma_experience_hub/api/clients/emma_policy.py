@@ -16,12 +16,9 @@ class EmmaPolicyClient:
     def __init__(self, server_endpoint: AnyHttpUrl) -> None:
         self._endpoint = server_endpoint
 
-        self._healthcheck_endpoint = f"{self._endpoint}/ping"
-        self._generate_endpoint = f"{self._endpoint}/generate"
-
     def healthcheck(self) -> bool:
         """Verify the server is online and healthy."""
-        response = httpx.get(self._healthcheck_endpoint)
+        response = httpx.get(f"{self._endpoint}/ping")
 
         try:
             response.raise_for_status()
@@ -45,7 +42,7 @@ class EmmaPolicyClient:
         logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
 
         response = httpx.post(
-            self._generate_endpoint,
+            f"{self._endpoint}/generate",
             json=orjson.loads(
                 emma_policy_request.json(
                     models_as_dict=True,

@@ -1,3 +1,4 @@
+from emma_experience_hub.api.clients.simbot.action_prediction import SimbotActionPredictionClient
 from emma_experience_hub.api.clients.simbot.cache import (
     SimBotAuxiliaryMetadataClient,
     SimBotCacheClient,
