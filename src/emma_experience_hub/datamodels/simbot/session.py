@@ -5,6 +5,7 @@ from datetime import datetime
 from functools import cached_property
 from typing import Callable, Optional, cast
 
+import numpy as np
 from loguru import logger
 from overrides import overrides
 from pydantic import BaseModel, Field, root_validator, validator
@@ -174,6 +175,29 @@ class SimBotSessionTurnEnvironment(BaseModel):
             for viewpoint_name, viewpoint_location in self.viewpoints.items()
             if viewpoint_name.startswith(self.current_room)
         }
+
+    def get_closest_viewpoint_name(self) -> str:
+        """Get the name of the closest viewpoint to the agent.
+
+        Adapted from: https://codereview.stackexchange.com/a/28210
+        """
+        # Get the coordinates for each viewpoint in the current room
+        viewpoint_coords = np.asarray(
+            [position.as_list() for position in self.viewpoints_in_current_room.values()]
+        )
+        # Get the coordinates for the agent
+        agent_coords = np.asarray(self.current_position.as_list())
+
+        # Determine the euclidean distance between each agent and their coords
+        coord_delta_to_agent = viewpoint_coords - agent_coords
+        euclidean_distances = np.einsum("ij,ij->i", coord_delta_to_agent, coord_delta_to_agent)
+
+        # Get the index of the closest viewpoint
+        viewpoint_index = np.argmin(euclidean_distances)
+
+        # Use the index to get the name of the viewpoint
+        viewpoint_name = list(self.viewpoints_in_current_room.keys())[int(viewpoint_index)]
+        return viewpoint_name
 
 
 class SimBotSessionTurnState(BaseModel, validate_assignment=True):

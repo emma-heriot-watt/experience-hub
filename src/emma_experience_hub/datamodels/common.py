@@ -8,6 +8,10 @@ class Position(BaseModel):
     y: float
     z: float
 
+    def as_list(self) -> list[float]:
+        """Return the coordinates as a list."""
+        return [self.x, self.y, self.z]
+
 
 class Rotation(BaseModel):
     """Rotation of an entity."""
@@ -16,8 +20,16 @@ class Rotation(BaseModel):
     y: float
     z: float
 
+    def as_list(self) -> list[float]:
+        """Return the coordinates as a list."""
+        return [self.x, self.y, self.z]
+
 
 class RotationQuaternion(Rotation):
     """Rotation quaternion of an entity."""
 
     w: float
+
+    def as_list(self) -> list[float]:
+        """Return the coordinates as a list."""
+        return [self.x, self.y, self.z, self.w]
