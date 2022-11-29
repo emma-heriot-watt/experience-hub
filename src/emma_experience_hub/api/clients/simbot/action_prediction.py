@@ -5,7 +5,7 @@ from emma_experience_hub.datamodels import DialogueUtterance, EnvironmentStateTu
 class SimbotActionPredictionClient(EmmaPolicyClient):
     """Action prediction client which interfaces with the Policy model."""
 
-    def get_visual_token(
+    def find_object_in_scene(
         self,
         environment_state_history: list[EnvironmentStateTurn],
         dialogue_history: list[DialogueUtterance],
