@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.1](https://github.com/emma-simbot/experience-hub/compare/v5.2.0...v5.2.1) (2022-11-29)
+
+
+### Bug Fixes
+
+* importerror for loguru's contextualizer ([4dde50d](https://github.com/emma-simbot/experience-hub/commit/4dde50d42d0b37c90dd231eeb48cd441bc5917a3))
+* linting error ([7c4fc55](https://github.com/emma-simbot/experience-hub/commit/7c4fc55bd28909355883b86764855816e7f3bcdf))
+
 ## [5.2.0](https://github.com/emma-simbot/experience-hub/compare/v5.1.1...v5.2.0) (2022-11-25)
 
 
