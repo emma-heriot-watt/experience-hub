@@ -283,7 +283,7 @@ class SimBotController:
             logger.debug(
                 "User has given us a new instruction to act on. Therefore, reset the queue."
             )
-            session.current_state.utterance_queue.clear()
+            session.current_state.utterance_queue.reset()
 
         session.current_turn.intent.user = user_intent
         return session
@@ -319,7 +319,7 @@ class SimBotController:
                 f"[REQUEST]: Get utterance from the session queue ({len(session.current_state.utterance_queue) - 1} remaining"
             )
             session.current_turn.speech = SimBotUserSpeech(
-                utterance=session.current_state.utterance_queue.pop()
+                utterance=session.current_state.utterance_queue.pop_from_head()
             )
 
         return session
@@ -364,6 +364,6 @@ class SimBotController:
         """Clear the queue if the user has provided us with a new instruction."""
         if session.current_turn.speech:
             logger.debug("[REQUEST]: Received utterance from user; clearing the utterance queue")
-            session.current_state.utterance_queue.clear()
+            session.current_state.utterance_queue.reset()
 
         return session

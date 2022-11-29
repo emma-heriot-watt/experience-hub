@@ -1,4 +1,3 @@
-from collections import deque
 from collections.abc import Iterator
 from datetime import datetime
 from functools import cached_property
@@ -16,6 +15,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotDialogPayload,
     SimBotObjectOutputType,
 )
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueue
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
 from emma_experience_hub.datamodels.simbot.speech import SimBotUserSpeech
@@ -175,7 +175,7 @@ class SimBotSessionTurnState(BaseModel, validate_assignment=True):
     The queue is a list of utterances which the model can use to predict successive actions from.
     """
 
-    utterance_queue: deque[str] = Field(default_factory=deque)
+    utterance_queue: SimBotQueue[str] = SimBotQueue[str]()
 
 
 class SimBotSessionTurn(BaseModel):
