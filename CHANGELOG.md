@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.0](https://github.com/emma-simbot/experience-hub/compare/v5.5.0...v5.6.0) (2022-11-29)
+
+
+### Features
+
+* support getting the closest viewpoint to the agent for a given turn ([#166](https://github.com/emma-simbot/experience-hub/issues/166)) ([d394489](https://github.com/emma-simbot/experience-hub/commit/d394489801a9eab4a4693fd17a8b478c4e4fdf14))
+
 ## [5.5.0](https://github.com/emma-simbot/experience-hub/compare/v5.4.0...v5.5.0) (2022-11-29)
 
 
