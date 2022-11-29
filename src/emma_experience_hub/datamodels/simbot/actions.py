@@ -11,7 +11,6 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoObjectPayload,
     SimBotGotoPayload,
     SimBotGotoRoomPayload,
-    SimBotInteractionObject,
     SimBotLookAroundPayload,
     SimBotLookDownPayload,
     SimBotLookPayload,
@@ -467,8 +466,8 @@ class SimBotAction(BaseModel):
     @property
     def object_output_type(self) -> Optional[SimBotObjectOutputType]:
         """Return the object output type used by the action."""
-        if isinstance(self.payload, (SimBotGotoPayload, SimBotObjectInteractionPayload)):
-            if isinstance(self.payload.object, SimBotInteractionObject):
+        if self.type == SimBotActionType.Examine:
+            if isinstance(self.payload, SimBotObjectInteractionPayload):
                 return self.payload.object.object_output_type
 
         # Otherwise, return the default
