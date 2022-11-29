@@ -5,12 +5,13 @@ from typing import Literal
 import boto3
 import loguru
 from fastapi import FastAPI, Request, Response, status
-from loguru import logger
 
 from emma_experience_hub.api.controllers import SimBotController
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
 
+
+logger = loguru.logger
 
 app = FastAPI(title="SimBot Challenge Inference")
 
