@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.0](https://github.com/emma-simbot/experience-hub/compare/v5.3.0...v5.4.0) (2022-11-29)
+
+
+### Features
+
+* **parser:** create a skeleton for the `SimBotVisualGroundingOutputParser` ([#169](https://github.com/emma-simbot/experience-hub/issues/169)) ([1a48bc5](https://github.com/emma-simbot/experience-hub/commit/1a48bc594fcc6b722ec40b051212760ddfe9340c))
+
 ## [5.3.0](https://github.com/emma-simbot/experience-hub/compare/v5.2.1...v5.3.0) (2022-11-29)
 
 
