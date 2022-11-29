@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.1](https://github.com/emma-simbot/experience-hub/compare/v5.6.0...v5.6.1) (2022-11-29)
+
+
+### Bug Fixes
+
+* only use the object class within the payload when the action type is `Examine` ([#171](https://github.com/emma-simbot/experience-hub/issues/171)) ([21fb9a8](https://github.com/emma-simbot/experience-hub/commit/21fb9a8f594df011ab0147b777d9316b72cffb2f))
+
 ## [5.6.0](https://github.com/emma-simbot/experience-hub/compare/v5.5.0...v5.6.0) (2022-11-29)
 
 
