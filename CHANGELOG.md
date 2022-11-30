@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.10.0](https://github.com/emma-simbot/experience-hub/compare/v5.9.0...v5.10.0) (2022-11-30)
+
+
+### Features
+
+* support continuing search after confirmation questions and converting highlight to goto action ([#180](https://github.com/emma-simbot/experience-hub/issues/180)) ([2ca0b8f](https://github.com/emma-simbot/experience-hub/commit/2ca0b8f24e12a583443f685efda81f8b46c6c082))
+
 ## [5.9.0](https://github.com/emma-simbot/experience-hub/compare/v5.8.0...v5.9.0) (2022-11-30)
 
 
