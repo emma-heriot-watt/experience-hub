@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.0](https://github.com/emma-simbot/experience-hub/compare/v5.10.0...v5.11.0) (2022-11-30)
+
+
+### Features
+
+* **clients:** implement request to finding object in scene ([#181](https://github.com/emma-simbot/experience-hub/issues/181)) ([685901a](https://github.com/emma-simbot/experience-hub/commit/685901ae1c9c1b710552c29e72c8cef7851c9ffb))
+
 ## [5.10.0](https://github.com/emma-simbot/experience-hub/compare/v5.9.0...v5.10.0) (2022-11-30)
 
 
