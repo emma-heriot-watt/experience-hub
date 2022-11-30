@@ -61,7 +61,8 @@ class SimBotFindObjectPipeline:
             # If the object has not been found, get the next action to perform
             return self._get_next_action_from_plan(session)
 
-        # If the object has been found, create the highlight action
+        # If the object has been found, create the highlight action and clear the plan
+        session.current_state.find_queue.reset()
         return self._create_highlight_action_from_scene_object(
             decoded_scene_object_tokens, extracted_features
         )
