@@ -1,3 +1,5 @@
+from typing import Any
+
 import httpx
 import orjson
 from loguru import logger
@@ -34,6 +36,17 @@ class EmmaPolicyClient:
         dialogue_history: list[DialogueUtterance],
     ) -> str:
         """Generate a response from the features and provided language."""
+        return self._make_request(
+            f"{self._endpoint}/generate", environment_state_history, dialogue_history
+        )
+
+    def _make_request(
+        self,
+        endpoint: str,
+        environment_state_history: list[EnvironmentStateTurn],
+        dialogue_history: list[DialogueUtterance],
+    ) -> Any:
+        """Generate a response from the features and provided language."""
         emma_policy_request = EmmaPolicyRequest(
             environment_history=environment_state_history, dialogue_history=dialogue_history
         )
@@ -42,7 +55,7 @@ class EmmaPolicyClient:
         logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
 
         response = httpx.post(
-            f"{self._endpoint}/generate",
+            endpoint,
             json=orjson.loads(
                 emma_policy_request.json(
                     models_as_dict=True,
@@ -61,4 +74,6 @@ class EmmaPolicyClient:
             logger.exception("Unable to get response from EMMA policy server", exc_info=err)
             raise err from None
 
-        return response.json()
+        json_response = response.json()
+        logger.debug(f"Response from policy endpoint `{endpoint}`: {json_response}")
+        return json_response

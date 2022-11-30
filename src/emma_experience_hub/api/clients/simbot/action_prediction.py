@@ -9,34 +9,8 @@ class SimbotActionPredictionClient(EmmaPolicyClient):
         self,
         environment_state_history: list[EnvironmentStateTurn],
         dialogue_history: list[DialogueUtterance],
-    ) -> str:
+    ) -> list[str]:
         """Generate a response from the features and provided language."""
-        raise NotImplementedError()
-
-        # emma_policy_request = EmmaPolicyRequest(
-        #     environment_history=environment_state_history, dialogue_history=dialogue_history
-        # )
-        # logger.debug(f"Sending {emma_policy_request.num_images} images.")
-        # logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
-
-        # response = httpx.post(
-        #     f"{self._endpoint}/generate",
-        #     json=orjson.loads(
-        #         emma_policy_request.json(
-        #             models_as_dict=True,
-        #             exclude={
-        #                 "environment_history": {
-        #                     "__all__": {"features": {"__all__": {"class_labels"}}}
-        #                 }
-        #             },
-        #         )
-        #     ),
-        # )
-
-        # try:
-        #     response.raise_for_status()
-        # except httpx.HTTPError as err:
-        #     logger.exception("Unable to get response from EMMA policy server", exc_info=err)
-        #     raise err from None
-
-        # return response.json()
+        return self._make_request(
+            f"{self._endpoint}/generate_find", environment_state_history, dialogue_history
+        )
