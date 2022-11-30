@@ -65,7 +65,6 @@
 /src/emma_experience_hub/functions/ @amitkparekh
 /src/emma_experience_hub/parsers/* @aleSuglia
 /src/emma_experience_hub/parsers/simbot/ @amitkparekh
-/src/emma_experience_hub/parsers/simbot/__init__.py @aleSuglia
 /src/emma_experience_hub/parsers/simbot/action_predictor_output.py @aleSuglia
 /src/emma_experience_hub/pipelines/* @amitkparekh
 /src/emma_experience_hub/pipelines/simbot/__init__.py @aleSuglia
