@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.12.0](https://github.com/emma-simbot/experience-hub/compare/v5.11.0...v5.12.0) (2022-11-30)
+
+
+### Features
+
+* agent should continue with search if its in progress ([#183](https://github.com/emma-simbot/experience-hub/issues/183)) ([4568212](https://github.com/emma-simbot/experience-hub/commit/456821287aa81afd1e771e7bb946cef9453dff9b))
+
+
+### Bug Fixes
+
+* reset the queue when an object has been found ([#185](https://github.com/emma-simbot/experience-hub/issues/185)) ([46e6b71](https://github.com/emma-simbot/experience-hub/commit/46e6b713ce3807f1c8cabeeb7965b2b73824772e))
+
 ## [5.11.0](https://github.com/emma-simbot/experience-hub/compare/v5.10.0...v5.11.0) (2022-11-30)
 
 
