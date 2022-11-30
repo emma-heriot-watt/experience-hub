@@ -22,6 +22,7 @@
 /src/emma_experience_hub/api/* @amitkparekh
 /src/emma_experience_hub/api/clients/__init__.py @amitkparekh
 /src/emma_experience_hub/api/clients/client.py @aleSuglia
+/src/emma_experience_hub/api/clients/confirmation_response_classifier.py @amitkparekh
 /src/emma_experience_hub/api/clients/dynamo_db.py @aleSuglia
 /src/emma_experience_hub/api/clients/emma_policy.py @amitkparekh
 /src/emma_experience_hub/api/clients/feature_extractor.py @amitkparekh
@@ -79,7 +80,7 @@
 /storage/fixtures/simbot/features/ @amitkparekh
 /storage/fixtures/simbot/game_metadata/* @amitkparekh
 /storage/fixtures/simbot/game_metadata/amzn1.echo-api.session.1f12bb8c-20eb-4a09-be31-b752f80235d8_3/ @aleSuglia
-/storage/registry/ @aleSuglia
+/storage/registry/ @amitkparekh
 /tests/* @amitkparekh
 /tests/constants/ @amitkparekh
 /tests/datamodels/ @amitkparekh
