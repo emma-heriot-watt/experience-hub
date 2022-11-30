@@ -17,7 +17,10 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotInteractionObject,
     SimBotObjectInteractionPayload,
 )
-from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
+from emma_experience_hub.parsers.simbot import (
+    SimBotActionPredictorOutputParser,
+    SimBotPreviousActionParser,
+)
 
 
 class SimBotAgentActionGenerationPipeline:
@@ -32,6 +35,7 @@ class SimBotAgentActionGenerationPipeline:
         button_detector_client: PlaceholderVisionClient,
         action_predictor_client: EmmaPolicyClient,
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
+        previous_action_parser: SimBotPreviousActionParser,
     ) -> None:
         self._features_client = features_client
 
@@ -39,6 +43,7 @@ class SimBotAgentActionGenerationPipeline:
 
         self._action_predictor_client = action_predictor_client
         self._action_predictor_response_parser = action_predictor_response_parser
+        self._previous_action_parser = previous_action_parser
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action to perform on the environment."""
@@ -124,14 +129,18 @@ class SimBotAgentActionGenerationPipeline:
 
         return output
 
+    def handle_act_previous_intent(self, session: SimBotSession) -> SimBotAction:
+        """Get the aciton from the previous turn."""
+        return self._previous_action_parser(session)
+
     def _get_action_intent_handler(
         self, intent: SimBotIntent
     ) -> Callable[[SimBotSession], Optional[SimBotAction]]:
         """Get the handler to use when generating an action to perform on the environment."""
         switcher = {
             SimBotIntentType.act_low_level: self.handle_act_intent,
+            SimBotIntentType.act_previous: self.handle_act_previous_intent,
             SimBotIntentType.press_button: self.handle_press_button_intent,
-            # TODO: Add handler for getting the action from the previous turn
             # TODO: Add handler for search
         }
 

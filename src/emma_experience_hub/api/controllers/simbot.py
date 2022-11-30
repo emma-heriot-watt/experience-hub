@@ -35,6 +35,7 @@ from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotLowASRConfidenceDetector,
     SimBotNLUOutputParser,
+    SimBotPreviousActionParser,
 )
 from emma_experience_hub.pipelines.simbot import (
     SimBotAgentActionGenerationPipeline,
@@ -200,6 +201,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     action_delimiter=simbot_settings.action_predictor_delimiter,
                     eos_token=simbot_settings.action_predictor_eos_token,
                 ),
+                previous_action_parser=SimBotPreviousActionParser(),
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(
                 utterance_generator_client=clients.utterance_generator,
