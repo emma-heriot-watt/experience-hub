@@ -28,6 +28,11 @@ class SimBotQueue(GenericModel, Generic[QueueType], validate_assignment=True):
     popped_elements_count: int = 0
 
     @property
+    def is_empty(self) -> bool:
+        """Detect whether the queue is empty."""
+        return not self.is_not_empty
+
+    @property
     def is_not_empty(self) -> bool:
         """Detect whether the queue is empty or not."""
         return bool(len(self.queue))

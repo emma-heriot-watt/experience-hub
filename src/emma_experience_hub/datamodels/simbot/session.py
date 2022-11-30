@@ -350,6 +350,28 @@ class SimBotSession(BaseModel):
         """Return the state from the most current turn."""
         return self.current_turn.state
 
+    @property
+    def is_find_object_in_progress(self) -> bool:
+        """Is the find object pipeline currently in progress?"""
+        return self.current_state.find_queue.is_not_empty
+
+    @property
+    def is_find_object_recently_finished(self) -> bool:
+        """Was the find object pipeline recently finished?
+
+        By recently, we are meaning that the last valid turn resulted in the clearing of the queue.
+        """
+        conditions = [
+            # The find queue in the previous valid turn is empty (since it got reset when we found
+            # the object, or when there are no actions left to take)
+            self.previous_valid_turn is not None
+            and self.previous_valid_turn.state.find_queue.is_empty,
+            # The find queue in the valid turn BEFORE the previous valid turn IS NOT empty (since
+            # there is at least one action left to take)
+            len(self.valid_turns) > 2 and self.valid_turns[-3].state.find_queue.is_not_empty,
+        ]
+        return all(conditions)
+
     def get_turns_within_interaction_window(self) -> list[SimBotSessionTurn]:
         """Get all the turns within the local interaction window.
 
