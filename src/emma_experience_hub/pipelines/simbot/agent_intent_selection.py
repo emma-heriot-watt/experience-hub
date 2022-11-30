@@ -44,6 +44,11 @@ class SimBotAgentIntentSelectionPipeline:
             logger.debug("Setting environment intent as the agent intent.")
             return session.current_turn.intent.environment
 
+        # If we are currently in the middle of a search routine, continue it.
+        if session.is_find_object_in_progress and not self._disable_search_actions:
+            logger.debug("Setting agent intent to search since we are current in progress")
+            return SimBotIntent(type=SimBotIntentType.act_search)
+
         # Otherwise, let the agent act
         return SimBotIntent(type=SimBotIntentType.act_low_level)
 
