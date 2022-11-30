@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.0](https://github.com/emma-simbot/experience-hub/compare/v5.6.1...v5.7.0) (2022-11-30)
+
+
+### Features
+
+* **parser:** implement parser to handle the `<act><previous>` intent type ([#174](https://github.com/emma-simbot/experience-hub/issues/174)) ([825b791](https://github.com/emma-simbot/experience-hub/commit/825b791a43a80ce5d6abae3fe61e143c9ba20b20))
+
 ## [5.6.1](https://github.com/emma-simbot/experience-hub/compare/v5.6.0...v5.6.1) (2022-11-29)
 
 
