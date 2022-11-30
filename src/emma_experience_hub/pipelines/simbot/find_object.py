@@ -46,7 +46,7 @@ class SimBotFindObjectPipeline:
             logger.debug("Preparing search plan...")
             search_plan = self.prepare_search_plan(session)
 
-            # Reset the queue and add the search plan
+            # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
             session.current_state.find_queue.extend_tail(search_plan)
 
@@ -84,9 +84,9 @@ class SimBotFindObjectPipeline:
     def _should_start_new_search(self, session: SimBotSession) -> bool:
         """Should we be starting a new search?
 
-        If the queue is not empty, we should start a new one. If the queue is empty, do not.
+        If the queue is empty, start a enw one. If the queue is not empty,do not.
         """
-        return not session.current_state.find_queue.is_not_empty
+        return session.current_state.find_queue.is_empty
 
     def _get_object_from_previous_turn(
         self,
