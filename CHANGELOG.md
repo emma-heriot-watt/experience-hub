@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.8.0](https://github.com/emma-simbot/experience-hub/compare/v5.7.0...v5.8.0) (2022-11-30)
+
+
+### Features
+
+* include the confirmation response classifier ([#161](https://github.com/emma-simbot/experience-hub/issues/161)) ([6e97d7e](https://github.com/emma-simbot/experience-hub/commit/6e97d7e3448cc9f33b730ef265588b0f9f62a3e3))
+
 ## [5.7.0](https://github.com/emma-simbot/experience-hub/compare/v5.6.1...v5.7.0) (2022-11-30)
 
 
