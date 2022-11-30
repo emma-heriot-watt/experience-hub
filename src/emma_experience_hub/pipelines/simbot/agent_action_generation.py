@@ -21,6 +21,7 @@ from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotPreviousActionParser,
 )
+from emma_experience_hub.pipelines.simbot.find_object import SimBotFindObjectPipeline
 
 
 class SimBotAgentActionGenerationPipeline:
@@ -36,6 +37,7 @@ class SimBotAgentActionGenerationPipeline:
         action_predictor_client: EmmaPolicyClient,
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
         previous_action_parser: SimBotPreviousActionParser,
+        find_object_pipeline: SimBotFindObjectPipeline,
     ) -> None:
         self._features_client = features_client
 
@@ -44,6 +46,8 @@ class SimBotAgentActionGenerationPipeline:
         self._action_predictor_client = action_predictor_client
         self._action_predictor_response_parser = action_predictor_response_parser
         self._previous_action_parser = previous_action_parser
+
+        self._find_object_pipeline = find_object_pipeline
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action to perform on the environment."""
@@ -129,9 +133,17 @@ class SimBotAgentActionGenerationPipeline:
 
         return output
 
-    def handle_act_previous_intent(self, session: SimBotSession) -> SimBotAction:
-        """Get the aciton from the previous turn."""
+    def handle_act_previous_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
+        """Get the action from the previous turn."""
+        # If there is a routine is in progress, continue it
+        if session.is_find_object_in_progress:
+            return self.handle_act_search_intent(session)
+
         return self._previous_action_parser(session)
+
+    def handle_act_search_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
+        """Handle the search for object intent."""
+        return self._find_object_pipeline.run(session)
 
     def _get_action_intent_handler(
         self, intent: SimBotIntent
@@ -141,7 +153,7 @@ class SimBotAgentActionGenerationPipeline:
             SimBotIntentType.act_low_level: self.handle_act_intent,
             SimBotIntentType.act_previous: self.handle_act_previous_intent,
             SimBotIntentType.press_button: self.handle_press_button_intent,
-            # TODO: Add handler for search
+            SimBotIntentType.act_search: self.handle_act_search_intent,
         }
 
         return switcher[intent.type]

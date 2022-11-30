@@ -37,12 +37,14 @@ from emma_experience_hub.parsers.simbot import (
     SimBotLowASRConfidenceDetector,
     SimBotNLUOutputParser,
     SimBotPreviousActionParser,
+    SimBotVisualGroundingOutputParser,
 )
 from emma_experience_hub.pipelines.simbot import (
     SimBotAgentActionGenerationPipeline,
     SimBotAgentIntentSelectionPipeline,
     SimBotAgentLanguageGenerationPipeline,
     SimBotEnvironmentIntentExtractionPipeline,
+    SimBotFindObjectPipeline,
     SimBotRequestProcessingPipeline,
     SimBotUserIntentExtractionPipeline,
     SimBotUserUtteranceVerificationPipeline,
@@ -167,13 +169,23 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
     agent_intent_selector: SimBotAgentIntentSelectionPipeline
     agent_action_generator: SimBotAgentActionGenerationPipeline
     agent_language_generator: SimBotAgentLanguageGenerationPipeline
+    find_object: SimBotFindObjectPipeline
 
     @classmethod
     def from_clients(
         cls, clients: SimBotControllerClients, simbot_settings: SimBotSettings
     ) -> "SimBotControllerPipelines":
         """Create the pipelines from the clients."""
+        find_object = SimBotFindObjectPipeline(
+            features_client=clients.features,
+            action_predictor_client=clients.action_predictor,
+            visual_grounding_output_parser=SimBotVisualGroundingOutputParser(
+                action_delimiter=simbot_settings.action_predictor_delimiter,
+                eos_token=simbot_settings.action_predictor_eos_token,
+            ),
+        )
         return cls(
+            find_object=find_object,
             request_processing=SimBotRequestProcessingPipeline(
                 session_db_client=clients.session_db,
             ),
@@ -208,6 +220,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     eos_token=simbot_settings.action_predictor_eos_token,
                 ),
                 previous_action_parser=SimBotPreviousActionParser(),
+                find_object_pipeline=find_object,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(
                 utterance_generator_client=clients.utterance_generator,

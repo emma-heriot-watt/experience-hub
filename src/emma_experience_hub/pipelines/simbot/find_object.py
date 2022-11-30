@@ -14,12 +14,12 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotObjectInteractionPayload,
     SimBotObjectMaskType,
 )
-from emma_experience_hub.parsers.simbot import SimBotVisualGroundingOutputParser
-from emma_experience_hub.parsers.simbot.functions import (
+from emma_experience_hub.functions.simbot import (
     SimBotSceneObjectTokens,
     get_correct_frame_index,
     get_mask_from_special_tokens,
 )
+from emma_experience_hub.parsers.simbot import SimBotVisualGroundingOutputParser
 
 
 class SimBotFindObjectPipeline:
@@ -33,12 +33,12 @@ class SimBotFindObjectPipeline:
         self,
         features_client: SimBotFeaturesClient,
         action_predictor_client: SimbotActionPredictionClient,
-        visual_grounding_response_parser: SimBotVisualGroundingOutputParser,
+        visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
     ) -> None:
         self._features_client = features_client
 
         self._action_predictor_client = action_predictor_client
-        self._visual_grounding_response_parser = visual_grounding_response_parser
+        self._visual_grounding_output_parser = visual_grounding_output_parser
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Handle the search through the environment."""
@@ -103,7 +103,7 @@ class SimBotFindObjectPipeline:
             environment_state_history=[EnvironmentStateTurn(features=extracted_features)],
         )
 
-        scene_object_tokens = self._visual_grounding_response_parser(raw_visual_grounding_output)
+        scene_object_tokens = self._visual_grounding_output_parser(raw_visual_grounding_output)
 
         if scene_object_tokens is None:
             raise AssertionError("Unable to get scene object tokens from the model output.")

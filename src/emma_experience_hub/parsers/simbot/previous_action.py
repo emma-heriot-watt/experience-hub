@@ -1,4 +1,15 @@
-from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotSession
+from typing import cast
+
+from loguru import logger
+
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
+from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotGotoObjectPayload,
+    SimBotGotoPayload,
+    SimBotObjectInteractionPayload,
+)
+from emma_experience_hub.functions.simbot import SimBotDeconstructedAction
 from emma_experience_hub.parsers.parser import Parser
 
 
@@ -13,7 +24,37 @@ class SimBotPreviousActionParser(Parser[SimBotSession, SimBotAction]):
         # Get the interaction action from the previous turn
         previous_interaction_action = self._get_previous_interaction_action(session)
 
+        if session.is_find_object_recently_finished:
+            logger.debug(
+                "Find routine was recently finished; trying to convert highlight action to goto action."
+            )
+            previous_interaction_action = self.convert_action_to_goto_action(
+                previous_interaction_action
+            )
+
         return previous_interaction_action
+
+    def convert_action_to_goto_action(self, action: SimBotAction) -> SimBotAction:
+        """Convert the action from the previous step into a Goto action."""
+        # Ensure that we can get the payload from the action
+        if not isinstance(action.payload, SimBotObjectInteractionPayload):
+            logger.warning(
+                "Cannot convert the action to a 'Goto' action as the payload is cannot be converted."
+            )
+            return action
+
+        raw_output = action.raw_output
+
+        if raw_output:
+            deconstructed_action = SimBotDeconstructedAction.from_raw_action(raw_output)
+            raw_output = f"goto <frame_token_{deconstructed_action.frame_index}> <vis_token_{deconstructed_action.object_index} {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
+
+        return SimBotAction(
+            id=0,
+            type=SimBotActionType.Goto,
+            raw_output=raw_output,
+            payload=SimBotGotoPayload(object=cast(SimBotGotoObjectPayload, action.payload.object)),
+        )
 
     def _get_previous_interaction_action(self, session: SimBotSession) -> SimBotAction:
         """Get the interaction action from the previous turn."""
