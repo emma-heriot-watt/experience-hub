@@ -87,6 +87,7 @@ max-annotation-complexity = 4
 min-name-length = 1
 max-try-body-length = 2
 exps-for-one-empty-line = 1
+max-access-level = 5
 show-violation-links = true
 format = wemake
 
