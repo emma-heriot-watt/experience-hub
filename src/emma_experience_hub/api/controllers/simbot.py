@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import (
     Client,
+    ConfirmationResponseClassifierClient,
     EmmaPolicyClient,
     FeatureExtractorClient,
     OutOfDomainDetectorClient,
@@ -61,6 +62,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     utterance_generator: SimBotUtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
     button_detector: PlaceholderVisionClient
+    confirmation_response_classifier: ConfirmationResponseClassifierClient
 
     @classmethod
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
@@ -95,6 +97,9 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 endpoint=simbot_settings.out_of_domain_detector_url
             ),
             button_detector=PlaceholderVisionClient(endpoint=simbot_settings.button_detector_url),
+            confirmation_response_classifier=ConfirmationResponseClassifierClient(
+                endpoint=simbot_settings.confirmation_classifier_url
+            ),
         )
 
     def healthcheck(self, attempts: int = 1, interval: int = 0) -> bool:
@@ -180,6 +185,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 out_of_domain_detector_client=clients.out_of_domain_detector,
             ),
             user_intent_extractor=SimBotUserIntentExtractionPipeline(
+                confirmation_response_classifier=clients.confirmation_response_classifier,
                 _disable_clarification_questions=simbot_settings.disable_clarification_questions,
                 _disable_clarification_confirmation=simbot_settings.disable_clarification_confirmation,
             ),

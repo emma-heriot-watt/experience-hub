@@ -50,6 +50,8 @@ class SimBotSettings(BaseSettings):
 
     button_detector_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5506", scheme="http")
 
+    confirmation_classifier_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5507", scheme="http")
+
     class Config:
         """Config for the settings."""
 

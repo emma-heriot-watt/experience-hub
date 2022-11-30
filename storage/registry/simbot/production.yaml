@@ -36,3 +36,9 @@ services:
   - name: profanity_filter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/profanity-filter
     image_version: latest
+
+  - name: confirmation_classifier
+    image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/confirmation-classifier
+    image_version: 1.0.0-cu116
+
+    model_url: s3://emma-simbot/model/checkpoints/confirmation-classifier/end_to_end/

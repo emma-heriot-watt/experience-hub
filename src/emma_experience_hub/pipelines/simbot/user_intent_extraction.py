@@ -2,6 +2,7 @@ from typing import Optional
 
 from loguru import logger
 
+from emma_experience_hub.api.clients import ConfirmationResponseClassifierClient
 from emma_experience_hub.constants.simbot import get_simbot_is_press_button_verbs
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
@@ -19,9 +20,12 @@ class SimBotUserIntentExtractionPipeline:
 
     def __init__(
         self,
+        confirmation_response_classifier: ConfirmationResponseClassifierClient,
         _disable_clarification_questions: bool = False,
         _disable_clarification_confirmation: bool = False,
     ) -> None:
+        self._confirmation_response_classifier = confirmation_response_classifier
+
         self._is_press_button_verbs = get_simbot_is_press_button_verbs()
 
         # Feature flags
@@ -115,4 +119,4 @@ class SimBotUserIntentExtractionPipeline:
 
     def _is_confirmation_request_approved(self, utterance: str) -> bool:
         """Return True if the confirmation request was approved from the user."""
-        return False
+        return self._confirmation_response_classifier.is_confirmation(utterance)
