@@ -1,7 +1,7 @@
 from loguru import logger
 
+from emma_experience_hub.functions.simbot import SimBotSceneObjectTokens
 from emma_experience_hub.parsers.parser import NeuralParser
-from emma_experience_hub.parsers.simbot.functions import SimBotSceneObjectTokens
 
 
 class SimBotVisualGroundingOutputParser(NeuralParser[SimBotSceneObjectTokens]):

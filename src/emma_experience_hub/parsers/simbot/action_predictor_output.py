@@ -18,12 +18,12 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotObjectMaskType,
     SimBotPayload,
 )
-from emma_experience_hub.parsers.parser import NeuralParser
-from emma_experience_hub.parsers.simbot.functions import (
+from emma_experience_hub.functions.simbot import (
     SimBotDeconstructedAction,
     get_correct_frame_index,
     get_mask_from_special_tokens,
 )
+from emma_experience_hub.parsers.parser import NeuralParser
 
 
 class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):

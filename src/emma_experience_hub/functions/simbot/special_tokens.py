@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectMaskType
-from emma_experience_hub.parsers.simbot.functions.masks import compress_segmentation_mask
+from emma_experience_hub.functions.simbot.masks import compress_segmentation_mask
 
 
 class SimBotSceneObjectTokens(BaseModel):

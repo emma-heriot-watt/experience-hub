@@ -9,7 +9,7 @@ from emma_experience_hub.constants.simbot import (
     get_simbot_room_name_map,
 )
 from emma_experience_hub.datamodels.simbot import SimBotActionType
-from emma_experience_hub.parsers.simbot.functions.special_tokens import (
+from emma_experience_hub.functions.simbot.special_tokens import (
     SimBotSceneObjectTokens,
     extract_index_from_special_token,
 )

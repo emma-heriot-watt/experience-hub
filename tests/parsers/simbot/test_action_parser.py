@@ -20,11 +20,11 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotObjectInteractionPayload,
     SimBotTurnAroundPayload,
 )
-from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
-from emma_experience_hub.parsers.simbot.functions import (
+from emma_experience_hub.functions.simbot import (
     get_correct_frame_index,
     get_mask_from_special_tokens,
 )
+from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
 from tests.fixtures.simbot_actions import simbot_extracted_features, simbot_room_names
 
 
