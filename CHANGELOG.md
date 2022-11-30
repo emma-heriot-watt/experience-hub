@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.9.0](https://github.com/emma-simbot/experience-hub/compare/v5.8.0...v5.9.0) (2022-11-30)
+
+
+### Features
+
+* easily get progress of find object routine from the session state ([#179](https://github.com/emma-simbot/experience-hub/issues/179)) ([e4b9c24](https://github.com/emma-simbot/experience-hub/commit/e4b9c24d48e257974bf18fd0fb2b4e43dd878ebc))
+* **pipeline:** create pipeline to find objects in the arena ([#176](https://github.com/emma-simbot/experience-hub/issues/176)) ([9e60eb4](https://github.com/emma-simbot/experience-hub/commit/9e60eb4fc3520f0aa8bd7ae7f24f1ec8d360144a))
+
 ## [5.8.0](https://github.com/emma-simbot/experience-hub/compare/v5.7.0...v5.8.0) (2022-11-30)
 
 
