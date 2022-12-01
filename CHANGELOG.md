@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.15.0](https://github.com/emma-simbot/experience-hub/compare/v5.14.0...v5.15.0) (2022-12-01)
+
+
+### Features
+
+* include handling for search predictions in language generation pipeline ([4a9252e](https://github.com/emma-simbot/experience-hub/commit/4a9252eb041aa2021b014aeccb9d1b90da55aef3))
+
+
+### Bug Fixes
+
+* action type for the look around action in find object pipeline ([397aa38](https://github.com/emma-simbot/experience-hub/commit/397aa3822db69f7548457bab6731df78acb14624))
+* add a lot more logs to the language generation pipeline ([5bb470b](https://github.com/emma-simbot/experience-hub/commit/5bb470b89c0394ab93bf8e70498dd93bd6f328e8))
+* add entity name property to goto viewpoint payload ([8526e5b](https://github.com/emma-simbot/experience-hub/commit/8526e5b02ae30983ef325f9e9640c2bead7ef58c))
+* improve detection of whether we should continue the search routine ([6b14c0d](https://github.com/emma-simbot/experience-hub/commit/6b14c0d0f3f11ec1c0cc3dd5852923aaebabb402))
+* **registry/download:** append file hash to downloaded model file name ([dbaf6e3](https://github.com/emma-simbot/experience-hub/commit/dbaf6e39fd436500447f887aa64048f89a4c633a))
+* remove entity type from simbot dialog action payload since its not a valid field ([e87bb07](https://github.com/emma-simbot/experience-hub/commit/e87bb0793da5e1e002c345ada3d7f7cd0e87d49a))
+* separate responding to confirmation request from the clarify answer path ([4aa6c44](https://github.com/emma-simbot/experience-hub/commit/4aa6c4441620f36dd09bc09176846bba5707c9e9))
+
 ## [5.14.0](https://github.com/emma-simbot/experience-hub/compare/v5.13.0...v5.14.0) (2022-12-01)
 
 
