@@ -17,15 +17,15 @@ services:
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.5.1-cu113
+    image_version: 1.8.0-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v3_bsz512_lr1e-4_0.5_speaker_tokens.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v4_bsz1024_lr2e-4_customised_paraphrases_filtered_human_lookaround.ckpt
 
   - name: feature_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/perception
-    image_version: 1.2.0-cu113
+    image_version: 1.5.0-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/vinvl_vg_x152c4_simbot.pth
+    model_url: s3://emma-simbot/model/checkpoints/vinvl_vg_x152c4_simbot_v124_customised.pth
 
   - name: placeholder_button_detector
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/color-matcher

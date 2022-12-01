@@ -47,7 +47,7 @@ services:
     volumes: *model-volume
     deploy: *deploy-gpu
     entrypoint: python
-    command: src/emma_perception/commands/run_server.py --config_file "src/emma_perception/constants/vinvl_x152c4_simbot.yaml" MODEL.WEIGHT "/app/model/${FEATURE_EXTRACTOR_MODEL}" MODEL.ROI_HEADS.NMS_FILTER "1" MODEL.ROI_HEADS.SCORE_THRESH "0.2" TEST.IGNORE_BOX_REGRESSION "False"
+    command: src/emma_perception/commands/run_server.py --config_file "src/emma_perception/constants/vinvl_x152c4_simbot_customised.yaml" MODEL.WEIGHT "/app/model/${FEATURE_EXTRACTOR_MODEL}" MODEL.ROI_HEADS.NMS_FILTER "1" MODEL.ROI_HEADS.SCORE_THRESH "0.2" TEST.IGNORE_BOX_REGRESSION "False"
 
   intent_extractor:
     container_name: intent_extractor
