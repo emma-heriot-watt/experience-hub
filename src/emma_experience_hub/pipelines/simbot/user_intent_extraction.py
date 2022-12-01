@@ -45,6 +45,11 @@ class SimBotUserIntentExtractionPipeline:
             logger.debug("Utterance is instructing us to press the button.")
             return SimBotIntentType.press_button
 
+        # Check if the question was a confirmation request
+        if self._utterance_responding_to_confirm_request(session.previous_valid_turn):
+            logger.debug("Utterance is responding to a confirmation request.")
+            return self.handle_confirmation_request_approval(session.current_turn)
+
         # Check if we are dealing with a clarification response
         if self._utterance_is_responding_to_clarify_question(session.previous_valid_turn):
             logger.debug("Utterance is a response to a clarification question.")
@@ -58,12 +63,7 @@ class SimBotUserIntentExtractionPipeline:
 
         Note: Verify that the utterance _is_ responding to a question before calling this method.
         """
-        # Check if the question was a confirmation request
-        if self._utterance_responding_to_confirm_request(session.previous_valid_turn):
-            logger.debug("Utterance is responding to a confirmation request.")
-            return self.handle_confirmation_request_approval(session.current_turn)
-
-        # Assume it's a clarification answer if it's not responding to a confirmation
+        # Assume it's a clarification answerr
         return SimBotIntentType.clarify_answer
 
     def handle_confirmation_request_approval(
