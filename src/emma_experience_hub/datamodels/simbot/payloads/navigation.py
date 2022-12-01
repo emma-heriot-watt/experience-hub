@@ -28,6 +28,11 @@ class SimBotGotoViewpointPayload(SimBotPayload):
 
     go_to_point: str = Field(..., alias="goToPoint")
 
+    @property
+    def entity_name(self) -> Optional[str]:
+        """Get the name of the entity."""
+        return self.go_to_point
+
 
 class SimBotGotoPayload(SimBotPayload, smart_union=True):
     """SimBot Goto action."""
