@@ -245,5 +245,5 @@ class SimBotAgentLanguageGenerationPipeline:
             type=SimBotActionType.LightweightDialog
             if use_lightweight_dialog
             else SimBotActionType.Dialog,
-            payload=SimBotDialogPayload(value=utterance, intent=intent.type),
+            payload=SimBotDialogPayload(value=utterance),
         )
