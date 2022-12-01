@@ -71,7 +71,7 @@ class SimBotFindObjectPipeline:
         """Plan out the actions the agent will take to perform the search."""
         look_around_action = SimBotAction(
             id=0,
-            type=SimBotActionType.LookAround,
+            type=SimBotActionType.Look,
             raw_output="look around.",
             payload=SimBotLookAroundPayload(),
         )
