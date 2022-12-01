@@ -44,7 +44,8 @@ typer = "^0.6.1"
 pydantic = { extras = ["dotenv"], version = "^1.10.2" }
 cloudpathlib = {extras = ["s3"], version = "^0.10.0"}
 convert-case = "^1.1.1"
-emma-common = {git = "https://github.com/emma-simbot/common"}
+emma-common = {git = "https://github.com/emma-simbot/common", extras = ["api"]}
+gunicorn = "^20.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"

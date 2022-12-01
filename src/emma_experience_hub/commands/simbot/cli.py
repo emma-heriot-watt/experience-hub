@@ -5,9 +5,10 @@ from pathlib import Path
 import typer
 import yaml
 from loguru import logger
-from uvicorn import Config, Server
 
+from emma_common.gunicorn import GunicornLogger, StandaloneApplication
 from emma_common.logging import setup_rich_logging
+from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
 
@@ -88,6 +89,9 @@ def run_controller_api(
         exists=True,
     ),
     log_to_cloudwatch: bool = typer.Option(default=False, help="Send logs to CloudWatch"),
+    workers: int = typer.Option(
+        default=1, min=1, help="Set the number of workers to run the server with."
+    ),
 ) -> None:
     """Run the inference server."""
     os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(auxiliary_metadata_dir)
@@ -96,13 +100,16 @@ def run_controller_api(
 
     simbot_settings = SimBotSettings.from_env()
 
-    server = Server(
-        Config(
-            "emma_experience_hub.api.simbot:app",
-            host=simbot_settings.host,
-            port=simbot_settings.port,
-        ),
-    )
+    server_config = {
+        "bind": f"{simbot_settings.host}:{simbot_settings.port}",
+        "workers": workers,
+        "accesslog": "-",
+        "errorlog": "-",
+        "worker_class": "uvicorn.workers.UvicornWorker",
+        "logger_class": GunicornLogger,
+    }
+
+    server = StandaloneApplication(simbot_api, server_config)
 
     setup_rich_logging(rich_traceback_show_locals=False)
 
