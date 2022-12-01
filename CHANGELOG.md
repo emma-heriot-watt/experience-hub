@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.16.0](https://github.com/emma-simbot/experience-hub/compare/v5.15.0...v5.16.0) (2022-12-01)
+
+
+### Features
+
+* run server with gunicorn and multiple workers ([#191](https://github.com/emma-simbot/experience-hub/issues/191)) ([1e5cf8b](https://github.com/emma-simbot/experience-hub/commit/1e5cf8bbe0e471f04c3a37bc8045231af575dc98))
+
 ## [5.15.0](https://github.com/emma-simbot/experience-hub/compare/v5.14.0...v5.15.0) (2022-12-01)
 
 
