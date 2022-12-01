@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.14.0](https://github.com/emma-simbot/experience-hub/compare/v5.13.0...v5.14.0) (2022-12-01)
+
+
+### Features
+
+* use simbot action model with custom classes ([#189](https://github.com/emma-simbot/experience-hub/issues/189)) ([57569b4](https://github.com/emma-simbot/experience-hub/commit/57569b4569c2742029f128e0ead05d53846e890f))
+
 ## [5.13.0](https://github.com/emma-simbot/experience-hub/compare/v5.12.1...v5.13.0) (2022-12-01)
 
 
