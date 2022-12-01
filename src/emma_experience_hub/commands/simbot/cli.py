@@ -120,7 +120,7 @@ def run_controller_api(
                 log_group_name=simbot_settings.watchtower_log_group_name,
                 send_interval=1,
             )
-            log_handler.formatter.add_log_record_attrs = [
+            log_handler.formatter.add_log_record_attrs = [  # pyright: ignore
                 "levelname",
                 "funcName",
                 "lineno",

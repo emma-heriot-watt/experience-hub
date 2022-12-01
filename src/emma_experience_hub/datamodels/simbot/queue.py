@@ -1,7 +1,7 @@
 from collections import deque
 from collections.abc import Iterable
 from enum import Enum
-from typing import Generic, TypeVar
+from typing import Callable, Generic, TypeVar
 
 from pydantic import Field
 from pydantic.generics import GenericModel
@@ -75,14 +75,20 @@ class SimBotQueue(GenericModel, Generic[QueueType], validate_assignment=True):
         return self._extend(elements, side=QueueSide.tail)
 
     def _pop(self, side: QueueSide) -> QueueType:
-        """Pop an element from the queue."""
-        if side == QueueSide.head:
-            element = self.queue.popleft()
-        if side == QueueSide.tail:
-            element = self.queue.pop()
+        """Pop an element from the queue.
+
+        Note: A switcher was used to prevent possible element unbound errors.
+        """
+        # Create a switcher to get the element depending on the side
+        switcher: dict[QueueSide, Callable[[], QueueType]] = {
+            QueueSide.head: self.queue.popleft,
+            QueueSide.tail: self.queue.pop,
+        }
+        element = switcher[side]()
 
         # Increase the number of popped elements by 1
         self.popped_elements_count += 1  # noqa: WPS601
+
         return element
 
     def _append(self, element: QueueType, side: QueueSide) -> None:

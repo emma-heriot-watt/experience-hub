@@ -144,7 +144,7 @@ def simbot_object_interaction_payloads(
 
     return SimBotObjectInteractionPayload(
         object=SimBotInteractionObject(
-            name=draw(class_names), color_image_index=color_image_index, mask=mask
+            name=draw(class_names), colorImageIndex=color_image_index, mask=mask
         )
     )
 

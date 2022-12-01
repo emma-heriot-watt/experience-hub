@@ -34,7 +34,7 @@ class ServiceMetadata(BaseModel):
         Hash for the file is from the etag: https://stackoverflow.com/a/26989678
         """
         if self.model_url:
-            file_hash = self.model_url.etag[1:-1]
+            file_hash: str = self.model_url.etag[1:-1]  # pyright: ignore
             return f"{self.name}-{self.file_safe_version}-{file_hash}"
 
         return self.name
