@@ -33,6 +33,9 @@ class SimBotAgentLanguageGenerationPipeline:
         if not action:
             action = self.handle_non_actionable_intents(session)
 
+        if not action:
+            action = self.handle_search_predictions(session)
+
         # If we wanted to generate an action and we failed to do so
         if not action:
             action = self.handle_failed_action_prediction(session)
