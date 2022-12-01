@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.13.0](https://github.com/emma-simbot/experience-hub/compare/v5.12.1...v5.13.0) (2022-12-01)
+
+
+### Features
+
+* add utterances for the search intents ([#187](https://github.com/emma-simbot/experience-hub/issues/187)) ([1562135](https://github.com/emma-simbot/experience-hub/commit/1562135310259d80795328d3eb5ccb27b1bc1a62))
+
 ## [5.12.1](https://github.com/emma-simbot/experience-hub/compare/v5.12.0...v5.12.1) (2022-11-30)
 
 
