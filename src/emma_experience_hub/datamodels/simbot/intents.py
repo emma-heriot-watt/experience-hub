@@ -28,13 +28,15 @@ class SimBotIntentType(Enum):
     clarify_description = "<clarify><description>"
     clarify_location = "<clarify><location>"
     clarify_disambiguation = "<clarify><disambiguation>"
-    clarify_confirmation = "<clarify><confirmation>"
+
+    # Confirmation questions
+    confirm_generic = "<confirm><generic>"
+    confirm_highlight = "<confirm><highlight>"
 
     # Clarification answer from the user
     clarify_answer = "<clarify><answer>"
 
     # Feedback for search
-    search_found_object = "<search><found_object>"
     search_not_found_object = "<search><not_found_object>"
     search_look_around = "<search><look_around>"
     search_goto_viewpoint = "<search><goto_viewpoint>"
@@ -86,6 +88,7 @@ class SimBotIntentType(Enum):
             SimBotIntentType.clarify_answer,
             SimBotIntentType.act,
             SimBotIntentType.press_button,
+            SimBotIntentType.act_previous,
         }
 
     @property
@@ -117,7 +120,14 @@ class SimBotIntentType(Enum):
             SimBotIntentType.clarify_description,
             SimBotIntentType.clarify_location,
             SimBotIntentType.clarify_disambiguation,
-            SimBotIntentType.clarify_confirmation,
+        }
+
+    @property
+    def is_confirmation_question(self) -> bool:
+        """Return True if the intent is one from a confirmation question."""
+        return self in {
+            SimBotIntentType.confirm_generic,
+            SimBotIntentType.confirm_highlight,
         }
 
     @property
@@ -135,7 +145,6 @@ class SimBotIntentType(Enum):
     def is_search_feedback(self) -> bool:
         """Return True if the intent is used for providing feedback during search sub-routine."""
         return self in {
-            SimBotIntentType.search_found_object,
             SimBotIntentType.search_not_found_object,
             SimBotIntentType.search_look_around,
             SimBotIntentType.search_goto_viewpoint,

@@ -8,7 +8,12 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
 )
-from emma_experience_hub.datamodels.simbot.payloads import SimBotDialogPayload
+from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotDialogPayload,
+    SimBotGotoPayload,
+    SimBotGotoRoomPayload,
+    SimBotGotoViewpointPayload,
+)
 
 
 class SimBotAgentLanguageGenerationPipeline:
@@ -67,6 +72,69 @@ class SimBotAgentLanguageGenerationPipeline:
 
         intent = SimBotIntent(type=SimBotIntentType.generic_failure)
         return self._generate_from_intent(intent, use_lightweight_dialog=False)
+
+    def handle_search_predictions(  # noqa: WPS212
+        self, session: SimBotSession
+    ) -> Optional[SimBotAction]:
+        """Handle search-related dialog generations."""
+        # Agent intent should not be None
+        if not session.current_turn.intent.agent:
+            return None
+
+        # This handler is only for when we are trying to do a search routine
+        if session.current_turn.intent.agent != SimBotIntentType.act_search:
+            return None
+
+        # Get the interaction action
+        action = session.current_turn.actions.interaction
+
+        # If there is no action, we did not find an object
+        if not action:
+            return self._generate_from_intent(
+                SimBotIntent(type=SimBotIntentType.search_not_found_object),
+                use_lightweight_dialog=False,
+            )
+
+        # If we are returning a Highlight action, it means we found the object.
+        if action.type == SimBotActionType.Highlight:
+            return self._generate_from_intent(
+                SimBotIntent(type=SimBotIntentType.confirm_highlight),
+                use_lightweight_dialog=False,
+            )
+
+        # If we are returning a look around, return a lightweight dialog action
+        if action.type == SimBotActionType.LookAround:
+            return self._generate_from_intent(
+                SimBotIntent(
+                    type=SimBotIntentType.search_look_around,
+                    action=SimBotActionType.LookAround,
+                ),
+                use_lightweight_dialog=True,
+            )
+
+        if action.type == SimBotActionType.Goto and isinstance(action.payload, SimBotGotoPayload):
+            # If we are going to a viewpoint to look more
+            if isinstance(action.payload.object, SimBotGotoViewpointPayload):
+                return self._generate_from_intent(
+                    SimBotIntent(
+                        type=SimBotIntentType.search_goto_viewpoint,
+                        action=SimBotActionType.Goto,
+                    ),
+                    use_lightweight_dialog=True,
+                )
+
+            # If we are going to a room to look more
+            if isinstance(action.payload.object, SimBotGotoRoomPayload):
+                return self._generate_from_intent(
+                    SimBotIntent(
+                        type=SimBotIntentType.search_goto_room,
+                        action=SimBotActionType.Goto,
+                    ),
+                    use_lightweight_dialog=True,
+                )
+
+        # If none of the above conditions fit, return None
+        return None
 
     def handle_successful_action_prediction(
         self, session: SimBotSession

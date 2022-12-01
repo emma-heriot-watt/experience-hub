@@ -112,7 +112,7 @@ class SimBotUserIntentExtractionPipeline:
         return (
             previous_turn is not None
             and previous_turn.intent.agent is not None
-            and previous_turn.intent.agent.type == SimBotIntentType.clarify_confirmation
+            and previous_turn.intent.agent.type.is_confirmation_question
             # This will always resolve to False if clarification questions are disabled.
             and not self._disable_clarification_confirmation
         )

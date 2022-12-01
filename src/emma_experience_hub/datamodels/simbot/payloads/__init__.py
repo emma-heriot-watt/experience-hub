@@ -9,6 +9,7 @@ from emma_experience_hub.datamodels.simbot.payloads.navigation import (
     SimBotGotoObjectPayload,
     SimBotGotoPayload,
     SimBotGotoRoomPayload,
+    SimBotGotoViewpointPayload,
     SimBotLookAroundPayload,
     SimBotLookDownPayload,
     SimBotLookPayload,
