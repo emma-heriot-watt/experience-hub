@@ -372,6 +372,11 @@ class SimBotSession(BaseModel):
         ]
         return all(conditions)
 
+    @property
+    def is_finding_object(self) -> bool:
+        """Return True if the agent is working on finding an object."""
+        return self.is_find_object_in_progress or self.is_find_object_recently_finished
+
     def get_turns_within_interaction_window(self) -> list[SimBotSessionTurn]:
         """Get all the turns within the local interaction window.
 
