@@ -1,5 +1,7 @@
 from typing import Optional
 
+from loguru import logger
+
 from emma_experience_hub.api.clients.simbot import SimBotUtteranceGeneratorClient
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
@@ -82,17 +84,23 @@ class SimBotAgentLanguageGenerationPipeline:
         """Handle search-related dialog generations."""
         # Agent intent should not be None
         if not session.current_turn.intent.agent:
+            logger.debug("[NLG SEARCH]: Agent does not have an intent? This should not happen")
             return None
 
         # This handler is only for when we are trying to do a search routine
-        if session.current_turn.intent.agent != SimBotIntentType.act_search:
+        if session.current_turn.intent.agent.type != SimBotIntentType.act_search:
+            logger.debug("[NLG SEARCH]: Agent intent is not search, returning.")
             return None
 
         # Get the interaction action
+        logger.debug("[NLG SEARCH]: Try get the interaction action from the agent")
         action = session.current_turn.actions.interaction
 
         # If there is no action, we did not find an object
         if not action:
+            logger.debug(
+                "[NLG SEARCH]: There is no interaction action, so we did not find an object and there is no planning steps left"
+            )
             return self._generate_from_intent(
                 SimBotIntent(type=SimBotIntentType.search_not_found_object),
                 use_lightweight_dialog=False,
@@ -100,13 +108,15 @@ class SimBotAgentLanguageGenerationPipeline:
 
         # If we are returning a Highlight action, it means we found the object.
         if action.type == SimBotActionType.Highlight:
+            logger.debug("[NLG SEARCH]: We might have found an object")
             return self._generate_from_intent(
                 SimBotIntent(type=SimBotIntentType.confirm_highlight),
                 use_lightweight_dialog=False,
             )
 
         # If we are returning a look around, return a lightweight dialog action
-        if action.type == SimBotActionType.LookAround:
+        if action.type == SimBotActionType.Look:
+            logger.debug("[NLG SEARCH]: We are looking around for the object")
             return self._generate_from_intent(
                 SimBotIntent(
                     type=SimBotIntentType.search_look_around,
@@ -118,6 +128,7 @@ class SimBotAgentLanguageGenerationPipeline:
         if action.type == SimBotActionType.Goto and isinstance(action.payload, SimBotGotoPayload):
             # If we are going to a viewpoint to look more
             if isinstance(action.payload.object, SimBotGotoViewpointPayload):
+                logger.debug("[NLG SEARCH]: We are going to a new viewpoint")
                 return self._generate_from_intent(
                     SimBotIntent(
                         type=SimBotIntentType.search_goto_viewpoint,
@@ -128,6 +139,7 @@ class SimBotAgentLanguageGenerationPipeline:
 
             # If we are going to a room to look more
             if isinstance(action.payload.object, SimBotGotoRoomPayload):
+                logger.debug("[NLG SEARCH]: We are going to a new room")
                 return self._generate_from_intent(
                     SimBotIntent(
                         type=SimBotIntentType.search_goto_room,
@@ -137,6 +149,7 @@ class SimBotAgentLanguageGenerationPipeline:
                 )
 
         # If none of the above conditions fit, return None
+        logger.debug("[NLG SEARCH]: None of the search conditions fit, returning `None`.")
         return None
 
     def handle_successful_action_prediction(
