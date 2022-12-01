@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional
 
-from cloudpathlib import CloudPath
+from cloudpathlib import S3Path
 from convert_case import snake_case
 from pydantic import BaseModel
 from rich.progress import Progress
@@ -15,7 +15,7 @@ class ServiceMetadata(BaseModel):
     name: str
     image_repository_uri: str
     image_version: str
-    model_url: Optional[CloudPath] = None
+    model_url: Optional[S3Path] = None
 
     @property
     def file_safe_version(self) -> str:
@@ -29,9 +29,13 @@ class ServiceMetadata(BaseModel):
 
     @property
     def model_file_name(self) -> str:
-        """Get the model file name for the service."""
+        """Get the model file name for the service.
+
+        Hash for the file is from the etag: https://stackoverflow.com/a/26989678
+        """
         if self.model_url:
-            return f"{self.name}-{self.file_safe_version}"
+            file_hash = self.model_url.etag[1:-1]
+            return f"{self.name}-{self.file_safe_version}-{file_hash}"
 
         return self.name
 
