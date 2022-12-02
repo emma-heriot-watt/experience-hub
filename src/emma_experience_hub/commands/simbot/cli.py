@@ -139,7 +139,11 @@ def run_controller_api(
 
 
 @app.command()
-def run_production_server() -> None:
+def run_production_server(
+    workers: int = typer.Option(
+        default=8, min=1, help="Set the number of workers when running in production."
+    )
+) -> None:
     """Run all the services in the background and start the server.
 
     This command should only be run on the EC2 instance, where the relevant EFS directories have
@@ -160,6 +164,7 @@ def run_production_server() -> None:
         auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),
         extracted_features_cache_dir=Path("../cache/features"),
         log_to_cloudwatch=True,
+        workers=workers,
     )
 
 
