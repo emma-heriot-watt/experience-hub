@@ -15,6 +15,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotActionStatus,
     SimBotActionStatusType,
     SimBotActionType,
+    SimBotDialogAction,
     SimBotIntent,
     SimBotIntentType,
     SimBotSessionTurn,
@@ -152,7 +153,9 @@ def simbot_object_interaction_payloads(
 @st.composite
 def simbot_dialog_payloads(draw: st.DrawFn) -> SimBotDialogPayload:
     """Generate a dialog payload."""
-    return SimBotDialogPayload(value=draw(st.text(min_size=1)))
+    return SimBotDialogPayload(
+        value=draw(st.text(min_size=1)), intent=SimBotIntentType.generic_success
+    )
 
 
 @st.composite
@@ -262,7 +265,7 @@ def simbot_actions(
         assume(action_status.error_type)
 
     action_builder: st.SearchStrategy[SimBotAction] = st.builds(
-        SimBotAction,
+        SimBotDialogAction if isinstance(payload, SimBotDialogPayload) else SimBotAction,
         id=st.just(0),
         payload=st.just(payload),
         type=st.just(action_type),
@@ -283,7 +286,7 @@ def simbot_session_turns(
         simbot_interaction_payloads(), allow_none=True
     ),
     dialog_action: st.SearchStrategy[Optional[SimBotAction]] = simbot_actions(
-        simbot_interaction_payloads(), allow_none=True
+        simbot_dialog_payloads(), allow_none=True
     ),
 ) -> SimBotSessionTurn:
     """Generate a session turn."""
@@ -291,8 +294,12 @@ def simbot_session_turns(
     intents = SimBotSessionTurnIntent(
         user=None, environment=None, agent=SimBotIntent(type=SimBotIntentType.act_low_level)
     )
+    drawn_dialog_action = draw(dialog_action)
+
+    assert isinstance(drawn_dialog_action, SimBotDialogAction)
+
     actions = SimBotSessionTurnActions(
-        interaction=draw(interaction_action), dialog=draw(dialog_action)
+        interaction=draw(interaction_action), dialog=drawn_dialog_action
     )
     turn: SimBotSessionTurn = draw(
         st.builds(

@@ -1,6 +1,6 @@
 from hypothesis import given
 
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotDialogAction
 from emma_experience_hub.datamodels.simbot.session import SimBotSessionTurnActions
 from tests.fixtures.simbot_actions import (
     simbot_actions,
@@ -14,7 +14,7 @@ from tests.fixtures.simbot_actions import (
     dialog_action=simbot_actions(simbot_dialog_payloads()),
 )
 def test_actions_always_have_correct_ids(
-    interaction_action: SimBotAction, dialog_action: SimBotAction
+    interaction_action: SimBotAction, dialog_action: SimBotDialogAction
 ) -> None:
     # Create empty turn action
     turn_actions = SimBotSessionTurnActions()
@@ -46,7 +46,7 @@ def test_actions_always_have_correct_ids(
     dialog_action=simbot_actions(simbot_dialog_payloads()),
 )
 def test_actions_as_list_are_in_correct_order(
-    interaction_action: SimBotAction, dialog_action: SimBotAction
+    interaction_action: SimBotAction, dialog_action: SimBotDialogAction
 ) -> None:
     # Create empty turn action
     turn_actions = SimBotSessionTurnActions()

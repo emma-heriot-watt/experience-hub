@@ -3,7 +3,7 @@ from collections.abc import Iterator
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from functools import cached_property
-from typing import Callable, Optional, cast
+from typing import Callable, Optional
 
 from loguru import logger
 from overrides import overrides
@@ -15,11 +15,11 @@ from emma_experience_hub.datamodels import (
     EnvironmentStateTurn,
 )
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
-from emma_experience_hub.datamodels.simbot.intents import SimBotIntent, SimBotIntentType
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotDialogAction
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionType, SimBotIntentType
+from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
-    SimBotDialogPayload,
     SimBotObjectOutputType,
 )
 from emma_experience_hub.datamodels.simbot.queue import SimBotQueue
@@ -69,7 +69,7 @@ class SimBotSessionTurnActions(BaseModel, validate_assignment=True):
     """
 
     interaction: Optional[SimBotAction] = None
-    dialog: Optional[SimBotAction] = None
+    dialog: Optional[SimBotDialogAction] = None
 
     @overrides(check_signature=False)
     def __iter__(self) -> Iterator[SimBotAction]:
@@ -255,9 +255,10 @@ class SimBotSessionTurn(BaseModel):
             utterances.append(DialogueUtterance(utterance=self.speech.utterance, role="user"))
 
         # Do not include lightweight dialog actions within the utterances!
-        if self.actions.dialog is not None and self.actions.dialog.type == SimBotActionType.Dialog:
-            payload = cast(SimBotDialogPayload, self.actions.dialog.payload)
-            utterances.append(DialogueUtterance(utterance=payload.value, role="agent"))
+        if self.actions.dialog is not None:
+            utterances.append(
+                DialogueUtterance(utterance=self.actions.dialog.payload.value, role="agent")
+            )
 
         return utterances
 

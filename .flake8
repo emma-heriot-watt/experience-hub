@@ -117,7 +117,7 @@ per-file-ignores =
 		tests/*:D,F401,WPS118,WPS202,WPS204,WPS214,WPS218,WPS226,WPS231,WPS232,WPS235,WPS301,WPS404,WPS432,WPS437,WPS442,S101
 		src/*/__main__.py:WPS404
 		src/*/commands/*:WPS404
-		src/*/datamodels/simbot/actions.py:WPS402
+		src/*/datamodels/simbot/enums/actions.py:WPS402
 
 extend-exclude=
 	.venv/,

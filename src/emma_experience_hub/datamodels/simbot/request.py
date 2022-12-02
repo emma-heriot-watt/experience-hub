@@ -2,11 +2,8 @@ from typing import Optional, cast
 
 from pydantic import BaseModel, Field
 
-from emma_experience_hub.datamodels.simbot.actions import (
-    SimBotAction,
-    SimBotActionStatus,
-    SimBotActionType,
-)
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionStatus
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotSpeechRecognitionPayload,

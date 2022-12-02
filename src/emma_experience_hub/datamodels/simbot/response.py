@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
-from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectOutputType
 
 
@@ -18,6 +19,7 @@ class SimBotResponse(BaseModel):
                 # Do not include the field
                 "status": True,
                 "raw_output": True,
+                "dialog": {"intent"},
             },
         },
     )
