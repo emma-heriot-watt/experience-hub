@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.17.0](https://github.com/emma-simbot/experience-hub/compare/v5.16.0...v5.17.0) (2022-12-02)
+
+
+### Features
+
+* default the number of workers in production to 8 ([e2c9bf4](https://github.com/emma-simbot/experience-hub/commit/e2c9bf4d89b8db9553ce0ab155a5fa3c38586d74))
+
+
+### Bug Fixes
+
+* improve how dialog intents are retrieved from previous actions ([#190](https://github.com/emma-simbot/experience-hub/issues/190)) ([e00e15f](https://github.com/emma-simbot/experience-hub/commit/e00e15fac9f5a45bb384a01a2bdd11a67eb8e91c))
+
 ## [5.16.0](https://github.com/emma-simbot/experience-hub/compare/v5.15.0...v5.16.0) (2022-12-01)
 
 
