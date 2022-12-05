@@ -58,7 +58,7 @@ async def healthcheck(response: Response) -> str:
     return "success"
 
 
-@app.post("/v1/predict", response_model=SimBotResponse)
+@app.post("/v1/predict")
 async def handle_request_from_simbot_arena(request: Request, response: Response) -> SimBotResponse:
     """Handle a new request from the SimBot API."""
     raw_request = await request.json()
