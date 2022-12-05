@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.2](https://github.com/emma-simbot/experience-hub/compare/v5.18.1...v5.18.2) (2022-12-05)
+
+
+### Bug Fixes
+
+* set default number of workers to 4 ([ef96404](https://github.com/emma-simbot/experience-hub/commit/ef96404586341f1c5487194fdf7baa2507bd7d43))
+
 ## [5.18.1](https://github.com/emma-simbot/experience-hub/compare/v5.18.0...v5.18.1) (2022-12-05)
 
 
