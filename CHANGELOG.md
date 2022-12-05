@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.1](https://github.com/emma-simbot/experience-hub/compare/v5.18.0...v5.18.1) (2022-12-05)
+
+
+### Bug Fixes
+
+* do not re-serialise the response model to `SimBotResponse` on returning endpoint ([#196](https://github.com/emma-simbot/experience-hub/issues/196)) ([8f08fe0](https://github.com/emma-simbot/experience-hub/commit/8f08fe04f42542038ecbd3f89d1abe4258e8b1d3))
+
 ## [5.18.0](https://github.com/emma-simbot/experience-hub/compare/v5.17.0...v5.18.0) (2022-12-05)
 
 
