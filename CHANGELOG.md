@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.0](https://github.com/emma-simbot/experience-hub/compare/v5.17.0...v5.18.0) (2022-12-05)
+
+
+### Features
+
+* **cli:** add option to force download all models if desired ([b1b9a6d](https://github.com/emma-simbot/experience-hub/commit/b1b9a6dbb1697759ee9df91665eaa3dcf12e829e))
+
+
+### Bug Fixes
+
+* **registry:** feature extractor version did not exist ([193e86d](https://github.com/emma-simbot/experience-hub/commit/193e86d9c4f5483cf798d5a45f5c0289f90be2fb))
+* **registry:** remove file hash from the downloaded model file name ([1503d10](https://github.com/emma-simbot/experience-hub/commit/1503d105adefeb69aeffe21ca941b84c53b30a46))
+
 ## [5.17.0](https://github.com/emma-simbot/experience-hub/compare/v5.16.0...v5.17.0) (2022-12-02)
 
 
