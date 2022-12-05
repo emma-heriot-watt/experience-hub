@@ -39,7 +39,7 @@ def run_background_services(
         default=True, help="Download all models for the services if necessary."
     ),
     force_download: bool = typer.Option(
-        False, # noqa: WPS425
+        False,  # noqa: WPS425
         "--force",
         "-f",
         is_flag=True,
