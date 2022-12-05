@@ -29,13 +29,9 @@ class ServiceMetadata(BaseModel):
 
     @property
     def model_file_name(self) -> str:
-        """Get the model file name for the service.
-
-        Hash for the file is from the etag: https://stackoverflow.com/a/26989678
-        """
+        """Get the model file name for the service."""
         if self.model_url:
-            file_hash: str = self.model_url.etag[1:-1]  # pyright: ignore
-            return f"{self.name}-{self.file_safe_version}-{file_hash}"
+            return f"{self.name}-{self.file_safe_version}"
 
         return self.name
 
