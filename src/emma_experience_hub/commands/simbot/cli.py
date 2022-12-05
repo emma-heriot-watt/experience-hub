@@ -148,7 +148,7 @@ def run_controller_api(
 @app.command()
 def run_production_server(
     workers: int = typer.Option(
-        default=8, min=1, help="Set the number of workers when running in production."
+        default=4, min=1, help="Set the number of workers when running in production."
     )
 ) -> None:
     """Run all the services in the background and start the server.
