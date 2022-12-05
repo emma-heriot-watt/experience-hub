@@ -38,6 +38,13 @@ def run_background_services(
     download_models: bool = typer.Option(
         default=True, help="Download all models for the services if necessary."
     ),
+    force_download: bool = typer.Option(
+        False, # noqa: WPS425
+        "--force",
+        "-f",
+        is_flag=True,
+        help="Force download all models for all services.",
+    ),
     run_in_background: bool = typer.Option(
         False,  # noqa: WPS425
         "--run-in-background",
@@ -59,7 +66,7 @@ def run_background_services(
         model_storage_dir.mkdir(exist_ok=True, parents=True)
 
         # Download models
-        service_registry.download_all_models(model_storage_dir)
+        service_registry.download_all_models(model_storage_dir, force=force_download)
 
     # Build the run command
     run_command = "up"
