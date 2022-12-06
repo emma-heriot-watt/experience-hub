@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.3](https://github.com/emma-simbot/experience-hub/compare/v5.18.2...v5.18.3) (2022-12-06)
+
+
+### Bug Fixes
+
+* remove placeholder button detector ([#198](https://github.com/emma-simbot/experience-hub/issues/198)) ([97c802c](https://github.com/emma-simbot/experience-hub/commit/97c802ca87bd8d99ae9b24e1c8bf3f3b748cb2be))
+* remove the placeholder client from the `__init__.py` ([0f5bbc2](https://github.com/emma-simbot/experience-hub/commit/0f5bbc2a3d58a6847bb23867afb546d38b76daa5))
+
 ## [5.18.2](https://github.com/emma-simbot/experience-hub/compare/v5.18.1...v5.18.2) (2022-12-05)
 
 
