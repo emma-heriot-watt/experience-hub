@@ -16,7 +16,6 @@ from emma_experience_hub.api.clients import (
     ProfanityFilterClient,
 )
 from emma_experience_hub.api.clients.simbot import (
-    PlaceholderVisionClient,
     SimbotActionPredictionClient,
     SimBotAuxiliaryMetadataClient,
     SimBotExtractedFeaturesClient,
@@ -63,7 +62,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     profanity_filter: ProfanityFilterClient
     utterance_generator: SimBotUtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
-    button_detector: PlaceholderVisionClient
     confirmation_response_classifier: ConfirmationResponseClassifierClient
 
     @classmethod
@@ -98,7 +96,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url
             ),
-            button_detector=PlaceholderVisionClient(endpoint=simbot_settings.button_detector_url),
             confirmation_response_classifier=ConfirmationResponseClassifierClient(
                 endpoint=simbot_settings.confirmation_classifier_url
             ),
@@ -213,7 +210,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             ),
             agent_action_generator=SimBotAgentActionGenerationPipeline(
                 features_client=clients.features,
-                button_detector_client=clients.button_detector,
                 action_predictor_client=clients.action_predictor,
                 action_predictor_response_parser=SimBotActionPredictorOutputParser(
                     action_delimiter=simbot_settings.action_predictor_delimiter,

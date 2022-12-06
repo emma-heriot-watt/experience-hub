@@ -3,19 +3,12 @@ from typing import Callable, Optional
 from loguru import logger
 
 from emma_experience_hub.api.clients import EmmaPolicyClient
-from emma_experience_hub.api.clients.simbot import PlaceholderVisionClient, SimBotFeaturesClient
-from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.api.clients.simbot import SimBotFeaturesClient
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
-    SimBotActionType,
     SimBotIntent,
     SimBotIntentType,
     SimBotSession,
-)
-from emma_experience_hub.datamodels.simbot.payloads import (
-    SimBotAuxiliaryMetadataPayload,
-    SimBotInteractionObject,
-    SimBotObjectInteractionPayload,
 )
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
@@ -33,16 +26,12 @@ class SimBotAgentActionGenerationPipeline:
     def __init__(
         self,
         features_client: SimBotFeaturesClient,
-        button_detector_client: PlaceholderVisionClient,
         action_predictor_client: EmmaPolicyClient,
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
         previous_action_parser: SimBotPreviousActionParser,
         find_object_pipeline: SimBotFindObjectPipeline,
     ) -> None:
         self._features_client = features_client
-
-        self._button_detector_client = button_detector_client
-
         self._action_predictor_client = action_predictor_client
         self._action_predictor_response_parser = action_predictor_response_parser
         self._previous_action_parser = previous_action_parser
@@ -100,39 +89,6 @@ class SimBotAgentActionGenerationPipeline:
             logger.error(f"Unable to parse a response for the output {raw_action_prediction}")
             return None
 
-    def handle_press_button_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
-        """Generate an action when we want to press a button."""
-        if not session.current_turn.speech:
-            raise AssertionError("The session turn should have an utterance for this intent.")
-
-        raw_output = f"toggle button {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
-        predicted_mask = self._button_detector_client.get_object_mask_from_image(
-            raw_utterance=session.current_turn.speech.utterance,
-            # Load the image from the turn's auxiliary metadata file
-            # we always use the image in the front view
-            image=SimBotAuxiliaryMetadataPayload.from_efs_uri(
-                session.current_turn.auxiliary_metadata_uri
-            ).images[0],
-        )
-
-        # If mask is empty, return None because we failed.
-        if not predicted_mask or not predicted_mask[0]:
-            logger.error("Predicted mask is empty.")
-            return None
-
-        output = SimBotAction(
-            id=0,
-            type=SimBotActionType.Toggle,
-            raw_output=raw_output,
-            payload=SimBotObjectInteractionPayload(
-                object=SimBotInteractionObject(
-                    colorImageIndex=0, mask=predicted_mask, name="button"
-                )
-            ),
-        )
-
-        return output
-
     def handle_act_previous_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Get the action from the previous turn."""
         # If there is a routine is in progress, continue it
@@ -152,7 +108,6 @@ class SimBotAgentActionGenerationPipeline:
         switcher = {
             SimBotIntentType.act_low_level: self.handle_act_intent,
             SimBotIntentType.act_previous: self.handle_act_previous_intent,
-            SimBotIntentType.press_button: self.handle_press_button_intent,
             SimBotIntentType.act_search: self.handle_act_search_intent,
         }
 

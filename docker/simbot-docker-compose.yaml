@@ -103,24 +103,6 @@ services:
     command:
       - src/emma_ood_detection/api/ood_detection_api.py
 
-  placeholder_button_detector:
-    container_name: placeholder_button_detector
-    image: "${PLACEHOLDER_BUTTON_DETECTOR_IMAGE}"
-    environment:
-      LOG_LEVEL: info
-      DEVICE: "cuda:0"
-      MODEL_CHECKPOINT_PATH: "/app/model/${PLACEHOLDER_BUTTON_DETECTOR_MODEL}"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5506/healthcheck"]
-      <<: *healthcheck-defaults
-    deploy: *deploy-gpu
-    volumes: *model-volume
-    ports:
-      - "5506:5506"
-    entrypoint: python
-    command:
-      - src/emma_color_matcher/api/color_matcher_api.py
-
   confirmation_classifier:
     container_name: confirmation_classifier
     image: "${CONFIRMATION_CLASSIFIER_IMAGE}"

@@ -3,7 +3,6 @@ from typing import Optional
 from loguru import logger
 
 from emma_experience_hub.api.clients import ConfirmationResponseClassifierClient
-from emma_experience_hub.constants.simbot import get_simbot_is_press_button_verbs
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
@@ -26,8 +25,6 @@ class SimBotUserIntentExtractionPipeline:
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
 
-        self._is_press_button_verbs = get_simbot_is_press_button_verbs()
-
         # Feature flags
         self._disable_clarification_questions = _disable_clarification_questions
         self._disable_clarification_confirmation = _disable_clarification_confirmation
@@ -39,11 +36,6 @@ class SimBotUserIntentExtractionPipeline:
                 "There is no utterance to extract intent from. Therefore the user has not explicitly told us to do anything. Why has this pipeline been called?"
             )
             return None
-
-        # If the user wants us to press a button
-        if self._utterance_is_press_button(session.current_turn):
-            logger.debug("Utterance is instructing us to press the button.")
-            return SimBotIntentType.press_button
 
         # Check if the question was a confirmation request
         if self._utterance_responding_to_confirm_request(session.previous_valid_turn):
@@ -80,18 +72,6 @@ class SimBotUserIntentExtractionPipeline:
 
         logger.debug("Utterance denies confirmation request.")
         return SimBotIntentType.generic_failure
-
-    def _utterance_is_press_button(self, turn: SimBotSessionTurn) -> bool:
-        """Detect whether the utterance is for pressing the buttom.
-
-        Adopted from https://github.com/emma-simbot/simbot-ml-toolbox/blob/8a697b32b47794f37b4dc481753f7e66de358efb/action_model/placeholder_model.py#L165-L579
-        """
-        is_press_button = False
-        if turn.speech is not None:
-            utterance = turn.speech.utterance.lower()
-            if "button" in utterance:
-                is_press_button = any([verb in utterance for verb in self._is_press_button_verbs])
-        return is_press_button
 
     def _utterance_is_responding_to_clarify_question(
         self, previous_turn: Optional[SimBotSessionTurn]

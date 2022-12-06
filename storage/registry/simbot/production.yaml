@@ -27,12 +27,6 @@ services:
 
     model_url: s3://emma-simbot/model/checkpoints/vinvl_vg_x152c4_simbot_v124_customised.pth
 
-  - name: placeholder_button_detector
-    image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/color-matcher
-    image_version: 1.0.2-cu113
-
-    model_url: s3://emma-simbot/perception/amazon-simbot-vision-model/vision_model_21.pth
-
   - name: profanity_filter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/profanity-filter
     image_version: latest

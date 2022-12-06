@@ -9,7 +9,6 @@ class SimBotIntentType(Enum):
     act_low_level = "<act><low_level>"
     act_search = "<act><search>"
     act_previous = "<act><previous>"
-    press_button = "<act><press_button>"
 
     # Improper instructions
     low_asr_confidence = "<language><low_asr_confidence>"
@@ -70,7 +69,6 @@ class SimBotIntentType(Enum):
         return self in {
             SimBotIntentType.low_asr_confidence,
             SimBotIntentType.out_of_domain,
-            SimBotIntentType.press_button,
             SimBotIntentType.profanity,
             SimBotIntentType.only_wake_word,
             SimBotIntentType.empty_utterance,
@@ -82,7 +80,6 @@ class SimBotIntentType(Enum):
         return self.is_invalid_user_utterance or self in {
             SimBotIntentType.clarify_answer,
             SimBotIntentType.act,
-            SimBotIntentType.press_button,
             SimBotIntentType.act_previous,
         }
 
@@ -133,7 +130,6 @@ class SimBotIntentType(Enum):
             SimBotIntentType.act_low_level,
             SimBotIntentType.act_search,
             SimBotIntentType.act_previous,
-            SimBotIntentType.press_button,
         }
 
     @property
