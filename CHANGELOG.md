@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.19.0](https://github.com/emma-simbot/experience-hub/compare/v5.18.3...v5.19.0) (2022-12-07)
+
+
+### Features
+
+* update nlu model and enable search ([#199](https://github.com/emma-simbot/experience-hub/issues/199)) ([63ddd3e](https://github.com/emma-simbot/experience-hub/commit/63ddd3e4bd385c2db75a4b81eb5b5eeb8d5d7896))
+
 ## [5.18.3](https://github.com/emma-simbot/experience-hub/compare/v5.18.2...v5.18.3) (2022-12-06)
 
 
