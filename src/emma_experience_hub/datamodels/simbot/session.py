@@ -300,11 +300,11 @@ class SimBotSession(BaseModel):
         turns = sorted(turns, key=lambda turn: turn.timestamp.start)
 
         # Verify that indexes are in order
-        if sorted(turns, key=lambda turn: turn.idx) != turns:
-            # TODO: Is this the best way to handle this?
-            raise AssertionError(
-                "Ordering turns in date order is not the same as ordering in index order. Something is wrong here."
-            )
+        # if sorted(turns, key=lambda turn: turn.idx) != turns:
+        #     # TODO: Is this the best way to handle this?
+        #     raise AssertionError(
+        #         "Ordering turns in date order is not the same as ordering in index order. Something is wrong here."
+        #     )
 
         return turns
 
