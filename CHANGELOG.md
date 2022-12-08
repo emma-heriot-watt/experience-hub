@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.20.0](https://github.com/emma-simbot/experience-hub/compare/v5.19.0...v5.20.0) (2022-12-08)
+
+
+### Features
+
+* added support for new errors ([#202](https://github.com/emma-simbot/experience-hub/issues/202)) ([717ab08](https://github.com/emma-simbot/experience-hub/commit/717ab0816455308f8bba7d4dc3c19f27de2f9b9c))
+
 ## [5.19.0](https://github.com/emma-simbot/experience-hub/compare/v5.18.3...v5.19.0) (2022-12-07)
 
 
