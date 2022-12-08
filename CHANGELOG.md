@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.22.0](https://github.com/emma-simbot/experience-hub/compare/v5.21.1...v5.22.0) (2022-12-08)
+
+
+### Features
+
+* Implement goto after highlight in search ([#200](https://github.com/emma-simbot/experience-hub/issues/200)) ([4304aab](https://github.com/emma-simbot/experience-hub/commit/4304aab3f496902d524c4cb21437226daa496aad))
+
 ## [5.21.1](https://github.com/emma-simbot/experience-hub/compare/v5.21.0...v5.21.1) (2022-12-08)
 
 
