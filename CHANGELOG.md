@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.21.1](https://github.com/emma-simbot/experience-hub/compare/v5.21.0...v5.21.1) (2022-12-08)
+
+
+### Bug Fixes
+
+* arena error statuses also need to be intents ([#206](https://github.com/emma-simbot/experience-hub/issues/206)) ([7a15eea](https://github.com/emma-simbot/experience-hub/commit/7a15eea421d5bd7923eb6f6565c6c85190bae4dc))
+
 ## [5.21.0](https://github.com/emma-simbot/experience-hub/compare/v5.20.0...v5.21.0) (2022-12-08)
 
 
