@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.23.0](https://github.com/emma-simbot/experience-hub/compare/v5.22.0...v5.23.0) (2022-12-08)
+
+
+### Features
+
+* **parser:** Add compound instruction splitter ([#130](https://github.com/emma-simbot/experience-hub/issues/130)) ([98797da](https://github.com/emma-simbot/experience-hub/commit/98797da113686a886d489acb530c2cf469a218ae))
+
 ## [5.22.0](https://github.com/emma-simbot/experience-hub/compare/v5.21.1...v5.22.0) (2022-12-08)
 
 
