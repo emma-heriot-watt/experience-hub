@@ -1,7 +1,6 @@
 from typing import Optional
 
-import pytest
-from hypothesis import assume, given, settings, strategies as st
+from hypothesis import HealthCheck, example, given, settings, strategies as st
 from pytest_cases import fixture, parametrize
 
 from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
@@ -13,9 +12,9 @@ from emma_experience_hub.constants.simbot import (
 from emma_experience_hub.datamodels.emma import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
-    SimBotGotoObjectPayload,
+    SimBotGotoObject,
     SimBotGotoPayload,
-    SimBotGotoRoomPayload,
+    SimBotGotoRoom,
     SimBotInteractionObject,
     SimBotObjectInteractionPayload,
     SimBotTurnAroundPayload,
@@ -25,7 +24,11 @@ from emma_experience_hub.functions.simbot import (
     get_mask_from_special_tokens,
 )
 from emma_experience_hub.parsers.simbot import SimBotActionPredictorOutputParser
-from tests.fixtures.simbot_actions import simbot_extracted_features, simbot_room_names
+from tests.fixtures.simbot_actions import (
+    simbot_extracted_features,
+    simbot_object_labels,
+    simbot_room_names,
+)
 
 
 @given(data=st.data(), frame_token_id=st.integers(1, 2), visual_token_id=st.integers(1, 2))
@@ -121,6 +124,7 @@ def _get_expected_color_image_index(entity: str, frame_token_id: Optional[int] =
     room_name=simbot_room_names(),
     simbot_extracted_features=simbot_extracted_features(),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_simbot_action_parser_room_navigation(
     data: st.DataObject,
     room_name: str,
@@ -142,7 +146,7 @@ def test_simbot_action_parser_room_navigation(
         type=SimBotActionType.Goto,
         raw_output=raw_output.removesuffix("</s>").removesuffix("."),
         payload=SimBotGotoPayload(
-            object=SimBotGotoRoomPayload(officeRoom=get_simbot_room_name_map()[room_name.lower()]),
+            object=SimBotGotoRoom(officeRoom=get_simbot_room_name_map()[room_name.lower()]),
         ),
     )
 
@@ -182,42 +186,70 @@ def _build_raw_output(
 
 
 @given(
+    simbot_object_name=simbot_object_labels(),
     include_end_of_trajectory=st.booleans(),
-    frame_token_id=st.one_of(st.none(), st.integers(1, 2)),
-    visual_token_id=st.one_of(st.none(), st.integers(1, 2)),
+    frame_token_id=st.integers(1, 2),
+    visual_token_id=st.integers(1, 2),
 )
 @settings(deadline=None, max_examples=5)
+@example(
+    simbot_object_name="Sticky Note",
+    include_end_of_trajectory=True,
+    frame_token_id=1,
+    visual_token_id=1,
+)
 def test_simbot_action_parser_object_navigation(
     simbot_object_name: str,
     include_end_of_trajectory: bool,
     simbot_action_parser: SimBotActionPredictorOutputParser,
-    frame_token_id: Optional[int],
-    visual_token_id: Optional[int],
+    frame_token_id: int,
+    visual_token_id: int,
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object navigation actions."""
-    assume(visual_token_id is not None and frame_token_id is not None)
-
-    raw_output = _build_raw_output(
-        "goto",
-        simbot_object_name,
-        visual_token_id=visual_token_id,
-        frame_token_id=frame_token_id,
-        include_end_of_trajectory=include_end_of_trajectory,
-    )
-    expected_action = SimBotAction(
-        id=0,
-        type=SimBotActionType.Goto,
-        payload=SimBotGotoPayload(
-            object=SimBotGotoObjectPayload(
-                name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
-                colorImageIndex=_get_expected_color_image_index(
-                    simbot_object_name, frame_token_id
+    if simbot_object_name == "Sticky Note":
+        raw_output = _build_raw_output(
+            "goto",
+            simbot_object_name,
+            include_end_of_trajectory=include_end_of_trajectory,
+        )
+        expected_action = SimBotAction(
+            id=0,
+            type=SimBotActionType.Goto,
+            raw_output=raw_output.removesuffix("</s>").removesuffix("."),
+            payload=SimBotGotoPayload(
+                object=SimBotGotoObject(
+                    name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
+                    colorImageIndex=_get_expected_color_image_index(
+                        simbot_object_name, frame_token_id
+                    ),
                 ),
-                mask=None,
             ),
-        ),
-    )
+        )
+    else:
+        raw_output = _build_raw_output(
+            "goto",
+            simbot_object_name,
+            visual_token_id=visual_token_id,
+            frame_token_id=frame_token_id,
+            include_end_of_trajectory=include_end_of_trajectory,
+        )
+        expected_action = SimBotAction(
+            id=0,
+            type=SimBotActionType.Goto,
+            raw_output=raw_output.removesuffix("</s>").removesuffix("."),
+            payload=SimBotGotoPayload(
+                object=SimBotGotoObject(
+                    name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
+                    colorImageIndex=_get_expected_color_image_index(
+                        simbot_object_name, frame_token_id
+                    ),
+                    mask=get_mask_from_special_tokens(
+                        frame_token_id, visual_token_id, simbot_extracted_features
+                    ),
+                ),
+            ),
+        )
 
     parsed_action = simbot_action_parser(
         raw_output,
@@ -225,28 +257,7 @@ def test_simbot_action_parser_object_navigation(
         num_frames_in_current_turn=len(simbot_extracted_features),
     )
 
-    # Check if everything is identical except the compressed mask
-    assert parsed_action.type == expected_action.type
-
-    assert isinstance(parsed_action.payload, SimBotGotoPayload)
-    assert isinstance(expected_action.payload, SimBotGotoPayload)
-
-    assert isinstance(parsed_action.payload.object, SimBotGotoObjectPayload)
-    assert isinstance(expected_action.payload.object, SimBotGotoObjectPayload)
-
-    assert (
-        parsed_action.payload.object.color_image_index
-        == expected_action.payload.object.color_image_index
-    )
-    assert parsed_action.payload.object.name == expected_action.payload.object.name
-
-    parsed_action_type_payload = getattr(parsed_action, parsed_action.type.name.lower())
-    expected_action_type_payload = getattr(expected_action, expected_action.type.name.lower())
-    assert (
-        parsed_action_type_payload.object.color_image_index
-        == expected_action_type_payload.object.color_image_index
-    )
-    assert parsed_action_type_payload.object.name == expected_action_type_payload.object.name
+    assert parsed_action == expected_action
 
 
 @given(
@@ -260,23 +271,25 @@ def test_simbot_action_parser_object_interaction(
     simbot_object_name: str,
     include_end_of_trajectory: bool,
     simbot_action_parser: SimBotActionPredictorOutputParser,
-    frame_token_id: Optional[int],
-    visual_token_id: Optional[int],
+    frame_token_id: int,
+    visual_token_id: int,
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object interaction actions actions."""
-    if visual_token_id is None or frame_token_id is None:
-        pytest.skip(
-            "We are no longer attempting to parse object-related actions when no visual token is present. Stop the test here."
+    if simbot_object_name == "Sticky Note":
+        raw_output = _build_raw_output(
+            simbot_interaction_action,
+            simbot_object_name,
+            include_end_of_trajectory=include_end_of_trajectory,
         )
-
-    raw_output = _build_raw_output(
-        simbot_interaction_action,
-        simbot_object_name,
-        visual_token_id=visual_token_id,
-        frame_token_id=frame_token_id,
-        include_end_of_trajectory=include_end_of_trajectory,
-    )
+    else:
+        raw_output = _build_raw_output(
+            simbot_interaction_action,
+            simbot_object_name,
+            visual_token_id=visual_token_id,
+            frame_token_id=frame_token_id,
+            include_end_of_trajectory=include_end_of_trajectory,
+        )
 
     parsed_action = simbot_action_parser(
         raw_output,
@@ -299,33 +312,16 @@ def test_simbot_action_parser_object_interaction(
                 colorImageIndex=_get_expected_color_image_index(
                     simbot_object_name, frame_token_id
                 ),
-                mask=None,
+                mask=None
+                if simbot_object_name == "Sticky Note"
+                else get_mask_from_special_tokens(
+                    frame_token_id, visual_token_id, simbot_extracted_features
+                ),
             )
         ),
     )
 
-    # Check if everything is identical except the compressed mask
-    assert parsed_action.type == expected_action.type
-
-    assert isinstance(parsed_action.payload, SimBotObjectInteractionPayload)
-    assert isinstance(expected_action.payload, SimBotObjectInteractionPayload)
-
-    assert isinstance(parsed_action.payload.object, SimBotInteractionObject)
-    assert isinstance(expected_action.payload.object, SimBotInteractionObject)
-
-    assert (
-        parsed_action.payload.object.color_image_index
-        == expected_action.payload.object.color_image_index
-    )
-    assert parsed_action.payload.object.name == expected_action.payload.object.name
-
-    parsed_action_type_payload = getattr(parsed_action, parsed_action.type.name.lower())
-    expected_action_type_payload = getattr(expected_action, expected_action.type.name.lower())
-    assert (
-        parsed_action_type_payload.object.color_image_index
-        == expected_action_type_payload.object.color_image_index
-    )
-    assert parsed_action_type_payload.object.name == expected_action_type_payload.object.name
+    assert parsed_action == expected_action
 
 
 @parametrize(

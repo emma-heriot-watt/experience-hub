@@ -5,7 +5,7 @@ from loguru import logger
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
-    SimBotGotoObjectPayload,
+    SimBotGotoObject,
     SimBotGotoPayload,
     SimBotObjectInteractionPayload,
 )
@@ -53,7 +53,7 @@ class SimBotPreviousActionParser(Parser[SimBotSession, SimBotAction]):
             id=0,
             type=SimBotActionType.Goto,
             raw_output=raw_output,
-            payload=SimBotGotoPayload(object=cast(SimBotGotoObjectPayload, action.payload.object)),
+            payload=SimBotGotoPayload(object=cast(SimBotGotoObject, action.payload.object)),
         )
 
     def _get_previous_interaction_action(self, session: SimBotSession) -> SimBotAction:

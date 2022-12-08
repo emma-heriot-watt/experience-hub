@@ -6,9 +6,12 @@ from emma_experience_hub.datamodels.simbot.payloads.auxiliary_metadata import (
 )
 from emma_experience_hub.datamodels.simbot.payloads.dialog import SimBotDialogPayload
 from emma_experience_hub.datamodels.simbot.payloads.navigation import (
+    SimBotGotoObject,
     SimBotGotoObjectPayload,
     SimBotGotoPayload,
+    SimBotGotoRoom,
     SimBotGotoRoomPayload,
+    SimBotGotoViewpoint,
     SimBotGotoViewpointPayload,
     SimBotLookAroundPayload,
     SimBotLookDownPayload,

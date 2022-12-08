@@ -25,9 +25,9 @@ from emma_experience_hub.datamodels.simbot import (
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotDialogPayload,
-    SimBotGotoObjectPayload,
+    SimBotGotoObject,
     SimBotGotoPayload,
-    SimBotGotoRoomPayload,
+    SimBotGotoRoom,
     SimBotInteractionObject,
     SimBotNavigationPayload,
     SimBotObjectInteractionPayload,
@@ -162,9 +162,7 @@ def simbot_dialog_payloads(draw: st.DrawFn) -> SimBotDialogPayload:
 def simbot_goto_object_payloads(draw: st.DrawFn) -> SimBotGotoPayload:
     """Generate a payload for going to an object."""
     interaction_payload = draw(simbot_object_interaction_payloads())
-    return SimBotGotoPayload(
-        object=SimBotGotoObjectPayload.parse_obj(interaction_payload.object.dict())
-    )
+    return SimBotGotoPayload(object=SimBotGotoObject.parse_obj(interaction_payload.object.dict()))
 
 
 @st.composite
@@ -172,7 +170,7 @@ def simbot_goto_room_payloads(
     draw: st.DrawFn, room_names: st.SearchStrategy[str] = simbot_room_names()
 ) -> SimBotGotoPayload:
     """Generate a payload for going to a room."""
-    return SimBotGotoPayload(object=SimBotGotoRoomPayload(officeRoom=draw(room_names)))
+    return SimBotGotoPayload(object=SimBotGotoRoom(officeRoom=draw(room_names)))
 
 
 @st.composite

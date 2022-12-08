@@ -16,7 +16,7 @@ class SimBotResponse(BaseModel):
         max_items=5,
         exclude={
             "__all__": {
-                # Do not include the field
+                # Do not include fields
                 "status": True,
                 "raw_output": True,
                 "dialog": {"intent"},
@@ -28,6 +28,6 @@ class SimBotResponse(BaseModel):
         """Config for the model."""
 
         json_encoders = {
-            # Use the action type name when converting to the JSON response
-            SimBotActionType: lambda action_type: action_type.name,
+            # When serialising the action type, convert to its base type and then get the name
+            SimBotActionType: lambda action_type: action_type.base_type.name,
         }

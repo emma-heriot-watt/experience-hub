@@ -41,7 +41,7 @@ def test_payload_field_automatically_converted_to_correct_attribute(action: SimB
     assert action
 
     # Get the correct key for the action type
-    payload_key = action.type.value.strip()
+    payload_key = action.type.base_type.value.strip()
 
     # Make sure that key exists
     assert getattr(action, payload_key)

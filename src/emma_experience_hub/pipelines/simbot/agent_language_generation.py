@@ -11,12 +11,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
 )
-from emma_experience_hub.datamodels.simbot.payloads import (
-    SimBotDialogPayload,
-    SimBotGotoPayload,
-    SimBotGotoRoomPayload,
-    SimBotGotoViewpointPayload,
-)
+from emma_experience_hub.datamodels.simbot.payloads import SimBotDialogPayload
 
 
 class SimBotAgentLanguageGenerationPipeline:
@@ -130,28 +125,27 @@ class SimBotAgentLanguageGenerationPipeline:
                 use_lightweight_dialog=True,
             )
 
-        if action.type == SimBotActionType.Goto and isinstance(action.payload, SimBotGotoPayload):
+        if action.type == SimBotActionType.GotoViewpoint:
             # If we are going to a viewpoint to look more
-            if isinstance(action.payload.object, SimBotGotoViewpointPayload):
-                logger.debug("[NLG SEARCH]: We are going to a new viewpoint")
-                return self._generate_from_intent(
-                    SimBotIntent(
-                        type=SimBotIntentType.search_goto_viewpoint,
-                        action=SimBotActionType.Goto,
-                    ),
-                    use_lightweight_dialog=True,
-                )
+            logger.debug("[NLG SEARCH]: We are going to a new viewpoint")
+            return self._generate_from_intent(
+                SimBotIntent(
+                    type=SimBotIntentType.search_goto_viewpoint,
+                    action=SimBotActionType.GotoViewpoint,
+                ),
+                use_lightweight_dialog=True,
+            )
 
+        if action.type == SimBotActionType.GotoRoom:
             # If we are going to a room to look more
-            if isinstance(action.payload.object, SimBotGotoRoomPayload):
-                logger.debug("[NLG SEARCH]: We are going to a new room")
-                return self._generate_from_intent(
-                    SimBotIntent(
-                        type=SimBotIntentType.search_goto_room,
-                        action=SimBotActionType.Goto,
-                    ),
-                    use_lightweight_dialog=True,
-                )
+            logger.debug("[NLG SEARCH]: We are going to a new room")
+            return self._generate_from_intent(
+                SimBotIntent(
+                    type=SimBotIntentType.search_goto_room,
+                    action=SimBotActionType.GotoRoom,
+                ),
+                use_lightweight_dialog=True,
+            )
 
         # If none of the above conditions fit, return None
         logger.debug("[NLG SEARCH]: None of the search conditions fit, returning `None`.")

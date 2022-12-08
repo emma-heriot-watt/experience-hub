@@ -8,11 +8,11 @@ from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
 from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
 
 
-class SimBotGotoObjectPayload(SimBotInteractionObject):
+class SimBotGotoObject(SimBotInteractionObject):
     """SimBot action for going to an object."""
 
 
-class SimBotGotoRoomPayload(SimBotPayload):
+class SimBotGotoRoom(SimBotPayload):
     """SimBot action for going to a room."""
 
     office_room: str = Field(..., alias="officeRoom")
@@ -23,7 +23,7 @@ class SimBotGotoRoomPayload(SimBotPayload):
         return self.office_room
 
 
-class SimBotGotoViewpointPayload(SimBotPayload):
+class SimBotGotoViewpoint(SimBotPayload):
     """SimBot action for navigating to a specific viewpoint."""
 
     go_to_point: str = Field(..., alias="goToPoint")
@@ -37,12 +37,30 @@ class SimBotGotoViewpointPayload(SimBotPayload):
 class SimBotGotoPayload(SimBotPayload, smart_union=True):
     """SimBot Goto action."""
 
-    object: Union[SimBotGotoObjectPayload, SimBotGotoRoomPayload, SimBotGotoViewpointPayload]
+    object: Union[SimBotGotoObject, SimBotGotoRoom, SimBotGotoViewpoint]
 
     @property
     def entity_name(self) -> Optional[str]:
         """Get the name of the entity."""
         return self.object.entity_name
+
+
+class SimBotGotoRoomPayload(SimBotGotoPayload):
+    """SimBot Goto room action."""
+
+    object: SimBotGotoRoom
+
+
+class SimBotGotoViewpointPayload(SimBotGotoPayload):
+    """SimBot Goto viewpoint action."""
+
+    object: SimBotGotoViewpoint
+
+
+class SimBotGotoObjectPayload(SimBotGotoPayload):
+    """SimBot Goto object action."""
+
+    object: SimBotGotoObject
 
 
 class SimBotNavigationPayload(SimBotPayload):

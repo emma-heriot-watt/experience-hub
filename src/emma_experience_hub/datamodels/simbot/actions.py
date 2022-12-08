@@ -1,7 +1,7 @@
 from contextlib import suppress
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, ValidationError, root_validator, validator
 
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels.simbot.enums import (
@@ -11,9 +11,6 @@ from emma_experience_hub.datamodels.simbot.enums import (
 )
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotDialogPayload,
-    SimBotGotoObjectPayload,
-    SimBotGotoPayload,
-    SimBotGotoRoomPayload,
     SimBotObjectInteractionPayload,
     SimBotObjectOutputType,
     SimBotPayload,
@@ -83,7 +80,8 @@ class SimBotAction(BaseModel):
 
         extra = "allow"
         json_encoders = {
-            SimBotActionType: lambda action_type: action_type.name,
+            # When serialising the action type, convert to its base type and then get the name
+            SimBotActionType: lambda action_type: action_type.base_type.name,
         }
 
     @root_validator(pre=True)
@@ -105,7 +103,7 @@ class SimBotAction(BaseModel):
             raise AssertionError("Unknown action type")
 
         # Get the correct key for the action payload
-        payload_key = action_type.value.strip()
+        payload_key = action_type.base_type.value.strip()
 
         # Get the payload from either the `payload` field or the field for the payload_key
         payload: Union[SimBotPayload, dict[str, Any], None] = values.get(
@@ -131,6 +129,49 @@ class SimBotAction(BaseModel):
         values[payload_key] = parsed_payload
         values["payload"] = parsed_payload
 
+        return values
+
+    @root_validator
+    @classmethod
+    def try_convert_base_types_to_aliases(
+        cls, values: dict[str, Any]  # noqa: WPS110
+    ) -> dict[str, Any]:
+        """Convert the action type and payload to the correct alias'd type if there is one."""
+        action_type: Optional[SimBotActionType] = values.get("type")
+        payload: Optional[SimBotPayload] = values.get("payload")
+
+        # If the action type or the payload doesn't exist, do nothing.
+        if not action_type or not payload:
+            return values
+
+        possible_aliases = SimBotActionType.base_type_to_aliases().get(action_type)
+
+        # If there are no possible aliases for the current action type, do nothing.
+        if not possible_aliases:
+            return values
+
+        # Iterate over all the possible alias types to find the right one for the current payload
+        for alias_type in possible_aliases:
+            try:
+                # If the payload can directly be parsed as the alias payload, then it is THAT
+                # payload.
+                parsed_payload = alias_type.payload_model.parse_obj(payload.dict(by_alias=True))
+            except ValidationError:
+                continue
+
+            # If there is no exception, update the payload in the values dict
+            values["payload"] = parsed_payload
+
+            # Also update the payload for the correct payload key
+            values[alias_type.base_type.value.strip()] = parsed_payload
+
+            # Also update action type to the alias too
+            values["type"] = alias_type
+
+            # And then break because we don't need to do anything else
+            break
+
+        # Return the values, whether or not they have been changed
         return values
 
     @root_validator
@@ -184,20 +225,12 @@ class SimBotAction(BaseModel):
     @property
     def is_goto_room(self) -> bool:
         """Is the action for navigating to a room?"""
-        return (
-            self.type == SimBotActionType.Goto
-            and isinstance(self.payload, SimBotGotoPayload)
-            and isinstance(self.payload.object, SimBotGotoRoomPayload)
-        )
+        return self.type == SimBotActionType.GotoRoom
 
     @property
     def is_goto_object(self) -> bool:
         """Is the action for navigating to an object?"""
-        return (
-            self.type == SimBotActionType.Goto
-            and isinstance(self.payload, SimBotGotoPayload)
-            and isinstance(self.payload.object, SimBotGotoObjectPayload)
-        )
+        return self.type == SimBotActionType.GotoObject
 
     @property
     def is_low_level_navigation(self) -> bool:

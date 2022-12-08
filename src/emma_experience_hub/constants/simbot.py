@@ -6,7 +6,7 @@ from typing import Any
 
 import orjson
 
-from emma_experience_hub.datamodels.simbot.actions import SimBotActionType
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 
 
 constants_absolute_path = Path(__file__).parent.resolve()

@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 from loguru import logger
 from overrides import overrides
@@ -10,14 +10,15 @@ from emma_experience_hub.constants.simbot import (
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
-    SimBotGotoObjectPayload,
-    SimBotGotoPayload,
+    SimBotGotoObject,
+    SimBotGotoRoom,
     SimBotGotoRoomPayload,
     SimBotInteractionObject,
     SimBotObjectInteractionPayload,
     SimBotObjectMaskType,
     SimBotPayload,
 )
+from emma_experience_hub.datamodels.simbot.payloads.navigation import SimBotGotoObjectPayload
 from emma_experience_hub.functions.simbot import (
     SimBotDeconstructedAction,
     get_correct_frame_index,
@@ -134,27 +135,33 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
         """Return an executable goto action."""
-        payload: Union[SimBotGotoRoomPayload, SimBotGotoObjectPayload]
-
         if deconstructed_action.class_name in self.available_room_names:
-            payload = SimBotGotoRoomPayload(officeRoom=deconstructed_action.class_name)
-        else:
-            mask, color_image_index = self._prepare_interaction_object_payload(
-                deconstructed_action=deconstructed_action,
-                num_frames_in_current_turn=num_frames_in_current_turn,
-                extracted_features=extracted_features,
+            return SimBotAction(
+                id=0,
+                type=SimBotActionType.GotoRoom,
+                raw_output=deconstructed_action.raw_action,
+                payload=SimBotGotoRoomPayload(
+                    object=SimBotGotoRoom(officeRoom=deconstructed_action.class_name)
+                ),
             )
-            payload = SimBotGotoObjectPayload(
-                name=deconstructed_action.class_name,
-                colorImageIndex=color_image_index,
-                mask=mask,
-            )
+
+        mask, color_image_index = self._prepare_interaction_object_payload(
+            deconstructed_action=deconstructed_action,
+            num_frames_in_current_turn=num_frames_in_current_turn,
+            extracted_features=extracted_features,
+        )
 
         return SimBotAction(
             id=0,
-            type=deconstructed_action.action_type,
+            type=SimBotActionType.GotoObject,
             raw_output=deconstructed_action.raw_action,
-            payload=SimBotGotoPayload(object=payload),
+            payload=SimBotGotoObjectPayload(
+                object=SimBotGotoObject(
+                    name=deconstructed_action.class_name,
+                    colorImageIndex=color_image_index,
+                    mask=mask,
+                )
+            ),
         )
 
     def _separate_decoded_trajectory(self, decoded_trajectory: str) -> list[str]:
