@@ -7,6 +7,7 @@ from emma_experience_hub.pipelines.simbot.agent_intent_selection import (
 from emma_experience_hub.pipelines.simbot.agent_language_generation import (
     SimBotAgentLanguageGenerationPipeline,
 )
+from emma_experience_hub.pipelines.simbot.compound_splitter import SimBotCompoundSplitterPipeline
 from emma_experience_hub.pipelines.simbot.environment_intent_extraction import (
     SimBotEnvironmentIntentExtractionPipeline,
 )

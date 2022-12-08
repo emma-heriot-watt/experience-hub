@@ -50,6 +50,8 @@ class SimBotSettings(BaseSettings):
 
     confirmation_classifier_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5507", scheme="http")
 
+    compound_splitter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5508", scheme="http")
+
     class Config:
         """Config for the settings."""
 

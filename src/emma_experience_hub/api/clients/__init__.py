@@ -1,4 +1,5 @@
 from emma_experience_hub.api.clients.client import Client
+from emma_experience_hub.api.clients.compound_splitter import CompoundSplitterClient
 from emma_experience_hub.api.clients.confirmation_response_classifier import (
     ConfirmationResponseClassifierClient,
 )

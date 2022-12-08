@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import (
     Client,
+    CompoundSplitterClient,
     ConfirmationResponseClassifierClient,
     EmmaPolicyClient,
     FeatureExtractorClient,
@@ -42,6 +43,7 @@ from emma_experience_hub.pipelines.simbot import (
     SimBotAgentActionGenerationPipeline,
     SimBotAgentIntentSelectionPipeline,
     SimBotAgentLanguageGenerationPipeline,
+    SimBotCompoundSplitterPipeline,
     SimBotEnvironmentIntentExtractionPipeline,
     SimBotFindObjectPipeline,
     SimBotRequestProcessingPipeline,
@@ -63,6 +65,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     utterance_generator: SimBotUtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
     confirmation_response_classifier: ConfirmationResponseClassifierClient
+    compound_splitter: CompoundSplitterClient
 
     @classmethod
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
@@ -98,6 +101,9 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             ),
             confirmation_response_classifier=ConfirmationResponseClassifierClient(
                 endpoint=simbot_settings.confirmation_classifier_url
+            ),
+            compound_splitter=CompoundSplitterClient(
+                endpoint=simbot_settings.compound_splitter_url
             ),
         )
 
@@ -167,6 +173,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
     agent_action_generator: SimBotAgentActionGenerationPipeline
     agent_language_generator: SimBotAgentLanguageGenerationPipeline
     find_object: SimBotFindObjectPipeline
+    compound_splitter: SimBotCompoundSplitterPipeline
 
     @classmethod
     def from_clients(
@@ -181,7 +188,9 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 eos_token=simbot_settings.action_predictor_eos_token,
             ),
         )
+
         return cls(
+            compound_splitter=SimBotCompoundSplitterPipeline(clients.compound_splitter),
             find_object=find_object,
             request_processing=SimBotRequestProcessingPipeline(
                 session_db_client=clients.session_db,
@@ -253,6 +262,7 @@ class SimBotController:
         """Handle an incoming request from the SimBot arena."""
         session = self.load_session_from_request(request)
         session = self._clear_queue_if_needed(session)
+        session = self.split_utterance_if_needed(session)
         session = self.get_utterance_from_queue_if_needed(session)
         session = self.extract_intent_from_user_utterance(session)
         session = self.extract_intent_from_environment_feedback(session)
@@ -263,6 +273,11 @@ class SimBotController:
         self._upload_session_turn_to_database(session)
 
         return session.current_turn.convert_to_simbot_response()
+
+    def split_utterance_if_needed(self, session: SimBotSession) -> SimBotSession:
+        """Tries to split the utterance in case we are dealing with a complex instruction."""
+        logger.debug("Trying to split the instruction...")
+        return self.pipelines.compound_splitter.run(session)
 
     def load_session_from_request(self, simbot_request: SimBotRequest) -> SimBotSession:
         """Load the entire session from the given request."""
@@ -319,10 +334,6 @@ class SimBotController:
     def get_utterance_from_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Check the queue to see if there is an utterance that needs to be handled."""
         should_get_utterance_from_queue = [
-            # Do not overwrite existing user speech
-            not session.current_turn.speech,
-            # Do not overwrite existing user intent
-            not session.current_turn.intent.user,
             # Queue must not be empty
             session.current_state.utterance_queue,
             # Previous action must end in end-of-trajectory token
