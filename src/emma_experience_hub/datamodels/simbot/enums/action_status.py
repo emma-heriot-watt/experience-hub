@@ -19,8 +19,10 @@ class SimBotActionStatusType(Enum):
     invalid_command = "InvalidCommand"
     object_not_picked_up = "ObjectNotPickedUp"
     arena_unavailable = "ArenaUnavailable"
-    invalid_action_format = "InvalidActionFormat"
+    incorrect_action_format = "IncorrectActionFormat"
+    invalid_object_class = "InvalidObjectClass"
     action_execution_error = "ActionExecutionError"
+    post_process_error = "PostProcessError"
 
     @classmethod
     def reverse_mapping(cls) -> dict[str, str]:

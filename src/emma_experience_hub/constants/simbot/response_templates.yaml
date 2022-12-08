@@ -102,6 +102,15 @@ arena_unavailable:
 action_execution_error:
   - Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?
 
+incorrect_action_format:
+  - I tried to perform an action but looks like I don't remember how to do it. Can you give me a different instruction?
+
+invalid_object_class:
+  - I made a mistake in interacting with that object class. Could you please give me a different instruction?
+
+post_process_error:
+  - Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?
+
 confirm_generic:
   - Are you sure you want me to {action} the {entity}?
   - Just to check, would you like me to {action} the {entity}?
