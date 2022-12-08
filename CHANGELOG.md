@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.21.0](https://github.com/emma-simbot/experience-hub/compare/v5.20.0...v5.21.0) (2022-12-08)
+
+
+### Features
+
+* include/support alias types for the Goto action ([#203](https://github.com/emma-simbot/experience-hub/issues/203)) ([ce8802c](https://github.com/emma-simbot/experience-hub/commit/ce8802c4ebef6d1f04222e46fb783081384090af))
+
 ## [5.20.0](https://github.com/emma-simbot/experience-hub/compare/v5.19.0...v5.20.0) (2022-12-08)
 
 
