@@ -357,26 +357,13 @@ class SimBotSession(BaseModel):
         return self.current_state.find_queue.is_not_empty
 
     @property
-    def is_find_object_recently_finished(self) -> bool:
-        """Was the find object pipeline recently finished?
-
-        By recently, we are meaning that the last valid turn resulted in the clearing of the queue.
-        """
-        conditions = [
-            # The find queue in the previous valid turn is empty (since it got reset when we found
-            # the object, or when there are no actions left to take)
+    def has_found_object(self) -> bool:
+        """Object has been found."""
+        return (
             self.previous_valid_turn is not None
-            and self.previous_valid_turn.state.find_queue.is_empty,
-            # The find queue in the valid turn BEFORE the previous valid turn IS NOT empty (since
-            # there is at least one action left to take)
-            len(self.valid_turns) > 2 and self.valid_turns[-3].state.find_queue.is_not_empty,
-        ]
-        return all(conditions)
-
-    @property
-    def is_finding_object(self) -> bool:
-        """Return True if the agent is working on finding an object."""
-        return self.is_find_object_in_progress or self.is_find_object_recently_finished
+            and self.previous_valid_turn.actions.interaction is not None
+            and self.previous_valid_turn.actions.interaction.type == SimBotActionType.Highlight
+        )
 
     def get_turns_within_interaction_window(self) -> list[SimBotSessionTurn]:
         """Get all the turns within the local interaction window.

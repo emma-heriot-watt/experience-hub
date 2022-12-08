@@ -23,15 +23,6 @@ class SimBotPreviousActionParser(Parser[SimBotSession, SimBotAction]):
         """Get the action from the previous turn."""
         # Get the interaction action from the previous turn
         previous_interaction_action = self._get_previous_interaction_action(session)
-
-        if session.is_find_object_recently_finished:
-            logger.debug(
-                "Find routine was recently finished; trying to convert highlight action to goto action."
-            )
-            previous_interaction_action = self.convert_action_to_goto_action(
-                previous_interaction_action
-            )
-
         return previous_interaction_action
 
     def convert_action_to_goto_action(self, action: SimBotAction) -> SimBotAction:

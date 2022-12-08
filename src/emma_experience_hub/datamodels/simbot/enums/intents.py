@@ -31,6 +31,7 @@ class SimBotIntentType(Enum):
     clarify_answer = "<clarify><answer>"
 
     # Feedback for search
+    search_found_object = "<search><highlight>"
     search_not_found_object = "<search><not_found_object>"
     search_look_around = "<search><look_around>"
     search_goto_viewpoint = "<search><goto_viewpoint>"

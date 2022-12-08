@@ -12,7 +12,6 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotInteractionObject,
     SimBotLookAroundPayload,
     SimBotObjectInteractionPayload,
-    SimBotObjectMaskType,
 )
 from emma_experience_hub.functions.simbot import (
     SimBotSceneObjectTokens,
@@ -50,22 +49,37 @@ class SimBotFindObjectPipeline:
             session.current_state.find_queue.reset()
             session.current_state.find_queue.extend_tail(search_plan)
 
-        extracted_features = self._features_client.get_features(session.current_turn)
+        if self._should_goto_found_object(session):
+            # Pop the gotoaction from the head and clear the plan.
+            goto_action = session.current_state.find_queue.pop_from_head()
+            logger.warning("Clearing the find queue of the session")
+            session.current_state.find_queue.reset()
+            return goto_action
 
-        # Try to find the object in the previous turn
-        try:
-            decoded_scene_object_tokens = self._get_object_from_previous_turn(
-                session, extracted_features
+        if session.current_state.find_queue:
+            extracted_features = self._features_client.get_features(session.current_turn)
+
+            # Try to find the object in the previous turn
+            try:
+                decoded_scene_object_tokens = self._get_object_from_previous_turn(
+                    session, extracted_features
+                )
+            except AssertionError:
+                # If the object has not been found, get the next action to perform
+                return self._get_next_action_from_plan(session)
+
+            # If the object has been found, create the highlight and goto action
+            goto_action = self._create_goto_action_from_scene_object(
+                decoded_scene_object_tokens, extracted_features
             )
-        except AssertionError:
-            # If the object has not been found, get the next action to perform
-            return self._get_next_action_from_plan(session)
-
-        # If the object has been found, create the highlight action and clear the plan
-        session.current_state.find_queue.reset()
-        return self._create_highlight_action_from_scene_object(
-            decoded_scene_object_tokens, extracted_features
-        )
+            session.current_state.find_queue.append_to_head(goto_action)
+            logger.debug(
+                f"Appending to head goto action {session.current_state.find_queue.queue[0]}"
+            )
+            return self._create_highlight_action_from_scene_object(
+                decoded_scene_object_tokens, extracted_features
+            )
+        return None
 
     def prepare_search_plan(self, session: SimBotSession) -> list[SimBotAction]:
         """Plan out the actions the agent will take to perform the search."""
@@ -84,9 +98,18 @@ class SimBotFindObjectPipeline:
     def _should_start_new_search(self, session: SimBotSession) -> bool:
         """Should we be starting a new search?
 
-        If the queue is empty, start a enw one. If the queue is not empty,do not.
+        If the queue is empty, start a new one. If the queue is not empty, do not.
         """
         return session.current_state.find_queue.is_empty
+
+    def _should_goto_found_object(self, session: SimBotSession) -> bool:
+        """Should we go to the highlighted object?
+
+        The queue contain has a goto action at its head whenever we have found an object.
+        """
+        logger.debug(f"Checking head for goto action {session.current_state.find_queue.queue[0]}")
+        head_action = session.current_state.find_queue.queue[0]
+        return head_action.type == SimBotActionType.GotoObject
 
     def _get_object_from_previous_turn(
         self,
@@ -123,25 +146,14 @@ class SimBotFindObjectPipeline:
         object_mask = get_mask_from_special_tokens(
             scene_object_tokens.frame_index, scene_object_tokens.object_index, extracted_features
         )
-        correct_frame_index = get_correct_frame_index(
+        color_image_index = get_correct_frame_index(
             parsed_frame_index=scene_object_tokens.frame_index,
             num_frames_in_current_turn=len(extracted_features),
             num_total_frames=len(extracted_features),
         )
 
-        return self._create_action_from_scene_object(
-            SimBotActionType.Highlight, scene_object_tokens, correct_frame_index, object_mask
-        )
+        action_type = SimBotActionType.Highlight
 
-    def _create_action_from_scene_object(
-        self,
-        action_type: SimBotActionType,
-        scene_object_tokens: SimBotSceneObjectTokens,
-        color_image_index: int,
-        object_mask: SimBotObjectMaskType,
-        object_name: str = "",
-    ) -> SimBotAction:
-        """Create a SimBotAction from the scene object."""
         return SimBotAction(
             id=0,
             type=action_type,
@@ -151,7 +163,41 @@ class SimBotFindObjectPipeline:
                     colorImageIndex=color_image_index,
                     mask=object_mask,
                     # TODO: do we need an object name? What if we need the closest stickynote?
-                    name=object_name,
+                    name="",
+                )
+            ),
+        )
+
+    def _create_goto_action_from_scene_object(
+        self,
+        scene_object_tokens: SimBotSceneObjectTokens,
+        extracted_features: list[EmmaExtractedFeatures],
+    ) -> SimBotAction:
+        """Convert the decoded scene object into a highlight action for the user."""
+        if scene_object_tokens.object_index is None:
+            raise AssertionError("The object index for the object should not be None.")
+
+        object_mask = get_mask_from_special_tokens(
+            scene_object_tokens.frame_index, scene_object_tokens.object_index, extracted_features
+        )
+        color_image_index = get_correct_frame_index(
+            parsed_frame_index=scene_object_tokens.frame_index,
+            num_frames_in_current_turn=len(extracted_features),
+            num_total_frames=len(extracted_features),
+        )
+
+        action_type = SimBotActionType.GotoObject
+
+        return SimBotAction(
+            id=0,
+            type=action_type,
+            raw_output=f"{action_type.value} <frame_token_{scene_object_tokens.frame_index}> <vis_token_{scene_object_tokens.object_index}.",
+            payload=SimBotObjectInteractionPayload(
+                object=SimBotInteractionObject(
+                    colorImageIndex=color_image_index,
+                    mask=object_mask,
+                    # TODO: do we need an object name? What if we need the closest stickynote?
+                    name="",
                 )
             ),
         )

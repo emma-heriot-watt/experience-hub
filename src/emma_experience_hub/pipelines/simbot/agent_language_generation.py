@@ -108,10 +108,10 @@ class SimBotAgentLanguageGenerationPipeline:
 
         # If we are returning a Highlight action, it means we found the object.
         if action.type == SimBotActionType.Highlight:
-            logger.debug("[NLG SEARCH]: We might have found an object")
+            logger.debug("[NLG SEARCH]: We have found an object")
             return self._generate_from_intent(
-                SimBotIntent(type=SimBotIntentType.confirm_highlight),
-                use_lightweight_dialog=False,
+                SimBotIntent(type=SimBotIntentType.search_found_object),
+                use_lightweight_dialog=True,
             )
 
         # If we are returning a look around, return a lightweight dialog action
@@ -145,6 +145,17 @@ class SimBotAgentLanguageGenerationPipeline:
                     action=SimBotActionType.GotoRoom,
                 ),
                 use_lightweight_dialog=True,
+            )
+
+        # We are going to the object indicated by the find routine
+        if action.type == SimBotActionType.GotoObject:
+            logger.debug("[NLG SEARCH]: We are going to the found object")
+            return self._generate_from_intent(
+                SimBotIntent(
+                    type=SimBotIntentType.goto_object_success,
+                    action=SimBotActionType.Goto,
+                ),
+                use_lightweight_dialog=False,
             )
 
         # If none of the above conditions fit, return None

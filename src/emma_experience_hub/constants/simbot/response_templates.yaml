@@ -118,11 +118,14 @@ confirm_generic:
 confirm_highlight:
   - Is this your object?
 
+search_found_object:
+  - Hm, I think I found it, its over there. I'm moving closer.
+
 search_not_found_object:
   - I can't find the object.
 
 search_look_around:
-  - I'm going to look around.
+  - Sorry, I don't see it in front of me. Let me have a look around the room.
 
 search_goto_viewpoint:
   - I'm going to a viewpoint.
