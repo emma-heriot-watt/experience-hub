@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.23.1](https://github.com/emma-simbot/experience-hub/compare/v5.23.0...v5.23.1) (2022-12-10)
+
+
+### Bug Fixes
+
+* **deployment:** add compound splitter to the docker compose ([#211](https://github.com/emma-simbot/experience-hub/issues/211)) ([705a875](https://github.com/emma-simbot/experience-hub/commit/705a875b012be310c93dddb0dfae6801761dac18))
+
 ## [5.23.0](https://github.com/emma-simbot/experience-hub/compare/v5.22.0...v5.23.0) (2022-12-08)
 
 
