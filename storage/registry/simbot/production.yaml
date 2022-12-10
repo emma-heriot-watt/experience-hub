@@ -36,3 +36,7 @@ services:
     image_version: 1.0.0-cu116
 
     model_url: s3://emma-simbot/model/checkpoints/confirmation-classifier/end_to_end/
+
+  - name: compound_splitter
+    image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/compound-splitter
+    image_version: 1.0.0

@@ -120,3 +120,18 @@ services:
     entrypoint: python
     command:
       - src/emma_confirmation_classifier/api/confirmation_classifier_api.py
+
+  compound_splitter:
+    container_name: compound_splitter
+    image: "${COMPOUND_SPLITTER_IMAGE}"
+    environment:
+      LOG_LEVEL: INFO
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    ports:
+      - "5508:6600"
+    entrypoint: python
+    command:
+      - src/emma_compound_splitter/api/compound_splitter_api.py
