@@ -125,7 +125,7 @@ services:
     container_name: compound_splitter
     image: "${COMPOUND_SPLITTER_IMAGE}"
     environment:
-      LOG_LEVEL: INFO
+      LOG_LEVEL: info
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]
       <<: *healthcheck-defaults
