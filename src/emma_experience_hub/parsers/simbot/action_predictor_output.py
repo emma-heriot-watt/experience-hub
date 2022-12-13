@@ -55,7 +55,6 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
     ) -> SimBotAction:
         """Convert the decoded trajectory to a sequence of SimBot actions."""
         logger.debug(f"Decoded trajectory: `{decoded_trajectory}`")
-
         try:
             decoded_action = self._separate_decoded_trajectory(decoded_trajectory)[0]
         except IndexError:

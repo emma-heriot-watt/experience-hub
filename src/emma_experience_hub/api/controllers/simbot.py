@@ -46,6 +46,7 @@ from emma_experience_hub.pipelines.simbot import (
     SimBotCompoundSplitterPipeline,
     SimBotEnvironmentIntentExtractionPipeline,
     SimBotFindObjectPipeline,
+    SimbotRawTextMatchActionPredictionPipeline,
     SimBotRequestProcessingPipeline,
     SimBotUserIntentExtractionPipeline,
     SimBotUserUtteranceVerificationPipeline,
@@ -174,6 +175,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
     agent_language_generator: SimBotAgentLanguageGenerationPipeline
     find_object: SimBotFindObjectPipeline
     compound_splitter: SimBotCompoundSplitterPipeline
+    raw_text_action_predictor: SimbotRawTextMatchActionPredictionPipeline
 
     @classmethod
     def from_clients(
@@ -187,6 +189,11 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 action_delimiter=simbot_settings.action_predictor_delimiter,
                 eos_token=simbot_settings.action_predictor_eos_token,
             ),
+        )
+
+        action_predictor_response_parser = SimBotActionPredictorOutputParser(
+            action_delimiter=simbot_settings.action_predictor_delimiter,
+            eos_token=simbot_settings.action_predictor_eos_token,
         )
 
         return cls(
@@ -220,15 +227,16 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             agent_action_generator=SimBotAgentActionGenerationPipeline(
                 features_client=clients.features,
                 action_predictor_client=clients.action_predictor,
-                action_predictor_response_parser=SimBotActionPredictorOutputParser(
-                    action_delimiter=simbot_settings.action_predictor_delimiter,
-                    eos_token=simbot_settings.action_predictor_eos_token,
-                ),
+                action_predictor_response_parser=action_predictor_response_parser,
                 previous_action_parser=SimBotPreviousActionParser(),
                 find_object_pipeline=find_object,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(
                 utterance_generator_client=clients.utterance_generator,
+            ),
+            raw_text_action_predictor=SimbotRawTextMatchActionPredictionPipeline(
+                action_predictor_client=clients.action_predictor,
+                action_predictor_response_parser=action_predictor_response_parser,
             ),
         )
 
@@ -356,7 +364,14 @@ class SimBotController:
     def decide_what_the_agent_should_do(self, session: SimBotSession) -> SimBotSession:
         """Decide what the agent should do next."""
         logger.debug("Selecting agent intent...")
-        session.current_turn.intent.agent = self.pipelines.agent_intent_selector.run(session)
+        raw_text_intent, raw_text_action = self.pipelines.raw_text_action_predictor.run(session)
+        # We have matched the user utterance with an intent and an action using raw text match
+        # We can skip the agent intent and action generation pipeline
+        if raw_text_intent is not None and raw_text_action is not None:
+            session.current_turn.intent.agent = raw_text_intent
+            session.current_turn.actions.interaction = raw_text_action
+        else:
+            session.current_turn.intent.agent = self.pipelines.agent_intent_selector.run(session)
 
         logger.info(f"[INTENT] Agent: `{session.current_turn.intent.agent}`")
         return session
@@ -369,10 +384,13 @@ class SimBotController:
             )
             return session
 
-        logger.debug("Generating interaction action...")
-        session.current_turn.actions.interaction = self.pipelines.agent_action_generator.run(
-            session
-        )
+        # The raw text match has failed to match the user utterance into a single action
+        # Therefore, there is no interaction for the current turn, try to fill it
+        if session.current_turn.actions.interaction is None:
+            logger.debug("Generating interaction action...")
+            session.current_turn.actions.interaction = self.pipelines.agent_action_generator.run(
+                session
+            )
 
         logger.info(f"[ACTION] Interaction: `{session.current_turn.actions.interaction}`")
         return session
