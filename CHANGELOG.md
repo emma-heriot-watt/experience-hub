@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.23.2](https://github.com/emma-simbot/experience-hub/compare/v5.23.1...v5.23.2) (2022-12-13)
+
+
+### Bug Fixes
+
+* **docker:** `LOG_LEVEL` for compound splitter service needs to be lowercase ([f3d947c](https://github.com/emma-simbot/experience-hub/commit/f3d947c5d00385e8ff3fd8f515e7d4f2510b81fd))
+
 ## [5.23.1](https://github.com/emma-simbot/experience-hub/compare/v5.23.0...v5.23.1) (2022-12-10)
 
 
