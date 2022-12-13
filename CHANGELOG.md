@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.24.1](https://github.com/emma-simbot/experience-hub/compare/v5.24.0...v5.24.1) (2022-12-13)
+
+
+### Bug Fixes
+
+* update policy image version to 1.10.2 ([#215](https://github.com/emma-simbot/experience-hub/issues/215)) ([fe8bec4](https://github.com/emma-simbot/experience-hub/commit/fe8bec428a385106abf7341163ec0a29cdc13ffc))
+
 ## [5.24.0](https://github.com/emma-simbot/experience-hub/compare/v5.23.2...v5.24.0) (2022-12-13)
 
 
