@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.24.0](https://github.com/emma-simbot/experience-hub/compare/v5.23.2...v5.24.0) (2022-12-13)
+
+
+### Features
+
+* Add raw text matcher pipeline ([#213](https://github.com/emma-simbot/experience-hub/issues/213)) ([0890932](https://github.com/emma-simbot/experience-hub/commit/08909329b703edec168cef41895ea65d046dbe7c))
+
 ## [5.23.2](https://github.com/emma-simbot/experience-hub/compare/v5.23.1...v5.23.2) (2022-12-13)
 
 

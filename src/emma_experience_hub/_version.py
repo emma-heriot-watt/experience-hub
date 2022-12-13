@@ -4,4 +4,4 @@
 # 3) we can import it into your module module
 #
 # This is automatic, therefore DO NOT manually change this file!
-__version__ = "5.23.2"
+__version__ = "5.24.0"
