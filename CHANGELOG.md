@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.26.1](https://github.com/emma-simbot/experience-hub/compare/v5.26.0...v5.26.1) (2022-12-14)
+
+
+### Bug Fixes
+
+* path to observability docker compose when running the production ([#219](https://github.com/emma-simbot/experience-hub/issues/219)) ([f4fc37e](https://github.com/emma-simbot/experience-hub/commit/f4fc37e00dd09c1293e7526c9fd3e1a7bd7d74d9))
+
 ## [5.26.0](https://github.com/emma-simbot/experience-hub/compare/v5.25.0...v5.26.0) (2022-12-14)
 
 
