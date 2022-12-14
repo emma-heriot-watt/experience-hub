@@ -1,0 +1,57 @@
+entry-pipeline:
+  delay: "100"
+  source:
+    otel_trace_source:
+      ssl: false
+  sink:
+    - pipeline:
+        name: "raw-pipeline"
+    - pipeline:
+        name: "service-map-pipeline"
+
+raw-pipeline:
+  source:
+    pipeline:
+      name: "entry-pipeline"
+  processor:
+    - otel_trace_raw:
+  sink:
+    - opensearch:
+        hosts:
+          - "https://search-emma-simbot-5ucbongn32ozs6sg7laqwg3ncq.us-east-1.es.amazonaws.com"
+        username: writer
+        password: "ygz7wka5exm1MJU_wgd"
+        insecure: true
+        index_type: trace-analytics-raw
+
+service-map-pipeline:
+  delay: "100"
+  source:
+    pipeline:
+      name: "entry-pipeline"
+  processor:
+    - service_map_stateful:
+  sink:
+    - opensearch:
+        hosts:
+          - "https://search-emma-simbot-5ucbongn32ozs6sg7laqwg3ncq.us-east-1.es.amazonaws.com"
+        username: writer
+        password: "ygz7wka5exm1MJU_wgd"
+        insecure: true
+        index_type: trace-analytics-service-map
+
+metrics-pipeline:
+  delay: "100"
+  source:
+    otel_metrics_source:
+      ssl: false
+  processor:
+    - otel_metrics_raw_processor:
+  sink:
+    - opensearch:
+        hosts:
+          - "https://search-emma-simbot-5ucbongn32ozs6sg7laqwg3ncq.us-east-1.es.amazonaws.com"
+        username: writer
+        password: "ygz7wka5exm1MJU_wgd"
+        insecure: true
+        index: metrics-otel-v1-%{yyyy.MM.dd}

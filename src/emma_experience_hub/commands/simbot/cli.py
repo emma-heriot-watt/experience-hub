@@ -1,13 +1,16 @@
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import typer
 import yaml
 from loguru import logger
 
-from emma_common.gunicorn import GunicornLogger, StandaloneApplication
-from emma_common.logging import setup_rich_logging
+from emma_common.api.gunicorn import create_gunicorn_server
+from emma_common.api.instrumentation import InstrumentedInterceptHandler
+from emma_common.logging import setup_logging, setup_rich_logging
+from emma_experience_hub.api.observability import instrument_app, send_logs_to_cloudwatch
 from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
@@ -78,24 +81,61 @@ def run_background_services(
 
 
 @app.command()
+def run_observability_services(
+    compose_file_path: Path = typer.Option(
+        Path("docker/observability-docker-compose.yaml"),
+        help="Location of the compose definition file.",
+        exists=True,
+        file_okay=True,
+    ),
+    run_in_background: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--run-in-background",
+        "-d",
+        is_flag=True,
+        help="Run the services in the background.",
+    ),
+) -> None:
+    """Run the additional observability services."""
+    run_command = "up"
+    if run_in_background:
+        run_command = f"{run_command} -d"
+
+    # Run services
+    subprocess.run(f"docker compose -f {compose_file_path} {run_command}", shell=True, check=True)
+
+
+@app.command()
 def run_controller_api(
     auxiliary_metadata_dir: Path = typer.Option(
         ...,
         help="Local directory to source metadata from the Arena.",
+        rich_help_panel="Directories",
     ),
     auxiliary_metadata_cache_dir: Path = typer.Option(
         ...,
         help="Local directory to store the cached auxiliary metadata before uploading to S3.",
         writable=True,
         exists=True,
+        rich_help_panel="Directories",
     ),
     extracted_features_cache_dir: Path = typer.Option(
         ...,
         help="Local directory to store cache the extracted features in.",
         writable=True,
         exists=True,
+        rich_help_panel="Directories",
     ),
-    log_to_cloudwatch: bool = typer.Option(default=False, help="Send logs to CloudWatch"),
+    log_to_cloudwatch: bool = typer.Option(
+        default=False,
+        help="Send logs to CloudWatch",
+        rich_help_panel="Observability",
+    ),
+    traces_to_opensearch: bool = typer.Option(
+        default=False,
+        help="Send trace information to OpenSearch to track metrics and requests.",
+        rich_help_panel="Observability",
+    ),
     workers: int = typer.Option(
         default=1, min=1, help="Set the number of workers to run the server with."
     ),
@@ -107,40 +147,18 @@ def run_controller_api(
 
     simbot_settings = SimBotSettings.from_env()
 
-    server_config = {
-        "bind": f"{simbot_settings.host}:{simbot_settings.port}",
-        "workers": workers,
-        "accesslog": "-",
-        "errorlog": "-",
-        "worker_class": "uvicorn.workers.UvicornWorker",
-        "logger_class": GunicornLogger,
-    }
+    if traces_to_opensearch:
+        instrument_app(simbot_api, simbot_settings)
+        setup_logging(sys.stdout, InstrumentedInterceptHandler())
+    else:
+        setup_rich_logging(rich_traceback_show_locals=False)
 
-    server = StandaloneApplication(simbot_api, server_config)
-
-    setup_rich_logging(rich_traceback_show_locals=False)
+    server = create_gunicorn_server(
+        simbot_api, simbot_settings.host, simbot_settings.port, workers
+    )
 
     if log_to_cloudwatch:
-        try:
-            import watchtower  # noqa: WPS433
-        except ModuleNotFoundError:
-            logger.warning(
-                "Watchtower package not found. Ensure you have installed the package with `poetry install --with production`."
-            )
-        else:
-            log_handler = watchtower.CloudWatchLogHandler(
-                boto3_profile_name=simbot_settings.aws_profile,
-                log_stream_name=simbot_settings.watchtower_log_stream_name,
-                log_group_name=simbot_settings.watchtower_log_group_name,
-                send_interval=1,
-            )
-            log_handler.formatter.add_log_record_attrs = [  # pyright: ignore
-                "levelname",
-                "funcName",
-                "lineno",
-                "process",
-            ]
-            logger.add(log_handler, format="{message} | {extra}")
+        send_logs_to_cloudwatch(simbot_settings, traces_to_opensearch)
 
     server.run()
 
@@ -166,11 +184,15 @@ def run_production_server(
         download_models=True,
         run_in_background=True,
     )
+    run_observability_services(
+        compose_file_path=Path("docker/observability_docker_compose.yaml"), run_in_background=True
+    )
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
         auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),
         extracted_features_cache_dir=Path("../cache/features"),
         log_to_cloudwatch=True,
+        traces_to_opensearch=True,
         workers=workers,
     )
 

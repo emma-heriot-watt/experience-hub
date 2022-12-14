@@ -3,27 +3,29 @@ from __future__ import annotations
 from typing import Literal
 
 import boto3
-import loguru
 from fastapi import FastAPI, Request, Response, status
+from loguru import logger
 
 from emma_experience_hub.api.controllers import SimBotController
+from emma_experience_hub.api.observability import create_logger_context
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
 
 
-logger = loguru.logger
+try:
+    from opentelemetry import trace  # noqa: WPS433
+except Exception:
+    logger.warning(
+        "Unable to get tracer for the API. If you are NOT running in production, you can safely ignore this error."
+    )
+else:
+    tracer = trace.get_tracer(__name__)
+
 
 app = FastAPI(title="SimBot Challenge Inference")
 
+
 state: dict[Literal["controller"], SimBotController] = {}
-
-
-def _create_logger_context(request: SimBotRequest) -> loguru.Contextualizer:
-    """Contextualise the logger for the current request."""
-    return logger.contextualize(
-        session_id=request.header.session_id,
-        prediction_request_id=request.header.prediction_request_id,
-    )
 
 
 @app.on_event("startup")
@@ -64,27 +66,30 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
     raw_request = await request.json()
 
     # Parse the request from the server
-    try:
-        simbot_request = SimBotRequest.parse_obj(raw_request)
-    except Exception as request_err:
-        logger.exception("Unable to parse request", exc_info=request_err)
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        raise request_err
+    with tracer.start_as_current_span("parse-request"):
+        try:
+            simbot_request = SimBotRequest.parse_obj(raw_request)
+        except Exception as request_err:
+            logger.exception("Unable to parse request", exc_info=request_err)
+            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            raise request_err
 
     # Verify the state is healthy
-    try:
-        state["controller"].healthcheck()
-    except Exception as state_err:
-        logger.exception("Clients are not currently healthy", exc_info=state_err)
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        raise state_err
+    with tracer.start_as_current_span("healthcheck-before-process"):
+        try:
+            state["controller"].healthcheck()
+        except Exception as state_err:
+            logger.exception("Clients are not currently healthy", exc_info=state_err)
+            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            raise state_err
 
-    with _create_logger_context(simbot_request):
+    with create_logger_context(simbot_request):
         # Log the incoming request
         logger.info(f"Received request: {raw_request}")
 
-        # Handle the request
-        simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
+        with tracer.start_as_current_span("process-request"):
+            # Handle the request
+            simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
 
         # Return response
         logger.info(f"Returning the response {simbot_response.json(by_alias=True)}")

@@ -1,0 +1,27 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+exporters:
+  logging:
+    loglevel: debug
+  otlp/data-prepper:
+    endpoint: data_prepper:21890
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+
+processors:
+  batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging, otlp/data-prepper]
+      processors: [batch]
+    metrics:
+      receivers: [otlp]
+      exporters: [logging, otlp/data-prepper]
+      processors: [batch]

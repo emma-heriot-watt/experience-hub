@@ -52,6 +52,10 @@ class SimBotSettings(BaseSettings):
 
     compound_splitter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5508", scheme="http")
 
+    otlp_endpoint: AnyHttpUrl = AnyHttpUrl(url="http://localhost:4317", scheme="http")
+
+    opensearch_service_name: str = "experience-hub"
+
     class Config:
         """Config for the settings."""
 
