@@ -148,16 +148,14 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
         """Check all the clients are healthy and running."""
         with ThreadPoolExecutor() as pool:
             clients: list[Client] = list(self.dict().values())
-            # TODO: Should there be a timeout on the healthcheck for each client?
-            #       If yes: how should timeouts be handled?
-            #       If not: what if it hangs?
-            healthcheck_futures = [pool.submit(client.healthcheck) for client in clients]
+            healthcheck_futures = {pool.submit(client.healthcheck): client for client in clients}
 
             for future in as_completed(healthcheck_futures):
+                client = healthcheck_futures[future]
                 try:
                     future.result()
                 except Exception:
-                    logger.error("Failed to verify the healthcheck")
+                    logger.error(f"Failed to verify the healthcheck for client `{client}`")
                     return False
 
         return True
