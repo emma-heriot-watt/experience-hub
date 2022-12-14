@@ -185,7 +185,7 @@ def run_production_server(
         run_in_background=True,
     )
     run_observability_services(
-        compose_file_path=Path("docker/observability_docker_compose.yaml"), run_in_background=True
+        compose_file_path=Path("docker/observability-docker-compose.yaml"), run_in_background=True
     )
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
