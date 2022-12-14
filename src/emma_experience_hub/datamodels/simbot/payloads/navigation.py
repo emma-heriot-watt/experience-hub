@@ -99,11 +99,11 @@ class SimBotRotatePayload(SimBotNavigationPayload):
 class SimBotRotateLeftPayload(SimBotRotatePayload):
     """SimBot action for rotating left.
 
-    Defaults to 90deg turn.
+    Defaults to 45deg turn.
     """
 
     direction: Literal["Left"] = "Left"
-    magnitude: PositiveFloat = 90
+    magnitude: PositiveFloat = 45
 
 
 class SimBotTurnAroundPayload(SimBotRotateLeftPayload):
@@ -119,11 +119,11 @@ class SimBotTurnAroundPayload(SimBotRotateLeftPayload):
 class SimBotRotateRightPayload(SimBotRotatePayload):
     """SimBot action for rotating right.
 
-    Defaults to 90deg turn.
+    Defaults to 45deg turn.
     """
 
     direction: Literal["Right"] = "Right"
-    magnitude: PositiveFloat = 90
+    magnitude: PositiveFloat = 45
 
 
 class SimBotLookPayload(SimBotNavigationPayload):
