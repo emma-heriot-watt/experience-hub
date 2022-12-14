@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.26.0](https://github.com/emma-simbot/experience-hub/compare/v5.25.0...v5.26.0) (2022-12-14)
+
+
+### Features
+
+* improve observability for the API ([#217](https://github.com/emma-simbot/experience-hub/issues/217)) ([4aa11a4](https://github.com/emma-simbot/experience-hub/commit/4aa11a43ef85baba2b589cf5641895101b7c2622))
+
+
+### Bug Fixes
+
+* need to import future annotations ([#218](https://github.com/emma-simbot/experience-hub/issues/218)) ([0b514e1](https://github.com/emma-simbot/experience-hub/commit/0b514e109acc1278d860e0b6c344d8ba52ba62c1))
+
 ## [5.25.0](https://github.com/emma-simbot/experience-hub/compare/v5.24.1...v5.25.0) (2022-12-14)
 
 
