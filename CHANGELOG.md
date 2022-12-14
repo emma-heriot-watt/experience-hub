@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.27.0](https://github.com/emma-simbot/experience-hub/compare/v5.26.1...v5.27.0) (2022-12-14)
+
+
+### Features
+
+* log the clients which fail the healthcheck ([#220](https://github.com/emma-simbot/experience-hub/issues/220)) ([991cec1](https://github.com/emma-simbot/experience-hub/commit/991cec13cc020389193eee2add46398e22bf7205))
+
 ## [5.26.1](https://github.com/emma-simbot/experience-hub/compare/v5.26.0...v5.26.1) (2022-12-14)
 
 
