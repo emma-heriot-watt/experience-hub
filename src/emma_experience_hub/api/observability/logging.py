@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import loguru
 
 from emma_experience_hub.common.settings import SimBotSettings
