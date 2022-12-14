@@ -34,14 +34,7 @@ async def startup_event() -> None:
     simbot_settings = SimBotSettings.from_env()
     boto3.setup_default_session(profile_name=simbot_settings.aws_profile)
 
-    controller = SimBotController.from_simbot_settings(simbot_settings)
-
-    # Check clients every 15 seconds for 100 attempts (=1500s=25mins), which is ridiculously long
-    # because ECR can take up to 300secs to download all the images
-    if not controller.healthcheck(attempts=100, interval=15):  # noqa: WPS432
-        raise AssertionError("Clients failed to respond to healthchecks.")
-
-    state["controller"] = controller
+    state["controller"] = SimBotController.from_simbot_settings(simbot_settings)
 
     logger.info("API for the SimBot Arena is ready.")
 
