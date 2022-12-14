@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.0](https://github.com/emma-simbot/experience-hub/compare/v5.24.1...v5.25.0) (2022-12-14)
+
+
+### Features
+
+* switch to 45 degrees by default when rotating ([#207](https://github.com/emma-simbot/experience-hub/issues/207)) ([9f9aa3f](https://github.com/emma-simbot/experience-hub/commit/9f9aa3f6c7ea2e64b2c4baacf256d4c38bf5127b))
+
 ## [5.24.1](https://github.com/emma-simbot/experience-hub/compare/v5.24.0...v5.24.1) (2022-12-13)
 
 
