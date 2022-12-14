@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.27.1](https://github.com/emma-simbot/experience-hub/compare/v5.27.0...v5.27.1) (2022-12-14)
+
+
+### Bug Fixes
+
+* remove the healthcheck from the startup event ([#221](https://github.com/emma-simbot/experience-hub/issues/221)) ([d975b9d](https://github.com/emma-simbot/experience-hub/commit/d975b9d63994e15a9734a4c13894aa588b07d80d))
+
 ## [5.27.0](https://github.com/emma-simbot/experience-hub/compare/v5.26.1...v5.27.0) (2022-12-14)
 
 
