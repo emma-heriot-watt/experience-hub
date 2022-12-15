@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.27.2](https://github.com/emma-simbot/experience-hub/compare/v5.27.1...v5.27.2) (2022-12-15)
+
+
+### Bug Fixes
+
+* **services:** revert to old version of OOD ([#222](https://github.com/emma-simbot/experience-hub/issues/222)) ([3f88f03](https://github.com/emma-simbot/experience-hub/commit/3f88f039ff08762c198557bc0beacb7953dca744))
+
 ## [5.27.1](https://github.com/emma-simbot/experience-hub/compare/v5.27.0...v5.27.1) (2022-12-14)
 
 
