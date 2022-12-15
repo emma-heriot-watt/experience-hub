@@ -282,6 +282,10 @@ class SimBotController:
 
     def split_utterance_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Tries to split the utterance in case we are dealing with a complex instruction."""
+        # If user intent exists for the current turn, do not try to split it.
+        if not session.current_turn.speech:
+            return session
+
         logger.debug("Trying to split the instruction...")
         return self.pipelines.compound_splitter.run(session)
 
@@ -309,6 +313,9 @@ class SimBotController:
 
         # If the user has an intent --- i.e. it is not valid --- do not overwrite it.
         if session.current_turn.intent.user:
+            logger.debug(
+                f"User intent (`{session.current_turn.intent.user}`) already exists for turn; using that."
+            )
             return session
 
         # If the utterance is valid, extract the intent from it.
@@ -339,6 +346,10 @@ class SimBotController:
 
     def get_utterance_from_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Check the queue to see if there is an utterance that needs to be handled."""
+        # If user intent exists for the current turn, do not try to replace it.
+        if not session.current_turn.speech:
+            return session
+
         should_get_utterance_from_queue = [
             # Queue must not be empty
             session.current_state.utterance_queue,
