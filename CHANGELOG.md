@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.27.3](https://github.com/emma-simbot/experience-hub/compare/v5.27.2...v5.27.3) (2022-12-15)
+
+
+### Bug Fixes
+
+* add guards to prevent actions if the utterance is invalid ([#223](https://github.com/emma-simbot/experience-hub/issues/223)) ([71b043b](https://github.com/emma-simbot/experience-hub/commit/71b043b8f1c6284754a63a0b55d64d8b0356c0ce))
+
 ## [5.27.2](https://github.com/emma-simbot/experience-hub/compare/v5.27.1...v5.27.2) (2022-12-15)
 
 
