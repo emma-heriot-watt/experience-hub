@@ -268,7 +268,7 @@ class SimBotController:
         """Handle an incoming request from the SimBot arena."""
         session = self.load_session_from_request(request)
         session = self._clear_queue_if_needed(session)
-        session = self.split_utterance_if_needed(session)
+        # session = self.split_utterance_if_needed(session)
         session = self.get_utterance_from_queue_if_needed(session)
         session = self.extract_intent_from_user_utterance(session)
         session = self.extract_intent_from_environment_feedback(session)
