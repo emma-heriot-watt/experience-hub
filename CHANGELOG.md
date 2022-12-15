@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.27.5](https://github.com/emma-simbot/experience-hub/compare/v5.27.4...v5.27.5) (2022-12-15)
+
+
+### Bug Fixes
+
+* compound splitter no longer adds to queue if its not needed ([#224](https://github.com/emma-simbot/experience-hub/issues/224)) ([e8b1baa](https://github.com/emma-simbot/experience-hub/commit/e8b1baa37811c27a0baa9eb40396d571c93f8322))
+
 ## [5.27.4](https://github.com/emma-simbot/experience-hub/compare/v5.27.3...v5.27.4) (2022-12-15)
 
 
