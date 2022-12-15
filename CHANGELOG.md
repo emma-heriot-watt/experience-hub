@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.27.4](https://github.com/emma-simbot/experience-hub/compare/v5.27.3...v5.27.4) (2022-12-15)
+
+
+### Bug Fixes
+
+* disable compound utterance splitting until further investigation ([00f503e](https://github.com/emma-simbot/experience-hub/commit/00f503e3c6ee2de72f0555bbc1d29910b66909c7))
+* guard for checking if user intents exists before checking queue ([0d437e7](https://github.com/emma-simbot/experience-hub/commit/0d437e7c9f9c0c6d7bad81cdb41d06ec597b0c72))
+
 ## [5.27.3](https://github.com/emma-simbot/experience-hub/compare/v5.27.2...v5.27.3) (2022-12-15)
 
 
