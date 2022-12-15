@@ -283,6 +283,9 @@ class SimBotController:
     def split_utterance_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Tries to split the utterance in case we are dealing with a complex instruction."""
         # If user intent exists for the current turn, do not try to split it.
+        if session.current_turn.intent.user is not None:
+            return session
+
         if not session.current_turn.speech:
             return session
 
@@ -347,6 +350,9 @@ class SimBotController:
     def get_utterance_from_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Check the queue to see if there is an utterance that needs to be handled."""
         # If user intent exists for the current turn, do not try to replace it.
+        if session.current_turn.intent.user is not None:
+            return session
+
         if not session.current_turn.speech:
             return session
 
