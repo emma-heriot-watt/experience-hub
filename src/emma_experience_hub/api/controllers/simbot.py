@@ -282,11 +282,8 @@ class SimBotController:
 
     def split_utterance_if_needed(self, session: SimBotSession) -> SimBotSession:
         """Tries to split the utterance in case we are dealing with a complex instruction."""
-        # If user intent exists for the current turn, do not try to split it.
         if session.current_turn.intent.user is not None:
-            return session
-
-        if not session.current_turn.speech:
+            logger.debug("Current turn already has user intent; utterance will not be split.")
             return session
 
         logger.debug("Trying to split the instruction...")
