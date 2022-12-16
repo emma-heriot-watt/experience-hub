@@ -10,13 +10,18 @@ from emma_experience_hub.datamodels import EmmaExtractedFeatures, EnvironmentSta
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotInteractionObject,
-    SimBotLookAroundPayload,
     SimBotObjectInteractionPayload,
 )
 from emma_experience_hub.functions.simbot import (
     SimBotSceneObjectTokens,
     get_correct_frame_index,
     get_mask_from_special_tokens,
+)
+from emma_experience_hub.functions.simbot.search import (
+    BasicSearchPlanner,
+    GreedyMaximumVertexCoverSearchPlanner,
+    PlannerType,
+    SearchPlanner,
 )
 from emma_experience_hub.parsers.simbot import SimBotVisualGroundingOutputParser
 
@@ -33,17 +38,24 @@ class SimBotFindObjectPipeline:
         features_client: SimBotFeaturesClient,
         action_predictor_client: SimbotActionPredictionClient,
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
+        distance_threshold: float = 2,
+        viewpoint_budget: int = 2,
+        planner_type: PlannerType = PlannerType.basic,
     ) -> None:
         self._features_client = features_client
 
         self._action_predictor_client = action_predictor_client
         self._visual_grounding_output_parser = visual_grounding_output_parser
+        self._distance_threshold = distance_threshold
+        self._viewpoint_budget = viewpoint_budget
+        self._rotation_magnitude = 90
+        self._planner = self._get_planner_from_type(planner_type)
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Handle the search through the environment."""
         if self._should_start_new_search(session):
             logger.debug("Preparing search plan...")
-            search_plan = self.prepare_search_plan(session)
+            search_plan = self._planner.run(session)
 
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
@@ -81,19 +93,15 @@ class SimBotFindObjectPipeline:
             )
         return None
 
-    def prepare_search_plan(self, session: SimBotSession) -> list[SimBotAction]:
-        """Plan out the actions the agent will take to perform the search."""
-        look_around_action = SimBotAction(
-            id=0,
-            type=SimBotActionType.Look,
-            raw_output="look around.",
-            payload=SimBotLookAroundPayload(),
-        )
-
-        search_plan = [look_around_action]
-
-        logger.debug(f"Built search plan: {search_plan}")
-        return search_plan
+    def _get_planner_from_type(self, planner_type: PlannerType) -> SearchPlanner:
+        """Get the planner for the pipeline."""
+        planners = {
+            PlannerType.basic: BasicSearchPlanner(),
+            PlannerType.greedy_max_vertex_cover: GreedyMaximumVertexCoverSearchPlanner(
+                distance_threshold=self._distance_threshold, vertex_budget=self._viewpoint_budget
+            ),
+        }
+        return planners[planner_type]
 
     def _should_start_new_search(self, session: SimBotSession) -> bool:
         """Should we be starting a new search?

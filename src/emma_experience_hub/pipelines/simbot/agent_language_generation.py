@@ -96,10 +96,18 @@ class SimBotAgentLanguageGenerationPipeline:
         logger.debug("[NLG SEARCH]: Try get the interaction action from the agent")
         action = session.current_turn.actions.interaction
 
-        # If there is no action, we did not find an object
+        # There is no interaction action
         if not action:
+            logger.debug("[NLG SEARCH]: There is no interaction action")
+            return None
+
+        # If the current action is rotate left and the queue is empty there are no more actions to perform
+        if (  # noqa: WPS337
+            action.type == SimBotActionType.RotateLeft
+            and session.current_turn.state.find_queue.is_empty
+        ):
             logger.debug(
-                "[NLG SEARCH]: There is no interaction action, so we did not find an object and there is no planning steps left"
+                "[NLG SEARCH]: We did not find an object and there are no planning steps left"
             )
             return self._generate_from_intent(
                 SimBotIntent(type=SimBotIntentType.search_not_found_object),
@@ -114,8 +122,12 @@ class SimBotAgentLanguageGenerationPipeline:
                 use_lightweight_dialog=True,
             )
 
-        # If we are returning a look around, return a lightweight dialog action
-        if action.type == SimBotActionType.Look:
+        # For the first turn left action, return a lightweight dialog action
+        if (  # noqa: WPS337
+            action.type == SimBotActionType.RotateLeft
+            and session.previous_turn is not None
+            and session.previous_turn.state.find_queue.is_empty
+        ):
             logger.debug("[NLG SEARCH]: We are looking around for the object")
             return self._generate_from_intent(
                 SimBotIntent(
