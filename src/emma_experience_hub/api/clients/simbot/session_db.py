@@ -104,4 +104,8 @@ class SimBotSessionDbClient(DynamoDbClient):
                 return []
 
         logger.debug(f"Successfully got previous `{len(parsed_responses)}` turns")
-        return parsed_responses
+
+        # Sort the responses by the sort key before returning
+        sorted_responses = sorted(parsed_responses, key=lambda turn: turn.idx)
+
+        return sorted_responses
