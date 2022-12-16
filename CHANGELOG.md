@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.29.2](https://github.com/emma-simbot/experience-hub/compare/v5.29.1...v5.29.2) (2022-12-16)
+
+
+### Bug Fixes
+
+* add tracing for feature extractor client ([7d82776](https://github.com/emma-simbot/experience-hub/commit/7d82776b8a80dd65629e00fd1ce04d86041a5547))
+* add tracing to action prediction client ([bf7b524](https://github.com/emma-simbot/experience-hub/commit/bf7b5240930a22daf3853717de34c956d4bcbdfe))
+
 ## [5.29.1](https://github.com/emma-simbot/experience-hub/compare/v5.29.0...v5.29.1) (2022-12-16)
 
 
