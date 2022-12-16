@@ -67,15 +67,6 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
             response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             raise request_err
 
-    # Verify the state is healthy
-    with tracer.start_as_current_span("Healthcheck"):
-        try:
-            state["controller"].healthcheck()
-        except Exception as state_err:
-            logger.exception("Clients are not currently healthy", exc_info=state_err)
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            raise state_err
-
     with create_logger_context(simbot_request):
         # Log the incoming request
         logger.info(f"Received request: {raw_request}")
