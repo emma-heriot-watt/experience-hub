@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.29.0](https://github.com/emma-simbot/experience-hub/compare/v5.28.1...v5.29.0) (2022-12-16)
+
+
+### Features
+
+* add more tracing to the requests ([#228](https://github.com/emma-simbot/experience-hub/issues/228)) ([190b6de](https://github.com/emma-simbot/experience-hub/commit/190b6de38d148681df3ba63567b74fe3c99aeead))
+
 ## [5.28.1](https://github.com/emma-simbot/experience-hub/compare/v5.28.0...v5.28.1) (2022-12-16)
 
 
