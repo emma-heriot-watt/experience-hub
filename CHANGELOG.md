@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.28.1](https://github.com/emma-simbot/experience-hub/compare/v5.28.0...v5.28.1) (2022-12-16)
+
+
+### Bug Fixes
+
+* Correct s3 path for ood models ([#227](https://github.com/emma-simbot/experience-hub/issues/227)) ([991a3e7](https://github.com/emma-simbot/experience-hub/commit/991a3e78b18609014ef61a36ae61591914011e68))
+* ensure raw-text matching uses the pipeline guards ([#226](https://github.com/emma-simbot/experience-hub/issues/226)) ([5b9b5c9](https://github.com/emma-simbot/experience-hub/commit/5b9b5c99ebacd273707450409f0c6dfeefc40571)), closes [#222](https://github.com/emma-simbot/experience-hub/issues/222) [#223](https://github.com/emma-simbot/experience-hub/issues/223) [#224](https://github.com/emma-simbot/experience-hub/issues/224) [#214](https://github.com/emma-simbot/experience-hub/issues/214)
+
 ## [5.28.0](https://github.com/emma-simbot/experience-hub/compare/v5.27.5...v5.28.0) (2022-12-16)
 
 
