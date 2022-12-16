@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.29.1](https://github.com/emma-simbot/experience-hub/compare/v5.29.0...v5.29.1) (2022-12-16)
+
+
+### Bug Fixes
+
+* do not perform healthcheck when handling request from arena ([8b8e66f](https://github.com/emma-simbot/experience-hub/commit/8b8e66f0399b672957c0c1f888a0d3da821b5bf1))
+* sort all the session turns when getting from dynamo db ([ce02630](https://github.com/emma-simbot/experience-hub/commit/ce026308562321d14eba79c2648c09061b2ba159))
+* stop pinging the S3 bucket during healthcheck ([#230](https://github.com/emma-simbot/experience-hub/issues/230)) ([5395bad](https://github.com/emma-simbot/experience-hub/commit/5395badef2e61f62369b36df2c083e99df360a6e))
+
 ## [5.29.0](https://github.com/emma-simbot/experience-hub/compare/v5.28.1...v5.29.0) (2022-12-16)
 
 
