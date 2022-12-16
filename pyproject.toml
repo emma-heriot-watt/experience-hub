@@ -33,7 +33,7 @@ cmd = "pytest -v --durations=40 --color=yes --junitxml=pytest.xml --cov=src -m '
 
 [tool.poetry.dependencies]
 python = "~3.9"
-torch = "<1.13"
+torch = "^1.13.1"
 rich = "^12.5.1"
 boto3 = "1.23.3"
 Pillow = "^9.2.0"
