@@ -2,10 +2,13 @@ from typing import Optional
 
 from loguru import logger
 from methodtools import lru_cache
+from opentelemetry import trace
 
 from emma_experience_hub.api.clients.emma_policy import EmmaPolicyClient
 from emma_experience_hub.datamodels import DialogueUtterance, EnvironmentStateTurn
 
+
+tracer = trace.get_tracer(__name__)
 
 LRU_CACHE_MAX_SIZE = 64
 
@@ -19,9 +22,10 @@ class SimbotActionPredictionClient(EmmaPolicyClient):
         dialogue_history: list[DialogueUtterance],
     ) -> list[str]:
         """Generate a response from the features and provided language."""
-        return self._make_request(
-            f"{self._endpoint}/generate_find", environment_state_history, dialogue_history
-        )
+        with tracer.start_as_current_span("Find object in scene"):
+            return self._make_request(
+                f"{self._endpoint}/generate_find", environment_state_history, dialogue_history
+            )
 
     def get_low_level_prediction_from_raw_text(
         self,
@@ -29,9 +33,11 @@ class SimbotActionPredictionClient(EmmaPolicyClient):
         dialogue_history: list[DialogueUtterance],
     ) -> Optional[str]:
         """Generate a response from the features and provided language."""
-        response = self._get_low_level_prediction_from_raw_text(
-            tuple(environment_state_history), tuple(dialogue_history)
-        )
+        with tracer.start_as_current_span("Match text to template"):
+            response = self._get_low_level_prediction_from_raw_text(
+                tuple(environment_state_history), tuple(dialogue_history)
+            )
+
         logger.debug(f"Cache info: {self._get_low_level_prediction_from_raw_text.cache_info()}.")
         return response
 
