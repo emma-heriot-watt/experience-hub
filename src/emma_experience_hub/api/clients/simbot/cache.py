@@ -13,9 +13,7 @@ from pathlib import Path
 from typing import Generic, Optional, TypeVar, Union
 
 import torch
-from botocore.exceptions import ClientError
 from cloudpathlib import S3Client, S3Path
-from loguru import logger
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.api.clients.pydantic import PydanticClientMixin, PydanticT
@@ -46,13 +44,7 @@ class SimBotCacheClient(Client, Generic[T]):
         self._s3 = S3Client(local_cache_dir=local_cache_dir)
 
     def healthcheck(self) -> bool:
-        """Verify that the S3 bucket is available and accessible."""
-        try:
-            self._s3.client.head_bucket(Bucket=self.bucket)
-        except ClientError as err:
-            logger.exception("Failed to get S3 bucket", exc_info=err)
-            return False
-
+        """Assume that the bucket is available."""
         return True
 
     def check_exist(self, session_id: str, prediction_request_id: str) -> bool:
