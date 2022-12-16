@@ -28,9 +28,10 @@ class SimBotRequestProcessingPipeline:
             )
 
         # Create a turn for the current request and update the history
-        session_history.append(
-            SimBotSessionTurn.new_from_simbot_request(request, idx=len(session_history))
-        )
+        session_turn = SimBotSessionTurn.new_from_simbot_request(request, idx=len(session_history))
+        session_history.append(session_turn)
+
+        logger.debug(f"Created session turn: {session_turn}")
 
         # Instantiate the session from the turns
         session = SimBotSession(session_id=request.header.session_id, turns=session_history)
@@ -39,6 +40,13 @@ class SimBotRequestProcessingPipeline:
         # where we start from.
         if session.previous_turn:
             session.current_turn.state = session.previous_turn.state.copy(deep=True)
+
+        logger.debug(f"Current turn: {session.current_turn}")
+
+        if session_turn != session.current_turn:
+            logger.error(
+                "The current turn is not equal to the newly created session turn. The inference is likely about to go very wrong."
+            )
 
         return session
 
