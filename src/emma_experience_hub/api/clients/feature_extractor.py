@@ -6,11 +6,15 @@ import numpy as np
 import torch
 from loguru import logger
 from numpy.typing import ArrayLike
+from opentelemetry import trace
 from PIL import Image
 from pydantic import AnyHttpUrl
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class FeatureExtractorClient(Client):
@@ -54,10 +58,12 @@ class FeatureExtractorClient(Client):
     def process_single_image(self, image: Union[Image.Image, ArrayLike]) -> EmmaExtractedFeatures:
         """Submit a request to the feature extraction server for a single image."""
         image_bytes = self._convert_single_image_to_bytes(image)
-        response = httpx.post(
-            f"{self._endpoint}/features",
-            files={self._single_image_post_arg_name: image_bytes},
-        )
+
+        with tracer.start_as_current_span("Extract features from single image"):
+            response = httpx.post(
+                f"{self._endpoint}/features",
+                files={self._single_image_post_arg_name: image_bytes},
+            )
 
         try:
             response.raise_for_status()
@@ -90,7 +96,8 @@ class FeatureExtractorClient(Client):
 
         # Make the request
         # TODO: Does the feature extractor change the order of the images?
-        response = httpx.post(f"{self._endpoint}/batch_features", files=request_files)
+        with tracer.start_as_current_span("Extract features from image batch"):
+            response = httpx.post(f"{self._endpoint}/batch_features", files=request_files)
 
         try:
             response.raise_for_status()
