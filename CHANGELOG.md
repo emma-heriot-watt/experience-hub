@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.28.0](https://github.com/emma-simbot/experience-hub/compare/v5.27.5...v5.28.0) (2022-12-16)
+
+
+### Features
+
+* implement search plan ([#208](https://github.com/emma-simbot/experience-hub/issues/208)) ([70ea133](https://github.com/emma-simbot/experience-hub/commit/70ea133a4f7ab8f9595a08cac190823a9068a254))
+
 ## [5.27.5](https://github.com/emma-simbot/experience-hub/compare/v5.27.4...v5.27.5) (2022-12-15)
 
 
