@@ -15,17 +15,7 @@ class ConfirmationResponseClassifierClient(Client):
 
     def healthcheck(self) -> bool:
         """Verify the server is healthy."""
-        response = httpx.get(self._healthcheck_endpoint)
-
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            logger.exception(
-                "Unable to perform healthcheck on confirmation classifier", exc_info=err
-            )
-            return False
-
-        return True
+        return self._run_healthcheck(self._healthcheck_endpoint)
 
     def is_confirmation(self, text: str) -> bool:
         """Return True if the input is a confirmation to the request."""

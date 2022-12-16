@@ -59,7 +59,7 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
     raw_request = await request.json()
 
     # Parse the request from the server
-    with tracer.start_as_current_span("parse-request"):
+    with tracer.start_as_current_span("Parse raw request"):
         try:
             simbot_request = SimBotRequest.parse_obj(raw_request)
         except Exception as request_err:
@@ -68,7 +68,7 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
             raise request_err
 
     # Verify the state is healthy
-    with tracer.start_as_current_span("healthcheck-before-process"):
+    with tracer.start_as_current_span("Healthcheck"):
         try:
             state["controller"].healthcheck()
         except Exception as state_err:
@@ -80,7 +80,7 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
         # Log the incoming request
         logger.info(f"Received request: {raw_request}")
 
-        with tracer.start_as_current_span("process-request"):
+        with tracer.start_as_current_span("Handle request"):
             # Handle the request
             simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
 

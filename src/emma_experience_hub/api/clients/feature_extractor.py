@@ -30,15 +30,7 @@ class FeatureExtractorClient(Client):
 
     def healthcheck(self) -> bool:
         """Verify the feature extractor server is healthy."""
-        response = httpx.get(f"{self._endpoint}/ping")
-
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            logger.exception("Unable to perform healthcheck on feature extractor", exc_info=err)
-            return False
-
-        return True
+        return self._run_healthcheck(f"{self._endpoint}/ping")
 
     def change_device(self, device: torch.device) -> None:
         """Change the device used by the feature extractor.

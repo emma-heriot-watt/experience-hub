@@ -5,6 +5,7 @@ import orjson
 from loguru import logger
 from pydantic import AnyHttpUrl
 
+from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.datamodels import (
     DialogueUtterance,
     EmmaPolicyRequest,
@@ -12,7 +13,7 @@ from emma_experience_hub.datamodels import (
 )
 
 
-class EmmaPolicyClient:
+class EmmaPolicyClient(Client):
     """API client for interfacing with an EMMA Policy model."""
 
     def __init__(self, server_endpoint: AnyHttpUrl) -> None:
@@ -20,15 +21,7 @@ class EmmaPolicyClient:
 
     def healthcheck(self) -> bool:
         """Verify the server is online and healthy."""
-        response = httpx.get(f"{self._endpoint}/ping")
-
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            logger.exception("Unable to perform healtcheck on EMMA policy server", exc_info=err)
-            return False
-
-        return True
+        return self._run_healthcheck(f"{self._endpoint}/ping")
 
     def generate(
         self,

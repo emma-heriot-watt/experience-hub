@@ -13,17 +13,7 @@ class OutOfDomainDetectorClient(Client):
 
     def healthcheck(self) -> bool:
         """Verify the server is healthy."""
-        response = httpx.get(f"{self._endpoint}/healthcheck")
-
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            logger.exception(
-                "Failed to perform healthcheck on Out Of Domain Detector", exc_info=err
-            )
-            return False
-
-        return True
+        return self._run_healthcheck(f"{self._endpoint}/healthcheck")
 
     def is_out_of_domain(self, text: str) -> bool:
         """Return True if the input is out of the domain."""
