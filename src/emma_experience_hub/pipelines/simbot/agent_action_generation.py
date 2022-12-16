@@ -2,8 +2,10 @@ from typing import Callable, Optional
 
 from loguru import logger
 
-from emma_experience_hub.api.clients import EmmaPolicyClient
-from emma_experience_hub.api.clients.simbot import SimBotFeaturesClient
+from emma_experience_hub.api.clients.simbot import (
+    SimbotActionPredictionClient,
+    SimBotFeaturesClient,
+)
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
     SimBotIntent,
@@ -26,7 +28,7 @@ class SimBotAgentActionGenerationPipeline:
     def __init__(
         self,
         features_client: SimBotFeaturesClient,
-        action_predictor_client: EmmaPolicyClient,
+        action_predictor_client: SimbotActionPredictionClient,
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
         previous_action_parser: SimBotPreviousActionParser,
         find_object_pipeline: SimBotFindObjectPipeline,
@@ -61,6 +63,63 @@ class SimBotAgentActionGenerationPipeline:
 
     def handle_act_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action when we want to just act."""
+        try:
+            return self._predict_action_from_template_matching(session)
+        except Exception:
+            return self._predict_action_from_emma_policy(session)
+
+    def handle_act_previous_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
+        """Get the action from the previous turn."""
+        # If there is a routine is in progress, continue it
+        if session.is_find_object_in_progress:
+            return self.handle_act_search_intent(session)
+
+        return self._previous_action_parser(session)
+
+    def handle_act_search_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
+        """Handle the search for object intent."""
+        return self._find_object_pipeline.run(session)
+
+    def _get_action_intent_handler(
+        self, intent: SimBotIntent
+    ) -> Callable[[SimBotSession], Optional[SimBotAction]]:
+        """Get the handler to use when generating an action to perform on the environment."""
+        switcher = {
+            SimBotIntentType.act_low_level: self.handle_act_intent,
+            SimBotIntentType.act_previous: self.handle_act_previous_intent,
+            SimBotIntentType.act_search: self.handle_act_search_intent,
+        }
+
+        return switcher[intent.type]
+
+    def _predict_action_from_template_matching(self, session: SimBotSession) -> SimBotAction:
+        """Generate an action from the raw-text matching templater."""
+        if not session.current_turn.utterances:
+            raise AssertionError("No utterances to try match with")
+
+        raw_text_match_prediction = (
+            self._action_predictor_client.get_low_level_prediction_from_raw_text(
+                dialogue_history=session.current_turn.utterances,
+                environment_state_history=[],
+            )
+        )
+
+        if raw_text_match_prediction is None:
+            raise AssertionError("Cannot match raw text to template.")
+
+        # Try to parse the outcome
+        try:
+            return self._action_predictor_response_parser(
+                raw_text_match_prediction, extracted_features=[]
+            )
+        except Exception as err:
+            logger.error(
+                f"Cannot convert matched template ({raw_text_match_prediction}) to SimBotAction?"
+            )
+            raise err
+
+    def _predict_action_from_emma_policy(self, session: SimBotSession) -> Optional[SimBotAction]:
+        """Generate an action from the EMMA policy client."""
         turns_within_interaction_window = session.get_turns_within_interaction_window()
         environment_state_history = session.get_environment_state_history_from_turns(
             turns_within_interaction_window,
@@ -88,27 +147,3 @@ class SimBotAgentActionGenerationPipeline:
         except AssertionError:
             logger.error(f"Unable to parse a response for the output {raw_action_prediction}")
             return None
-
-    def handle_act_previous_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
-        """Get the action from the previous turn."""
-        # If there is a routine is in progress, continue it
-        if session.is_find_object_in_progress:
-            return self.handle_act_search_intent(session)
-
-        return self._previous_action_parser(session)
-
-    def handle_act_search_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
-        """Handle the search for object intent."""
-        return self._find_object_pipeline.run(session)
-
-    def _get_action_intent_handler(
-        self, intent: SimBotIntent
-    ) -> Callable[[SimBotSession], Optional[SimBotAction]]:
-        """Get the handler to use when generating an action to perform on the environment."""
-        switcher = {
-            SimBotIntentType.act_low_level: self.handle_act_intent,
-            SimBotIntentType.act_previous: self.handle_act_previous_intent,
-            SimBotIntentType.act_search: self.handle_act_search_intent,
-        }
-
-        return switcher[intent.type]

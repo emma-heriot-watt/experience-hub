@@ -1,7 +1,10 @@
 from loguru import logger
 
 from emma_experience_hub.api.clients import EmmaPolicyClient
-from emma_experience_hub.api.clients.simbot import SimBotFeaturesClient
+from emma_experience_hub.api.clients.simbot import (
+    SimbotActionPredictionClient,
+    SimBotFeaturesClient,
+)
 from emma_experience_hub.datamodels import EnvironmentStateTurn
 from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType, SimBotSession
 from emma_experience_hub.parsers import NeuralParser
@@ -19,6 +22,7 @@ class SimBotAgentIntentSelectionPipeline:
         features_client: SimBotFeaturesClient,
         nlu_intent_client: EmmaPolicyClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
+        action_predictor_client: SimbotActionPredictionClient,
         _disable_clarification_questions: bool = False,
         _disable_search_actions: bool = False,
     ) -> None:
@@ -26,6 +30,8 @@ class SimBotAgentIntentSelectionPipeline:
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
+
+        self._action_predictor_client = action_predictor_client
 
         self._disable_clarification_questions = _disable_clarification_questions
         self._disable_search_actions = _disable_search_actions
@@ -63,6 +69,11 @@ class SimBotAgentIntentSelectionPipeline:
         """
         # If the user wants us to act, then do that.
         if user_intent == SimBotIntentType.act:
+            # Check if the utterance matches one of the known templates
+            if self._does_utterance_match_known_template(session):
+                return SimBotIntent(type=SimBotIntentType.act_low_level)
+
+            # Otherwise, use the NLU to detect it
             return self._process_utterance_with_nlu(session)
 
         # If the user has replied to a clarification question, then act
@@ -103,3 +114,13 @@ class SimBotAgentIntentSelectionPipeline:
             return SimBotIntent(type=SimBotIntentType.act_low_level)
 
         return intent
+
+    def _does_utterance_match_known_template(self, session: SimBotSession) -> bool:
+        """Determine what the agent should do next from the user intent."""
+        raw_text_match_prediction = (
+            self._action_predictor_client.get_low_level_prediction_from_raw_text(
+                dialogue_history=session.current_turn.utterances,
+                environment_state_history=[],
+            )
+        )
+        return raw_text_match_prediction is not None

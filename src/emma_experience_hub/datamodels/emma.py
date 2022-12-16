@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from emma_common.datamodels import EmmaExtractedFeatures
 
 
-class DialogueUtterance(BaseModel):
+class DialogueUtterance(BaseModel, frozen=True):
     """Single utterance model for the Emma Policy client."""
 
     utterance: str

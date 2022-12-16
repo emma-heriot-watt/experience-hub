@@ -46,7 +46,6 @@ from emma_experience_hub.pipelines.simbot import (
     SimBotCompoundSplitterPipeline,
     SimBotEnvironmentIntentExtractionPipeline,
     SimBotFindObjectPipeline,
-    SimbotRawTextMatchActionPredictionPipeline,
     SimBotRequestProcessingPipeline,
     SimBotUserIntentExtractionPipeline,
     SimBotUserUtteranceVerificationPipeline,
@@ -173,7 +172,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
     agent_language_generator: SimBotAgentLanguageGenerationPipeline
     find_object: SimBotFindObjectPipeline
     compound_splitter: SimBotCompoundSplitterPipeline
-    raw_text_action_predictor: SimbotRawTextMatchActionPredictionPipeline
 
     @classmethod
     def from_clients(
@@ -219,6 +217,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 nlu_intent_parser=SimBotNLUOutputParser(
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
                 ),
+                action_predictor_client=clients.action_predictor,
                 _disable_clarification_questions=simbot_settings.disable_clarification_questions,
                 _disable_search_actions=simbot_settings.disable_search_actions,
             ),
@@ -231,10 +230,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(
                 utterance_generator_client=clients.utterance_generator,
-            ),
-            raw_text_action_predictor=SimbotRawTextMatchActionPredictionPipeline(
-                action_predictor_client=clients.action_predictor,
-                action_predictor_response_parser=action_predictor_response_parser,
             ),
         )
 
@@ -376,14 +371,7 @@ class SimBotController:
     def decide_what_the_agent_should_do(self, session: SimBotSession) -> SimBotSession:
         """Decide what the agent should do next."""
         logger.debug("Selecting agent intent...")
-        raw_text_intent, raw_text_action = self.pipelines.raw_text_action_predictor.run(session)
-        # We have matched the user utterance with an intent and an action using raw text match
-        # We can skip the agent intent and action generation pipeline
-        if raw_text_intent is not None and raw_text_action is not None:
-            session.current_turn.intent.agent = raw_text_intent
-            session.current_turn.actions.interaction = raw_text_action
-        else:
-            session.current_turn.intent.agent = self.pipelines.agent_intent_selector.run(session)
+        session.current_turn.intent.agent = self.pipelines.agent_intent_selector.run(session)
 
         logger.info(f"[INTENT] Agent: `{session.current_turn.intent.agent}`")
         return session

@@ -51,6 +51,7 @@ emma-common = { git = "https://github.com/emma-simbot/common", extras = [
 gunicorn = "^20.1.0"
 overrides = "^6.1.0"
 numpy = "^1.23.5"
+methodtools = "^0.4.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
