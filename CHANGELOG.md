@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.29.4](https://github.com/emma-simbot/experience-hub/compare/v5.29.3...v5.29.4) (2022-12-17)
+
+
+### Bug Fixes
+
+* instrumentations with emma-common@^1.13.0 ([931c5b4](https://github.com/emma-simbot/experience-hub/commit/931c5b46c21e1b6360996056545cd2bd42d7729b))
+* sort session turns by idx instead of timestamps ([1e17cf6](https://github.com/emma-simbot/experience-hub/commit/1e17cf6daec46857ae601b07d57ca14f47f56023))
+
 ## [5.29.3](https://github.com/emma-simbot/experience-hub/compare/v5.29.2...v5.29.3) (2022-12-17)
 
 
