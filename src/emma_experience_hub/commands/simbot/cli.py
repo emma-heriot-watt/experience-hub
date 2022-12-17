@@ -8,9 +8,9 @@ import yaml
 from loguru import logger
 
 from emma_common.api.gunicorn import create_gunicorn_server
-from emma_common.api.instrumentation import InstrumentedInterceptHandler
+from emma_common.api.instrumentation import InstrumentedInterceptHandler, instrument_app
 from emma_common.logging import setup_logging, setup_rich_logging
-from emma_experience_hub.api.observability import instrument_app, send_logs_to_cloudwatch
+from emma_experience_hub.api.observability import send_logs_to_cloudwatch
 from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
@@ -148,7 +148,9 @@ def run_controller_api(
     simbot_settings = SimBotSettings.from_env()
 
     if traces_to_opensearch:
-        instrument_app(simbot_api, simbot_settings)
+        instrument_app(
+            simbot_api, simbot_settings.opensearch_service_name, simbot_settings.otlp_endpoint
+        )
         setup_logging(sys.stdout, InstrumentedInterceptHandler())
     else:
         setup_rich_logging(rich_traceback_show_locals=False)
