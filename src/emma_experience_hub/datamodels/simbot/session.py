@@ -299,7 +299,7 @@ class SimBotSession(BaseModel):
         logger.debug(f"Sorting session turns; original idx order: {[turn.idx for turn in turns]}")
 
         # Sort from the oldest request to the newest request
-        turns = sorted(turns, key=lambda turn: turn.timestamp.start)
+        turns = sorted(turns, key=lambda turn: turn.idx)
 
         logger.debug(f"Sorting session turns; new idx order {[turn.idx for turn in turns]}")
 
