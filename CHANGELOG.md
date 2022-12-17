@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.29.3](https://github.com/emma-simbot/experience-hub/compare/v5.29.2...v5.29.3) (2022-12-17)
+
+
+### Bug Fixes
+
+* add log points when sorting session turns ([d6fef15](https://github.com/emma-simbot/experience-hub/commit/d6fef1511145673e9dd608f3eb4e36d65f48c43c))
+
 ## [5.29.2](https://github.com/emma-simbot/experience-hub/compare/v5.29.1...v5.29.2) (2022-12-16)
 
 
