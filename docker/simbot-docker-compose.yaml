@@ -10,6 +10,14 @@ x-model-volume: &model-volume
   - type: bind
     source: ../storage/models
     target: /app/model
+  - type: bind
+    source: /home/ubuntu/.aws/credentials
+    target: /root/.aws/credentials
+    read_only: true
+  - type: bind
+    source: /home/ubuntu/.aws/config
+    target: /root/.aws/config
+    read_only: true
 
 x-healthcheck-defaults: &healthcheck-defaults
   interval: 1m30s
@@ -90,6 +98,9 @@ services:
     environment:
       LOG_LEVEL: info
       DEVICE: "cuda:0"
+      LOG_TO_CLOUDWATCH: true
+      TRACES_TO_OPENSEARCH: true
+      OTLP_ENDPOINT: "otel_collector:4317"
       EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
       MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components2_data-1.joblib"
     healthcheck:
@@ -101,7 +112,7 @@ services:
       - "5505:6500"
     entrypoint: python
     command:
-      - src/emma_ood_detection/api/ood_detection_api.py
+      - src/emma_ood_detection/run.py
 
   confirmation_classifier:
     container_name: confirmation_classifier
