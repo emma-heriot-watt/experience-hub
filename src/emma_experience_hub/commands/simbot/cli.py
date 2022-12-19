@@ -8,8 +8,8 @@ import yaml
 from loguru import logger
 
 from emma_common.api.gunicorn import create_gunicorn_server
-from emma_common.api.instrumentation import InstrumentedInterceptHandler, instrument_app
-from emma_common.logging import setup_logging, setup_rich_logging
+from emma_common.api.instrumentation import instrument_app
+from emma_common.logging import InstrumentedInterceptHandler, setup_logging, setup_rich_logging
 from emma_experience_hub.api.observability import send_logs_to_cloudwatch
 from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
