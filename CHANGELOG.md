@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.30.0](https://github.com/emma-simbot/experience-hub/compare/v5.29.4...v5.30.0) (2022-12-19)
+
+
+### Features
+
+* **services:** integrate tracing across services with OOD ([#231](https://github.com/emma-simbot/experience-hub/issues/231)) ([b648ef4](https://github.com/emma-simbot/experience-hub/commit/b648ef49654fe13d6920db7c60b976992b68f994))
+
+
+### Bug Fixes
+
+* imports with emma-common ([164d5eb](https://github.com/emma-simbot/experience-hub/commit/164d5eb51f412ffdb048a6eaa613b43728112f0d))
+
 ## [5.29.4](https://github.com/emma-simbot/experience-hub/compare/v5.29.3...v5.29.4) (2022-12-17)
 
 
