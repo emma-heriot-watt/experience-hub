@@ -55,8 +55,13 @@ def run_background_services(
         is_flag=True,
         help="Run the services in the background.",
     ),
+    enable_observability: bool = typer.Option(
+        default=False, is_flag=True, help="Run the services with observability enabled."
+    ),
 ) -> None:
     """Run all the services for SimBot inference."""
+    os.environ["ENABLE_OBSERVABILITY"] = str(enable_observability)
+
     # Load the registry for the services
     service_registry = ServiceRegistry.parse_obj(yaml.safe_load(registry_path.read_bytes()))
 
@@ -185,6 +190,7 @@ def run_production_server(
         compose_file_path=Path("docker/simbot-docker-compose.yaml"),
         download_models=True,
         run_in_background=True,
+        enable_observability=True,
     )
     run_observability_services(
         compose_file_path=Path("docker/observability-docker-compose.yaml"), run_in_background=True

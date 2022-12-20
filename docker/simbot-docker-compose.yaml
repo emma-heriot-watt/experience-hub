@@ -98,8 +98,8 @@ services:
     environment:
       LOG_LEVEL: info
       DEVICE: "cuda:0"
-      LOG_TO_CLOUDWATCH: true
-      TRACES_TO_OPENSEARCH: true
+      LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
+      TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
       OTLP_ENDPOINT: "otel_collector:4317"
       EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
       MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components2_data-1.joblib"
