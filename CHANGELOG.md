@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.31.1](https://github.com/emma-simbot/experience-hub/compare/v5.31.0...v5.31.1) (2022-12-20)
+
+
+### Bug Fixes
+
+* tracing through services and clients ([#234](https://github.com/emma-simbot/experience-hub/issues/234)) ([58fc563](https://github.com/emma-simbot/experience-hub/commit/58fc56307491164dcacbf12fef7933c7cdc2f3f7))
+
 ## [5.31.0](https://github.com/emma-simbot/experience-hub/compare/v5.30.0...v5.31.0) (2022-12-20)
 
 
