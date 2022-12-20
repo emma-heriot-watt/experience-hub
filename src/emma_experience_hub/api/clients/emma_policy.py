@@ -29,9 +29,7 @@ class EmmaPolicyClient(Client):
         dialogue_history: list[DialogueUtterance],
     ) -> str:
         """Generate a response from the features and provided language."""
-        return self._make_request(
-            f"{self._endpoint}/generate", environment_state_history, dialogue_history
-        )
+        raise NotImplementedError
 
     def _make_request(
         self,
@@ -44,22 +42,22 @@ class EmmaPolicyClient(Client):
             environment_history=environment_state_history, dialogue_history=dialogue_history
         )
         logger.debug(f"Sending {emma_policy_request.num_images} images.")
-
         logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
 
-        response = httpx.post(
-            endpoint,
-            json=orjson.loads(
-                emma_policy_request.json(
-                    models_as_dict=True,
-                    exclude={
-                        "environment_history": {
-                            "__all__": {"features": {"__all__": {"class_labels"}}}
-                        }
-                    },
-                )
-            ),
-        )
+        with httpx.Client() as client:
+            response = client.post(
+                endpoint,
+                json=orjson.loads(
+                    emma_policy_request.json(
+                        models_as_dict=True,
+                        exclude={
+                            "environment_history": {
+                                "__all__": {"features": {"__all__": {"class_labels"}}}
+                            }
+                        },
+                    )
+                ),
+            )
 
         try:
             response.raise_for_status()

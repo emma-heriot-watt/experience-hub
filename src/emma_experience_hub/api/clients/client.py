@@ -2,10 +2,6 @@ from abc import ABC, abstractmethod
 
 import httpx
 from loguru import logger
-from opentelemetry import trace
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class Client(ABC):
@@ -18,13 +14,13 @@ class Client(ABC):
 
     def _run_healthcheck(self, endpoint: str) -> bool:
         """Verify the server is healthy."""
-        with tracer.start_as_current_span(f"Healthcheck for {self.__class__.__name__}"):
-            response = httpx.get(endpoint)
+        with httpx.Client() as client:
+            response = client.get(endpoint)
 
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError as err:
-                logger.exception("Unable to perform healthcheck", exc_info=err)
-                return False
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as err:
+            logger.exception("Unable to perform healthcheck", exc_info=err)
+            return False
 
-            return True
+        return True

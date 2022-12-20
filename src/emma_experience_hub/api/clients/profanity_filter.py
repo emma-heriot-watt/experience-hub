@@ -19,7 +19,8 @@ class ProfanityFilterClient(Client):
 
     def is_profane(self, text: str) -> bool:
         """Return True if the input is profane."""
-        response = httpx.post(self._is_profane_endpoint, json={"text": text})
+        with httpx.Client() as client:
+            response = client.post(self._is_profane_endpoint, json={"text": text})
 
         try:
             response.raise_for_status()

@@ -12,7 +12,6 @@ from emma_experience_hub.api.clients import (
     Client,
     CompoundSplitterClient,
     ConfirmationResponseClassifierClient,
-    EmmaPolicyClient,
     FeatureExtractorClient,
     OutOfDomainDetectorClient,
     ProfanityFilterClient,
@@ -22,6 +21,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotAuxiliaryMetadataClient,
     SimBotExtractedFeaturesClient,
     SimBotFeaturesClient,
+    SimBotNLUIntentClient,
     SimBotSessionDbClient,
     SimBotUtteranceGeneratorClient,
 )
@@ -62,7 +62,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     _exit = Event()
 
     features: SimBotFeaturesClient
-    nlu_intent: EmmaPolicyClient
+    nlu_intent: SimBotNLUIntentClient
     action_predictor: SimbotActionPredictionClient
     session_db: SimBotSessionDbClient
     profanity_filter: ProfanityFilterClient
@@ -92,7 +92,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 resource_region=simbot_settings.session_db_region,
                 table_name=simbot_settings.session_db_memory_table_name,
             ),
-            nlu_intent=EmmaPolicyClient(server_endpoint=simbot_settings.nlu_predictor_url),
+            nlu_intent=SimBotNLUIntentClient(server_endpoint=simbot_settings.nlu_predictor_url),
             action_predictor=SimbotActionPredictionClient(
                 server_endpoint=simbot_settings.action_predictor_url
             ),

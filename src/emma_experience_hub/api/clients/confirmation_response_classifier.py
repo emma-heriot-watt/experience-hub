@@ -19,7 +19,8 @@ class ConfirmationResponseClassifierClient(Client):
 
     def is_confirmation(self, text: str) -> bool:
         """Return True if the input is a confirmation to the request."""
-        response = httpx.post(self._is_confirmation_endpoint, params={"text": text})
+        with httpx.Client() as client:
+            response = client.post(self._is_confirmation_endpoint, params={"text": text})
 
         try:
             response.raise_for_status()

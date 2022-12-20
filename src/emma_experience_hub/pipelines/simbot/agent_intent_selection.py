@@ -1,9 +1,9 @@
 from loguru import logger
 
-from emma_experience_hub.api.clients import EmmaPolicyClient
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
+    SimBotNLUIntentClient,
 )
 from emma_experience_hub.datamodels import EnvironmentStateTurn
 from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType, SimBotSession
@@ -20,7 +20,7 @@ class SimBotAgentIntentSelectionPipeline:
     def __init__(
         self,
         features_client: SimBotFeaturesClient,
-        nlu_intent_client: EmmaPolicyClient,
+        nlu_intent_client: SimBotNLUIntentClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
         action_predictor_client: SimbotActionPredictionClient,
         _disable_clarification_questions: bool = False,

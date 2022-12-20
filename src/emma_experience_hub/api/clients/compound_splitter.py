@@ -19,7 +19,10 @@ class CompoundSplitterClient(Client):
 
     def split(self, instruction: str) -> list[str]:
         """Given a complex instruction, returns a list of simpler instructions."""
-        response = httpx.post(self._compound_splitter_endpoint, json={"instruction": instruction})
+        with httpx.Client() as client:
+            response = client.post(
+                self._compound_splitter_endpoint, json={"instruction": instruction}
+            )
 
         try:
             response.raise_for_status()

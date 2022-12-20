@@ -43,9 +43,10 @@ class FeatureExtractorClient(Client):
         """
         logger.info(f"Asking Feature Extractor to move to device: `{device}`")
 
-        response = httpx.post(
-            f"{self._endpoint}/update_model_device", json={"device": str(device)}
-        )
+        with httpx.Client() as client:
+            response = client.post(
+                f"{self._endpoint}/update_model_device", json={"device": str(device)}
+            )
 
         try:
             response.raise_for_status()
@@ -57,23 +58,24 @@ class FeatureExtractorClient(Client):
 
     def process_single_image(self, image: Union[Image.Image, ArrayLike]) -> EmmaExtractedFeatures:
         """Submit a request to the feature extraction server for a single image."""
-        image_bytes = self._convert_single_image_to_bytes(image)
-
         with tracer.start_as_current_span("Extract features from single image"):
-            response = httpx.post(
-                f"{self._endpoint}/features",
-                files={self._single_image_post_arg_name: image_bytes},
-            )
+            image_bytes = self._convert_single_image_to_bytes(image)
 
-        try:
-            response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.exception("Unable to extract features for a single image", exc_info=err)
-            raise err from None
+            with httpx.Client() as client:
+                response = client.post(
+                    f"{self._endpoint}/features",
+                    files={self._single_image_post_arg_name: image_bytes},
+                )
 
-        # Process the response
-        raw_response_data: dict[str, ArrayLike] = response.json()
-        feature_response = EmmaExtractedFeatures.from_raw_response(raw_response_data)
+            try:
+                response.raise_for_status()
+            except httpx.HTTPError as err:
+                logger.exception("Unable to extract features for a single image", exc_info=err)
+                raise err from None
+
+            # Process the response
+            raw_response_data: dict[str, ArrayLike] = response.json()
+            feature_response = EmmaExtractedFeatures.from_raw_response(raw_response_data)
 
         return feature_response
 
@@ -85,32 +87,32 @@ class FeatureExtractorClient(Client):
         There is no batch size limit for the client to send, as the server will extract the maximum
         number of images as it can at any one time.
         """
-        # Build the request from the images
-        all_images_as_bytes: list[bytes] = [
-            self._convert_single_image_to_bytes(image) for image in images
-        ]
-        request_files: list[tuple[str, tuple[str, bytes]]] = [
-            (self._multiple_images_post_arg_name, (str(idx), image_bytes))
-            for idx, image_bytes in enumerate(all_images_as_bytes)
-        ]
-
-        # Make the request
-        # TODO: Does the feature extractor change the order of the images?
         with tracer.start_as_current_span("Extract features from image batch"):
-            response = httpx.post(f"{self._endpoint}/batch_features", files=request_files)
+            # Build the request from the images
+            all_images_as_bytes: list[bytes] = [
+                self._convert_single_image_to_bytes(image) for image in images
+            ]
+            request_files: list[tuple[str, tuple[str, bytes]]] = [
+                (self._multiple_images_post_arg_name, (str(idx), image_bytes))
+                for idx, image_bytes in enumerate(all_images_as_bytes)
+            ]
 
-        try:
-            response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.exception("Unable to extract features for multiple images", exc_info=True)
-            raise err from None
+            # Make the request
+            with httpx.Client() as client:
+                response = client.post(f"{self._endpoint}/batch_features", files=request_files)
 
-        # Process the response
-        raw_response_data: list[dict[str, ArrayLike]] = response.json()
-        all_feature_responses = list(
-            map(EmmaExtractedFeatures.from_raw_response, raw_response_data)
-        )
-        return all_feature_responses
+            try:
+                response.raise_for_status()
+            except httpx.HTTPError as err:
+                logger.exception("Unable to extract features for multiple images", exc_info=True)
+                raise err from None
+
+            # Process the response
+            raw_response_data: list[dict[str, ArrayLike]] = response.json()
+            all_feature_responses = list(
+                map(EmmaExtractedFeatures.from_raw_response, raw_response_data)
+            )
+            return all_feature_responses
 
     def _convert_single_image_to_bytes(self, image: Union[Image.Image, ArrayLike]) -> bytes:
         """Converts a single image to bytes."""
