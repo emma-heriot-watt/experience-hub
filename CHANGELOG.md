@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.31.0](https://github.com/emma-simbot/experience-hub/compare/v5.30.0...v5.31.0) (2022-12-20)
+
+
+### Features
+
+* add flag to enable/disable observability for background services ([#233](https://github.com/emma-simbot/experience-hub/issues/233)) ([16a64e1](https://github.com/emma-simbot/experience-hub/commit/16a64e1b79c1d8859cf96092c78808aa09385daf))
+
 ## [5.30.0](https://github.com/emma-simbot/experience-hub/compare/v5.29.4...v5.30.0) (2022-12-19)
 
 
