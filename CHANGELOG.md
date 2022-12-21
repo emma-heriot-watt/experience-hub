@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.32.0](https://github.com/emma-simbot/experience-hub/compare/v5.31.1...v5.32.0) (2022-12-21)
+
+
+### Features
+
+* run neural services on separate GPUs ([#237](https://github.com/emma-simbot/experience-hub/issues/237)) ([4b1d54b](https://github.com/emma-simbot/experience-hub/commit/4b1d54b7263b9e97d8b2d25fe5e7049d1e560648))
+
 ## [5.31.1](https://github.com/emma-simbot/experience-hub/compare/v5.31.0...v5.31.1) (2022-12-20)
 
 
