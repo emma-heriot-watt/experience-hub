@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.32.1](https://github.com/emma-simbot/experience-hub/compare/v5.32.0...v5.32.1) (2022-12-22)
+
+
+### Bug Fixes
+
+* re-enable the compound splitter ([#225](https://github.com/emma-simbot/experience-hub/issues/225)) ([02825cf](https://github.com/emma-simbot/experience-hub/commit/02825cf9cddb83a7fc9a1b8e7151712fa2c7487e))
+
 ## [5.32.0](https://github.com/emma-simbot/experience-hub/compare/v5.31.1...v5.32.0) (2022-12-21)
 
 
