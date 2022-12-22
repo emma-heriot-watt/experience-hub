@@ -50,6 +50,4 @@ class SimBotCompoundSplitterPipeline:
             f"Replacing current utterance ('{session.current_turn.speech.utterance}') with head of utterance queue ('{new_utterance}')"
         )
 
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance=session.current_state.utterance_queue.pop_from_head()
-        )
+        session.current_turn.speech = SimBotUserSpeech(utterance=new_utterance)

@@ -27,7 +27,6 @@ from emma_experience_hub.api.clients.simbot import (
 )
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels.simbot import (
-    SimBotIntentType,
     SimBotRequest,
     SimBotResponse,
     SimBotSession,
@@ -267,7 +266,7 @@ class SimBotController:
         """Handle an incoming request from the SimBot arena."""
         session = self.load_session_from_request(request)
         session = self._clear_queue_if_needed(session)
-        # session = self.split_utterance_if_needed(session)
+        session = self.split_utterance_if_needed(session)
         session = self.get_utterance_from_queue_if_needed(session)
         session = self.extract_intent_from_user_utterance(session)
         session = self.extract_intent_from_environment_feedback(session)
@@ -329,13 +328,6 @@ class SimBotController:
 
         logger.info(f"[INTENT] User: `{user_intent}`")
 
-        # If the user wants us to act, reset the queue
-        if user_intent is not None and user_intent == SimBotIntentType.act:
-            logger.debug(
-                "User has given us a new instruction to act on. Therefore, reset the queue."
-            )
-            session.current_state.utterance_queue.reset()
-
         session.current_turn.intent.user = user_intent
         return session
 
@@ -357,7 +349,7 @@ class SimBotController:
         if session.current_turn.intent.user is not None:
             return session
 
-        if not session.current_turn.speech:
+        if session.current_turn.speech:
             return session
 
         should_get_utterance_from_queue = [
@@ -368,7 +360,6 @@ class SimBotController:
             and session.previous_turn.actions.interaction
             and session.previous_turn.actions.interaction.is_end_of_trajectory,
         ]
-
         # Pop the utterance from the queue and add it to the turn
         if all(should_get_utterance_from_queue):
             logger.info(
@@ -426,9 +417,24 @@ class SimBotController:
         self.clients.session_db.add_session_turn(session.current_turn)
 
     def _clear_queue_if_needed(self, session: SimBotSession) -> SimBotSession:
-        """Clear the queue if the user has provided us with a new instruction."""
-        if session.current_turn.speech:
+        """Clear the queue if the user has provided us with a new instruction.
+
+        That means if there is speech in the current turn and that is not in response to a
+        question.
+        """
+        if session.current_turn.speech and not self._user_is_responding_to_question(session):
             logger.debug("[REQUEST]: Received utterance from user; clearing the utterance queue")
             session.current_state.utterance_queue.reset()
 
         return session
+
+    def _user_is_responding_to_question(self, session: SimBotSession) -> bool:
+        """Return True if the user is responding to a previous question."""
+        previous_turn = session.previous_valid_turn
+        if previous_turn is None or previous_turn.actions.dialog is None:
+            return False
+
+        return (
+            previous_turn.actions.dialog.intent.is_clarification_question
+            or previous_turn.actions.dialog.intent.is_confirmation_question
+        )

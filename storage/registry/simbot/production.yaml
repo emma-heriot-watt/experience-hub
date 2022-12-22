@@ -39,4 +39,4 @@ services:
 
   - name: compound_splitter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/compound-splitter
-    image_version: 1.0.0
+    image_version: 1.0.1

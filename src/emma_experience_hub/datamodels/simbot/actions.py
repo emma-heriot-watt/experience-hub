@@ -209,8 +209,8 @@ class SimBotAction(BaseModel):
         if raw_output and not raw_output.endswith(PREDICTED_ACTION_DELIMITER):
             return f"{raw_output}{PREDICTED_ACTION_DELIMITER}"
 
-        # Otherwise return None
-        return None
+        # Otherwise return raw_output
+        return raw_output
 
     @property
     def is_status_known(self) -> bool:
