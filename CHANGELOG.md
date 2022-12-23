@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.32.2](https://github.com/emma-simbot/experience-hub/compare/v5.32.1...v5.32.2) (2022-12-23)
+
+
+### Bug Fixes
+
+* bump emma-common dep ([9c3723f](https://github.com/emma-simbot/experience-hub/commit/9c3723fc89cf25bdf1ecd671c857ace325a3e627))
+* **registry:** bump ood ([88e763b](https://github.com/emma-simbot/experience-hub/commit/88e763b80a982765f96823bab9b3e792f314f0c4))
+
 ## [5.32.1](https://github.com/emma-simbot/experience-hub/compare/v5.32.0...v5.32.1) (2022-12-22)
 
 
