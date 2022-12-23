@@ -5,7 +5,7 @@ env_var_delimiter: "_"
 services:
   - name: out_of_domain_detector
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/ood-detection
-    image_version: 1.2.4-cu117
+    image_version: 1.2.5-cu117
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_ood_with_confirmations/
 
