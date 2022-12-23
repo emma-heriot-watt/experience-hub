@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.34.0](https://github.com/emma-simbot/experience-hub/compare/v5.33.0...v5.34.0) (2022-12-23)
+
+
+### Features
+
+* enable tracing on perception and policy services ([#235](https://github.com/emma-simbot/experience-hub/issues/235)) ([56f9d0b](https://github.com/emma-simbot/experience-hub/commit/56f9d0be4c39e62213f08bd8ef38ce298bbc7946))
+
 ## [5.33.0](https://github.com/emma-simbot/experience-hub/compare/v5.32.2...v5.33.0) (2022-12-23)
 
 
