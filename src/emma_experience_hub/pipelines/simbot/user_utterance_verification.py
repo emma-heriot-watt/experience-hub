@@ -1,11 +1,15 @@
 from typing import Optional
 
 from loguru import logger
+from opentelemetry import trace
 
 from emma_experience_hub.api.clients import OutOfDomainDetectorClient, ProfanityFilterClient
 from emma_experience_hub.datamodels.simbot import SimBotIntentType
 from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
 from emma_experience_hub.parsers import Parser
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class SimBotUserUtteranceVerificationPipeline:
@@ -35,7 +39,7 @@ class SimBotUserUtteranceVerificationPipeline:
             return SimBotIntentType.profanity
 
         # Check whether ASR confidence is high enough
-        if not self._low_asr_confidence_detector(speech_recognition_payload):
+        if self._utterance_is_low_asr_confidence(speech_recognition_payload):
             logger.debug("ASR confidence is too low; therefore we cannot understand the user.")
             return SimBotIntentType.low_asr_confidence
 
@@ -57,6 +61,15 @@ class SimBotUserUtteranceVerificationPipeline:
         # Utterance is not invalid
         return None
 
+    @tracer.start_as_current_span("Check for low ASR confidence")
+    def _utterance_is_low_asr_confidence(
+        self, speech_recognition_payload: SimBotSpeechRecognitionPayload
+    ) -> bool:
+        """Check whether or not the incoming utterance has a low ASR confidence."""
+        # If True, then it is ABOVE the threshold and it is NOT low ASR
+        return not self._low_asr_confidence_detector(speech_recognition_payload)
+
+    @tracer.start_as_current_span("Check for profanity")
     def _utterance_contains_profanity(
         self, speech_recognition_payload: SimBotSpeechRecognitionPayload
     ) -> bool:
@@ -68,6 +81,7 @@ class SimBotUserUtteranceVerificationPipeline:
             logger.exception("Unable to check for profanity.", exc_info=err)
             raise err
 
+    @tracer.start_as_current_span("Check for out of domain")
     def _utterance_is_out_of_domain(
         self, speech_recognition_payload: SimBotSpeechRecognitionPayload
     ) -> bool:
@@ -81,12 +95,14 @@ class SimBotUserUtteranceVerificationPipeline:
             logger.exception("Unable to check for out of domain utterance.", exc_info=err)
             raise err
 
+    @tracer.start_as_current_span("Check for only wake word")
     def _utterance_only_contains_wake_word(
         self, speech_recognition_payload: SimBotSpeechRecognitionPayload
     ) -> bool:
         """Detect whether the utterance only contains the wake word or not."""
         return all([token.is_wake_word for token in speech_recognition_payload.tokens])
 
+    @tracer.start_as_current_span("Check for empty utterance")
     def _utterance_is_empty(
         self, speech_recognition_payload: SimBotSpeechRecognitionPayload
     ) -> bool:

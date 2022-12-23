@@ -1,6 +1,7 @@
 from typing import Optional
 
 from loguru import logger
+from opentelemetry import trace
 
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
@@ -24,6 +25,9 @@ from emma_experience_hub.functions.simbot.search import (
     SearchPlanner,
 )
 from emma_experience_hub.parsers.simbot import SimBotVisualGroundingOutputParser
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class SimBotFindObjectPipeline:
@@ -55,7 +59,8 @@ class SimBotFindObjectPipeline:
         """Handle the search through the environment."""
         if self._should_start_new_search(session):
             logger.debug("Preparing search plan...")
-            search_plan = self._planner.run(session)
+            with tracer.start_as_current_span("Building search plan"):
+                search_plan = self._planner.run(session)
 
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
@@ -68,30 +73,32 @@ class SimBotFindObjectPipeline:
             session.current_state.find_queue.reset()
             return goto_action
 
-        if session.current_state.find_queue:
-            extracted_features = self._features_client.get_features(session.current_turn)
+        if not session.current_state.find_queue:
+            logger.debug("Find queue is empty; returning None")
+            return None
 
-            # Try to find the object in the previous turn
-            try:
-                decoded_scene_object_tokens = self._get_object_from_previous_turn(
-                    session, extracted_features
-                )
-            except AssertionError:
-                # If the object has not been found, get the next action to perform
-                return self._get_next_action_from_plan(session)
+        extracted_features = self._features_client.get_features(session.current_turn)
 
-            # If the object has been found, create the highlight and goto action
-            goto_action = self._create_goto_action_from_scene_object(
-                decoded_scene_object_tokens, extracted_features
+        # Try to find the object in the previous turn
+        try:
+            decoded_scene_object_tokens = self._get_object_from_previous_turn(
+                session, extracted_features
             )
-            session.current_state.find_queue.append_to_head(goto_action)
-            logger.debug(
-                f"Appending to head goto action {session.current_state.find_queue.queue[0]}"
-            )
-            return self._create_highlight_action_from_scene_object(
-                decoded_scene_object_tokens, extracted_features
-            )
-        return None
+        except AssertionError:
+            # If the object has not been found, get the next action to perform
+            return self._get_next_action_from_plan(session)
+
+        # If the object has been found, create the highlight and goto action
+        goto_action = self._create_goto_action_from_scene_object(
+            decoded_scene_object_tokens, extracted_features
+        )
+        session.current_state.find_queue.append_to_head(goto_action)
+
+        logger.debug(f"Appending to head goto action {session.current_state.find_queue.queue[0]}")
+
+        return self._create_highlight_action_from_scene_object(
+            decoded_scene_object_tokens, extracted_features
+        )
 
     def _get_planner_from_type(self, planner_type: PlannerType) -> SearchPlanner:
         """Get the planner for the pipeline."""
@@ -119,6 +126,7 @@ class SimBotFindObjectPipeline:
         head_action = session.current_state.find_queue.queue[0]
         return head_action.type == SimBotActionType.GotoObject
 
+    @tracer.start_as_current_span("Trying to find object from visuals")
     def _get_object_from_previous_turn(
         self,
         session: SimBotSession,
@@ -135,13 +143,15 @@ class SimBotFindObjectPipeline:
             environment_state_history=[EnvironmentStateTurn(features=extracted_features)],
         )
 
-        scene_object_tokens = self._visual_grounding_output_parser(raw_visual_grounding_output)
+        with tracer.start_as_current_span("Parse visual grounding output"):
+            scene_object_tokens = self._visual_grounding_output_parser(raw_visual_grounding_output)
 
         if scene_object_tokens is None:
             raise AssertionError("Unable to get scene object tokens from the model output.")
 
         return scene_object_tokens
 
+    @tracer.start_as_current_span("Create highlight for the found object")
     def _create_highlight_action_from_scene_object(
         self,
         scene_object_tokens: SimBotSceneObjectTokens,
@@ -152,8 +162,11 @@ class SimBotFindObjectPipeline:
             raise AssertionError("The object index for the object should not be None.")
 
         object_mask = get_mask_from_special_tokens(
-            scene_object_tokens.frame_index, scene_object_tokens.object_index, extracted_features
+            scene_object_tokens.frame_index,
+            scene_object_tokens.object_index,
+            extracted_features,
         )
+
         color_image_index = get_correct_frame_index(
             parsed_frame_index=scene_object_tokens.frame_index,
             num_frames_in_current_turn=len(extracted_features),
@@ -176,6 +189,7 @@ class SimBotFindObjectPipeline:
             ),
         )
 
+    @tracer.start_as_current_span("Create action to goto found object")
     def _create_goto_action_from_scene_object(
         self,
         scene_object_tokens: SimBotSceneObjectTokens,
@@ -210,6 +224,7 @@ class SimBotFindObjectPipeline:
             ),
         )
 
+    @tracer.start_as_current_span("Try get next action from plan")
     def _get_next_action_from_plan(self, session: SimBotSession) -> Optional[SimBotAction]:
         """If the model did not find the object, get the next action from the search plan."""
         try:

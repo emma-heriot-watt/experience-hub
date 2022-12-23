@@ -1,6 +1,7 @@
 from typing import Callable, Optional
 
 from loguru import logger
+from opentelemetry import trace
 
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
@@ -17,6 +18,9 @@ from emma_experience_hub.parsers.simbot import (
     SimBotPreviousActionParser,
 )
 from emma_experience_hub.pipelines.simbot.find_object import SimBotFindObjectPipeline
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class SimBotAgentActionGenerationPipeline:
@@ -55,11 +59,12 @@ class SimBotAgentActionGenerationPipeline:
             )
             return None
 
-        try:
-            return action_intent_handler(session)
-        except Exception:
-            logger.error("Failed to convert the agent intent to executable form.")
-            return None
+        with tracer.start_as_current_span("Generate action"):
+            try:
+                return action_intent_handler(session)
+            except Exception:
+                logger.error("Failed to convert the agent intent to executable form.")
+                return None
 
     def handle_act_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action when we want to just act."""
@@ -92,6 +97,7 @@ class SimBotAgentActionGenerationPipeline:
 
         return switcher[intent.type]
 
+    @tracer.start_as_current_span("Predict from template matching")
     def _predict_action_from_template_matching(self, session: SimBotSession) -> SimBotAction:
         """Generate an action from the raw-text matching templater."""
         if not session.current_turn.utterances:
@@ -118,6 +124,7 @@ class SimBotAgentActionGenerationPipeline:
             )
             raise err
 
+    @tracer.start_as_current_span("Predict from Policy")
     def _predict_action_from_emma_policy(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action from the EMMA policy client."""
         turns_within_interaction_window = session.get_turns_within_interaction_window()
