@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.33.0](https://github.com/emma-simbot/experience-hub/compare/v5.32.2...v5.33.0) (2022-12-23)
+
+
+### Features
+
+* add more tracing to various pipelines ([#238](https://github.com/emma-simbot/experience-hub/issues/238)) ([b499c47](https://github.com/emma-simbot/experience-hub/commit/b499c47242b58bb656788f3554c6ffebf47f124a))
+
+
+### Bug Fixes
+
+* optimise the compress segmentation mask fn ([#239](https://github.com/emma-simbot/experience-hub/issues/239)) ([070a0c2](https://github.com/emma-simbot/experience-hub/commit/070a0c272ba315448077772828d06410ea1449c8))
+
 ## [5.32.2](https://github.com/emma-simbot/experience-hub/compare/v5.32.1...v5.32.2) (2022-12-23)
 
 
