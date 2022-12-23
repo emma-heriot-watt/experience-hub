@@ -57,6 +57,11 @@ x-healthcheck-defaults: &healthcheck-defaults
   retries: 3
   start_period: 30s
 
+x-observability-env-vars: &observability-env-vars
+  LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
+  TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
+  OTLP_ENDPOINT: "otel_collector:4317"
+
 version: "3.9"
 
 services:
@@ -76,6 +81,7 @@ services:
     container_name: feature_extractor
     image: "${FEATURE_EXTRACTOR_IMAGE}"
     environment:
+      <<: *observability-env-vars
       LOG_LEVEL: "debug"
       DEVICE_ID: "0"
       CLASSMAP_TYPE: "simbot"
@@ -93,6 +99,7 @@ services:
     container_name: intent_extractor
     image: "${INTENT_EXTRACTOR_IMAGE}"
     environment:
+      <<: *observability-env-vars
       LOG_LEVEL: debug
       DEVICE: "cuda:0"
       MODEL_NAME: "heriot-watt/emma-base"
@@ -111,6 +118,7 @@ services:
     container_name: instruction_predictor
     image: "${INSTRUCTION_PREDICTOR_IMAGE}"
     environment:
+      <<: *observability-env-vars
       LOG_LEVEL: debug
       DEVICE: "cuda:0"
       MODEL_CHECKPOINT_PATH: "/app/model/${INSTRUCTION_PREDICTOR_MODEL}"
@@ -128,11 +136,9 @@ services:
     container_name: out_of_domain_detector
     image: "${OUT_OF_DOMAIN_DETECTOR_IMAGE}"
     environment:
+      <<: *observability-env-vars
       LOG_LEVEL: info
       DEVICE: "cuda:0"
-      LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
-      TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
-      OTLP_ENDPOINT: "otel_collector:4317"
       EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
       MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components2_data-1.joblib"
     healthcheck:
