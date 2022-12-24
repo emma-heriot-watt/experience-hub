@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.35.0](https://github.com/emma-simbot/experience-hub/compare/v5.34.0...v5.35.0) (2022-12-24)
+
+
+### Features
+
+* **telemetry:** trace the compress segmentation mask fn ([256ea2e](https://github.com/emma-simbot/experience-hub/commit/256ea2e064606bb9662c40a3f3d551084020b492))
+
+
+### Bug Fixes
+
+* optimise creating actions for the found object to only extract the mask once ([b51ee94](https://github.com/emma-simbot/experience-hub/commit/b51ee9493b0662c73ba8fd41aa1a60f4eadc5bcd))
+
 ## [5.34.0](https://github.com/emma-simbot/experience-hub/compare/v5.33.0...v5.34.0) (2022-12-23)
 
 
