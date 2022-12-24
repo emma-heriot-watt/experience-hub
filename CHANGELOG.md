@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.0](https://github.com/emma-simbot/experience-hub/compare/v5.35.0...v5.36.0) (2022-12-24)
+
+
+### Features
+
+* optimise the compress segmentation mask function further ([#240](https://github.com/emma-simbot/experience-hub/issues/240)) ([f8ca410](https://github.com/emma-simbot/experience-hub/commit/f8ca410fab4f426171aef3a6ffa2c20b3bae508a)), closes [#239](https://github.com/emma-simbot/experience-hub/issues/239)
+* **telemetry:** monitor steps before prediction action with emma policy ([5691a8d](https://github.com/emma-simbot/experience-hub/commit/5691a8d949ad339cfbe10c59ca09b79a8d0ebac2))
+
 ## [5.35.0](https://github.com/emma-simbot/experience-hub/compare/v5.34.0...v5.35.0) (2022-12-24)
 
 
