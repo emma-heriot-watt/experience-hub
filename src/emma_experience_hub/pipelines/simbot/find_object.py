@@ -12,6 +12,7 @@ from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotInteractionObject,
     SimBotObjectInteractionPayload,
+    SimBotObjectMaskType,
 )
 from emma_experience_hub.functions.simbot import (
     SimBotSceneObjectTokens,
@@ -88,16 +89,10 @@ class SimBotFindObjectPipeline:
             # If the object has not been found, get the next action to perform
             return self._get_next_action_from_plan(session)
 
-        # If the object has been found, create the highlight and goto action
-        goto_action = self._create_goto_action_from_scene_object(
-            decoded_scene_object_tokens, extracted_features
-        )
-        session.current_state.find_queue.append_to_head(goto_action)
-
-        logger.debug(f"Appending to head goto action {session.current_state.find_queue.queue[0]}")
-
-        return self._create_highlight_action_from_scene_object(
-            decoded_scene_object_tokens, extracted_features
+        # If the object has been found, create the highlight and goto action, and return the
+        # highlight
+        return self._create_actions_for_found_object(
+            session, decoded_scene_object_tokens, extracted_features
         )
 
     def _get_planner_from_type(self, planner_type: PlannerType) -> SearchPlanner:
@@ -151,13 +146,14 @@ class SimBotFindObjectPipeline:
 
         return scene_object_tokens
 
-    @tracer.start_as_current_span("Create highlight for the found object")
-    def _create_highlight_action_from_scene_object(
+    @tracer.start_as_current_span("Create actions for the found object")
+    def _create_actions_for_found_object(
         self,
+        session: SimBotSession,
         scene_object_tokens: SimBotSceneObjectTokens,
         extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
-        """Convert the decoded scene object into a highlight action for the user."""
+        """Create the actions when the object has been found."""
         if scene_object_tokens.object_index is None:
             raise AssertionError("The object index for the object should not be None.")
 
@@ -173,47 +169,41 @@ class SimBotFindObjectPipeline:
             num_total_frames=len(extracted_features),
         )
 
-        action_type = SimBotActionType.Highlight
-
-        return SimBotAction(
-            id=0,
-            type=action_type,
-            raw_output=f"{action_type.value} <frame_token_{scene_object_tokens.frame_index}> <vis_token_{scene_object_tokens.object_index}.",
-            payload=SimBotObjectInteractionPayload(
-                object=SimBotInteractionObject(
-                    colorImageIndex=color_image_index,
-                    mask=object_mask,
-                    # TODO: do we need an object name? What if we need the closest stickynote?
-                    name="",
-                )
-            ),
+        goto_action = self._create_action_from_scene_object(
+            action_type=SimBotActionType.GotoObject,
+            object_mask=object_mask,
+            frame_index=scene_object_tokens.frame_index,
+            object_index=scene_object_tokens.object_index,
+            color_image_index=color_image_index,
         )
 
-    @tracer.start_as_current_span("Create action to goto found object")
-    def _create_goto_action_from_scene_object(
+        # Add the goto action to the head of the queue
+        session.current_state.find_queue.append_to_head(goto_action)
+        logger.debug(f"Appending to head goto action {session.current_state.find_queue.queue[0]}")
+
+        highlight_action = self._create_action_from_scene_object(
+            action_type=SimBotActionType.Highlight,
+            object_mask=object_mask,
+            frame_index=scene_object_tokens.frame_index,
+            object_index=scene_object_tokens.object_index,
+            color_image_index=color_image_index,
+        )
+
+        return highlight_action
+
+    def _create_action_from_scene_object(
         self,
-        scene_object_tokens: SimBotSceneObjectTokens,
-        extracted_features: list[EmmaExtractedFeatures],
+        action_type: SimBotActionType,
+        object_mask: SimBotObjectMaskType,
+        frame_index: int,
+        object_index: int,
+        color_image_index: int,
     ) -> SimBotAction:
-        """Convert the decoded scene object into a highlight action for the user."""
-        if scene_object_tokens.object_index is None:
-            raise AssertionError("The object index for the object should not be None.")
-
-        object_mask = get_mask_from_special_tokens(
-            scene_object_tokens.frame_index, scene_object_tokens.object_index, extracted_features
-        )
-        color_image_index = get_correct_frame_index(
-            parsed_frame_index=scene_object_tokens.frame_index,
-            num_frames_in_current_turn=len(extracted_features),
-            num_total_frames=len(extracted_features),
-        )
-
-        action_type = SimBotActionType.GotoObject
-
+        """Create an action from a found scene object."""
         return SimBotAction(
             id=0,
             type=action_type,
-            raw_output=f"{action_type.value} <frame_token_{scene_object_tokens.frame_index}> <vis_token_{scene_object_tokens.object_index}.",
+            raw_output=f"{action_type.value} <frame_token_{frame_index}> <vis_token_{object_index}.",
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     colorImageIndex=color_image_index,
