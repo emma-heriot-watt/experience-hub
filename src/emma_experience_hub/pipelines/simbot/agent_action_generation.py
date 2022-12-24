@@ -127,14 +127,20 @@ class SimBotAgentActionGenerationPipeline:
     @tracer.start_as_current_span("Predict from Policy")
     def _predict_action_from_emma_policy(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action from the EMMA policy client."""
-        turns_within_interaction_window = session.get_turns_within_interaction_window()
-        environment_state_history = session.get_environment_state_history_from_turns(
-            turns_within_interaction_window,
-            self._features_client.get_features,
-        )
-        dialogue_history = session.get_dialogue_history_from_session_turns(
-            turns_within_interaction_window
-        )
+        with tracer.start_as_current_span("Get turns within interaction window"):
+            turns_within_interaction_window = session.get_turns_within_interaction_window()
+
+        with tracer.start_as_current_span("Build environment state history"):
+            environment_state_history = session.get_environment_state_history_from_turns(
+                turns_within_interaction_window,
+                self._features_client.get_features,
+            )
+
+        with tracer.start_as_current_span("Get dialogue history"):
+            dialogue_history = session.get_dialogue_history_from_session_turns(
+                turns_within_interaction_window
+            )
+
         raw_action_prediction = self._action_predictor_client.generate(
             dialogue_history=dialogue_history, environment_state_history=environment_state_history
         )
