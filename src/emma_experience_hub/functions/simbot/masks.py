@@ -1,10 +1,14 @@
 import torch
+from more_itertools import consecutive_groups
 
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectMaskType
 
 
-def compress_segmentation_mask(mask: torch.Tensor) -> SimBotObjectMaskType:  # noqa: WPS231
-    """Compress the segmenmtation mask for the arena."""
+def alexa_compress_segmentation_mask(mask: torch.Tensor) -> SimBotObjectMaskType:  # noqa: WPS231
+    """Compress the segmenmtation mask for the arena.
+
+    The algorithm was provided by the Alexa Prize people.
+    """
     run_len_compressed: SimBotObjectMaskType = []
     idx = 0
     curr_run = False
@@ -26,3 +30,21 @@ def compress_segmentation_mask(mask: torch.Tensor) -> SimBotObjectMaskType:  # n
         run_len_compressed[-1][1] = run_len
 
     return run_len_compressed
+
+
+def tensor_compress_segmntation_mask(mask: torch.Tensor) -> SimBotObjectMaskType:
+    """Improved version of the compress segmentation mask."""
+    simplified_mask: list[int] = mask.bool().flatten().nonzero().flatten().tolist()
+
+    compressed_mask: list[list[int]] = []
+
+    for group in consecutive_groups(simplified_mask):
+        list_group = list(group)
+        compressed_mask.append([list_group[0], len(list_group)])
+
+    return compressed_mask
+
+
+def compress_segmentation_mask(mask: torch.Tensor) -> SimBotObjectMaskType:
+    """Compress the segmenmtation mask for the arena."""
+    return tensor_compress_segmntation_mask(mask)
