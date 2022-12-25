@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.37.0](https://github.com/emma-simbot/experience-hub/compare/v5.36.0...v5.37.0) (2022-12-25)
+
+
+### Features
+
+* **telemetry:** add tracing within the "build environment state history" ([6fd4376](https://github.com/emma-simbot/experience-hub/commit/6fd4376193f6e8bc833d17c7ceac80e2227898a0))
+
 ## [5.36.0](https://github.com/emma-simbot/experience-hub/compare/v5.35.0...v5.36.0) (2022-12-24)
 
 
