@@ -1,4 +1,5 @@
 from loguru import logger
+from opentelemetry import trace
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.api.clients.feature_extractor import FeatureExtractorClient
@@ -9,6 +10,9 @@ from emma_experience_hub.api.clients.simbot.cache import (
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import SimBotSessionTurn
 from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class SimBotFeaturesClient(Client):
@@ -34,10 +38,12 @@ class SimBotFeaturesClient(Client):
             ]
         )
 
+    @tracer.start_as_current_span("Check if features exist")
     def check_exist(self, turn: SimBotSessionTurn) -> bool:
         """Check whether features already exist for the given turn."""
         return self._features_cache_client.check_exist(turn.session_id, turn.prediction_request_id)
 
+    @tracer.start_as_current_span("Get features")
     def get_features(self, turn: SimBotSessionTurn) -> list[EmmaExtractedFeatures]:
         """Get the features for the given turn."""
         logger.debug("Getting features for turn...")
@@ -58,6 +64,7 @@ class SimBotFeaturesClient(Client):
 
         return features
 
+    @tracer.start_as_current_span("Get auxiliary metadata")
     def _get_auxiliary_metadata(self, turn: SimBotSessionTurn) -> SimBotAuxiliaryMetadataPayload:
         """Cache the auxiliary metadata for the given turn."""
         # Check whether the auxiliary metadata exists within the cache
