@@ -68,24 +68,31 @@ class SimBotFeaturesClient(Client):
     def _get_auxiliary_metadata(self, turn: SimBotSessionTurn) -> SimBotAuxiliaryMetadataPayload:
         """Cache the auxiliary metadata for the given turn."""
         # Check whether the auxiliary metadata exists within the cache
-        auxiliary_metadata_exists = self._auxiliary_metadata_cache_client.check_exist(
-            turn.session_id, turn.prediction_request_id
-        )
+        with tracer.start_as_current_span("Check auxiliary metadata cache"):
+            auxiliary_metadata_exists = self._auxiliary_metadata_cache_client.check_exist(
+                turn.session_id, turn.prediction_request_id
+            )
 
-        # Load the auxiliary metadata from the cache or the EFS URi
-        auxiliary_metadata = (
-            self._auxiliary_metadata_cache_client.load(turn.session_id, turn.prediction_request_id)
-            if auxiliary_metadata_exists
-            else SimBotAuxiliaryMetadataPayload.from_efs_uri(uri=turn.auxiliary_metadata_uri)
-        )
+        # Load the auxiliary metadata from the cache or the EFS URI
+        if auxiliary_metadata_exists:
+            with tracer.start_as_current_span("Load auxiliary metadata from cache"):
+                auxiliary_metadata = self._auxiliary_metadata_cache_client.load(
+                    turn.session_id, turn.prediction_request_id
+                )
+        else:
+            with tracer.start_as_current_span("Load auxiliary metadata from EFS"):
+                auxiliary_metadata = SimBotAuxiliaryMetadataPayload.from_efs_uri(
+                    uri=turn.auxiliary_metadata_uri
+                )
 
         # If it has not been cached, upload it to the cache
         if not auxiliary_metadata_exists:
-            self._auxiliary_metadata_cache_client.save(
-                auxiliary_metadata,
-                turn.session_id,
-                turn.prediction_request_id,
-            )
+            with tracer.start_as_current_span("Save auxiliary metadata to cache"):
+                self._auxiliary_metadata_cache_client.save(
+                    auxiliary_metadata,
+                    turn.session_id,
+                    turn.prediction_request_id,
+                )
 
         return auxiliary_metadata
 
