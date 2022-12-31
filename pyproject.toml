@@ -41,7 +41,7 @@ httpx = "^0.23.0"
 orjson = "^3.8.0"
 fastapi = "^0.88.0"
 typer = "^0.6.1"
-pydantic = { extras = ["dotenv"], version = "^1.10.2" }
+pydantic = {version = "^1.10.0", extras = ["dotenv"]}
 cloudpathlib = { extras = ["s3"], version = "^0.10.0" }
 convert-case = "^1.1.1"
 gunicorn = "^20.1.0"
