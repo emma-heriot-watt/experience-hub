@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.38.0](https://github.com/emma-simbot/experience-hub/compare/v5.37.0...v5.38.0) (2022-12-31)
+
+
+### Features
+
+* **telemetry:** add tracing when getting auxiliary metadata ([a4863ca](https://github.com/emma-simbot/experience-hub/commit/a4863ca55fffca07522b02e5c257b3c0d345a7c1))
+
 ## [5.37.0](https://github.com/emma-simbot/experience-hub/compare/v5.36.0...v5.37.0) (2022-12-25)
 
 
