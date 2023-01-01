@@ -151,6 +151,9 @@ def run_controller_api(
     os.environ["SIMBOT_AUXILIARY_METADATA_CACHE_DIR"] = str(auxiliary_metadata_cache_dir)
     os.environ["SIMBOT_EXTRACTED_FEATURES_CACHE_DIR"] = str(extracted_features_cache_dir)
 
+    # Do not track any healthcheck calls
+    os.environ["OTEL_PYTHON_EXCLUDED_URLS"] = "healthcheck,ping"
+
     simbot_settings = SimBotSettings.from_env()
 
     if traces_to_opensearch:

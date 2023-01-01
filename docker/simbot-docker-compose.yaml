@@ -61,6 +61,7 @@ x-observability-env-vars: &observability-env-vars
   LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
   TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
   OTLP_ENDPOINT: "otel_collector:4317"
+  OTEL_PYTHON_EXCLUDED_URLS: "healthcheck,ping"
 
 version: "3.9"
 
