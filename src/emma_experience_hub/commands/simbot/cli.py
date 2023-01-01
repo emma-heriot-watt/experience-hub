@@ -26,6 +26,41 @@ app = typer.Typer(
 
 
 @app.command()
+def pull_service_images(
+    registry_path: Path = typer.Option(
+        Path("storage/registry/simbot/production.yaml"),
+        help="Location of the registry .yaml file",
+        exists=True,
+        file_okay=True,
+    ),
+    service_compose_file_path: Path = typer.Option(
+        Path("docker/simbot-docker-compose.yaml"),
+        help="Location of the compose definition file.",
+        exists=True,
+        file_okay=True,
+    ),
+    observability_compose_file_path: Path = typer.Option(
+        Path("docker/observability-docker-compose.yaml"),
+        help="Location of the compose definition file.",
+        exists=True,
+        file_okay=True,
+    ),
+) -> None:
+    """Pull images for the various services."""
+    # Load the registry for the services
+    service_registry = ServiceRegistry.parse_obj(yaml.safe_load(registry_path.read_bytes()))
+
+    # Set env vars for the services
+    service_registry.update_all_env_vars()
+
+    # Pull service images
+    subprocess.run(f"docker compose -f {service_compose_file_path} pull", shell=True, check=True)
+    subprocess.run(
+        f"docker compose -f {observability_compose_file_path} pull", shell=True, check=True
+    )
+
+
+@app.command()
 def run_background_services(
     registry_path: Path = typer.Option(
         Path("storage/registry/simbot/production.yaml"),
