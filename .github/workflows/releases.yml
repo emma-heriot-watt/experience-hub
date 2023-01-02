@@ -81,3 +81,31 @@ jobs:
         run: |
           npm install --no-save @bjoluc/semantic-release-config-poetry
           npx semantic-release
+
+  push_to_s3:
+    name: Push release to S3
+    runs-on: ubuntu-latest
+    needs: [release]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: Zip repository
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -r experience-hub.zip .
+
+      - name: Push to S3
+        uses: prewk/s3-cp-action@v2
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          source: "experience-hub.zip"
+          dest: "s3://emma-simbot/infrastructure/deployment/experience-hub.zip"
