@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.39.0](https://github.com/emma-simbot/experience-hub/compare/v5.38.0...v5.39.0) (2023-01-02)
+
+
+### Features
+
+* **simbot/cli:** add command to pull all related service images ([5c0698b](https://github.com/emma-simbot/experience-hub/commit/5c0698bf39f532fc6da0ac36be8e70002bb55280))
+* **telemetry:** improve trace metadata and send metrics to opensearch ([c7dc1b5](https://github.com/emma-simbot/experience-hub/commit/c7dc1b5f80b26fcd84c435b0ded15312f4adef29))
+
+
+### Bug Fixes
+
+* **deps:** fix poetry.lock file ([3178a74](https://github.com/emma-simbot/experience-hub/commit/3178a749db6607bd0e51179efb10c92188c6e219))
+* **telemetry:** stop tracking healthcheck calls ([250a363](https://github.com/emma-simbot/experience-hub/commit/250a363a0175ad0f6d0dac02f4bbfa8e5edc3b25))
+
 ## [5.38.0](https://github.com/emma-simbot/experience-hub/compare/v5.37.0...v5.38.0) (2022-12-31)
 
 
