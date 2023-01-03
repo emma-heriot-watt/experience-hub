@@ -90,6 +90,9 @@ sudo ./aws/install
 aws configure --profile TeamProfile
 # TODO: Configure profile
 
+# ---------------------------- Enable AWS Profile ---------------------------- #ç
+export AUS_PROFILE=TeamProfile
+
 # ---------------------------- Install NFS common ---------------------------- #
 sudo apt-get -y install nfs-common
 
@@ -115,6 +118,12 @@ mkdir auxiliary_metadata
 echo 10.0.112.83 fs-0bfa9bdb8b799cb84.efs.us-east-1.amazonaws.com | sudo tee -a /etc/hosts
 sudo mount -t efs -o tls,accesspoint=fsap-022169cf9e6e76aa9 fs-0bfa9bdb8b799cb84 auxiliary_metadata
 echo "fs-0bfa9bdb8b799cb84:/ /home/ubuntu/emma/auxiliary_metadata efs _netdev,noresvport,tls,iam,accesspoint=fsap-022169cf9e6e76aa9 0 0" | sudo tee -a /etc/fstab
+
+# ----------------- Setup EFS for staging auxiliary metadata ----------------- #
+mkdir staging_auxiliary_metadata
+echo 10.0.96.154 fs-02d492af78a2f5b1a.efs.us-east-1.amazonaws.com | sudo tee -a /etc/hosts
+sudo mount -t efs -o tls,accesspoint=fsap-01eda13760c255e37 fs-02d492af78a2f5b1a staging_auxiliary_metadata
+echo "fs-02d492af78a2f5b1a:/ /home/ubuntu/emma/staging_auxiliary_metadata efs _netdev,noresvport,tls,iam,accesspoint=fsap-01eda13760c255e37 0 0" | sudo tee -a /etc/fstab
 
 # ----------------------- Import experience-hub project ---------------------- #
 git clone https://github.com/emma-simbot/experience-hub experience-hub &&
