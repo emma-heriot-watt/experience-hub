@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.0](https://github.com/emma-simbot/experience-hub/compare/v5.39.1...v6.0.0) (2023-01-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* use grammar-style parsing to generate responses (#245)
+
+### Features
+
+* use grammar-style parsing to generate responses ([#245](https://github.com/emma-simbot/experience-hub/issues/245)) ([0879895](https://github.com/emma-simbot/experience-hub/commit/087989549ce33e5e48176ff62c4cfc237d586939))
+
 ## [5.39.1](https://github.com/emma-simbot/experience-hub/compare/v5.39.0...v5.39.1) (2023-01-05)
 
 
