@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.39.1](https://github.com/emma-simbot/experience-hub/compare/v5.39.0...v5.39.1) (2023-01-05)
+
+
+### Bug Fixes
+
+* **api:** return 500 if the api is not healthy ([3e1befc](https://github.com/emma-simbot/experience-hub/commit/3e1befcaf01030bb4f205cf334dc08ad331f28fe))
+
 ## [5.39.0](https://github.com/emma-simbot/experience-hub/compare/v5.38.0...v5.39.0) (2023-01-02)
 
 
