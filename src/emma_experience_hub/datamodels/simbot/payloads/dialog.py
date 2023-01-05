@@ -1,4 +1,5 @@
-from emma_experience_hub.datamodels.simbot.enums.intents import SimBotIntentType
+from pydantic import Field
+
 from emma_experience_hub.datamodels.simbot.payloads.payload import SimBotPayload
 
 
@@ -9,4 +10,4 @@ class SimBotDialogPayload(SimBotPayload):
     """
 
     value: str  # noqa: WPS110
-    intent: SimBotIntentType
+    rule_id: int = Field(..., description="the id of the rule used to generate the response")

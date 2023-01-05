@@ -17,6 +17,7 @@ from emma_experience_hub.datamodels import (
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotDialogAction
 from emma_experience_hub.datamodels.simbot.enums import SimBotActionType, SimBotIntentType
+from emma_experience_hub.datamodels.simbot.feedback import SimBotFeedbackState
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
@@ -262,6 +263,14 @@ class SimBotSessionTurn(BaseModel):
 
         return utterances
 
+    @property
+    def feedback_rule_id(self) -> Optional[int]:
+        """Get the id for the rule used to generate the agent feedback for that turn."""
+        if self.actions.dialog is not None:
+            return self.actions.dialog.payload.rule_id
+
+        return None
+
     def convert_to_simbot_response(self) -> SimBotResponse:
         """Convert the session turn to a SimBotResponse, to be returned to the API."""
         if not self.actions.to_list():
@@ -390,6 +399,28 @@ class SimBotSession(BaseModel):
 
         return turns_within_window
 
+    def to_feedback_state(self) -> SimBotFeedbackState:
+        """Convert the session to the simplified state."""
+        return SimBotFeedbackState.from_all_information(
+            num_turns=len(self.turns),
+            current_room=self.current_turn.environment.current_room,
+            user_intent_type=self.current_turn.intent.user,
+            environment_intent=self.current_turn.intent.environment,
+            agent_intent=self.current_turn.intent.agent,
+            agent_interaction_action=self.current_turn.actions.interaction,
+            current_room_per_turn=[turn.environment.current_room for turn in self.turns],
+            interaction_action_per_turn=[
+                turn.actions.interaction for turn in self.turns if turn.actions.interaction
+            ],
+            agent_intent_per_turn=[turn.intent.agent for turn in self.turns if turn.intent.agent],
+            utterance_queue_not_empty=self.current_state.utterance_queue.is_not_empty,
+            find_queue_not_empty=self.current_state.find_queue.is_not_empty,
+            previous_find_queue_not_empty=self.previous_turn.state.find_queue.is_not_empty
+            if self.previous_turn
+            else False,
+            used_rule_ids=self._get_used_feedback_rule_ids(),
+        )
+
     @staticmethod
     def get_dialogue_history_from_session_turns(  # noqa: WPS602
         turns: list[SimBotSessionTurn],
@@ -439,3 +470,10 @@ class SimBotSession(BaseModel):
 
         # Ensure the environment history is sorted properly and return them
         return list(dict(sorted(environment_history.items())).values())
+
+    def _get_used_feedback_rule_ids(self) -> list[int]:
+        """Get all the rule IDs that were used to generate responses."""
+        rule_ids = [
+            turn.feedback_rule_id for turn in self.turns if turn.feedback_rule_id is not None
+        ]
+        return rule_ids

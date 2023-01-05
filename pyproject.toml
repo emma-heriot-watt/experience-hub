@@ -1,4 +1,5 @@
 [tool.poetry]
+
 name = "emma-experience-hub"
 version = "5.39.1"
 description = ""
@@ -41,14 +42,15 @@ httpx = "^0.23.0"
 orjson = "^3.8.0"
 fastapi = "^0.88.0"
 typer = "^0.6.1"
-pydantic = {version = "^1.10.0", extras = ["dotenv"]}
+pydantic = { version = "^1.10.0", extras = ["dotenv"] }
 cloudpathlib = { extras = ["s3"], version = "^0.10.0" }
 convert-case = "^1.1.1"
 gunicorn = "^20.1.0"
+rule-engine = "^3.5.0"
 overrides = "^6.1.0"
 numpy = "^1.23.5"
 methodtools = "^0.4.5"
-emma-common = {git = "https://github.com/emma-simbot/common"}
+emma-common = { git = "https://github.com/emma-simbot/common" }
 more-itertools = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]

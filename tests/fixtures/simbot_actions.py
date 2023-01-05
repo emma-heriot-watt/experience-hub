@@ -18,9 +18,11 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotDialogAction,
     SimBotIntent,
     SimBotIntentType,
+    SimBotSession,
     SimBotSessionTurn,
     SimBotSessionTurnActions,
     SimBotSessionTurnIntent,
+    SimBotSessionTurnState,
 )
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
@@ -153,9 +155,8 @@ def simbot_object_interaction_payloads(
 @st.composite
 def simbot_dialog_payloads(draw: st.DrawFn) -> SimBotDialogPayload:
     """Generate a dialog payload."""
-    return SimBotDialogPayload(
-        value=draw(st.text(min_size=1)), intent=SimBotIntentType.generic_success
-    )
+    rule_id = draw(st.integers(0, 10))
+    return SimBotDialogPayload(value=draw(st.text(min_size=1)), rule_id=rule_id)
 
 
 @st.composite
@@ -267,7 +268,7 @@ def simbot_actions(
         id=st.just(0),
         payload=st.just(payload),
         type=st.just(action_type),
-        status=st.just(action_status) if include_status else st.none(),
+        status=st.just(action_status) if draw(include_status) else st.none(),
     )
 
     if allow_none:
@@ -283,7 +284,7 @@ def simbot_session_turns(
     interaction_action: st.SearchStrategy[Optional[SimBotAction]] = simbot_actions(
         simbot_interaction_payloads(), allow_none=True
     ),
-    dialog_action: st.SearchStrategy[Optional[SimBotAction]] = simbot_actions(
+    dialog_action: st.SearchStrategy[Optional[SimBotDialogAction]] = simbot_actions(  # type: ignore[assignment]
         simbot_dialog_payloads(), allow_none=True
     ),
 ) -> SimBotSessionTurn:
@@ -294,21 +295,33 @@ def simbot_session_turns(
     )
     drawn_dialog_action = draw(dialog_action)
 
-    assert isinstance(drawn_dialog_action, SimBotDialogAction)
-
     actions = SimBotSessionTurnActions(
         interaction=draw(interaction_action), dialog=drawn_dialog_action
     )
+    state = SimBotSessionTurnState()
     turn: SimBotSessionTurn = draw(
         st.builds(
             SimBotSessionTurn,
             session_id=st.just(session_id),
             current_room=current_room,
             unique_room_names=st.just(set(get_simbot_room_names())),
-            intents=st.just(intents),
+            intent=st.just(intents),
             actions=st.just(actions),
+            state=st.just(state),
             auxiliary_metadata_uri=st.just(draw(simbot_auxiliary_metadata_payloads()).uri),
         )
     )
-
     return turn
+
+
+@st.composite
+def simbot_session(
+    draw: st.DrawFn,
+) -> SimBotSession:
+    """Generate a session."""
+    session_id = "amzn1.echo-api.session.3f55df67-01ac-48ad-aa5b-380dcd22b837_5"
+    session_turns = st.lists(simbot_session_turns(), min_size=1, max_size=5)
+    session: SimBotSession = draw(
+        st.builds(SimBotSession, session_id=st.just(session_id), turns=session_turns)
+    )
+    return session

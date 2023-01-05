@@ -37,13 +37,6 @@ class SimBotIntentType(Enum):
     search_goto_viewpoint = "<search><goto_viewpoint>"
     search_goto_room = "<search><goto_room>"
 
-    # Feedback for success
-    generic_success = "<success><generic>"
-    object_interaction_success = "<success><object_interaction>"
-    low_level_navigation_success = "<success><low_level_navigation>"
-    goto_room_success = "<success><goto_room>"
-    goto_object_success = "<success><goto_object>"
-
     # Feedback for failure
     generic_failure = "<failure><generic>"
 

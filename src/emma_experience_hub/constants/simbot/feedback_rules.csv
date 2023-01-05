@@ -1,0 +1,69 @@
+id,conditions,response,is_lightweight
+1,agent_intent_type != null,',False
+2,user_intent_type == "profanity",Sorry I can't help with that.,False
+3,user_intent_type == "out_of_domain",Sorry I can't help with that.,False
+4,user_intent_type == "low_asr_confidence" and agent_intent_type_counter["low_asr_confidence"] == 1,Sorry I wasn't able to understand what you said. Are you able to repeat that?,False
+5,user_intent_type == "low_asr_confidence" and agent_intent_type_counter["low_asr_confidence"] > 1,<say-as interpret-as="interjection">um</say-as> Can you repeat that please?,False
+6,user_intent_type == "low_asr_confidence" and agent_intent_type_counter["low_asr_confidence"] > 2,Sorry I'm struggling to hear you - maybe try to go slower?,False
+7,user_intent_type == "clarify_disambiguation" and environment_intent_entity != null,Which {environment_intent_entity} are you referring to?,False
+8,user_intent_type == "clarify_disambiguation" and environment_intent_entity != null,Which {environment_intent_entity} do you mean?,False
+9,user_intent_type == "clarify_disambiguation" and environment_intent_entity != null,Which {environment_intent_entity} do you mean? I can see more than one.,False
+10,user_intent_type == "clarify_location" and agent_intent_type_counter["clarify_location"] == 1 and environment_intent_entity != null,I can't see the {environment_intent_entity}. If you ask me to find it I can look around.,False
+11,user_intent_type == "clarify_location" and agent_intent_type_counter["clarify_location"] > 1 and environment_intent_entity != null,Where can I find the {environment_intent_entity}?,False
+12,user_intent_type == "clarify_location" and agent_intent_type_counter["clarify_location"] > 1 and environment_intent_entity != null,Hmm I don't see that. Where is the {environment_intent_entity}?,False
+13,environment_intent_type == "generic_failure",Sorry I'm struggling with this one. Can you be more specific?,False
+14,environment_intent_type == "generic_failure",Sorry seems that I'm having some trouble. Can you rephrase that?,False
+15,environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity != null,Sorry I cannot {environment_intent_action_type} the {environment_intent_entity}.,False
+16,environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,Looks like I cannot go to the {environment_intent_entity}.,False
+17,environment_intent_type == "already_holding_object" and environment_intent_action_type == "pickup" and environment_intent_entity != null,I can only hold one thing at a time so I cannot pick up the {environment_intent_entity}.,False
+18,environment_intent_type == "already_holding_object" and environment_intent_action_type == "pickup" and environment_intent_entity != null,I am already holding something. We should put it down first.,False
+19,environment_intent_type == "receptacle_is_full" and environment_intent_action_type == "place" and environment_intent_entity != null,It looks like the {environment_intent_entity} is full.,False
+20,environment_intent_type == "receptacle_is_full" and environment_intent_action_type == "place" and environment_intent_entity != null,There's not enough space in the {environment_intent_entity}.,False
+21,environment_intent_type == "receptacle_is_closed" and environment_intent_action_type == "place" and environment_intent_entity != null,I can't do that because the {environment_intent_entity} is closed.,False
+22,environment_intent_type == "target_inaccessible" and environment_intent_entity != null,I can't access the {environment_intent_entity} from here. Can you provide me an instruction so it's in my view?,False
+23,environment_intent_type == "target_out_of_range" and environment_intent_action_type == "place" and environment_intent_entity != null,I can't reach the {environment_intent_entity} from here. Can you help me get closer?,False
+24,environment_intent_type == "target_out_of_range" and environment_intent_action_type == "toggle" and environment_intent_entity != null,I can't toggle the {environment_intent_entity}. It's too far for these robotic short hands.,False
+25,environment_intent_type == "target_out_of_range" and environment_intent_entity != null,<say-as interpret-as="interjection">whoops</say-as> it's too far. Can you tell me how to get closer?,False
+26,environment_intent_type == "target_out_of_range" and environment_intent_entity != null,The {environment_intent_entity} is too far away. I think we should get closer first.,False
+27,environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject",I got as close as I could.,False
+28,environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject",<say-as interpret-as="interjection">all righty</say-as> I think that's close enough,False
+29,environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject",Hope that's close enough!,False
+30,environment_intent_type == "object_overloaded",Hmm it seems like it is currently overloaded. I think we need to fix that first?,False
+31,environment_intent_type == "object_unpowered",Hmm it seems like it's not currently powered. I think we need to handle that first?,False
+32,environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity},False
+33,environment_intent_type == "arena_unavailable",Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?,False
+34,environment_intent_type == "action_execution_error",Something went wrong. Can you give me a different instruction?,False
+35,environment_intent_type == "incorrect_action_format",I tried to perform an action but looks like I don't remember how to do it. Can you give me a different instruction?,False
+36,environment_intent_type == "invalid_object_class" and environment_intent_entity != null,<say-as interpret-as="interjection">oops</say-as> I made a mistake in interacting with the {environment_intent_entity}. Could you please give me a different instruction?,False
+37,environment_intent_type == "post_process_error",Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?,False
+38,environment_intent_type == "killed_by_hazard",I am dead,False
+39,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and not utterance_queue_not_empty,I am in the {agent_interaction_entity},False
+40,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and not utterance_queue_not_empty,I got to the {agent_interaction_entity},False
+41,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and agent_interaction_entity in visited_room_counter and visited_room_counter[agent_interaction_entity] > 1 and not utterance_queue_not_empty,Back in the {agent_interaction_entity},False
+42,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and utterance_queue_not_empty,Going to the {agent_interaction_entity},True
+43,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and utterance_queue_not_empty,Moving to the {agent_interaction_entity},True
+44,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and utterance_queue_not_empty,Let me get to the {agent_interaction_entity},True
+45,interaction_action_per_turn[-1]["type"] != null and interaction_action_per_turn[-1]["type"] == "GotoRoom" and agent_interaction_entity != null and agent_interaction_entity in visited_room_counter and visited_room_counter[agent_interaction_entity] > 2 and not utterance_queue_not_empty,So what should I do here?,False
+46,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,Done,False
+47,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,Alright,False
+48,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,So what should I do next?,False
+49,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,Now what?,False
+50,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,<say-as interpret-as="interjection">righto</say-as>,False
+51,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,Alright what's next?,False
+52,agent_intent_type == "act_low_level" and not utterance_queue_not_empty,<say-as interpret-as="interjection">okey dokey</say-as>,False
+53,agent_intent_type == "act_low_level" and utterance_queue_not_empty,',True
+54,agent_intent_type == "act_search" and agent_interaction_action == "Highlight",<say-as interpret-as="interjection">hmm</say-as> I think I found it over there. I'm moving closer.,True
+55,agent_intent_type == "act_search" and agent_interaction_action == "Highlight",Found it! Let's get closer.,True
+56,agent_intent_type == "act_search" and agent_interaction_action == "Highlight",I think it is right there.,True
+57,agent_intent_type == "act_search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,It looks like it's over there.,True
+58,agent_intent_type == "act_search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,I think I found it. I'm going there.,True
+59,agent_intent_type == "act_search" and agent_interaction_action == "RotateLeft" and not find_queue_not_empty,I couldn't find it.,False
+60,agent_intent_type == "act_search" and agent_interaction_action == "RotateLeft" and not find_queue_not_empty,Sorry I don't see it. Can you give me a different instruction?,False
+61,agent_intent_type == "act_search" and agent_interaction_action == "RotateLeft" and not find_queue_not_empty,I can't find it. Can you give me another instruction?,False
+62,agent_intent_type == "act_search" and agent_interaction_action == "GotoObject" and not utterance_queue_not_empty,Now what should I do?,False
+63,agent_intent_type == "act_search" and agent_interaction_action == "GotoObject" and not utterance_queue_not_empty,Okay what next?,False
+64,agent_intent_type == "act_search" and agent_interaction_action == "GotoObject" and not utterance_queue_not_empty,What are we doing next?,False
+65,agent_intent_type == "act_search" and agent_interaction_action == "GotoObject" and utterance_queue_not_empty,',True
+66,agent_intent_type == "act_search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I don't see it in front of me. Let me have a look around the room.,True
+67,agent_intent_type == "act_search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns == 1,I don't see it in front of me. Let me have a look around the room.,True
+68,agent_intent_type == "act_search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty,',True

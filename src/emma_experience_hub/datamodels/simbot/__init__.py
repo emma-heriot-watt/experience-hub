@@ -8,6 +8,7 @@ from emma_experience_hub.datamodels.simbot.enums import (
     SimBotActionType,
     SimBotIntentType,
 )
+from emma_experience_hub.datamodels.simbot.feedback import SimBotFeedbackRule, SimBotFeedbackState
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
@@ -16,5 +17,6 @@ from emma_experience_hub.datamodels.simbot.session import (
     SimBotSessionTurn,
     SimBotSessionTurnActions,
     SimBotSessionTurnIntent,
+    SimBotSessionTurnState,
 )
 from emma_experience_hub.datamodels.simbot.speech import SimBotUserSpeech

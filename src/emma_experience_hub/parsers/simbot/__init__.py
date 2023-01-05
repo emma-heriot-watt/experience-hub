@@ -1,6 +1,9 @@
 from emma_experience_hub.parsers.simbot.action_predictor_output import (
     SimBotActionPredictorOutputParser,
 )
+from emma_experience_hub.parsers.simbot.feedback_from_session_context import (
+    SimBotFeedbackFromSessionStateParser,
+)
 from emma_experience_hub.parsers.simbot.intent_from_action_status import (
     SimBotIntentFromActionStatusParser,
 )

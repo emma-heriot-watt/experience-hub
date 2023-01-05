@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from csv import DictReader
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
@@ -75,6 +76,15 @@ def get_simbot_room_name_map() -> dict[str, str]:
     return {room_name.lower(): room_name for room_name in get_simbot_room_names()}
 
 
+@lru_cache(maxsize=1)
+def get_feedback_rules() -> list[dict[str, str]]:
+    """Load the feedback rules and responses from their file."""
+    csv_path = constants_absolute_path.joinpath("simbot", "feedback_rules.csv")
+    with open(csv_path, encoding="utf-8-sig") as csv_file:
+        reader = DictReader(csv_file)
+        return list(reader)
+
+
 ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
     {
         SimBotActionType.Goto: {"GoTo", "goto", "Goto"},
@@ -101,9 +111,25 @@ ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
     }
 )
 
+ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
+    {
+        "GotoRoom": "go to",
+        "MoveForward": "move forward",
+        "MoveBackward": "move backward",
+        "RotateLeft": "rotate left",
+        "RotateRight": "rotate right",
+        "LookUp": "look up",
+        "LookDown": "look down",
+        "LookAround": "look around",
+        "TurnAround": "turn around",
+        "Pickup": "pick up",
+    }
+)
+
+
 ROOM_SYNONYNMS: Mapping[str, str] = MappingProxyType(
     {
-        "BreakRoom": "break room",
+        "BreakRoom": "breakroom",
         "Lab1": "robotics lab",
         "Lab2": "quantum lab",
         "MainOffice": "main office",

@@ -1,271 +1,96 @@
 from typing import Optional
 
 from loguru import logger
+from opentelemetry import trace
 
-from emma_experience_hub.api.clients.simbot import SimBotUtteranceGeneratorClient
+from emma_experience_hub.constants.simbot import ACTION_SYNONYMS_FOR_GENERATION, ROOM_SYNONYNMS
 from emma_experience_hub.datamodels.simbot import (
-    SimBotAction,
     SimBotActionType,
     SimBotDialogAction,
-    SimBotIntent,
-    SimBotIntentType,
+    SimBotFeedbackRule,
+    SimBotFeedbackState,
     SimBotSession,
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotDialogPayload
+from emma_experience_hub.parsers.simbot.feedback_from_session_context import (
+    SimBotFeedbackFromSessionStateParser,
+)
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class SimBotAgentLanguageGenerationPipeline:
     """Generate language for the agent to say to the user."""
 
-    def __init__(self, utterance_generator_client: SimBotUtteranceGeneratorClient) -> None:
-        self._utterance_generator_client = utterance_generator_client
+    _default_entity = "object"
+
+    def __init__(self) -> None:
+        self._feedback_parser = SimBotFeedbackFromSessionStateParser.from_rules_csv()
 
     def run(self, session: SimBotSession) -> Optional[SimBotDialogAction]:
-        """Generate an utterance to send back to the user, if required."""
+        """Generate an utterance to send back to the user."""
         if not session.current_turn.intent.agent:
             raise AssertionError("The agent should have an intent before calling this module.")
 
-        action: Optional[SimBotDialogAction] = None
+        with tracer.start_as_current_span("Get feedback state"):
+            feedback_state = session.to_feedback_state()
 
-        # Generate dialog actions where the agent did not generate an interaction action
-        if not action:
-            action = self.handle_non_actionable_intents(session)
+        with tracer.start_as_current_span("Choose utterance"):
+            matching_rule = self._feedback_parser(feedback_state)
 
-        if not action:
-            action = self.handle_search_predictions(session)
-
-        # If we wanted to generate an action and we failed to do so
-        if not action:
-            action = self.handle_failed_action_prediction(session)
-
-        # If we successfully predicted an interaction action
-        if not action:
-            action = self.handle_successful_action_prediction(session)
+        action = self._generate_dialog_action(matching_rule, feedback_state)
 
         return action
 
-    def handle_non_actionable_intents(
-        self, session: SimBotSession
-    ) -> Optional[SimBotDialogAction]:
-        """Generate utterances for non-actionable intents.
-
-        These are basically all cases where the agent does not want to generate an action.
-        """
-        # Agent intent should not be None
-        if not session.current_turn.intent.agent:
-            return None
-
-        # If the agent intent should have generated an action, return None
-        if session.current_turn.intent.should_generate_interaction_action:
-            return None
-
-        # Otherwise, provide that intent to the utterance generator
-        return self._generate_from_intent(
-            session.current_turn.intent.agent, use_lightweight_dialog=False
-        )
-
-    def handle_failed_action_prediction(
-        self, session: SimBotSession
-    ) -> Optional[SimBotDialogAction]:
-        """Handle dialog generation if a valid action was not generated."""
-        agent_not_failed_action_prediction = (
-            session.current_turn.intent.should_generate_interaction_action
-            and session.current_turn.actions.interaction is not None
-        )
-        if agent_not_failed_action_prediction:
-            return None
-
-        intent = SimBotIntent(type=SimBotIntentType.generic_failure)
-        return self._generate_from_intent(intent, use_lightweight_dialog=False)
-
-    def handle_search_predictions(  # noqa: WPS212
-        self, session: SimBotSession
-    ) -> Optional[SimBotDialogAction]:
-        """Handle search-related dialog generations."""
-        # Agent intent should not be None
-        if not session.current_turn.intent.agent:
-            logger.debug("[NLG SEARCH]: Agent does not have an intent? This should not happen")
-            return None
-
-        # This handler is only for when we are trying to do a search routine
-        if session.current_turn.intent.agent.type != SimBotIntentType.act_search:
-            logger.debug("[NLG SEARCH]: Agent intent is not search, returning.")
-            return None
-
-        # Get the interaction action
-        logger.debug("[NLG SEARCH]: Try get the interaction action from the agent")
-        action = session.current_turn.actions.interaction
-
-        # There is no interaction action
-        if not action:
-            logger.debug("[NLG SEARCH]: There is no interaction action")
-            return None
-
-        # If the current action is rotate left and the queue is empty there are no more actions to perform
-        if (  # noqa: WPS337
-            action.type == SimBotActionType.RotateLeft
-            and session.current_turn.state.find_queue.is_empty
-        ):
-            logger.debug(
-                "[NLG SEARCH]: We did not find an object and there are no planning steps left"
-            )
-            return self._generate_from_intent(
-                SimBotIntent(type=SimBotIntentType.search_not_found_object),
-                use_lightweight_dialog=False,
-            )
-
-        # If we are returning a Highlight action, it means we found the object.
-        if action.type == SimBotActionType.Highlight:
-            logger.debug("[NLG SEARCH]: We have found an object")
-            return self._generate_from_intent(
-                SimBotIntent(type=SimBotIntentType.search_found_object),
-                use_lightweight_dialog=True,
-            )
-
-        # For the first turn left action, return a lightweight dialog action
-        if (  # noqa: WPS337
-            action.type == SimBotActionType.RotateLeft
-            and session.previous_turn is not None
-            and session.previous_turn.state.find_queue.is_empty
-        ):
-            logger.debug("[NLG SEARCH]: We are looking around for the object")
-            return self._generate_from_intent(
-                SimBotIntent(
-                    type=SimBotIntentType.search_look_around,
-                    action=SimBotActionType.LookAround,
-                ),
-                use_lightweight_dialog=True,
-            )
-
-        if action.type == SimBotActionType.GotoViewpoint:
-            # If we are going to a viewpoint to look more
-            logger.debug("[NLG SEARCH]: We are going to a new viewpoint")
-            return self._generate_from_intent(
-                SimBotIntent(
-                    type=SimBotIntentType.search_goto_viewpoint,
-                    action=SimBotActionType.GotoViewpoint,
-                ),
-                use_lightweight_dialog=True,
-            )
-
-        if action.type == SimBotActionType.GotoRoom:
-            # If we are going to a room to look more
-            logger.debug("[NLG SEARCH]: We are going to a new room")
-            return self._generate_from_intent(
-                SimBotIntent(
-                    type=SimBotIntentType.search_goto_room,
-                    action=SimBotActionType.GotoRoom,
-                ),
-                use_lightweight_dialog=True,
-            )
-
-        # We are going to the object indicated by the find routine
-        if action.type == SimBotActionType.GotoObject:
-            logger.debug("[NLG SEARCH]: We are going to the found object")
-            return self._generate_from_intent(
-                SimBotIntent(
-                    type=SimBotIntentType.goto_object_success,
-                    action=SimBotActionType.Goto,
-                ),
-                use_lightweight_dialog=False,
-            )
-
-        # If none of the above conditions fit, return None
-        logger.debug("[NLG SEARCH]: None of the search conditions fit, returning `None`.")
-        return None
-
-    def handle_successful_action_prediction(
-        self, session: SimBotSession
-    ) -> Optional[SimBotDialogAction]:
-        """Handle dialog generation for a successful action prediction."""
-        interaction_action = session.current_turn.actions.interaction
-
-        if not interaction_action:
-            raise AssertionError("There should be an interaction action here.")
-
-        # Check for end of trajectory token
-        if not interaction_action.is_end_of_trajectory:
-            return None
-
-        # We should use the lightweight dialog if the utterance queue is not empty, since we are
-        # going to act after this
-        is_utterance_queue_not_empty = bool(session.current_state.utterance_queue)
-
-        if interaction_action.is_goto_room:
-            return self.handle_goto_room_action(
-                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
-            )
-
-        if interaction_action.is_goto_object:
-            return self.handle_goto_object_action(
-                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
-            )
-
-        if interaction_action.is_low_level_navigation:
-            return self.handle_low_level_navigation_action(
-                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
-            )
-
-        if interaction_action.is_object_interaction:
-            return self.handle_object_interaction_action(
-                interaction_action, use_lightweight_dialog=is_utterance_queue_not_empty
-            )
-
-        raise AssertionError("All predicted action types should have been handled?")
-
-    def handle_goto_room_action(
-        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
-    ) -> Optional[SimBotDialogAction]:
-        """Generate dialog for goto room actions."""
-        intent = SimBotIntent(
-            type=SimBotIntentType.goto_room_success,
-            entity=interaction_action.payload.entity_name,
-            action=interaction_action.type,
-        )
-        return self._generate_from_intent(intent, use_lightweight_dialog)
-
-    def handle_goto_object_action(
-        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
-    ) -> Optional[SimBotDialogAction]:
-        """Generate dialog for goto object actions."""
-        intent = SimBotIntent(
-            type=SimBotIntentType.goto_object_success,
-            entity=interaction_action.payload.entity_name,
-            action=interaction_action.type,
-        )
-        return self._generate_from_intent(intent, use_lightweight_dialog)
-
-    def handle_low_level_navigation_action(
-        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
-    ) -> Optional[SimBotDialogAction]:
-        """Generate dialog for low-level navigation actions."""
-        intent = SimBotIntent(
-            type=SimBotIntentType.low_level_navigation_success,
-            action=interaction_action.type,
-        )
-        return self._generate_from_intent(intent, use_lightweight_dialog)
-
-    def handle_object_interaction_action(
-        self, interaction_action: SimBotAction, use_lightweight_dialog: bool = False
-    ) -> Optional[SimBotDialogAction]:
-        """Generate dialog for object interaction actions."""
-        intent = SimBotIntent(
-            type=SimBotIntentType.low_level_navigation_success,
-            entity=interaction_action.payload.entity_name,
-            action=interaction_action.type,
-        )
-        return self._generate_from_intent(intent, use_lightweight_dialog)
-
-    def _generate_from_intent(
-        self, intent: SimBotIntent, use_lightweight_dialog: bool
+    def _generate_dialog_action(
+        self, rule: SimBotFeedbackRule, feedback_state: SimBotFeedbackState
     ) -> SimBotDialogAction:
-        """Generate the utterance from the intent and return the dialog action."""
-        utterance = self._utterance_generator_client.generate_from_intent(intent)
+        """Generate a dialog action."""
+        utterance = self._generate_utterance(rule, feedback_state)
+
+        # Determine the dialog type for the response
+        dialog_type = (
+            SimBotActionType.LightweightDialog
+            if rule.is_lightweight_dialog or feedback_state.utterance_queue_not_empty
+            else SimBotActionType.Dialog
+        )
+
         return SimBotDialogAction(
             id=0,
             raw_output=utterance,
-            type=SimBotActionType.LightweightDialog
-            if use_lightweight_dialog
-            else SimBotActionType.Dialog,
-            payload=SimBotDialogPayload(value=utterance, intent=intent.type),
+            type=dialog_type,
+            payload=SimBotDialogPayload(value=utterance, rule_id=rule.id),
         )
+
+    def _generate_utterance(
+        self, rule: SimBotFeedbackRule, feedback_state: SimBotFeedbackState
+    ) -> str:
+        """Generate utterance from the rule and the feedback state."""
+        # Build the query dictionary from the feedback state
+        query_dict = feedback_state.to_query()
+        logger.debug(f"Feedback Query Dict: {query_dict}")
+
+        # Create the slot value pairs for the response
+        slot_value_pairs = {
+            slot_name: self._process_slot_name(query_dict[slot_name])
+            for slot_name in rule.slot_names
+        }
+
+        # Build the response itself
+        utterance = rule.response.format(**slot_value_pairs)
+
+        logger.debug(f"[NLG] Generated utterance from rule {rule.id}: {utterance}")
+        return utterance
+
+    def _process_slot_name(self, entity: Optional[str]) -> str:
+        """Return a synonym for the entity name if possible."""
+        if not entity:
+            return self._default_entity
+
+        action_synonym = ACTION_SYNONYMS_FOR_GENERATION.get(entity, None)
+
+        if action_synonym is not None:
+            return action_synonym
+
+        return ROOM_SYNONYNMS.get(entity, entity)

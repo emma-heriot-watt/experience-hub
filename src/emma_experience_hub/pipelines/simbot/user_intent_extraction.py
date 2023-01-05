@@ -78,9 +78,10 @@ class SimBotUserIntentExtractionPipeline:
     ) -> bool:
         """Return True if the user is responding to a previous clarification question."""
         return (
-            previous_turn is not None
+            previous_turn is not None  # noqa: WPS222
             and previous_turn.actions.dialog is not None
-            and previous_turn.actions.dialog.intent.is_clarification_question
+            and previous_turn.intent.user is not None
+            and previous_turn.intent.user.is_clarification_question
             # This will always resolve False if clarification questions are disabled
             and not self._disable_clarification_questions
         )
@@ -90,9 +91,10 @@ class SimBotUserIntentExtractionPipeline:
     ) -> bool:
         """Return True if the user is responding to a confirmation question."""
         return (
-            previous_turn is not None
+            previous_turn is not None  # noqa: WPS222
             and previous_turn.actions.dialog is not None
-            and previous_turn.actions.dialog.intent.is_confirmation_question
+            and previous_turn.intent.user is not None
+            and previous_turn.intent.user.is_confirmation_question
             # This will always resolve to False if clarification questions are disabled.
             and not self._disable_clarification_confirmation
         )

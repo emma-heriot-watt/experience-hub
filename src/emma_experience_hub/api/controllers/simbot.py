@@ -23,7 +23,6 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotFeaturesClient,
     SimBotNLUIntentClient,
     SimBotSessionDbClient,
-    SimBotUtteranceGeneratorClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels.simbot import (
@@ -65,7 +64,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     action_predictor: SimbotActionPredictionClient
     session_db: SimBotSessionDbClient
     profanity_filter: ProfanityFilterClient
-    utterance_generator: SimBotUtteranceGeneratorClient
     out_of_domain_detector: OutOfDomainDetectorClient
     confirmation_response_classifier: ConfirmationResponseClassifierClient
     compound_splitter: CompoundSplitterClient
@@ -96,9 +94,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 server_endpoint=simbot_settings.action_predictor_url
             ),
             profanity_filter=ProfanityFilterClient(endpoint=simbot_settings.profanity_filter_url),
-            utterance_generator=SimBotUtteranceGeneratorClient.from_templates_file(
-                simbot_settings.response_templates
-            ),
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url
             ),
@@ -231,9 +226,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 previous_action_parser=SimBotPreviousActionParser(),
                 find_object_pipeline=find_object,
             ),
-            agent_language_generator=SimBotAgentLanguageGenerationPipeline(
-                utterance_generator_client=clients.utterance_generator,
-            ),
+            agent_language_generator=SimBotAgentLanguageGenerationPipeline(),
         )
 
 
@@ -273,7 +266,6 @@ class SimBotController:
         session = self.decide_what_the_agent_should_do(session)
         session = self.generate_interaction_action_if_needed(session)
         session = self.generate_language_action_if_needed(session)
-
         self._upload_session_turn_to_database(session)
 
         return session.current_turn.convert_to_simbot_response()
@@ -431,10 +423,10 @@ class SimBotController:
     def _user_is_responding_to_question(self, session: SimBotSession) -> bool:
         """Return True if the user is responding to a previous question."""
         previous_turn = session.previous_valid_turn
-        if previous_turn is None or previous_turn.actions.dialog is None:
+        if previous_turn is None or previous_turn.intent.user is None:
             return False
 
         return (
-            previous_turn.actions.dialog.intent.is_clarification_question
-            or previous_turn.actions.dialog.intent.is_confirmation_question
+            previous_turn.intent.user.is_clarification_question
+            or previous_turn.intent.user.is_confirmation_question
         )

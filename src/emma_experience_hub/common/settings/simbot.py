@@ -1,6 +1,4 @@
-from pathlib import Path
-
-from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, Field, FilePath
+from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, Field
 
 
 class SimBotSettings(BaseSettings):
@@ -35,10 +33,6 @@ class SimBotSettings(BaseSettings):
     nlu_predictor_intent_type_delimiter: str = " "
 
     profanity_filter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5503", scheme="http")
-
-    response_templates: FilePath = Path.cwd().joinpath(
-        "src/", "emma_experience_hub/", "constants/", "simbot/", "response_templates.yaml"
-    )
 
     action_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5502", scheme="http")
     action_predictor_delimiter: str = "."

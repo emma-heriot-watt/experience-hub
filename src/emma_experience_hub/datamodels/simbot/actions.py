@@ -4,11 +4,7 @@ from typing import Any, Optional, Union
 from pydantic import BaseModel, Field, ValidationError, root_validator, validator
 
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
-from emma_experience_hub.datamodels.simbot.enums import (
-    SimBotActionStatusType,
-    SimBotActionType,
-    SimBotIntentType,
-)
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionStatusType, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotDialogPayload,
     SimBotObjectInteractionPayload,
@@ -270,8 +266,3 @@ class SimBotDialogAction(SimBotAction):
     """
 
     payload: SimBotDialogPayload = Field(..., exclude=True)
-
-    @property
-    def intent(self) -> SimBotIntentType:
-        """Get the intent behind the dialog."""
-        return self.payload.intent
