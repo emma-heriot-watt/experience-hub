@@ -1,41 +1,9 @@
-x-deploy-gpu-all: &deploy-gpu-all
+x-deploy-gpu: &deploy-gpu
   resources:
     reservations:
       devices:
         - driver: nvidia
           count: all
-          capabilities: [gpu]
-
-x-deploy-gpu-0: &deploy-gpu-0
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          device_ids: ["0"]
-          capabilities: [gpu]
-
-x-deploy-gpu-1: &deploy-gpu-1
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          device_ids: ["1"]
-          capabilities: [gpu]
-
-x-deploy-gpu-2: &deploy-gpu-2
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          device_ids: ["2"]
-          capabilities: [gpu]
-
-x-deploy-gpu-3: &deploy-gpu-3
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          device_ids: ["3"]
           capabilities: [gpu]
 
 x-model-volume: &model-volume
@@ -92,7 +60,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5500/ping"]
       <<: *healthcheck-defaults
     volumes: *model-volume
-    deploy: *deploy-gpu-0
+    deploy: *deploy-gpu
     entrypoint: python
     command: src/emma_perception/commands/run_server.py --config_file "src/emma_perception/constants/vinvl_x152c4_simbot_customised.yaml" MODEL.WEIGHT "/app/model/${FEATURE_EXTRACTOR_MODEL}" MODEL.ROI_HEADS.NMS_FILTER "1" MODEL.ROI_HEADS.SCORE_THRESH "0.2" TEST.IGNORE_BOX_REGRESSION "False"
 
@@ -111,7 +79,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
       <<: *healthcheck-defaults
     volumes: *model-volume
-    deploy: *deploy-gpu-1
+    deploy: *deploy-gpu
     entrypoint: python
     command: src/emma_policy/commands/run_simbot_nlu.py
 
@@ -129,7 +97,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
       <<: *healthcheck-defaults
     volumes: *model-volume
-    deploy: *deploy-gpu-2
+    deploy: *deploy-gpu
     entrypoint: python
     command: src/emma_policy/commands/run_simbot_action_api.py
 
@@ -145,7 +113,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6500/healthcheck"]
       <<: *healthcheck-defaults
-    deploy: *deploy-gpu-3
+    deploy: *deploy-gpu
     volumes: *model-volume
     ports:
       - "5505:6500"
@@ -163,7 +131,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]
       <<: *healthcheck-defaults
-    deploy: *deploy-gpu-3
+    deploy: *deploy-gpu
     volumes: *model-volume
     ports:
       - "5507:6600"

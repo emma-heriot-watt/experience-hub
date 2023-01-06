@@ -17,6 +17,11 @@ from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
 
 
+SERVICE_REGISTRY_PATH = Path("storage/registry/simbot/production.yaml")
+SERVICES_COMPOSE_PATH = Path("docker/simbot-docker-compose.yaml")
+SERVICES_PROD_COMPOSE_PATH = Path("docker/simbot-docker-compose.prod.yaml")
+OBSERVABILITY_COMPOSE_PATH = Path("docker/observability-docker-compose.yaml")
+
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
@@ -26,54 +31,23 @@ app = typer.Typer(
 
 
 @app.command()
-def pull_service_images(
-    registry_path: Path = typer.Option(
-        Path("storage/registry/simbot/production.yaml"),
-        help="Location of the registry .yaml file",
-        exists=True,
-        file_okay=True,
-    ),
-    service_compose_file_path: Path = typer.Option(
-        Path("docker/simbot-docker-compose.yaml"),
-        help="Location of the compose definition file.",
-        exists=True,
-        file_okay=True,
-    ),
-    observability_compose_file_path: Path = typer.Option(
-        Path("docker/observability-docker-compose.yaml"),
-        help="Location of the compose definition file.",
-        exists=True,
-        file_okay=True,
-    ),
-) -> None:
+def pull_service_images() -> None:
     """Pull images for the various services."""
     # Load the registry for the services
-    service_registry = ServiceRegistry.parse_obj(yaml.safe_load(registry_path.read_bytes()))
+    service_registry = ServiceRegistry.parse_obj(
+        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+    )
 
     # Set env vars for the services
     service_registry.update_all_env_vars()
 
     # Pull service images
-    subprocess.run(f"docker compose -f {service_compose_file_path} pull", shell=True, check=True)
-    subprocess.run(
-        f"docker compose -f {observability_compose_file_path} pull", shell=True, check=True
-    )
+    subprocess.run(f"docker compose -f {SERVICES_COMPOSE_PATH} pull", shell=True, check=True)
+    subprocess.run(f"docker compose -f {OBSERVABILITY_COMPOSE_PATH} pull", shell=True, check=True)
 
 
 @app.command()
 def run_background_services(
-    registry_path: Path = typer.Option(
-        Path("storage/registry/simbot/production.yaml"),
-        help="Location of the registry .yaml file",
-        exists=True,
-        file_okay=True,
-    ),
-    compose_file_path: Path = typer.Option(
-        Path("docker/simbot-docker-compose.yaml"),
-        help="Location of the compose definition file.",
-        exists=True,
-        file_okay=True,
-    ),
     download_models: bool = typer.Option(
         default=True, help="Download all models for the services if necessary."
     ),
@@ -94,12 +68,20 @@ def run_background_services(
     enable_observability: bool = typer.Option(
         default=False, is_flag=True, help="Run the services with observability enabled."
     ),
+    is_production: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--production",
+        is_flag=True,
+        help="Run the background services using the production config",
+    ),
 ) -> None:
     """Run all the services for SimBot inference."""
     os.environ["ENABLE_OBSERVABILITY"] = str(enable_observability)
 
     # Load the registry for the services
-    service_registry = ServiceRegistry.parse_obj(yaml.safe_load(registry_path.read_bytes()))
+    service_registry = ServiceRegistry.parse_obj(
+        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+    )
 
     # Set env vars for the services
     service_registry.update_all_env_vars()
@@ -117,18 +99,16 @@ def run_background_services(
     if run_in_background:
         run_command = f"{run_command} -d"
 
+    compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
+    if is_production:
+        compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
+
     # Run services
-    subprocess.run(f"docker compose -f {compose_file_path} {run_command}", shell=True, check=True)
+    subprocess.run(f"docker compose {compose_file_option} {run_command}", shell=True, check=True)
 
 
 @app.command()
 def run_observability_services(
-    compose_file_path: Path = typer.Option(
-        Path("docker/observability-docker-compose.yaml"),
-        help="Location of the compose definition file.",
-        exists=True,
-        file_okay=True,
-    ),
     run_in_background: bool = typer.Option(
         False,  # noqa: WPS425
         "--run-in-background",
@@ -143,7 +123,9 @@ def run_observability_services(
         run_command = f"{run_command} -d"
 
     # Run services
-    subprocess.run(f"docker compose -f {compose_file_path} {run_command}", shell=True, check=True)
+    subprocess.run(
+        f"docker compose -f {OBSERVABILITY_COMPOSE_PATH} {run_command}", shell=True, check=True
+    )
 
 
 @app.command()
@@ -229,15 +211,12 @@ def run_production_server(
     )
 
     run_background_services(
-        registry_path=Path("storage/registry/simbot/production.yaml"),
-        compose_file_path=Path("docker/simbot-docker-compose.yaml"),
         download_models=True,
         run_in_background=True,
         enable_observability=True,
+        is_production=True,
     )
-    run_observability_services(
-        compose_file_path=Path("docker/observability-docker-compose.yaml"), run_in_background=True
-    )
+    run_observability_services(run_in_background=True)
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
         auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),
