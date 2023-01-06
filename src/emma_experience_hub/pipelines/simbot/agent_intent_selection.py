@@ -53,10 +53,10 @@ class SimBotAgentIntentSelectionPipeline:
         # If we are currently in the middle of a search routine, continue it.
         if session.is_find_object_in_progress and not self._disable_search_actions:
             logger.debug("Setting agent intent to search since we are current in progress")
-            return SimBotIntent(type=SimBotIntentType.act_search)
+            return SimBotIntent(type=SimBotIntentType.search)
 
         # Otherwise, let the agent act
-        return SimBotIntent(type=SimBotIntentType.act_low_level)
+        return SimBotIntent(type=SimBotIntentType.act_one_match)
 
     def extract_intent_from_user_utterance(
         self, user_intent: SimBotIntentType, session: SimBotSession
@@ -71,7 +71,7 @@ class SimBotAgentIntentSelectionPipeline:
         if user_intent == SimBotIntentType.act:
             # Check if the utterance matches one of the known templates
             if self._does_utterance_match_known_template(session):
-                return SimBotIntent(type=SimBotIntentType.act_low_level)
+                return SimBotIntent(type=SimBotIntentType.act_one_match)
 
             # Otherwise, use the NLU to detect it
             return self._process_utterance_with_nlu(session)
@@ -80,7 +80,7 @@ class SimBotAgentIntentSelectionPipeline:
         if user_intent == SimBotIntentType.clarify_answer:
             # TODO: We can change this logic here to determine whether or not we should ask more
             #       questions or just act, if we want to start handling multi-turn dialogue
-            return SimBotIntent(type=SimBotIntentType.act_low_level)
+            return SimBotIntent(type=SimBotIntentType.act_one_match)
 
         # In all other cases, just return the intent as the agent _should_ know how to act.
         return SimBotIntent(type=user_intent)
@@ -105,13 +105,13 @@ class SimBotAgentIntentSelectionPipeline:
 
         if self._disable_clarification_questions and intent.type.is_clarification_question:
             logger.info(
-                "Clarification questions are disabled; returning the `<act><low_level>` intent."
+                "Clarification questions are disabled; returning the `<act><one_match>` intent."
             )
-            return SimBotIntent(type=SimBotIntentType.act_low_level)
+            return SimBotIntent(type=SimBotIntentType.act_one_match)
 
-        if self._disable_search_actions and intent.type == SimBotIntentType.act_search:
-            logger.info("Search actions are disabled; returning the `<act><low_level>` intent.")
-            return SimBotIntent(type=SimBotIntentType.act_low_level)
+        if self._disable_search_actions and intent.type == SimBotIntentType.search:
+            logger.info("Search actions are disabled; returning the `<act><one_match>` intent.")
+            return SimBotIntent(type=SimBotIntentType.act_one_match)
 
         return intent
 

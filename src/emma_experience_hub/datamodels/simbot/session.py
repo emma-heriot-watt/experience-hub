@@ -447,7 +447,7 @@ class SimBotSession(BaseModel):
         relevant_turns: Iterator[SimBotSessionTurn] = (
             turn
             for turn in turns
-            if turn.intent.agent and turn.intent.agent.type == SimBotIntentType.act_low_level
+            if turn.intent.agent and turn.intent.agent.type == SimBotIntentType.act_one_match
         )
 
         environment_history: dict[int, EnvironmentStateTurn] = {}

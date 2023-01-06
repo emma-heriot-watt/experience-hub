@@ -20,54 +20,30 @@ class DecodedNLUOutputs:
     _entity: str = "mug"
 
     def case_act(self) -> tuple[str, SimBotIntent]:
-        return "<act><low_level>", SimBotIntent(type=SimBotIntentType.act_low_level)
+        return "<act><one_match>", SimBotIntent(type=SimBotIntentType.act_one_match)
 
     def case_search(self) -> tuple[str, SimBotIntent]:
-        return "<act><search>", SimBotIntent(type=SimBotIntentType.act_search)
+        return "<search>", SimBotIntent(type=SimBotIntentType.search)
 
-    def case_clarify_direction(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
-        output = "<clarify><direction>"
+    def case_act_too_many_matches(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
+        output = "<act><too_many_matches>"
         if should_include_entity:
             output = f"{output} {self._entity}"
 
         intent = SimBotIntent(
-            type=SimBotIntentType.clarify_direction,
+            type=SimBotIntentType.act_too_many_matches,
             entity=self._entity if should_include_entity else None,
         )
 
         return output, intent
 
-    def case_clarify_disambiguation(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
-        output = "<clarify><disambiguation>"
+    def case_act_no_match(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
+        output = "<act><no_match>"
         if should_include_entity:
             output = f"{output} {self._entity}"
 
         intent = SimBotIntent(
-            type=SimBotIntentType.clarify_disambiguation,
-            entity=self._entity if should_include_entity else None,
-        )
-
-        return output, intent
-
-    def case_clarify_location(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
-        output = "<clarify><location>"
-        if should_include_entity:
-            output = f"{output} {self._entity}"
-
-        intent = SimBotIntent(
-            type=SimBotIntentType.clarify_location,
-            entity=self._entity if should_include_entity else None,
-        )
-
-        return output, intent
-
-    def case_clarify_description(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
-        output = "<clarify><description>"
-        if should_include_entity:
-            output = f"{output} {self._entity}"
-
-        intent = SimBotIntent(
-            type=SimBotIntentType.clarify_description,
+            type=SimBotIntentType.act_no_match,
             entity=self._entity if should_include_entity else None,
         )
 

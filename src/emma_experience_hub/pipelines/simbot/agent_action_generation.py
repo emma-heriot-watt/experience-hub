@@ -77,11 +77,11 @@ class SimBotAgentActionGenerationPipeline:
         """Get the action from the previous turn."""
         # If there is a routine is in progress, continue it
         if session.is_find_object_in_progress:
-            return self.handle_act_search_intent(session)
+            return self.handle_search_intent(session)
 
         return self._previous_action_parser(session)
 
-    def handle_act_search_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
+    def handle_search_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Handle the search for object intent."""
         return self._find_object_pipeline.run(session)
 
@@ -90,9 +90,9 @@ class SimBotAgentActionGenerationPipeline:
     ) -> Callable[[SimBotSession], Optional[SimBotAction]]:
         """Get the handler to use when generating an action to perform on the environment."""
         switcher = {
-            SimBotIntentType.act_low_level: self.handle_act_intent,
+            SimBotIntentType.act_one_match: self.handle_act_intent,
             SimBotIntentType.act_previous: self.handle_act_previous_intent,
-            SimBotIntentType.act_search: self.handle_act_search_intent,
+            SimBotIntentType.search: self.handle_search_intent,
         }
 
         return switcher[intent.type]

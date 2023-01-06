@@ -6,8 +6,8 @@ class SimBotIntentType(Enum):
 
     # Actionable
     act = "<act>"
-    act_low_level = "<act><low_level>"
-    act_search = "<act><search>"
+    act_one_match = "<act><one_match>"
+    search = "<search>"
     act_previous = "<act><previous>"
 
     # Improper instructions
@@ -18,10 +18,8 @@ class SimBotIntentType(Enum):
     empty_utterance = "<language><empty_utterance>"
 
     # Clarification questions
-    clarify_direction = "<clarify><direction>"
-    clarify_description = "<clarify><description>"
-    clarify_location = "<clarify><location>"
-    clarify_disambiguation = "<clarify><disambiguation>"
+    act_no_match = "<act><no_match>"
+    act_too_many_matches = "<act><too_many_matches>"
 
     # Confirmation questions
     confirm_generic = "<confirm><generic>"
@@ -108,10 +106,8 @@ class SimBotIntentType(Enum):
     def is_clarification_question(self) -> bool:
         """Return True if intent is one that triggers a clarification question."""
         return self in {
-            SimBotIntentType.clarify_direction,
-            SimBotIntentType.clarify_description,
-            SimBotIntentType.clarify_location,
-            SimBotIntentType.clarify_disambiguation,
+            SimBotIntentType.act_no_match,
+            SimBotIntentType.act_too_many_matches,
         }
 
     @property
@@ -127,8 +123,8 @@ class SimBotIntentType(Enum):
         """Return True if the intent is a type of instruction."""
         return self in {
             SimBotIntentType.act,
-            SimBotIntentType.act_low_level,
-            SimBotIntentType.act_search,
+            SimBotIntentType.act_one_match,
+            SimBotIntentType.search,
             SimBotIntentType.act_previous,
         }
 
