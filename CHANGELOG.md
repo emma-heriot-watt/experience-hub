@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.0](https://github.com/emma-simbot/experience-hub/compare/v6.0.1...v6.1.0) (2023-01-06)
+
+
+### Features
+
+* bump policy to 1.14.1 ([#253](https://github.com/emma-simbot/experience-hub/issues/253)) ([1d09d2a](https://github.com/emma-simbot/experience-hub/commit/1d09d2a47bcf1aa9cdb6eb81138b07a415fa1c86))
+
 ## [6.0.1](https://github.com/emma-simbot/experience-hub/compare/v6.0.0...v6.0.1) (2023-01-06)
 
 
