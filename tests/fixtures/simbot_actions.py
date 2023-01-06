@@ -19,10 +19,10 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntent,
     SimBotIntentType,
     SimBotSession,
+    SimBotSessionState,
     SimBotSessionTurn,
     SimBotSessionTurnActions,
     SimBotSessionTurnIntent,
-    SimBotSessionTurnState,
 )
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
@@ -298,7 +298,7 @@ def simbot_session_turns(
     actions = SimBotSessionTurnActions(
         interaction=draw(interaction_action), dialog=drawn_dialog_action
     )
-    state = SimBotSessionTurnState()
+    state = SimBotSessionState()
     turn: SimBotSessionTurn = draw(
         st.builds(
             SimBotSessionTurn,

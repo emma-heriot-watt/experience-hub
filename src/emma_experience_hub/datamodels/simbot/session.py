@@ -190,10 +190,12 @@ class SimBotSessionTurnEnvironment(BaseModel):
         return viewpoint_name
 
 
-class SimBotSessionTurnState(BaseModel, validate_assignment=True):
-    """Track the state of the session within the turn.
+class SimBotSessionState(BaseModel, validate_assignment=True):
+    """Track the state of the entire session, within each turn.
 
-    The queue is a list of utterances which the model can use to predict successive actions from.
+    IMPORTANT: This state is copied to the newly created session turn, therefore storing anything
+    in this class WILL be copied over to new turns. I recommend not storing anything here that is
+    not needed in future turns.
     """
 
     utterance_queue: SimBotQueue[str] = SimBotQueue[str]()
@@ -217,7 +219,7 @@ class SimBotSessionTurn(BaseModel):
     environment: SimBotSessionTurnEnvironment
     intent: SimBotSessionTurnIntent
     actions: SimBotSessionTurnActions
-    state: SimBotSessionTurnState
+    state: SimBotSessionState
 
     @classmethod
     def new_from_simbot_request(cls, request: SimBotRequest, idx: int) -> "SimBotSessionTurn":
@@ -243,7 +245,7 @@ class SimBotSessionTurn(BaseModel):
             ),
             intent=SimBotSessionTurnIntent(),
             actions=SimBotSessionTurnActions(),
-            state=SimBotSessionTurnState(),
+            state=SimBotSessionState(),
         )
 
     @property
@@ -360,7 +362,7 @@ class SimBotSession(BaseModel):
             return None
 
     @property
-    def current_state(self) -> SimBotSessionTurnState:
+    def current_state(self) -> SimBotSessionState:
         """Return the state from the most current turn."""
         return self.current_turn.state
 
