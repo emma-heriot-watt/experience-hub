@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.1](https://github.com/emma-simbot/experience-hub/compare/v6.0.0...v6.0.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* Make four rotate left actions in the basic planner ([#249](https://github.com/emma-simbot/experience-hub/issues/249)) ([f700d6c](https://github.com/emma-simbot/experience-hub/commit/f700d6c6b799d95efaf669df0bcea1837578d673))
+
 ## [6.0.0](https://github.com/emma-simbot/experience-hub/compare/v5.39.1...v6.0.0) (2023-01-05)
 
 
