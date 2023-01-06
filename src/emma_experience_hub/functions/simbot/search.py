@@ -60,6 +60,12 @@ class BasicSearchPlanner(SearchPlanner):
                 raw_output="turn left.",
                 payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
             ),
+            SimBotAction(
+                id=0,
+                type=SimBotActionType.RotateLeft,
+                raw_output="turn left.",
+                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
+            ),
         ]
 
 
