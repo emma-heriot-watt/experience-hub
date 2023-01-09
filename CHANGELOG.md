@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.1](https://github.com/emma-simbot/experience-hub/compare/v6.1.0...v6.1.1) (2023-01-09)
+
+
+### Bug Fixes
+
+* only generate lightweight dialogs when model does not return end of trajectory token ([#254](https://github.com/emma-simbot/experience-hub/issues/254)) ([f0afa66](https://github.com/emma-simbot/experience-hub/commit/f0afa6658c3bc5422f266784636fbd94070ecf67))
+
 ## [6.1.0](https://github.com/emma-simbot/experience-hub/compare/v6.0.1...v6.1.0) (2023-01-06)
 
 
