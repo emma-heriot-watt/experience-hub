@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from typing import Optional
 
@@ -43,14 +44,20 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
     @tracer.start_as_current_span("Get compatible rules")
     def _get_all_compatible_rules(self, state: SimBotFeedbackState) -> list[SimBotFeedbackRule]:
         """Get all of the rules which are compatible with the current state."""
+        # Store all the compatible rules with the given query
+        compatible_rules: list[SimBotFeedbackRule] = []
+
+        # Try filter rules to remove any that are clearly unneeded
+        filtered_rules = self._filter_rules(state)
+
         # Convert the session state to a dictionary we can iterate over.
         query_dict = state.to_query()
-        compatible_rules: list[SimBotFeedbackRule] = []
 
         # Use multithreading to evaluate every single rule as fast as possible
         with ThreadPoolExecutor(self._max_workers) as executor:
             future_to_rule: dict[Future[bool], SimBotFeedbackRule] = {
-                executor.submit(rule.is_query_suitable, query_dict): rule for rule in self._rules
+                executor.submit(rule.is_query_suitable, query_dict): rule
+                for rule in filtered_rules
             }
 
             for future in as_completed(future_to_rule):
@@ -59,13 +66,22 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
                 try:
                     future.result()
                 except Exception:
-                    logger.exception("Failed to check whether rule is compatible")
+                    logger.exception(f"Failed to check whether rule {rule.id} is compatible")
                 else:
                     if future.result():
                         compatible_rules.append(rule)  # noqa: WPS220
 
         logger.debug(f"Got {len(compatible_rules)} matching feedback rules.")
         return compatible_rules
+
+    def _filter_rules(self, state: SimBotFeedbackState) -> Iterator[SimBotFeedbackRule]:
+        """Filter the rules if possible to ensure that certain rules are returned."""
+        filtered_rules = iter(self._rules)
+
+        if state.require_lightweight_dialog:
+            filtered_rules = (rule for rule in self._rules if rule.is_lightweight_dialog)
+
+        return filtered_rules
 
     @tracer.start_as_current_span("Select feedback rule")
     def _select_feedback_rule(

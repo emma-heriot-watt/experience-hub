@@ -135,6 +135,9 @@ class SimBotFeedbackRule(BaseModel):
 class SimBotFeedbackState(BaseModel):
     """Flattened representation of the session state for feedback generation."""
 
+    # Force query for a lightweight dialog
+    require_lightweight_dialog: bool = False
+
     # Session statistics
     num_turns: int
 
@@ -208,6 +211,10 @@ class SimBotFeedbackState(BaseModel):
     ) -> "SimBotFeedbackState":
         """Create the state in a simple way."""
         return cls(
+            # Require a lightweight dialog action when the model does not decode a <stop token
+            require_lightweight_dialog=not agent_interaction_action.is_end_of_trajectory
+            if agent_interaction_action
+            else False,
             num_turns=num_turns,
             current_room=current_room,
             user_intent_type=user_intent_type,
