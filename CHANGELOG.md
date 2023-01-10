@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.0](https://github.com/emma-simbot/experience-hub/compare/v6.1.1...v6.2.0) (2023-01-10)
+
+
+### Features
+
+* bump service registry versions for perception and confirmation-classifier ([2751f98](https://github.com/emma-simbot/experience-hub/commit/2751f983f8a7753b5a2e275b9fa2f43a22c7e09d))
+
 ## [6.1.1](https://github.com/emma-simbot/experience-hub/compare/v6.1.0...v6.1.1) (2023-01-09)
 
 
