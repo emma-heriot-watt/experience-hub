@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.0](https://github.com/emma-simbot/experience-hub/compare/v6.2.0...v6.3.0) (2023-01-10)
+
+
+### Features
+
+* Enable clarifications ([#256](https://github.com/emma-simbot/experience-hub/issues/256)) ([e423de2](https://github.com/emma-simbot/experience-hub/commit/e423de279a254054837dc05309fdb70b9006e7b7))
+
 ## [6.2.0](https://github.com/emma-simbot/experience-hub/compare/v6.1.1...v6.2.0) (2023-01-10)
 
 
