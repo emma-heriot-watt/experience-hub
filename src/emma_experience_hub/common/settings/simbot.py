@@ -5,7 +5,7 @@ class SimBotSettings(BaseSettings):
     """Settings for the SimBot-related modules."""
 
     # Feature flags
-    disable_clarification_questions: bool = True
+    disable_clarification_questions: bool = False
     disable_clarification_confirmation: bool = True
     disable_search_actions: bool = False
 

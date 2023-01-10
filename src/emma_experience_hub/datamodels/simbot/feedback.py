@@ -157,6 +157,7 @@ class SimBotFeedbackState(BaseModel):
 
     # Agent intent
     agent_intent_type: Optional[SimBotIntentType] = None
+    agent_intent_entity: Optional[str] = None
     agent_interaction_action: Optional[SimBotActionType] = None
     agent_interaction_entity: Optional[str] = None
 
@@ -224,6 +225,7 @@ class SimBotFeedbackState(BaseModel):
             else None,
             environment_intent_entity=environment_intent.entity if environment_intent else None,
             agent_intent_type=agent_intent.type if agent_intent else None,
+            agent_intent_entity=agent_intent.entity if agent_intent else None,
             agent_interaction_action=agent_interaction_action.type
             if agent_interaction_action
             else None,

@@ -81,7 +81,7 @@ class SimBotUserIntentExtractionPipeline:
             previous_turn is not None  # noqa: WPS222
             and previous_turn.actions.dialog is not None
             and previous_turn.intent.user is not None
-            and previous_turn.intent.user.is_clarification_question
+            and previous_turn.intent.user == SimBotIntentType.act_too_many_matches
             # This will always resolve False if clarification questions are disabled
             and not self._disable_clarification_questions
         )
