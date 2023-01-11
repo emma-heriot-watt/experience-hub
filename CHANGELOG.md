@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.4](https://github.com/emma-simbot/experience-hub/compare/v6.3.3...v6.3.4) (2023-01-11)
+
+
+### Bug Fixes
+
+* docker run command needs to be right ([1e7d055](https://github.com/emma-simbot/experience-hub/commit/1e7d055320309d5f50d3605da0b4c7f8000a8915))
+
 ## [6.3.3](https://github.com/emma-simbot/experience-hub/compare/v6.3.2...v6.3.3) (2023-01-11)
 
 
