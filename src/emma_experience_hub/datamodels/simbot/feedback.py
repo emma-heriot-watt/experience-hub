@@ -129,7 +129,10 @@ class SimBotFeedbackRule(BaseModel):
 
     def is_query_suitable(self, query: dict[str, Any]) -> bool:
         """Evaluate the rule given the query and ensure it is suitable."""
-        return self.rule.matches(query) and all([name in query for name in self.slot_names])
+        try:
+            return self.rule.matches(query) and all([name in query for name in self.slot_names])
+        except Exception:
+            return False
 
 
 class SimBotFeedbackState(BaseModel):

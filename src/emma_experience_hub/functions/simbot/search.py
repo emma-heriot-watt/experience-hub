@@ -6,7 +6,7 @@ import numpy as np
 from loguru import logger
 from numpy import typing
 
-from emma_experience_hub.constants.model import PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoViewpoint,
@@ -64,7 +64,7 @@ class BasicSearchPlanner(SearchPlanner):
             SimBotAction(
                 id=0,
                 type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
+                raw_output=f"turn left {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}",
                 payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
             ),
         ]

@@ -70,3 +70,5 @@ id,conditions,response,is_lightweight
 69,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I don't see it in front of me. Let me have a look around the room.,True
 70,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns == 1,I don't see it in front of me. Let me have a look around the room.,True
 71,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty,',True
+72,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and agent_intent_per_turn[-2]["type"] == "act_no_match",Let's find it!,True
+73,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and agent_intent_per_turn[-2]["type"] == "act_no_match",Okay I am searching.,True
