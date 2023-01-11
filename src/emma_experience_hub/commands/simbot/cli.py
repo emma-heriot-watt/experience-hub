@@ -19,6 +19,7 @@ from emma_experience_hub.datamodels import ServiceRegistry
 
 SERVICE_REGISTRY_PATH = Path("storage/registry/simbot/production.yaml")
 SERVICES_COMPOSE_PATH = Path("docker/simbot-docker-compose.yaml")
+SERVICES_STAGING_COMPOSE_PATH = Path("docker/simbot-docker-compose.staging.yaml")
 SERVICES_PROD_COMPOSE_PATH = Path("docker/simbot-docker-compose.prod.yaml")
 OBSERVABILITY_COMPOSE_PATH = Path("docker/observability-docker-compose.yaml")
 
@@ -95,13 +96,15 @@ def run_background_services(
         service_registry.download_all_models(model_storage_dir, force=force_download)
 
     # Build the run command
-    run_command = "up"
+    run_command = "run"
     if run_in_background:
         run_command = f"{run_command} -d"
 
     compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
     if is_production:
         compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
+    else:
+        compose_file_option = f"{compose_file_option} -f {SERVICES_STAGING_COMPOSE_PATH}"
 
     # Run services
     subprocess.run(f"docker compose {compose_file_option} {run_command}", shell=True, check=True)

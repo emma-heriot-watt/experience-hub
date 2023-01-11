@@ -1,0 +1,23 @@
+x-deploy-gpu: &deploy-gpu
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [gpu]
+
+services:
+  feature_extractor:
+    deploy: *deploy-gpu
+
+  intent_extractor:
+    deploy: *deploy-gpu
+
+  instruction_predictor:
+    deploy: *deploy-gpu
+
+  out_of_domain_detector:
+    deploy: *deploy-gpu
+
+  confirmation_classifier:
+    deploy: *deploy-gpu
