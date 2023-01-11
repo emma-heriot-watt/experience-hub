@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.3](https://github.com/emma-simbot/experience-hub/compare/v6.3.2...v6.3.3) (2023-01-11)
+
+
+### Bug Fixes
+
+* docker compose config for different environments ([2beca0c](https://github.com/emma-simbot/experience-hub/commit/2beca0c5c0725fa0f311872669f60eaab1cad7fb))
+* remove the compose file merging when trying to run background services ([3fcd468](https://github.com/emma-simbot/experience-hub/commit/3fcd468236d9eb7944193a1ffd5dff610175ce75))
+
 ## [6.3.2](https://github.com/emma-simbot/experience-hub/compare/v6.3.1...v6.3.2) (2023-01-11)
 
 
