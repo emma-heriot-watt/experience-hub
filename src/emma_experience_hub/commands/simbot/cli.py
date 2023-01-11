@@ -96,7 +96,7 @@ def run_background_services(
         service_registry.download_all_models(model_storage_dir, force=force_download)
 
     # Build the run command
-    run_command = "run"
+    run_command = "up"
     if run_in_background:
         run_command = f"{run_command} -d"
 
