@@ -7,6 +7,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
 )
+from emma_experience_hub.constants.model import PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels import EmmaExtractedFeatures, EnvironmentStateTurn
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -203,7 +204,7 @@ class SimBotFindObjectPipeline:
         return SimBotAction(
             id=0,
             type=action_type,
-            raw_output=f"{action_type.value} <frame_token_{frame_index}> <vis_token_{object_index}.",
+            raw_output=f"{action_type.value} <frame_token_{frame_index}> <vis_token_{object_index}>{PREDICTED_ACTION_DELIMITER}",
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     colorImageIndex=color_image_index,
