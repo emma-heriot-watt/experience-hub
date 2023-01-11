@@ -102,7 +102,7 @@ def run_background_services(
 
     compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
     if is_production:
-        compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
+        compose_file_option = f"-f {SERVICES_PROD_COMPOSE_PATH}"
     else:
         compose_file_option = f"{compose_file_option} -f {SERVICES_STAGING_COMPOSE_PATH}"
 

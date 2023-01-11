@@ -30,18 +30,150 @@ x-deploy-gpu-3: &deploy-gpu-3
           device_ids: ["3"]
           capabilities: [gpu]
 
+x-model-volume: &model-volume
+  - type: bind
+    source: ../storage/models
+    target: /app/model
+  - type: bind
+    source: /home/ubuntu/.aws/credentials
+    target: /root/.aws/credentials
+    read_only: true
+  - type: bind
+    source: /home/ubuntu/.aws/config
+    target: /root/.aws/config
+    read_only: true
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 1m30s
+  timeout: 10s
+  retries: 3
+  start_period: 30s
+
+x-observability-env-vars: &observability-env-vars
+  LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
+  TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
+  OTLP_ENDPOINT: "otel_collector:4317"
+  OTEL_PYTHON_EXCLUDED_URLS: "healthcheck,ping"
+
+version: "3.9"
+
 services:
+  profanity_filter:
+    container_name: profanity_filter
+    image: "${PROFANITY_FILTER_IMAGE}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthcheck"]
+      <<: *healthcheck-defaults
+    ports:
+      - "5503:8000"
+    entrypoint: python -m
+    command:
+      - profanity_filter.web
+
   feature_extractor:
+    container_name: feature_extractor
+    image: "${FEATURE_EXTRACTOR_IMAGE}"
+    environment:
+      <<: *observability-env-vars
+      LOG_LEVEL: "debug"
+      DEVICE_ID: "0"
+      CLASSMAP_TYPE: "simbot"
+    ports:
+      - "5500:5500"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5500/ping"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
     deploy: *deploy-gpu-0
+    entrypoint: python
+    command: src/emma_perception/commands/run_server.py --config_file "src/emma_perception/constants/vinvl_x152c4_simbot_customised.yaml" MODEL.WEIGHT "/app/model/${FEATURE_EXTRACTOR_MODEL}" MODEL.ROI_HEADS.NMS_FILTER "1" MODEL.ROI_HEADS.SCORE_THRESH "0.2" TEST.IGNORE_BOX_REGRESSION "False"
 
   intent_extractor:
+    container_name: intent_extractor
+    image: "${INTENT_EXTRACTOR_IMAGE}"
+    environment:
+      <<: *observability-env-vars
+      LOG_LEVEL: debug
+      DEVICE: "cuda:0"
+      MODEL_NAME: "heriot-watt/emma-base"
+      MODEL_CHECKPOINT_PATH: "/app/model/${INTENT_EXTRACTOR_MODEL}"
+    ports:
+      - "5501:6000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
     deploy: *deploy-gpu-1
+    entrypoint: python
+    command: src/emma_policy/commands/run_simbot_nlu.py
 
   instruction_predictor:
+    container_name: instruction_predictor
+    image: "${INSTRUCTION_PREDICTOR_IMAGE}"
+    environment:
+      <<: *observability-env-vars
+      LOG_LEVEL: debug
+      DEVICE: "cuda:0"
+      MODEL_CHECKPOINT_PATH: "/app/model/${INSTRUCTION_PREDICTOR_MODEL}"
+    ports:
+      - "5502:6000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
     deploy: *deploy-gpu-2
+    entrypoint: python
+    command: src/emma_policy/commands/run_simbot_action_api.py
 
   out_of_domain_detector:
+    container_name: out_of_domain_detector
+    image: "${OUT_OF_DOMAIN_DETECTOR_IMAGE}"
+    environment:
+      <<: *observability-env-vars
+      LOG_LEVEL: info
+      DEVICE: "cuda:0"
+      EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
+      MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components2_data-1.joblib"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6500/healthcheck"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
     deploy: *deploy-gpu-3
+    ports:
+      - "5505:6500"
+    entrypoint: python
+    command:
+      - src/emma_ood_detection/run.py
 
   confirmation_classifier:
+    container_name: confirmation_classifier
+    image: "${CONFIRMATION_CLASSIFIER_IMAGE}"
+    environment:
+      LOG_LEVEL: info
+      DEVICE: "cuda:0"
+      MODEL_CHECKPOINT_PATH: "/app/model/${CONFIRMATION_CLASSIFIER_MODEL}/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
     deploy: *deploy-gpu-3
+    ports:
+      - "5507:6600"
+    entrypoint: python
+    command:
+      - src/emma_confirmation_classifier/api/confirmation_classifier_api.py
+
+  compound_splitter:
+    container_name: compound_splitter
+    image: "${COMPOUND_SPLITTER_IMAGE}"
+    environment:
+      LOG_LEVEL: info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    ports:
+      - "5508:6600"
+    entrypoint: python
+    command:
+      - src/emma_compound_splitter/api/compound_splitter_api.py
