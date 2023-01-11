@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.7](https://github.com/emma-simbot/experience-hub/compare/v6.3.6...v6.3.7) (2023-01-11)
+
+
+### Bug Fixes
+
+* bump confirmation classifier to 1.1.0 ([50028b6](https://github.com/emma-simbot/experience-hub/commit/50028b6b1bd19ab09cad25b5b92b1753f70a8b29))
+
 ## [6.3.6](https://github.com/emma-simbot/experience-hub/compare/v6.3.5...v6.3.6) (2023-01-11)
 
 
