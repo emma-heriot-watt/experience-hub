@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.2](https://github.com/emma-simbot/experience-hub/compare/v6.3.1...v6.3.2) (2023-01-11)
+
+
+### Bug Fixes
+
+* Response generation for first turn and search when no object was found ([#257](https://github.com/emma-simbot/experience-hub/issues/257)) ([8e4639c](https://github.com/emma-simbot/experience-hub/commit/8e4639c5bfacfc5c984372caeddc0b5f7ce0db5d))
+
 ## [6.3.1](https://github.com/emma-simbot/experience-hub/compare/v6.3.0...v6.3.1) (2023-01-11)
 
 
