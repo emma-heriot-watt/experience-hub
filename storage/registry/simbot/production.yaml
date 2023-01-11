@@ -11,13 +11,13 @@ services:
 
   - name: intent_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.14.1-cu113
+    image_version: 1.15.0-cu113
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/simbot_nlu_new_intents.ckpt
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.14.1-cu113
+    image_version: 1.15.0-cu113
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v4_bsz1024_lr2e-4_customised_paraphrases_filtered_human_lookaround.ckpt
 
