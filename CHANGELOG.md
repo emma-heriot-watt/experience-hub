@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.9](https://github.com/emma-simbot/experience-hub/compare/v6.3.8...v6.3.9) (2023-01-12)
+
+
+### Bug Fixes
+
+* messy docker compose configs ([30b4357](https://github.com/emma-simbot/experience-hub/commit/30b4357a90b9dcd711b113b5c865e2255d9fab16))
+
 ## [6.3.8](https://github.com/emma-simbot/experience-hub/compare/v6.3.7...v6.3.8) (2023-01-11)
 
 
