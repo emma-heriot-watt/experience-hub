@@ -6,6 +6,8 @@ from pathlib import Path
 import typer
 import yaml
 from loguru import logger
+from rich.console import Console
+from rich.syntax import Syntax
 
 from emma_common.api.gunicorn import create_gunicorn_server
 from emma_common.api.instrumentation import instrument_app
@@ -18,9 +20,11 @@ from emma_experience_hub.datamodels import ServiceRegistry
 
 
 SERVICE_REGISTRY_PATH = Path("storage/registry/simbot/production.yaml")
+
 SERVICES_COMPOSE_PATH = Path("docker/simbot-docker-compose.yaml")
 SERVICES_STAGING_COMPOSE_PATH = Path("docker/simbot-docker-compose.staging.yaml")
 SERVICES_PROD_COMPOSE_PATH = Path("docker/simbot-docker-compose.prod.yaml")
+
 OBSERVABILITY_COMPOSE_PATH = Path("docker/observability-docker-compose.yaml")
 
 app = typer.Typer(
@@ -29,6 +33,51 @@ app = typer.Typer(
     short_help="Setup and run the SimBot API.",
     help="Commands for setup and running inference on SimBot Arena.",
 )
+
+
+@app.command()
+def print_compose_config(
+    enable_observability: bool = typer.Option(
+        default=False, is_flag=True, help="Run the services with observability enabled."
+    ),
+    is_production: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--production",
+        is_flag=True,
+        help="Run the background services using the production config",
+    ),
+) -> None:
+    """Print the config for the docker compose."""
+    os.environ["ENABLE_OBSERVABILITY"] = str(enable_observability)
+
+    service_registry = ServiceRegistry.parse_obj(
+        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+    )
+
+    # Set env vars for the services
+    service_registry.update_all_env_vars()
+
+    compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
+    if is_production:
+        compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
+    else:
+        compose_file_option = f"{compose_file_option} -f {SERVICES_STAGING_COMPOSE_PATH}"
+
+    if enable_observability:
+        compose_file_option = f"{compose_file_option} -f {OBSERVABILITY_COMPOSE_PATH}"
+
+    # Run services
+    command_output = subprocess.run(
+        f"docker compose {compose_file_option} config", shell=True, check=True, capture_output=True
+    )
+
+    Console().print(
+        Syntax(
+            command_output.stdout.decode("utf-8"),
+            "yaml",
+            theme="ansi_dark",
+        )
+    )
 
 
 @app.command()
@@ -43,8 +92,11 @@ def pull_service_images() -> None:
     service_registry.update_all_env_vars()
 
     # Pull service images
-    subprocess.run(f"docker compose -f {SERVICES_COMPOSE_PATH} pull", shell=True, check=True)
-    subprocess.run(f"docker compose -f {OBSERVABILITY_COMPOSE_PATH} pull", shell=True, check=True)
+    subprocess.run(
+        f"docker compose -f {SERVICES_COMPOSE_PATH} -f {OBSERVABILITY_COMPOSE_PATH} pull",
+        shell=True,
+        check=True,
+    )
 
 
 @app.command()
@@ -100,35 +152,14 @@ def run_background_services(
     if run_in_background:
         run_command = f"{run_command} -d"
 
-    compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
+    compose_file_option = f"-f {SERVICES_COMPOSE_PATH} -f {SERVICES_STAGING_COMPOSE_PATH}"
     if is_production:
-        compose_file_option = f"-f {SERVICES_PROD_COMPOSE_PATH}"
-    else:
-        compose_file_option = f"{compose_file_option} -f {SERVICES_STAGING_COMPOSE_PATH}"
+        compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
+    if enable_observability:
+        compose_file_option = f"{compose_file_option} -f {OBSERVABILITY_COMPOSE_PATH}"
 
     # Run services
     subprocess.run(f"docker compose {compose_file_option} {run_command}", shell=True, check=True)
-
-
-@app.command()
-def run_observability_services(
-    run_in_background: bool = typer.Option(
-        False,  # noqa: WPS425
-        "--run-in-background",
-        "-d",
-        is_flag=True,
-        help="Run the services in the background.",
-    ),
-) -> None:
-    """Run the additional observability services."""
-    run_command = "up"
-    if run_in_background:
-        run_command = f"{run_command} -d"
-
-    # Run services
-    subprocess.run(
-        f"docker compose -f {OBSERVABILITY_COMPOSE_PATH} {run_command}", shell=True, check=True
-    )
 
 
 @app.command()
@@ -219,7 +250,6 @@ def run_production_server(
         enable_observability=True,
         is_production=True,
     )
-    run_observability_services(run_in_background=True)
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
         auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),

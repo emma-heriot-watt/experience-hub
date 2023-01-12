@@ -8,16 +8,26 @@ x-deploy-gpu: &deploy-gpu
 
 services:
   feature_extractor:
+    environment:
+      DEVICE: "cuda:0"
     deploy: *deploy-gpu
 
   intent_extractor:
+    environment:
+      DEVICE: "cuda:0"
     deploy: *deploy-gpu
 
   instruction_predictor:
+    environment:
+      DEVICE: "cuda:0"
     deploy: *deploy-gpu
 
   out_of_domain_detector:
+    environment:
+      DEVICE: "cuda:0"
     deploy: *deploy-gpu
 
   confirmation_classifier:
+    environment:
+      DEVICE: "cuda:0"
     deploy: *deploy-gpu
