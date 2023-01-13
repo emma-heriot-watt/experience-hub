@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.10](https://github.com/emma-simbot/experience-hub/compare/v6.3.9...v6.3.10) (2023-01-13)
+
+
+### Bug Fixes
+
+* disable timeout when extracting features ([#261](https://github.com/emma-simbot/experience-hub/issues/261)) ([acdd96b](https://github.com/emma-simbot/experience-hub/commit/acdd96b30b2a1b66e4ddb613d86bc668ca79d66c))
+
 ## [6.3.9](https://github.com/emma-simbot/experience-hub/compare/v6.3.8...v6.3.9) (2023-01-12)
 
 
