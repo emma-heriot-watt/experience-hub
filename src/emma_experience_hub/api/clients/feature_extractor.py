@@ -61,7 +61,7 @@ class FeatureExtractorClient(Client):
         """Submit a request to the feature extraction server for a single image."""
         image_bytes = self._convert_single_image_to_bytes(image)
 
-        with httpx.Client() as client:
+        with httpx.Client(timeout=None) as client:
             response = client.post(
                 f"{self._endpoint}/features",
                 files={self._single_image_post_arg_name: image_bytes},
@@ -98,7 +98,7 @@ class FeatureExtractorClient(Client):
         ]
 
         # Make the request
-        with httpx.Client() as client:
+        with httpx.Client(timeout=None) as client:
             response = client.post(f"{self._endpoint}/batch_features", files=request_files)
 
         try:
