@@ -2,6 +2,9 @@
 /docker/ @amitkparekh
 /pyproject.toml @amitkparekh
 /src/emma_experience_hub/ @amitkparekh
+/src/emma_experience_hub/constants/simbot/feedback_rules.csv @amitkparekh @MalvinaNikandrou
+/src/emma_experience_hub/parsers/simbot/feedback_from_session_context.py @MalvinaNikandrou
+/src/emma_experience_hub/pipelines/simbot/agent_language_generation.py @MalvinaNikandrou
 # Files that don't need owners
 poetry.lock
 /tests/
