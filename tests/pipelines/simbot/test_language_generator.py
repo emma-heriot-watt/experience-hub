@@ -1,9 +1,6 @@
 from collections import Counter
-from contextlib import suppress
 
-from loguru import logger
 from pytest_cases import fixture
-from rule_engine import Rule
 
 from emma_experience_hub.datamodels.simbot import SimBotFeedbackState
 from emma_experience_hub.parsers.simbot.feedback_from_session_context import (
@@ -11,27 +8,7 @@ from emma_experience_hub.parsers.simbot.feedback_from_session_context import (
 )
 
 
-logger.level("ERROR")
-
-rules = {
-    1: Rule('user_intent == "low_asr_confidence"'),
-    2: Rule('user_intent == "low_asr_confidence" and low_asr_intent_count == 1'),
-    3: Rule(
-        'user_intent == "low_asr_confidence" and low_asr_intent_count == 1 or low_asr_intent_count == 5'
-    ),
-    4: Rule('user_intent == "out_of_domain"'),
-}
-
-
-def test_simple_response_generation_works() -> None:
-    example_context = {"user_intent": "low_asr_confidence", "low_asr_intent_count": 1}
-    valid_rule_keys = []
-    for rule_id, rule in rules.items():
-        with suppress(Exception):
-            if rule.matches(example_context):
-                valid_rule_keys.append(rule_id)
-
-    assert valid_rule_keys
+MIN_RULE_ID = 1
 
 
 @fixture(scope="module")
@@ -44,6 +21,14 @@ def test_all_rules_are_valid(rule_parser: SimBotFeedbackFromSessionStateParser) 
     assert rule_parser._rules
 
 
+def test_ensure_no_rule_id_is_below_minumum(
+    rule_parser: SimBotFeedbackFromSessionStateParser,
+) -> None:
+    all_rule_ids = [rule.id for rule in rule_parser._rules]
+
+    assert min(all_rule_ids) == MIN_RULE_ID
+
+
 def test_all_rule_ids_are_unique(rule_parser: SimBotFeedbackFromSessionStateParser) -> None:
     ids_counter = Counter([rule.id for rule in rule_parser._rules])
 
@@ -52,6 +37,19 @@ def test_all_rule_ids_are_unique(rule_parser: SimBotFeedbackFromSessionStatePars
 
     # Assert that the list of repeated IDs IS empty
     assert not repeated_ids
+
+
+def test_rule_ids_are_consecutive(rule_parser: SimBotFeedbackFromSessionStateParser) -> None:
+    all_rule_ids = [rule.id for rule in rule_parser._rules]
+    all_rule_ids.sort()
+
+    # Create a simple list of all numbers from 0 to the total number of rules
+    consecutive_numbers = range(MIN_RULE_ID, len(all_rule_ids))
+
+    for actual_rule_id, expected_rule_id in zip(all_rule_ids, consecutive_numbers):
+        assert (
+            actual_rule_id == expected_rule_id
+        ), f"Rule {actual_rule_id} should be {expected_rule_id}"
 
 
 def test_response_slots_in_all_rules(rule_parser: SimBotFeedbackFromSessionStateParser) -> None:
