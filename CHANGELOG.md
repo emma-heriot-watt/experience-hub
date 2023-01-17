@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.0](https://github.com/emma-simbot/experience-hub/compare/v6.3.10...v6.4.0) (2023-01-17)
+
+
+### Features
+
+* add feedback for `only_wake_word` and `empty_utterance` intents ([#260](https://github.com/emma-simbot/experience-hub/issues/260)) ([397cc8d](https://github.com/emma-simbot/experience-hub/commit/397cc8de84a2bb2a1427ce7d0f9983f33b74ade0))
+
 ## [6.3.10](https://github.com/emma-simbot/experience-hub/compare/v6.3.9...v6.3.10) (2023-01-13)
 
 
