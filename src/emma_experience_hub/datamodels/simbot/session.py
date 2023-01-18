@@ -425,12 +425,21 @@ class SimBotSession(BaseModel):
 
     @staticmethod
     def get_dialogue_history_from_session_turns(  # noqa: WPS602
-        turns: list[SimBotSessionTurn],
+        turns: list[SimBotSessionTurn], *, include_agent_responses: bool = True
     ) -> list[DialogueUtterance]:
         """Get a dialogue history from the given turns."""
         utterances_lists = (turn.utterances for turn in turns)
-        dialogue_history = list(itertools.chain.from_iterable(utterances_lists))
-        return dialogue_history
+        dialogue_history: Iterator[DialogueUtterance] = itertools.chain.from_iterable(
+            utterances_lists
+        )
+
+        # Remvoe agent responses if they are not desired
+        if not include_agent_responses:
+            dialogue_history = (
+                utterance for utterance in dialogue_history if utterance.role != "agent"
+            )
+
+        return list(dialogue_history)
 
     @staticmethod
     def get_environment_state_history_from_turns(  # noqa: WPS602

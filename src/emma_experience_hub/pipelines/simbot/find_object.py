@@ -83,9 +83,7 @@ class SimBotFindObjectPipeline:
 
         # Try to find the object in the previous turn
         try:
-            decoded_scene_object_tokens = self._get_object_from_previous_turn(
-                session, extracted_features
-            )
+            decoded_scene_object_tokens = self._get_object_from_turn(session, extracted_features)
         except AssertionError:
             # If the object has not been found, get the next action to perform
             return self._get_next_action_from_plan(session)
@@ -123,7 +121,7 @@ class SimBotFindObjectPipeline:
         return head_action.type == SimBotActionType.GotoObject
 
     @tracer.start_as_current_span("Trying to find object from visuals")
-    def _get_object_from_previous_turn(
+    def _get_object_from_turn(
         self,
         session: SimBotSession,
         extracted_features: list[EmmaExtractedFeatures],
@@ -132,7 +130,7 @@ class SimBotFindObjectPipeline:
         # Only use the incoming turn for visual features but get the utterances from the
         # interation window (i.e. since the search action started)
         dialogue_history = session.get_dialogue_history_from_session_turns(
-            session.get_turns_within_interaction_window()
+            session.get_turns_within_interaction_window(), include_agent_responses=False
         )
         raw_visual_grounding_output = self._action_predictor_client.find_object_in_scene(
             dialogue_history=dialogue_history,
