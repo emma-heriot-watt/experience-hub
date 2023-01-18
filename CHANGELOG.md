@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.1](https://github.com/emma-simbot/experience-hub/compare/v6.4.0...v6.4.1) (2023-01-18)
+
+
+### Bug Fixes
+
+* do not send the agent utterances to the visual grounding endpoint ([#266](https://github.com/emma-simbot/experience-hub/issues/266)) ([a2946b5](https://github.com/emma-simbot/experience-hub/commit/a2946b5314dd37bff9d45a65d3e63e876b0a94d9))
+
 ## [6.4.0](https://github.com/emma-simbot/experience-hub/compare/v6.3.10...v6.4.0) (2023-01-17)
 
 
