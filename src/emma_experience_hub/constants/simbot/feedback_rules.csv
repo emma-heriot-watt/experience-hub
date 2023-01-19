@@ -80,3 +80,4 @@ id,conditions,response,is_lightweight
 79,user_intent_type == "empty_utterance",Did you say anything?,False
 80,user_intent_type == "empty_utterance",<say-as interpret-as="interjection">er</say-as> - Did you say anything?,False
 81,user_intent_type == "empty_utterance",<say-as interpret-as="interjection">hmm</say-as> - i didnt register anything there,False
+82,agent_intent_type != null and require_lightweight_dialog,',True
