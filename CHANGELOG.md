@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.0](https://github.com/emma-simbot/experience-hub/compare/v6.4.1...v6.5.0) (2023-01-19)
+
+
+### Features
+
+* build a search plan if we find the entity in the history (GFH) ([#264](https://github.com/emma-simbot/experience-hub/issues/264)) ([ad70e7b](https://github.com/emma-simbot/experience-hub/commit/ad70e7b997c86211dc2c903d86e759d64886ccf4)), closes [#229](https://github.com/emma-simbot/experience-hub/issues/229)
+
 ## [6.4.1](https://github.com/emma-simbot/experience-hub/compare/v6.4.0...v6.4.1) (2023-01-18)
 
 
