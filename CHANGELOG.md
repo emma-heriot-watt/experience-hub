@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.6.0](https://github.com/emma-simbot/experience-hub/compare/v6.5.0...v6.6.0) (2023-01-19)
+
+
+### Features
+
+* Update ood detection model ([#274](https://github.com/emma-simbot/experience-hub/issues/274)) ([5321f6c](https://github.com/emma-simbot/experience-hub/commit/5321f6c28ba231c60619afc06fe33e720d10438f))
+
 ## [6.5.0](https://github.com/emma-simbot/experience-hub/compare/v6.4.1...v6.5.0) (2023-01-19)
 
 
