@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.6.1](https://github.com/emma-simbot/experience-hub/compare/v6.6.0...v6.6.1) (2023-01-19)
+
+
+### Bug Fixes
+
+* missing rule for lightweight dialogue when policy hasn't finished generating ([#271](https://github.com/emma-simbot/experience-hub/issues/271)) ([4618858](https://github.com/emma-simbot/experience-hub/commit/46188587aa49e368998a8e1dd505b80df0a5094a))
+
 ## [6.6.0](https://github.com/emma-simbot/experience-hub/compare/v6.5.0...v6.6.0) (2023-01-19)
 
 
