@@ -43,6 +43,7 @@ class EmmaPolicyClient(Client):
         )
         logger.debug(f"Sending {emma_policy_request.num_images} images.")
         logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
+        logger.debug(f"size of the history {len(environment_state_history)}")
 
         with httpx.Client() as client:
             response = client.post(

@@ -8,6 +8,7 @@ class SimBotSettings(BaseSettings):
     disable_clarification_questions: bool = False
     disable_clarification_confirmation: bool = True
     disable_search_actions: bool = False
+    disable_grab_from_history: bool = True
 
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000

@@ -6,8 +6,17 @@ import numpy as np
 from loguru import logger
 from numpy import typing
 
-from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
-from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
+from emma_experience_hub.api.clients.simbot import (
+    SimbotActionPredictionClient,
+    SimBotFeaturesClient,
+)
+from emma_experience_hub.constants.model import PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.datamodels.simbot import (
+    SimBotAction,
+    SimBotActionType,
+    SimBotSession,
+    SimBotSessionTurn,
+)
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoViewpoint,
     SimBotGotoViewpointPayload,
@@ -42,35 +51,87 @@ class BasicSearchPlanner(SearchPlanner):
 
     def run(self, session: SimBotSession) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
-        return [
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-        ]
+        return self._create_look_around_actions()
+
+    def _create_look_around_actions(self) -> list[SimBotAction]:
+        """Create actions to perform the look around."""
+        turn_action = SimBotAction(
+            id=0,
+            type=SimBotActionType.RotateLeft,
+            raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
+            payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
+        )
+        return [turn_action, turn_action, turn_action, turn_action]
 
 
-class GreedyMaximumVertexCoverSearchPlanner(SearchPlanner):
+class GrabFromHistorySearchPlanner(BasicSearchPlanner):
+    """Create a plan to go to the object if we've seen it before."""
+
+    def __init__(
+        self,
+        features_client: SimBotFeaturesClient,
+        action_predictor_client: SimbotActionPredictionClient,
+        num_turns_to_search_through: int = 10,
+        rotation_magnitude: int = 90,
+    ) -> None:
+        super().__init__(rotation_magnitude=rotation_magnitude)
+
+        self._features_client = features_client
+        self._action_predictor_client = action_predictor_client
+        self._num_turns_to_search_through = num_turns_to_search_through
+
+    def run(self, session: SimBotSession) -> list[SimBotAction]:
+        """Go to the object if we have seen it before.
+
+        If the entity cannot be found in the turns, an exception will be raised.
+        """
+        turn_with_entity = self._get_turn_with_entity(session)
+        return self._build_plan(turn_with_entity)
+
+    def _get_turns_to_search_through(self, session: SimBotSession) -> list[SimBotSessionTurn]:
+        """Get the list of turns to search for the entity in."""
+        return session.valid_turns[-self._num_turns_to_search_through :]
+
+    def _get_turn_with_entity(self, session: SimBotSession) -> SimBotSessionTurn:
+        """Get the turn where we previously saw the entity."""
+        turns_to_search_through = self._get_turns_to_search_through(session)
+
+        if not turns_to_search_through:
+            raise AssertionError("[GFH] turns_to_search_through is empty. Skipping GFH")
+
+        environment_state_history = session.get_environment_state_history_from_turns(
+            turns_to_search_through, self._features_client.get_features
+        )
+
+        if not environment_state_history:
+            raise AssertionError("[GFH] environment_state_history is empty. Skipping GFH")
+
+        turn_index = self._action_predictor_client.find_entity_from_history(
+            environment_state_history, session.current_turn.utterances
+        )
+
+        if turn_index is None:
+            raise AssertionError("[GFH] Unable to find entity in turns")
+
+        return turns_to_search_through[turn_index]
+
+    def _build_plan(self, turn_with_entity: SimBotSessionTurn) -> list[SimBotAction]:
+        """Build the plan to find the object."""
+        viewpoint_name = turn_with_entity.environment.get_closest_viewpoint_name()
+
+        goto_closest_viewpoint = SimBotAction(
+            id=0,
+            type=SimBotActionType.GotoViewpoint,
+            raw_output=f"goto {viewpoint_name}.",
+            payload=SimBotGotoViewpointPayload(
+                object=SimBotGotoViewpoint(goToPoint=viewpoint_name)
+            ),
+        )
+
+        return [goto_closest_viewpoint, *self._create_look_around_actions()]
+
+
+class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
     """Greedy maximum vertex cover search planner.
 
     Given a viewpoint budget, select the viewpoints that cover the largest area.
@@ -82,11 +143,12 @@ class GreedyMaximumVertexCoverSearchPlanner(SearchPlanner):
         vertex_budget: int = 2,
         use_current_position: bool = True,
         rotation_magnitude: float = 90,
-    ):
+    ) -> None:
+        super().__init__(rotation_magnitude=rotation_magnitude)
+
         self.distance_threshold = distance_threshold
         self.viewpoint_budget = vertex_budget
         self.use_current_position = use_current_position
-        self.rotation_magnitude = rotation_magnitude
 
     def get_coverage_sets(self, coords: typing.NDArray[np.float64]) -> typing.NDArray[np.float64]:
         """Get the set of viewpoints covered by each other point."""
@@ -159,26 +221,7 @@ class GreedyMaximumVertexCoverSearchPlanner(SearchPlanner):
 
         We only need to rotate 3 times to see all the objects in a single viewpoint.
         """
-        return [
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-            SimBotAction(
-                id=0,
-                type=SimBotActionType.RotateLeft,
-                raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-                payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-            ),
-        ]
+        return self._create_look_around_actions()
 
     def run(self, session: SimBotSession) -> list[SimBotAction]:
         """Get the actions produced by the planner."""

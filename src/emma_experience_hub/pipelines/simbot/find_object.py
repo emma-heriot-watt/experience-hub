@@ -16,15 +16,14 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotObjectMaskType,
 )
 from emma_experience_hub.functions.simbot import (
-    SimBotSceneObjectTokens,
-    get_correct_frame_index,
-    get_mask_from_special_tokens,
-)
-from emma_experience_hub.functions.simbot.search import (
     BasicSearchPlanner,
+    GrabFromHistorySearchPlanner,
     GreedyMaximumVertexCoverSearchPlanner,
     PlannerType,
     SearchPlanner,
+    SimBotSceneObjectTokens,
+    get_correct_frame_index,
+    get_mask_from_special_tokens,
 )
 from emma_experience_hub.parsers.simbot import SimBotVisualGroundingOutputParser
 
@@ -44,25 +43,55 @@ class SimBotFindObjectPipeline:
         features_client: SimBotFeaturesClient,
         action_predictor_client: SimbotActionPredictionClient,
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
-        distance_threshold: float = 2,
-        viewpoint_budget: int = 2,
-        planner_type: PlannerType = PlannerType.basic,
+        search_planner: SearchPlanner,
+        grab_from_history_search_planner: SearchPlanner,
+        _disable_grab_from_history: bool = False,
     ) -> None:
         self._features_client = features_client
 
         self._action_predictor_client = action_predictor_client
         self._visual_grounding_output_parser = visual_grounding_output_parser
-        self._distance_threshold = distance_threshold
-        self._viewpoint_budget = viewpoint_budget
-        self._rotation_magnitude = 90
-        self._planner = self._get_planner_from_type(planner_type)
+
+        self._search_planner = search_planner
+        self._grab_from_history_search_planner = grab_from_history_search_planner
+        self._disable_grab_from_history = _disable_grab_from_history
+
+    @classmethod
+    def from_planner_type(
+        cls,
+        features_client: SimBotFeaturesClient,
+        action_predictor_client: SimbotActionPredictionClient,
+        visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
+        planner_type: PlannerType = PlannerType.basic,
+        distance_threshold: float = 2,
+        viewpoint_budget: int = 2,
+        _disable_grab_from_history: bool = False,
+    ) -> "SimBotFindObjectPipeline":
+        """Instantiate the pipeline from the PlannerType."""
+        planners = {
+            PlannerType.basic: BasicSearchPlanner(),
+            PlannerType.greedy_max_vertex_cover: GreedyMaximumVertexCoverSearchPlanner(
+                distance_threshold=distance_threshold, vertex_budget=viewpoint_budget
+            ),
+        }
+
+        return cls(
+            features_client=features_client,
+            action_predictor_client=action_predictor_client,
+            visual_grounding_output_parser=visual_grounding_output_parser,
+            search_planner=planners[planner_type],
+            grab_from_history_search_planner=GrabFromHistorySearchPlanner(
+                features_client, action_predictor_client
+            ),
+            _disable_grab_from_history=_disable_grab_from_history,
+        )
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Handle the search through the environment."""
         if self._should_start_new_search(session):
             logger.debug("Preparing search plan...")
             with tracer.start_as_current_span("Building search plan"):
-                search_plan = self._planner.run(session)
+                search_plan = self._build_search_plan(session)
 
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
@@ -94,15 +123,16 @@ class SimBotFindObjectPipeline:
             session, decoded_scene_object_tokens, extracted_features
         )
 
-    def _get_planner_from_type(self, planner_type: PlannerType) -> SearchPlanner:
-        """Get the planner for the pipeline."""
-        planners = {
-            PlannerType.basic: BasicSearchPlanner(),
-            PlannerType.greedy_max_vertex_cover: GreedyMaximumVertexCoverSearchPlanner(
-                distance_threshold=self._distance_threshold, vertex_budget=self._viewpoint_budget
-            ),
-        }
-        return planners[planner_type]
+    def _build_search_plan(self, session: SimBotSession) -> list[SimBotAction]:
+        """Build a plan of actions for the current session."""
+        if not self._disable_grab_from_history:
+            try:
+                return self._grab_from_history_search_planner.run(session)
+            except AssertionError:
+                logger.info("Assertion Error. Failed to find object from history")
+            except Exception as err:
+                logger.exception("GFH failed", exc_info=err)
+        return self._search_planner.run(session)
 
     def _should_start_new_search(self, session: SimBotSession) -> bool:
         """Should we be starting a new search?
@@ -116,7 +146,6 @@ class SimBotFindObjectPipeline:
 
         The queue contain has a goto action at its head whenever we have found an object.
         """
-        logger.debug(f"Checking head for goto action {session.current_state.find_queue.queue[0]}")
         head_action = session.current_state.find_queue.queue[0]
         return head_action.type == SimBotActionType.GotoObject
 
@@ -217,6 +246,7 @@ class SimBotFindObjectPipeline:
     def _get_next_action_from_plan(self, session: SimBotSession) -> Optional[SimBotAction]:
         """If the model did not find the object, get the next action from the search plan."""
         try:
+            logger.debug("get the next action from the search plan")
             return session.current_state.find_queue.pop_from_head()
         except IndexError:
             logger.debug("No more actions remaining within the search plan")

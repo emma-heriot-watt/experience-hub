@@ -176,13 +176,14 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
         cls, clients: SimBotControllerClients, simbot_settings: SimBotSettings
     ) -> "SimBotControllerPipelines":
         """Create the pipelines from the clients."""
-        find_object = SimBotFindObjectPipeline(
+        find_object = SimBotFindObjectPipeline.from_planner_type(
             features_client=clients.features,
             action_predictor_client=clients.action_predictor,
             visual_grounding_output_parser=SimBotVisualGroundingOutputParser(
                 action_delimiter=simbot_settings.action_predictor_delimiter,
                 eos_token=simbot_settings.action_predictor_eos_token,
             ),
+            _disable_grab_from_history=simbot_settings.disable_grab_from_history,
         )
 
         action_predictor_response_parser = SimBotActionPredictorOutputParser(
