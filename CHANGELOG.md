@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.6.3](https://github.com/emma-simbot/experience-hub/compare/v6.6.2...v6.6.3) (2023-01-20)
+
+
+### Bug Fixes
+
+* **cli:** add option to change the model storage dir ([6f72952](https://github.com/emma-simbot/experience-hub/commit/6f7295208ad17ca2ff453c3a9ae9dc9fccc83803))
+
 ## [6.6.2](https://github.com/emma-simbot/experience-hub/compare/v6.6.1...v6.6.2) (2023-01-20)
 
 
