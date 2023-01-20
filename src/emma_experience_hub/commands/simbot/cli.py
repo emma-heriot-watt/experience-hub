@@ -27,6 +27,8 @@ from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
 
 
+MODEL_STORAGE_DIR = Path("storage/models/")
+
 SERVICE_REGISTRY_PATH = Path("storage/registry/simbot/production.yaml")
 
 SERVICES_COMPOSE_PATH = Path("docker/simbot-docker-compose.yaml")
@@ -134,8 +136,13 @@ def run_background_services(
         help="Observability services for the SimBot environment",
         rich_help_panel="Config",
     ),
+    model_storage_dir: Path = typer.Option(
+        default=MODEL_STORAGE_DIR, help="Directory to save models.", rich_help_panel="Models"
+    ),
     download_models: bool = typer.Option(
-        default=True, help="Download all models for the services if necessary."
+        default=True,
+        help="Download all models for the services if necessary.",
+        rich_help_panel="Models",
     ),
     force_download: bool = typer.Option(
         False,  # noqa: WPS425
@@ -143,6 +150,7 @@ def run_background_services(
         "-f",
         is_flag=True,
         help="Force download all models for all services.",
+        rich_help_panel="Models",
     ),
     run_in_background: bool = typer.Option(
         False,  # noqa: WPS425
@@ -174,7 +182,6 @@ def run_background_services(
 
     if download_models:
         # Create model storage dir
-        model_storage_dir = Path("storage/models/")
         model_storage_dir.mkdir(exist_ok=True, parents=True)
 
         # Download models
