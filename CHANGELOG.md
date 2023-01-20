@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.6.2](https://github.com/emma-simbot/experience-hub/compare/v6.6.1...v6.6.2) (2023-01-20)
+
+
+### Bug Fixes
+
+* add `<stop>` token in last turn left in the look around ([45db0ed](https://github.com/emma-simbot/experience-hub/commit/45db0ed466e909f526a7e515261febe4be8446d4))
+
 ## [6.6.1](https://github.com/emma-simbot/experience-hub/compare/v6.6.0...v6.6.1) (2023-01-19)
 
 
