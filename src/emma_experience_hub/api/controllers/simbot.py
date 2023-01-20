@@ -78,7 +78,8 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                     local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
                 ),
                 feature_extractor_client=FeatureExtractorClient(
-                    endpoint=simbot_settings.feature_extractor_url
+                    endpoint=simbot_settings.feature_extractor_url,
+                    timeout=simbot_settings.client_timeout,
                 ),
                 features_cache_client=SimBotExtractedFeaturesClient(
                     bucket_name=simbot_settings.simbot_cache_s3_bucket,
@@ -93,15 +94,21 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             action_predictor=SimbotActionPredictionClient(
                 server_endpoint=simbot_settings.action_predictor_url
             ),
-            profanity_filter=ProfanityFilterClient(endpoint=simbot_settings.profanity_filter_url),
+            profanity_filter=ProfanityFilterClient(
+                endpoint=simbot_settings.profanity_filter_url,
+                timeout=simbot_settings.client_timeout,
+            ),
             out_of_domain_detector=OutOfDomainDetectorClient(
-                endpoint=simbot_settings.out_of_domain_detector_url
+                endpoint=simbot_settings.out_of_domain_detector_url,
+                timeout=simbot_settings.client_timeout,
             ),
             confirmation_response_classifier=ConfirmationResponseClassifierClient(
-                endpoint=simbot_settings.confirmation_classifier_url
+                endpoint=simbot_settings.confirmation_classifier_url,
+                timeout=simbot_settings.client_timeout,
             ),
             compound_splitter=CompoundSplitterClient(
-                endpoint=simbot_settings.compound_splitter_url
+                endpoint=simbot_settings.compound_splitter_url,
+                timeout=simbot_settings.client_timeout,
             ),
         )
 

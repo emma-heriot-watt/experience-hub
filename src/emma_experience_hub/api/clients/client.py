@@ -1,11 +1,17 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import httpx
 from loguru import logger
+from pydantic import AnyHttpUrl
 
 
 class Client(ABC):
     """Base client for all the API clients."""
+
+    def __init__(self, endpoint: AnyHttpUrl, timeout: Optional[int]) -> None:
+        self._endpoint = endpoint
+        self._timeout = timeout
 
     @abstractmethod
     def healthcheck(self) -> bool:

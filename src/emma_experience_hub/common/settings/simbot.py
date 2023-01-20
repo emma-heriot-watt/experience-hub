@@ -1,4 +1,6 @@
-from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, Field
+from typing import Optional
+
+from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, Field, validator
 
 
 class SimBotSettings(BaseSettings):
@@ -12,6 +14,8 @@ class SimBotSettings(BaseSettings):
 
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000
+
+    client_timeout: Optional[int] = 5
 
     aws_profile: str = Field(default="TeamProfile", env="aws_profile")
 
@@ -62,3 +66,12 @@ class SimBotSettings(BaseSettings):
     def from_env(cls) -> "SimBotSettings":
         """Instantiate from the environment variables."""
         return cls.parse_obj({})
+
+    @validator("client_timeout")
+    @classmethod
+    def fix_timeout(cls, timeout: Optional[int]) -> Optional[int]:
+        """Fix the timeout for httpx clients."""
+        if timeout is not None and timeout < 0:
+            return None
+
+        return timeout

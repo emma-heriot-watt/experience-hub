@@ -8,7 +8,6 @@ from loguru import logger
 from numpy.typing import ArrayLike
 from opentelemetry import trace
 from PIL import Image
-from pydantic import AnyHttpUrl
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
@@ -20,17 +19,8 @@ tracer = trace.get_tracer(__name__)
 class FeatureExtractorClient(Client):
     """API Client for sending requests to the feature extractor server."""
 
-    def __init__(
-        self,
-        endpoint: AnyHttpUrl,
-        _single_image_post_arg_name: str = "input_file",
-        _multiple_images_post_arg_name: str = "images",
-    ) -> None:
-        self._endpoint = endpoint
-
-        # TODO: These are horrendous names and need to be improved.
-        self._single_image_post_arg_name = _single_image_post_arg_name
-        self._multiple_images_post_arg_name = _multiple_images_post_arg_name
+    _single_image_post_arg_name: str = "input_file"
+    _multiple_images_post_arg_name: str = "images"
 
     def healthcheck(self) -> bool:
         """Verify the feature extractor server is healthy."""
@@ -43,7 +33,7 @@ class FeatureExtractorClient(Client):
         """
         logger.info(f"Asking Feature Extractor to move to device: `{device}`")
 
-        with httpx.Client() as client:
+        with httpx.Client(timeout=self._timeout) as client:
             response = client.post(
                 f"{self._endpoint}/update_model_device", json={"device": str(device)}
             )
@@ -61,7 +51,7 @@ class FeatureExtractorClient(Client):
         """Submit a request to the feature extraction server for a single image."""
         image_bytes = self._convert_single_image_to_bytes(image)
 
-        with httpx.Client(timeout=None) as client:
+        with httpx.Client(timeout=self._timeout) as client:
             response = client.post(
                 f"{self._endpoint}/features",
                 files={self._single_image_post_arg_name: image_bytes},
@@ -98,7 +88,7 @@ class FeatureExtractorClient(Client):
         ]
 
         # Make the request
-        with httpx.Client(timeout=None) as client:
+        with httpx.Client(timeout=self._timeout) as client:
             response = client.post(f"{self._endpoint}/batch_features", files=request_files)
 
         try:

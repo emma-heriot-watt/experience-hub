@@ -16,4 +16,6 @@ def profanity_filter_client(httpx_mock: HTTPXMock) -> Generator[ProfanityFilterC
         return httpx.Response(status_code=200, json="profanity" in text)
 
     httpx_mock.add_callback(custom_response)
-    yield ProfanityFilterClient(endpoint=AnyHttpUrl(url="http://localhost", scheme="http"))
+    yield ProfanityFilterClient(
+        endpoint=AnyHttpUrl(url="http://localhost", scheme="http"), timeout=None
+    )

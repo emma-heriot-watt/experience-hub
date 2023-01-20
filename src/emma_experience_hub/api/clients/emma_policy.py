@@ -45,7 +45,7 @@ class EmmaPolicyClient(Client):
         logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")
         logger.debug(f"size of the history {len(environment_state_history)}")
 
-        with httpx.Client() as client:
+        with httpx.Client(timeout=None) as client:
             response = client.post(
                 endpoint,
                 json=orjson.loads(
