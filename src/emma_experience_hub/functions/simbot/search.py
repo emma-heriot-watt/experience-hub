@@ -10,7 +10,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
 )
-from emma_experience_hub.constants.model import PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
     SimBotActionType,
@@ -61,7 +61,13 @@ class BasicSearchPlanner(SearchPlanner):
             raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
             payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
         )
-        return [turn_action, turn_action, turn_action, turn_action]
+        last_turn_action = SimBotAction(
+            id=0,
+            type=SimBotActionType.RotateLeft,
+            raw_output=f"turn left{END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}",
+            payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
+        )
+        return [turn_action, turn_action, turn_action, last_turn_action]
 
 
 class GrabFromHistorySearchPlanner(BasicSearchPlanner):
