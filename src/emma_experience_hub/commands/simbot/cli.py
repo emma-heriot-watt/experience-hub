@@ -1,3 +1,11 @@
+"""Commands to run the Experience Hub for SimBot.
+
+This module contains all the commands used to run the Experience Hub for the SimBot challenge.
+
+This module has become a bit unruly and needs a refactor to simplify commands, make it clear what
+is happening and how to do things, and make it more DRY.
+"""
+
 import os
 import subprocess
 import sys
@@ -101,6 +109,31 @@ def pull_service_images() -> None:
 
 @app.command()
 def run_background_services(
+    service_registry_path: Path = typer.Option(
+        default=SERVICE_REGISTRY_PATH,
+        help="Location of the services registry",
+        rich_help_panel="Config",
+    ),
+    services_docker_compose_path: Path = typer.Option(
+        default=SERVICES_COMPOSE_PATH,
+        help="Docker Compose configuration for the background services.",
+        rich_help_panel="Config",
+    ),
+    staging_services_docker_compose_path: Path = typer.Option(
+        default=SERVICES_STAGING_COMPOSE_PATH,
+        help="Addiional configuration for the staging environment.",
+        rich_help_panel="Config",
+    ),
+    production_services_docker_compose_path: Path = typer.Option(
+        SERVICES_PROD_COMPOSE_PATH,
+        help="Additional configuration for the production environment.",
+        rich_help_panel="Config",
+    ),
+    observability_services_docker_compose_path: Path = typer.Option(
+        OBSERVABILITY_COMPOSE_PATH,
+        help="Observability services for the SimBot environment",
+        rich_help_panel="Config",
+    ),
     download_models: bool = typer.Option(
         default=True, help="Download all models for the services if necessary."
     ),
@@ -133,7 +166,7 @@ def run_background_services(
 
     # Load the registry for the services
     service_registry = ServiceRegistry.parse_obj(
-        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+        yaml.safe_load(service_registry_path.read_bytes())
     )
 
     # Set env vars for the services
@@ -152,11 +185,16 @@ def run_background_services(
     if run_in_background:
         run_command = f"{run_command} -d"
 
-    compose_file_option = f"-f {SERVICES_COMPOSE_PATH} -f {SERVICES_STAGING_COMPOSE_PATH}"
+    compose_file_option = f"-f {services_docker_compose_path}"
     if is_production:
-        compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
+        compose_file_option = f"{compose_file_option} -f {production_services_docker_compose_path}"
+    else:
+        compose_file_option = f"{compose_file_option} -f {staging_services_docker_compose_path}"
+
     if enable_observability:
-        compose_file_option = f"{compose_file_option} -f {OBSERVABILITY_COMPOSE_PATH}"
+        compose_file_option = (
+            f"{compose_file_option} -f {observability_services_docker_compose_path}"
+        )
 
     # Run services
     subprocess.run(f"docker compose {compose_file_option} {run_command}", shell=True, check=True)
