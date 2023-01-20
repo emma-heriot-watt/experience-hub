@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.7.0](https://github.com/emma-simbot/experience-hub/compare/v6.6.3...v6.7.0) (2023-01-20)
+
+
+### Features
+
+* customise timeouts for all the clients from the settings ([#277](https://github.com/emma-simbot/experience-hub/issues/277)) ([c5330db](https://github.com/emma-simbot/experience-hub/commit/c5330dbcac60301685933e69fc76d3ac97c9a2e4))
+
+
+### Bug Fixes
+
+* added instructions to run EMMA on staging ([#275](https://github.com/emma-simbot/experience-hub/issues/275)) ([76ac2fd](https://github.com/emma-simbot/experience-hub/commit/76ac2fd2680e4236748c243881c13c96be201670))
+
 ## [6.6.3](https://github.com/emma-simbot/experience-hub/compare/v6.6.2...v6.6.3) (2023-01-20)
 
 
