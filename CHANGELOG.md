@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.7.2](https://github.com/emma-simbot/experience-hub/compare/v6.7.1...v6.7.2) (2023-01-23)
+
+
+### Bug Fixes
+
+* Bug in selecting search viewpoints ([#281](https://github.com/emma-simbot/experience-hub/issues/281)) ([fa81a10](https://github.com/emma-simbot/experience-hub/commit/fa81a1029fa449b60a04af873d3ff5e243c325b7))
+
 ## [6.7.1](https://github.com/emma-simbot/experience-hub/compare/v6.7.0...v6.7.1) (2023-01-23)
 
 
