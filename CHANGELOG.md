@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.0](https://github.com/emma-simbot/experience-hub/compare/v6.7.2...v6.8.0) (2023-01-23)
+
+
+### Features
+
+* refactor cache clients to only upload to S3 after API response ([#282](https://github.com/emma-simbot/experience-hub/issues/282)) ([031e05a](https://github.com/emma-simbot/experience-hub/commit/031e05a52d47f83613775f2e323c9bd75d73a668))
+
 ## [6.7.2](https://github.com/emma-simbot/experience-hub/compare/v6.7.1...v6.7.2) (2023-01-23)
 
 
