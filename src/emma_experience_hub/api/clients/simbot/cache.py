@@ -28,31 +28,29 @@ tracer = trace.get_tracer(__name__)
 
 
 class SimBotCacheClient(Client, Generic[T]):
-    """Cache client for SimBot data.
-
-    All data is automatially cached on S3.
-    """
+    """Cache client for SimBot data."""
 
     suffix: str
 
     def __init__(
         self,
         bucket_name: str,
+        local_cache_dir: Path,
         object_prefix: Optional[str] = None,
-        local_cache_dir: Optional[Path] = None,
     ) -> None:
         self.bucket = bucket_name
         self.prefix = object_prefix if object_prefix is not None else ""
+        self._local_cache_dir = local_cache_dir
 
-        self._s3 = S3Client(local_cache_dir=local_cache_dir)
+        self._s3 = S3Client(local_cache_dir=self._local_cache_dir)
 
     def healthcheck(self) -> bool:
-        """Assume that the bucket is available."""
-        return True
+        """Healthcheck for the client."""
+        return self._local_cache_dir.exists()
 
     def check_exist(self, session_id: str, prediction_request_id: str) -> bool:
         """Check whether or not the file exists."""
-        return self._create_path(session_id, prediction_request_id).exists()
+        return self._create_local_path(session_id, prediction_request_id).exists()
 
     def save(self, data: T, session_id: str, prediction_request_id: str) -> None:
         """Save the data, converting from the object to bytes."""
@@ -62,18 +60,30 @@ class SimBotCacheClient(Client, Generic[T]):
         """Load the data, converting from bytes to the object."""
         raise NotImplementedError()
 
+    def upload_to_s3(self, session_id: str, prediction_request_id: str) -> None:
+        """Load the cached data to S3."""
+        cached_data = self._load_bytes(session_id, prediction_request_id)
+        s3_path = self._create_s3_path(session_id, prediction_request_id)
+        s3_path.write_bytes(cached_data)
+
     def _save_bytes(self, data: bytes, session_id: str, prediction_request_id: str) -> None:
         """Save the data."""
-        destination_path = self._create_path(session_id, prediction_request_id)
+        destination_path = self._create_local_path(session_id, prediction_request_id)
         destination_path.write_bytes(data)
 
     def _load_bytes(self, session_id: str, prediction_request_id: str) -> bytes:
         """Load the data."""
-        path = self._create_path(session_id, prediction_request_id)
+        path = self._create_local_path(session_id, prediction_request_id)
         return path.read_bytes()
 
-    def _create_path(self, session_id: str, prediction_request_id: str) -> S3Path:
-        """Build the name of the object, including the default prefix."""
+    def _create_local_path(self, session_id: str, prediction_request_id: str) -> Path:
+        """Build the local path to the object."""
+        return self._local_cache_dir.joinpath(
+            Path(f"{session_id}/{str(prediction_request_id)}.{self.suffix}")
+        )
+
+    def _create_s3_path(self, session_id: str, prediction_request_id: str) -> S3Path:
+        """Build the name of the object on S3."""
         object_name = "/".join(
             [self.prefix, session_id, f"{str(prediction_request_id)}.{self.suffix}"]
         ).lstrip("/")

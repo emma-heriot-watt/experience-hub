@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Literal
 
 import boto3
-from fastapi import FastAPI, Request, Response, status
+from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from loguru import logger
 
 from emma_experience_hub.api.controllers import SimBotController
@@ -58,7 +58,9 @@ async def healthcheck(response: Response) -> str:
 
 
 @app.post("/v1/predict")
-async def handle_request_from_simbot_arena(request: Request, response: Response) -> SimBotResponse:
+async def handle_request_from_simbot_arena(
+    request: Request, response: Response, background_tasks: BackgroundTasks
+) -> SimBotResponse:
     """Handle a new request from the SimBot API."""
     raw_request = await request.json()
 
@@ -78,6 +80,12 @@ async def handle_request_from_simbot_arena(request: Request, response: Response)
         with tracer.start_as_current_span("Handle request"):
             # Handle the request
             simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
+
+        background_tasks.add_task(
+            state["controller"].upload_cache_to_s3,
+            simbot_response.session_id,
+            simbot_response.prediction_request_id,
+        )
 
         # Return response
         logger.info(f"Returning the response {simbot_response.json(by_alias=True)}")
