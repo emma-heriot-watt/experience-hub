@@ -241,6 +241,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         location_candidates = []
         first_selected_idx = None
         if self.use_current_position:
+            name_candidates.append("current_position")
             location_candidates.append(current_position.as_list())
             first_selected_idx = 0
 
