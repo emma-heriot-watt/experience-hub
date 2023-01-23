@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.7.1](https://github.com/emma-simbot/experience-hub/compare/v6.7.0...v6.7.1) (2023-01-23)
+
+
+### Bug Fixes
+
+* Enable search across viewpoints and reset of utterance queue ([#263](https://github.com/emma-simbot/experience-hub/issues/263)) ([4936421](https://github.com/emma-simbot/experience-hub/commit/4936421302a2d9b8f66c28c4a0a873eb6d651978))
+
 ## [6.7.0](https://github.com/emma-simbot/experience-hub/compare/v6.6.3...v6.7.0) (2023-01-20)
 
 
