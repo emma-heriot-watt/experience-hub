@@ -7,7 +7,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
 )
-from emma_experience_hub.constants.model import PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels import EmmaExtractedFeatures, EnvironmentStateTurn
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -62,8 +62,8 @@ class SimBotFindObjectPipeline:
         features_client: SimBotFeaturesClient,
         action_predictor_client: SimbotActionPredictionClient,
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
-        planner_type: PlannerType = PlannerType.basic,
-        distance_threshold: float = 2,
+        planner_type: PlannerType = PlannerType.greedy_max_vertex_cover,
+        distance_threshold: float = 3,
         viewpoint_budget: int = 2,
         _disable_grab_from_history: bool = False,
     ) -> "SimBotFindObjectPipeline":
@@ -106,6 +106,7 @@ class SimBotFindObjectPipeline:
 
         if not session.current_state.find_queue:
             logger.debug("Find queue is empty; returning None")
+            self._search_planner.reset_utterance_queue_if_object_not_found(session)
             return None
 
         extracted_features = self._features_client.get_features(session.current_turn)
@@ -203,6 +204,7 @@ class SimBotFindObjectPipeline:
             frame_index=scene_object_tokens.frame_index,
             object_index=scene_object_tokens.object_index,
             color_image_index=color_image_index,
+            add_stop_token=True,
         )
 
         # Add the goto action to the head of the queue
@@ -226,12 +228,18 @@ class SimBotFindObjectPipeline:
         frame_index: int,
         object_index: int,
         color_image_index: int,
+        add_stop_token: bool = False,
     ) -> SimBotAction:
         """Create an action from a found scene object."""
+        if add_stop_token:
+            output_suffix = f"{END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
+        else:
+            output_suffix = PREDICTED_ACTION_DELIMITER
+        raw_output = f"{action_type.value} <frame_token_{frame_index}> <vis_token_{object_index}> {output_suffix}"
         return SimBotAction(
             id=0,
             type=action_type,
-            raw_output=f"{action_type.value} <frame_token_{frame_index}> <vis_token_{object_index}>{PREDICTED_ACTION_DELIMITER}",
+            raw_output=raw_output,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
                     colorImageIndex=color_image_index,
@@ -245,9 +253,11 @@ class SimBotFindObjectPipeline:
     @tracer.start_as_current_span("Try get next action from plan")
     def _get_next_action_from_plan(self, session: SimBotSession) -> Optional[SimBotAction]:
         """If the model did not find the object, get the next action from the search plan."""
+        next_action: Optional[SimBotAction] = None
         try:
             logger.debug("get the next action from the search plan")
-            return session.current_state.find_queue.pop_from_head()
+            next_action = session.current_state.find_queue.pop_from_head()
         except IndexError:
             logger.debug("No more actions remaining within the search plan")
-            return None
+        self._search_planner.reset_utterance_queue_if_object_not_found(session, next_action)
+        return next_action

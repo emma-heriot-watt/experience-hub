@@ -31,6 +31,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
     SimBotUserSpeech,
 )
+from emma_experience_hub.functions.simbot.search import PlannerType
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotLowASRConfidenceDetector,
@@ -186,6 +187,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
         find_object = SimBotFindObjectPipeline.from_planner_type(
             features_client=clients.features,
             action_predictor_client=clients.action_predictor,
+            planner_type=PlannerType(simbot_settings.find_planner_type),
             visual_grounding_output_parser=SimBotVisualGroundingOutputParser(
                 action_delimiter=simbot_settings.action_predictor_delimiter,
                 eos_token=simbot_settings.action_predictor_eos_token,

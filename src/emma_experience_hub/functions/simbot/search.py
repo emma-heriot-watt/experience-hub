@@ -34,10 +34,52 @@ class PlannerType(Enum):
 class SearchPlanner(ABC):
     """Parent planner class."""
 
+    def __init__(self, rotation_magnitude: float = 90):
+        self.rotation_magnitude = rotation_magnitude
+
     @abstractmethod
     def run(self, session: SimBotSession) -> list[SimBotAction]:
         """Plan the actions needed to find an object for a given position."""
         raise NotImplementedError()
+
+    def reset_utterance_queue_if_object_not_found(
+        self, session: SimBotSession, current_action: Optional[SimBotAction] = None
+    ) -> None:
+        """Reset the utterance queue if the object was not found."""
+        # The object was not found if the find queue is empty and
+        if current_action is None:
+            # there is no remaining action
+            action_is_final = True
+        else:
+            # the remaining action is the final Rotate Left
+            action_is_final = current_action.type == SimBotActionType.RotateLeft
+
+        if not session.current_state.find_queue and action_is_final:
+            session.current_state.utterance_queue.reset()
+
+    def _create_goto_viewpoint_action(self, viewpoint_name: str) -> SimBotAction:
+        """Create action for going to a view point."""
+        return SimBotAction(
+            id=0,
+            type=SimBotActionType.GotoViewpoint,
+            raw_output=f"goto {viewpoint_name}{PREDICTED_ACTION_DELIMITER}",
+            payload=SimBotGotoViewpointPayload(
+                object=SimBotGotoViewpoint(goToPoint=viewpoint_name)
+            ),
+        )
+
+    def _create_turn_left_action(self, add_stop_token: bool = False) -> SimBotAction:
+        """Create a turn left action."""
+        if add_stop_token:
+            raw_output = f"turn left {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
+        else:
+            raw_output = f"turn left{PREDICTED_ACTION_DELIMITER}"
+        return SimBotAction(
+            id=0,
+            type=SimBotActionType.RotateLeft,
+            raw_output=raw_output,
+            payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
+        )
 
 
 class BasicSearchPlanner(SearchPlanner):
@@ -47,7 +89,7 @@ class BasicSearchPlanner(SearchPlanner):
     """
 
     def __init__(self, rotation_magnitude: float = 90):
-        self.rotation_magnitude = rotation_magnitude
+        super().__init__(rotation_magnitude=rotation_magnitude)
 
     def run(self, session: SimBotSession) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
@@ -55,19 +97,13 @@ class BasicSearchPlanner(SearchPlanner):
 
     def _create_look_around_actions(self) -> list[SimBotAction]:
         """Create actions to perform the look around."""
-        turn_action = SimBotAction(
-            id=0,
-            type=SimBotActionType.RotateLeft,
-            raw_output=f"turn left{PREDICTED_ACTION_DELIMITER}",
-            payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-        )
-        last_turn_action = SimBotAction(
-            id=0,
-            type=SimBotActionType.RotateLeft,
-            raw_output=f"turn left{END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}",
-            payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
-        )
-        return [turn_action, turn_action, turn_action, last_turn_action]
+        actions = [
+            self._create_turn_left_action(),
+            self._create_turn_left_action(),
+            self._create_turn_left_action(),
+            self._create_turn_left_action(add_stop_token=True),
+        ]
+        return actions
 
 
 class GrabFromHistorySearchPlanner(BasicSearchPlanner):
@@ -125,15 +161,7 @@ class GrabFromHistorySearchPlanner(BasicSearchPlanner):
         """Build the plan to find the object."""
         viewpoint_name = turn_with_entity.environment.get_closest_viewpoint_name()
 
-        goto_closest_viewpoint = SimBotAction(
-            id=0,
-            type=SimBotActionType.GotoViewpoint,
-            raw_output=f"goto {viewpoint_name}.",
-            payload=SimBotGotoViewpointPayload(
-                object=SimBotGotoViewpoint(goToPoint=viewpoint_name)
-            ),
-        )
-
+        goto_closest_viewpoint = self._create_goto_viewpoint_action(viewpoint_name)
         return [goto_closest_viewpoint, *self._create_look_around_actions()]
 
 
@@ -145,7 +173,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
 
     def __init__(
         self,
-        distance_threshold: float = 2,
+        distance_threshold: float = 3.0,
         vertex_budget: int = 2,
         use_current_position: bool = True,
         rotation_magnitude: float = 90,
@@ -185,14 +213,14 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
             else:
                 # Select the next viewpoint that covers most others
                 selected_idx = np.argmax(coverage_sets.sum(1), -1)
-            selected_viewpoints.append(selected_idx)
+                selected_viewpoints.append(selected_idx)
             # Set to zero all viewpoints already covered
             coverage_sets[coverage_sets[selected_idx] > 0, :] = 0
             coverage_sets[:, coverage_sets[selected_idx] > 0] = 0
 
-        logger.debug(f"Number of selected viewpoints = {len(selected_viewpoints)}")
+        logger.debug(f"[SEARCH] Number of selected viewpoints = {len(selected_viewpoints)}")
         logger.debug(
-            f"Number of viewpoints not covered = {np.where(coverage_sets.sum(0) > 0)[0].shape[0]}"
+            f"[SEARCH] Number of viewpoints not covered = {np.where(coverage_sets.sum(0) > 0)[0].shape[0]}"
         )
         return selected_viewpoints
 
@@ -243,23 +271,23 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         selected_room_locations = self.select_based_on_maximum_coverage(
             coverage_sets, first_selected_idx=first_selected_idx
         )
-        planned_actions = []
+        # We need 3 turns for each planned location + 1 more for the last viewpoint
+        planned_actions = self.get_actions_for_viewpoint()
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:
-                actions_for_viewpoint = self.get_actions_for_viewpoint()
+                planned_actions.append(self._create_goto_viewpoint_action(name))
+                planned_actions.extend(self.get_actions_for_viewpoint())
 
-                actions_for_viewpoint.append(
-                    SimBotAction(
-                        id=0,
-                        type=SimBotActionType.GotoViewpoint,
-                        raw_output=f"goto {name}.",
-                        payload=SimBotGotoViewpointPayload(
-                            object=SimBotGotoViewpoint(goToPoint=name)
-                        ),
-                    ),
-                )
-                planned_actions.extend(actions_for_viewpoint)
-
-        # We need 1 look around for each planned location + 1 more for the current viewpoint
-        planned_actions.extend(self.get_actions_for_viewpoint())
+        planned_actions.append(self._create_turn_left_action(add_stop_token=True))
+        logger.debug(f"[SEARCH] Plan = {planned_actions}")
         return planned_actions
+
+    def _create_look_around_actions(self) -> list[SimBotAction]:
+        """Create actions to perform the look around."""
+        actions = [
+            self._create_turn_left_action(),
+            self._create_turn_left_action(),
+            self._create_turn_left_action(),
+        ]
+
+        return actions
