@@ -290,7 +290,14 @@ def run_production_server(
     )
 
     run_background_services(
+        service_registry_path=SERVICE_REGISTRY_PATH,
+        services_docker_compose_path=SERVICES_COMPOSE_PATH,
+        staging_services_docker_compose_path=SERVICES_STAGING_COMPOSE_PATH,
+        production_services_docker_compose_path=SERVICES_PROD_COMPOSE_PATH,
+        observability_services_docker_compose_path=OBSERVABILITY_COMPOSE_PATH,
+        model_storage_dir=MODEL_STORAGE_DIR,
         download_models=True,
+        force_download=False,
         run_in_background=True,
         enable_observability=True,
         is_production=True,
