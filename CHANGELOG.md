@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.1](https://github.com/emma-simbot/experience-hub/compare/v6.8.0...v6.8.1) (2023-01-24)
+
+
+### Bug Fixes
+
+* **cli:** explicitly add params when calling typer-wrapped functions ([2de282c](https://github.com/emma-simbot/experience-hub/commit/2de282c1364ba255dd93d13bff844c524c4c2704))
+
 ## [6.8.0](https://github.com/emma-simbot/experience-hub/compare/v6.7.2...v6.8.0) (2023-01-23)
 
 
