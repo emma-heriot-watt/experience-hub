@@ -69,6 +69,7 @@ class SimBotCacheClient(Client, Generic[T]):
     def _save_bytes(self, data: bytes, session_id: str, prediction_request_id: str) -> None:
         """Save the data."""
         destination_path = self._create_local_path(session_id, prediction_request_id)
+        destination_path.parent.mkdir(parents=True, exist_ok=True)
         destination_path.write_bytes(data)
 
     def _load_bytes(self, session_id: str, prediction_request_id: str) -> bytes:
