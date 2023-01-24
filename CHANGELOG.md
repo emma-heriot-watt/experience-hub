@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.2](https://github.com/emma-simbot/experience-hub/compare/v6.8.1...v6.8.2) (2023-01-24)
+
+
+### Bug Fixes
+
+* need to create the directory for the file before writing to it ([8a8c4c3](https://github.com/emma-simbot/experience-hub/commit/8a8c4c34e84c4159b34eff16f4b369e776bea258))
+
 ## [6.8.1](https://github.com/emma-simbot/experience-hub/compare/v6.8.0...v6.8.1) (2023-01-24)
 
 
