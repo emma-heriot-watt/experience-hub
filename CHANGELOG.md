@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.9.1](https://github.com/emma-simbot/experience-hub/compare/v6.9.0...v6.9.1) (2023-01-25)
+
+
+### Bug Fixes
+
+* prefix watchtower logstreams with the service name ([8126288](https://github.com/emma-simbot/experience-hub/commit/812628870b43718bb32c8123f346eb25383741c2))
+
 ## [6.9.0](https://github.com/emma-simbot/experience-hub/compare/v6.8.2...v6.9.0) (2023-01-25)
 
 
