@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.9.0](https://github.com/emma-simbot/experience-hub/compare/v6.8.2...v6.9.0) (2023-01-25)
+
+
+### Features
+
+* Update simbot models ([#287](https://github.com/emma-simbot/experience-hub/issues/287)) ([90b3c6b](https://github.com/emma-simbot/experience-hub/commit/90b3c6be22c3179a547495c127bb394cebf01312))
+
 ## [6.8.2](https://github.com/emma-simbot/experience-hub/compare/v6.8.1...v6.8.2) (2023-01-24)
 
 
