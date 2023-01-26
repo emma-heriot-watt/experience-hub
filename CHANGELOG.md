@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.0](https://github.com/emma-simbot/experience-hub/compare/v6.10.0...v6.11.0) (2023-01-26)
+
+
+### Features
+
+* support detecting answers to confirmation questions ([#291](https://github.com/emma-simbot/experience-hub/issues/291)) ([d2afaeb](https://github.com/emma-simbot/experience-hub/commit/d2afaeb8522dabae35e21144caeaa51a50de6213))
+
 ## [6.10.0](https://github.com/emma-simbot/experience-hub/compare/v6.9.1...v6.10.0) (2023-01-26)
 
 
