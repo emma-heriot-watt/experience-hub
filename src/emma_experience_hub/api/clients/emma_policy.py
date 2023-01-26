@@ -51,11 +51,6 @@ class EmmaPolicyClient(Client):
                 json=orjson.loads(
                     emma_policy_request.json(
                         models_as_dict=True,
-                        exclude={
-                            "environment_history": {
-                                "__all__": {"features": {"__all__": {"class_labels"}}}
-                            }
-                        },
                     )
                 ),
             )
