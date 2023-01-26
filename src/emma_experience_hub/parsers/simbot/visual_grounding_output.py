@@ -13,10 +13,6 @@ from emma_experience_hub.parsers.parser import Parser
 class SimBotVisualGroundingOutputParser(Parser[list[str], Optional[SimBotSceneObjectTokens]]):
     """Parse the model output into the deconstructed action."""
 
-    def __init__(self, action_delimiter: str, eos_token: str) -> None:
-        self._eos_token = eos_token
-        self._action_delimiter = action_delimiter
-
     def __call__(self, model_output: list[str]) -> Optional[SimBotSceneObjectTokens]:
         """Convert the raw model output into a deconstructed action that we can use."""
         logger.debug(f"Raw model output: `{model_output}`")

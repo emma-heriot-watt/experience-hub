@@ -3,7 +3,6 @@ from typing import Optional
 from hypothesis import HealthCheck, example, given, settings, strategies as st
 from pytest_cases import fixture, parametrize
 
-from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
     get_simbot_object_label_to_class_name_map,
@@ -82,7 +81,7 @@ def test_can_get_correct_frame_index(
 
 @fixture(scope="module")
 def simbot_action_parser() -> SimBotActionPredictorOutputParser:
-    return SimBotActionPredictorOutputParser(PREDICTED_ACTION_DELIMITER, MODEL_EOS_TOKEN)
+    return SimBotActionPredictorOutputParser()
 
 
 @st.composite

@@ -7,7 +7,6 @@ from emma_experience_hub.functions.simbot.search import (
     BasicSearchPlanner,
     GrabFromHistorySearchPlanner,
     GreedyMaximumVertexCoverSearchPlanner,
-    PlannerType,
     SearchPlanner,
 )
 from emma_experience_hub.functions.simbot.special_tokens import (

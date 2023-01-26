@@ -3,6 +3,7 @@ from typing import Optional
 from loguru import logger
 from overrides import overrides
 
+from emma_experience_hub.constants.model import MODEL_EOS_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.constants.simbot import (
     get_simbot_objects_to_indices_map,
     get_simbot_room_names,
@@ -41,10 +42,6 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
     _lowercase_label_to_object_label: dict[str, str] = {
         object_label.lower(): object_label for object_label in _object_label_to_idx.keys()
     }
-
-    def __init__(self, action_delimiter: str, eos_token: str) -> None:
-        self._eos_token = eos_token
-        self._action_delimiter = action_delimiter
 
     @overrides(check_signature=False)
     def __call__(
@@ -170,8 +167,8 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         Also removes any blank strings from the list of actions.
         """
-        decoded_action_str = decoded_trajectory.replace(self._eos_token, "")
-        split_actions = decoded_action_str.split(self._action_delimiter)
+        decoded_action_str = decoded_trajectory.replace(MODEL_EOS_TOKEN, "")
+        split_actions = decoded_action_str.split(PREDICTED_ACTION_DELIMITER)
         actions = [action.strip() for action in split_actions if action]
         return actions
 

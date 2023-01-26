@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from typing import Optional
 
 import numpy as np
@@ -22,13 +21,6 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoViewpointPayload,
     SimBotRotatePayload,
 )
-
-
-class PlannerType(Enum):
-    """Available planner types."""
-
-    basic = "basic"
-    greedy_max_vertex_cover = "greedy_max_vertex_cover"
 
 
 class SearchPlanner(ABC):

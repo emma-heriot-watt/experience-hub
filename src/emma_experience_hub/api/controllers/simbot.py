@@ -32,7 +32,6 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
     SimBotUserSpeech,
 )
-from emma_experience_hub.functions.simbot.search import PlannerType
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotLowASRConfidenceDetector,
@@ -188,18 +187,12 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
         find_object = SimBotFindObjectPipeline.from_planner_type(
             features_client=clients.features,
             action_predictor_client=clients.action_predictor,
-            planner_type=PlannerType(simbot_settings.find_planner_type),
-            visual_grounding_output_parser=SimBotVisualGroundingOutputParser(
-                action_delimiter=simbot_settings.action_predictor_delimiter,
-                eos_token=simbot_settings.action_predictor_eos_token,
-            ),
-            _disable_grab_from_history=simbot_settings.disable_grab_from_history,
+            planner_type=simbot_settings.feature_flags.search_planner_type,
+            visual_grounding_output_parser=SimBotVisualGroundingOutputParser(),
+            _enable_grab_from_history=simbot_settings.feature_flags.enable_grab_from_history,
         )
 
-        action_predictor_response_parser = SimBotActionPredictorOutputParser(
-            action_delimiter=simbot_settings.action_predictor_delimiter,
-            eos_token=simbot_settings.action_predictor_eos_token,
-        )
+        action_predictor_response_parser = SimBotActionPredictorOutputParser()
 
         return cls(
             compound_splitter=SimBotCompoundSplitterPipeline(clients.compound_splitter),
@@ -216,8 +209,8 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             ),
             user_intent_extractor=SimBotUserIntentExtractionPipeline(
                 confirmation_response_classifier=clients.confirmation_response_classifier,
-                _disable_clarification_questions=simbot_settings.disable_clarification_questions,
-                _disable_clarification_confirmation=simbot_settings.disable_clarification_confirmation,
+                _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
+                _enable_confirmation_questions=simbot_settings.feature_flags.enable_confirmation_questions,
             ),
             environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
             agent_intent_selector=SimBotAgentIntentSelectionPipeline(
@@ -227,8 +220,8 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
                 ),
                 action_predictor_client=clients.action_predictor,
-                _disable_clarification_questions=simbot_settings.disable_clarification_questions,
-                _disable_search_actions=simbot_settings.disable_search_actions,
+                _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
+                _enable_search_actions=simbot_settings.feature_flags.enable_search_actions,
             ),
             agent_action_generator=SimBotAgentActionGenerationPipeline(
                 features_client=clients.features,

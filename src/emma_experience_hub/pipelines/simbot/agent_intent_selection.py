@@ -23,8 +23,8 @@ class SimBotAgentIntentSelectionPipeline:
         nlu_intent_client: SimBotNLUIntentClient,
         nlu_intent_parser: NeuralParser[SimBotIntent],
         action_predictor_client: SimbotActionPredictionClient,
-        _disable_clarification_questions: bool = False,
-        _disable_search_actions: bool = False,
+        _enable_clarification_questions: bool = True,
+        _enable_search_actions: bool = True,
     ) -> None:
         self._features_client = features_client
 
@@ -33,8 +33,8 @@ class SimBotAgentIntentSelectionPipeline:
 
         self._action_predictor_client = action_predictor_client
 
-        self._disable_clarification_questions = _disable_clarification_questions
-        self._disable_search_actions = _disable_search_actions
+        self._enable_clarification_questions = _enable_clarification_questions
+        self._enable_search_actions = _enable_search_actions
 
     def run(self, session: SimBotSession) -> SimBotIntent:
         """Decide that the agent should do next."""
@@ -51,7 +51,7 @@ class SimBotAgentIntentSelectionPipeline:
             return session.current_turn.intent.environment
 
         # If we are currently in the middle of a search routine, continue it.
-        if session.is_find_object_in_progress and not self._disable_search_actions:
+        if session.is_find_object_in_progress and self._enable_search_actions:
             logger.debug("Setting agent intent to search since we are current in progress")
             return SimBotIntent(type=SimBotIntentType.search)
 
@@ -103,13 +103,13 @@ class SimBotAgentIntentSelectionPipeline:
         intent = self._nlu_intent_parser(raw_intent)
         logger.debug(f"Extracted intent from turn: {intent}")
 
-        if self._disable_clarification_questions and intent.type.is_clarification_question:
+        if not self._enable_clarification_questions and intent.type.is_clarification_question:
             logger.info(
                 "Clarification questions are disabled; returning the `<act><one_match>` intent."
             )
             return SimBotIntent(type=SimBotIntentType.act_one_match)
 
-        if self._disable_search_actions and intent.type == SimBotIntentType.search:
+        if not self._enable_search_actions and intent.type == SimBotIntentType.search:
             logger.info("Search actions are disabled; returning the `<act><one_match>` intent.")
             return SimBotIntent(type=SimBotIntentType.act_one_match)
 

@@ -19,9 +19,9 @@ from rich.syntax import Syntax
 
 from emma_common.api.gunicorn import create_gunicorn_server
 from emma_common.api.instrumentation import instrument_app
+from emma_common.aws.cloudwatch import add_cloudwatch_handler_to_logger
 from emma_common.logging import InstrumentedInterceptHandler, setup_logging, setup_rich_logging
 from emma_experience_hub._version import __version__  # noqa: WPS436
-from emma_experience_hub.api.observability import send_logs_to_cloudwatch
 from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels import ServiceRegistry
@@ -269,7 +269,13 @@ def run_controller_api(
     )
 
     if log_to_cloudwatch:
-        send_logs_to_cloudwatch(simbot_settings, traces_to_opensearch)
+        add_cloudwatch_handler_to_logger(
+            boto3_profile_name=simbot_settings.aws_profile,
+            log_stream_name=simbot_settings.watchtower_log_stream_name,
+            log_group_name=simbot_settings.watchtower_log_group_name,
+            send_interval=1,
+            enable_trace_logging=traces_to_opensearch,
+        )
 
     server.run()
 

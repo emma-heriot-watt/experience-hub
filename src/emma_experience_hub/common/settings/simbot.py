@@ -1,17 +1,25 @@
 from typing import Optional
 
-from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, Field, validator
+from pydantic import AnyHttpUrl, BaseModel, BaseSettings, DirectoryPath, Field, validator
+
+from emma_experience_hub.datamodels.enums import SearchPlannerType
+
+
+class SimBotFeatureFlags(BaseModel):
+    """Feature flags for the SimBot agent."""
+
+    enable_clarification_questions: bool = True
+    enable_confirmation_questions: bool = False
+    enable_search_actions: bool = True
+    enable_grab_from_history: bool = False
+
+    search_planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover
 
 
 class SimBotSettings(BaseSettings):
     """Settings for the SimBot-related modules."""
 
-    # Feature flags
-    disable_clarification_questions: bool = False
-    disable_clarification_confirmation: bool = True
-    disable_search_actions: bool = False
-    disable_grab_from_history: bool = True
-    find_planner_type: str = "greedy_max_vertex_cover"
+    feature_flags: SimBotFeatureFlags = SimBotFeatureFlags()
 
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000
@@ -42,8 +50,6 @@ class SimBotSettings(BaseSettings):
     profanity_filter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5503", scheme="http")
 
     action_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5502", scheme="http")
-    action_predictor_delimiter: str = "."
-    action_predictor_eos_token: str = "</s>"
 
     out_of_domain_detector_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5505", scheme="http")
 

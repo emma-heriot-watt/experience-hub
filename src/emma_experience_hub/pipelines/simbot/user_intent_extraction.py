@@ -20,14 +20,14 @@ class SimBotUserIntentExtractionPipeline:
     def __init__(
         self,
         confirmation_response_classifier: ConfirmationResponseClassifierClient,
-        _disable_clarification_questions: bool = False,
-        _disable_clarification_confirmation: bool = False,
+        _enable_clarification_questions: bool = True,
+        _enable_confirmation_questions: bool = True,
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
 
         # Feature flags
-        self._disable_clarification_questions = _disable_clarification_questions
-        self._disable_clarification_confirmation = _disable_clarification_confirmation
+        self._enable_clarification_questions = _enable_clarification_questions
+        self._enable_confirmation_questions = _enable_confirmation_questions
 
     def run(self, session: SimBotSession) -> Optional[SimBotIntentType]:
         """Run the pipeline to get the user's intent."""
@@ -83,7 +83,7 @@ class SimBotUserIntentExtractionPipeline:
             and previous_turn.intent.user is not None
             and previous_turn.intent.user == SimBotIntentType.act_too_many_matches
             # This will always resolve False if clarification questions are disabled
-            and not self._disable_clarification_questions
+            and self._enable_clarification_questions
         )
 
     def _utterance_responding_to_confirm_request(
@@ -96,7 +96,7 @@ class SimBotUserIntentExtractionPipeline:
             and previous_turn.intent.user is not None
             and previous_turn.intent.user.is_confirmation_question
             # This will always resolve to False if clarification questions are disabled.
-            and not self._disable_clarification_confirmation
+            and self._enable_confirmation_questions
         )
 
     def _is_confirmation_request_approved(self, utterance: str) -> bool:
