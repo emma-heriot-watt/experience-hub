@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.10.0](https://github.com/emma-simbot/experience-hub/compare/v6.9.1...v6.10.0) (2023-01-26)
+
+
+### Features
+
+* Include class labels in features ([#288](https://github.com/emma-simbot/experience-hub/issues/288)) ([5dbb66f](https://github.com/emma-simbot/experience-hub/commit/5dbb66fa2b438cee9f0b5fa5058365d94b7610a3))
+
 ## [6.9.1](https://github.com/emma-simbot/experience-hub/compare/v6.9.0...v6.9.1) (2023-01-25)
 
 
