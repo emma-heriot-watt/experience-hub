@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import Optional
 
 from loguru import logger
@@ -18,39 +19,54 @@ class SimBotUserIntentExtractionPipeline:
     """
 
     def __init__(
-        self,
-        confirmation_response_classifier: ConfirmationResponseClassifierClient,
-        _enable_clarification_questions: bool = True,
-        _enable_confirmation_questions: bool = True,
+        self, confirmation_response_classifier: ConfirmationResponseClassifierClient
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
 
-        # Feature flags
-        self._enable_clarification_questions = _enable_clarification_questions
-        self._enable_confirmation_questions = _enable_confirmation_questions
-
     def run(self, session: SimBotSession) -> Optional[SimBotIntentType]:
-        """Run the pipeline to get the user's intent."""
+        """Run the pipeline to get the user's intent.
+
+        We create assertions when processing questions responses, but if any of those occur, we
+        default to let the model try to act on the utterance the best it can.
+        """
         if not session.current_turn.speech:
             logger.warning(
                 "There is no utterance to extract intent from. Therefore the user has not explicitly told us to do anything. Why has this pipeline been called?"
             )
             return None
 
-        # Check if the question was a confirmation request
-        if self._utterance_responding_to_confirm_request(session.previous_valid_turn):
-            logger.debug("Utterance is responding to a confirmation request.")
-            return self.handle_confirmation_request_approval(session.current_turn)
-
-        # Check if we are dealing with a clarification response
-        if self._utterance_is_responding_to_clarify_question(session.previous_valid_turn):
-            logger.debug("Utterance is a response to a clarification question.")
-            return self.handle_clarification_response(session)
+        # Did the agent as the user aquestion in the previous turn?
+        if self._was_question_asked_in_previous_turn(session.previous_valid_turn):
+            # Previous turn DID have a question to the user.
+            with suppress(AssertionError, NotImplementedError):
+                return self.handle_response_to_question(session)
 
         # If nothing else, just let the model try to act.
         return SimBotIntentType.act
 
-    def handle_clarification_response(self, session: SimBotSession) -> SimBotIntentType:
+    def handle_response_to_question(self, session: SimBotSession) -> SimBotIntentType:
+        """Handle responses to questions from the agent.
+
+        This method refers to others that raise assertions and exceptions. These must be caught
+        when calling this method.
+        """
+        agent_intent_type = self._get_agent_intent_from_turn(session.previous_valid_turn)
+
+        # Did agent ask for disambiguation?
+        if agent_intent_type.triggers_disambiguation_question:
+            return self.handle_clarification_response()
+
+        # Did agent ask for confirmation?
+        if agent_intent_type.triggers_confirmation_question:
+            # Make sure the user utterance exists
+            if not session.current_turn.speech:
+                raise AssertionError("There is no utterance from the user? That's not right")
+
+            return self.handle_confirmation_request_approval(session.current_turn.speech.utterance)
+
+        raise NotImplementedError("There is no known way to handle the type of question provided.")
+
+    def handle_clarification_response(self) -> SimBotIntentType:
         """Handle utterance that is responding to a clarification question.
 
         Note: Verify that the utterance _is_ responding to a question before calling this method.
@@ -58,47 +74,37 @@ class SimBotUserIntentExtractionPipeline:
         # Assume it's a clarification answerr
         return SimBotIntentType.clarify_answer
 
-    def handle_confirmation_request_approval(
-        self, current_turn: SimBotSessionTurn
-    ) -> SimBotIntentType:
+    def handle_confirmation_request_approval(self, utterance: str) -> SimBotIntentType:
         """Check if the confirmation request was approved and return the correct intent."""
-        if not current_turn.speech:
-            raise AssertionError("There should be an utterance to verify.")
+        confirmation_approved = self._confirmation_response_classifier.is_request_approved(
+            utterance
+        )
+        # If the utterance is NOT a response to the confirmation request
+        if confirmation_approved is None:
+            raise AssertionError("Utterance is not a response to the confirmation request")
 
-        # Tell agent to use generated action from previous turn if true
-        if self._is_confirmation_request_approved(current_turn.speech.utterance):
+        if confirmation_approved:
             logger.debug("Utterance approves of confirmation request.")
-            return SimBotIntentType.act_previous
+            return SimBotIntentType.confirm_yes
 
         logger.debug("Utterance denies confirmation request.")
-        return SimBotIntentType.generic_failure
+        return SimBotIntentType.confirm_no
 
-    def _utterance_is_responding_to_clarify_question(
+    def _was_question_asked_in_previous_turn(
         self, previous_turn: Optional[SimBotSessionTurn]
     ) -> bool:
-        """Return True if the user is responding to a previous clarification question."""
+        """Was a question asked by the agent in the previous turn?"""
         return (
-            previous_turn is not None  # noqa: WPS222
+            previous_turn is not None
             and previous_turn.actions.dialog is not None
-            and previous_turn.intent.user is not None
-            and previous_turn.intent.user == SimBotIntentType.act_too_many_matches
-            # This will always resolve False if clarification questions are disabled
-            and self._enable_clarification_questions
+            and previous_turn.intent.agent is not None
+            and previous_turn.intent.agent.type.triggers_question_to_user
         )
 
-    def _utterance_responding_to_confirm_request(
-        self, previous_turn: Optional[SimBotSessionTurn]
-    ) -> bool:
-        """Return True if the user is responding to a confirmation question."""
-        return (
-            previous_turn is not None  # noqa: WPS222
-            and previous_turn.actions.dialog is not None
-            and previous_turn.intent.user is not None
-            and previous_turn.intent.user.is_confirmation_question
-            # This will always resolve to False if clarification questions are disabled.
-            and self._enable_confirmation_questions
-        )
-
-    def _is_confirmation_request_approved(self, utterance: str) -> bool:
-        """Return True if the confirmation request was approved from the user."""
-        return self._confirmation_response_classifier.is_confirmation(utterance)
+    def _get_agent_intent_from_turn(self, turn: Optional[SimBotSessionTurn]) -> SimBotIntentType:
+        """Get the agent intent from the session turn, if it's available."""
+        if turn is None:
+            raise AssertionError()
+        if turn.intent.agent is None:
+            raise AssertionError()
+        return turn.intent.agent.type

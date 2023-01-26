@@ -208,9 +208,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 out_of_domain_detector_client=clients.out_of_domain_detector,
             ),
             user_intent_extractor=SimBotUserIntentExtractionPipeline(
-                confirmation_response_classifier=clients.confirmation_response_classifier,
-                _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
-                _enable_confirmation_questions=simbot_settings.feature_flags.enable_confirmation_questions,
+                confirmation_response_classifier=clients.confirmation_response_classifier
             ),
             environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
             agent_intent_selector=SimBotAgentIntentSelectionPipeline(
@@ -439,12 +437,8 @@ class SimBotController:
         return session
 
     def _user_is_responding_to_question(self, session: SimBotSession) -> bool:
-        """Return True if the user is responding to a previous question."""
-        previous_turn = session.previous_valid_turn
-        if previous_turn is None or previous_turn.intent.user is None:
-            return False
-
+        """Return True if the user is responding to question from previous turn."""
         return (
-            previous_turn.intent.user.is_clarification_question
-            or previous_turn.intent.user.is_confirmation_question
+            session.previous_turn is not None
+            and session.previous_turn.intent.agent_should_ask_question_to_user
         )

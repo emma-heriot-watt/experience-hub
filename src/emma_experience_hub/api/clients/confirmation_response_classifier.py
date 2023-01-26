@@ -1,3 +1,5 @@
+from typing import Optional
+
 import httpx
 from loguru import logger
 
@@ -11,9 +13,9 @@ class ConfirmationResponseClassifierClient(Client):
         """Verify the server is healthy."""
         return self._run_healthcheck(f"{self._endpoint}/healthcheck")
 
-    def is_confirmation(self, text: str) -> bool:
-        """Return True if the input is a confirmation to the request."""
-        with httpx.Client(timeout=self._timeout) as client:
+    def is_request_approved(self, text: str) -> Optional[bool]:
+        """Return boolean to the incoming request, or None if it is not a confirmation request."""
+        with httpx.Client() as client:
             response = client.post(f"{self._endpoint}/is-confirmation", params={"text": text})
 
         try:

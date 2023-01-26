@@ -1,3 +1,5 @@
+from typing import Optional
+
 from loguru import logger
 
 from emma_experience_hub.api.clients.simbot import (
@@ -6,7 +8,12 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotNLUIntentClient,
 )
 from emma_experience_hub.datamodels import EnvironmentStateTurn
-from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType, SimBotSession
+from emma_experience_hub.datamodels.simbot import (
+    SimBotIntent,
+    SimBotIntentType,
+    SimBotSession,
+    SimBotSessionTurn,
+)
 from emma_experience_hub.parsers import NeuralParser
 
 
@@ -51,14 +58,14 @@ class SimBotAgentIntentSelectionPipeline:
             return session.current_turn.intent.environment
 
         # If we are currently in the middle of a search routine, continue it.
-        if session.is_find_object_in_progress and self._enable_search_actions:
-            logger.debug("Setting agent intent to search since we are current in progress")
+        if session.is_find_object_in_progress:
+            logger.debug("Setting agent intent to search since we are currently in progress")
             return SimBotIntent(type=SimBotIntentType.search)
 
         # Otherwise, let the agent act
         return SimBotIntent(type=SimBotIntentType.act_one_match)
 
-    def extract_intent_from_user_utterance(
+    def extract_intent_from_user_utterance(  # noqa: WPS212
         self, user_intent: SimBotIntentType, session: SimBotSession
     ) -> SimBotIntent:
         """Determine what the agent should do next from the user intent.
@@ -76,11 +83,24 @@ class SimBotAgentIntentSelectionPipeline:
             # Otherwise, use the NLU to detect it
             return self._process_utterance_with_nlu(session)
 
-        # If the user has replied to a clarification question, then act
+        # If we are receiving an answer to a clarification question, then just act on it
         if user_intent == SimBotIntentType.clarify_answer:
-            # TODO: We can change this logic here to determine whether or not we should ask more
-            #       questions or just act, if we want to start handling multi-turn dialogue
             return SimBotIntent(type=SimBotIntentType.act_one_match)
+
+        # If we are within a find routine AND received a confirmation response from the user
+        if session.is_find_object_in_progress and user_intent.is_confirmation_response:
+            # Then let the search routine decide how to handle it.
+            return SimBotIntent(type=SimBotIntentType.search)
+
+        # If the agent explicitly asked a confirmation question in the previous turn
+        if self._agent_asked_for_confirm_before_acting(session.previous_valid_turn):
+            # And the user approved
+            if user_intent == SimBotIntentType.confirm_yes:
+                return SimBotIntent(type=SimBotIntentType.act_previous)
+
+            # And the user didn't approve
+            if user_intent == SimBotIntentType.confirm_no:
+                return SimBotIntent(type=SimBotIntentType.confirm_no)
 
         # In all other cases, just return the intent as the agent _should_ know how to act.
         return SimBotIntent(type=user_intent)
@@ -124,3 +144,13 @@ class SimBotAgentIntentSelectionPipeline:
             )
         )
         return raw_text_match_prediction is not None
+
+    def _agent_asked_for_confirm_before_acting(
+        self, previous_turn: Optional[SimBotSessionTurn]
+    ) -> bool:
+        """Did the agent explicitly ask for confirmation before performing an action?"""
+        return (
+            previous_turn is not None
+            and previous_turn.intent.agent is not None
+            and previous_turn.intent.agent.type == SimBotIntentType.confirm_before_act
+        )

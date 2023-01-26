@@ -17,16 +17,18 @@ class SimBotIntentType(Enum):
     only_wake_word = "<language><only_wake_word>"
     empty_utterance = "<language><empty_utterance>"
 
-    # Clarification questions
+    # Clarification question triggers
     act_no_match = "<act><no_match>"
     act_too_many_matches = "<act><too_many_matches>"
 
-    # Confirmation questions
+    # Confirmation question triggers
+    confirm_before_act = "<confirm><act>"
     confirm_generic = "<confirm><generic>"
-    confirm_highlight = "<confirm><highlight>"
 
-    # Clarification answer from the user
+    # Question responses from the user
     clarify_answer = "<clarify><answer>"
+    confirm_yes = "<confirm><yes>"
+    confirm_no = "<confirm><no>"
 
     # Feedback for search
     search_found_object = "<search><highlight>"
@@ -74,8 +76,9 @@ class SimBotIntentType(Enum):
         """Return True if the intent can be held by a user."""
         return self.is_invalid_user_utterance or self in {
             SimBotIntentType.clarify_answer,
+            SimBotIntentType.confirm_yes,
+            SimBotIntentType.confirm_no,
             SimBotIntentType.act,
-            SimBotIntentType.act_previous,
         }
 
     @property
@@ -103,6 +106,28 @@ class SimBotIntentType(Enum):
         }
 
     @property
+    def triggers_question_to_user(self) -> bool:
+        """Return True if the intent triggers a question to the user."""
+        return (
+            self.is_clarification_question
+            or self.triggers_confirmation_question
+            or self.triggers_disambiguation_question
+        )
+
+    @property
+    def triggers_disambiguation_question(self) -> bool:
+        """Did the agent ask for disambiguation from the user?"""
+        return self == SimBotIntentType.act_too_many_matches
+
+    @property
+    def triggers_confirmation_question(self) -> bool:
+        """Did the agent ask for confirmation from the user?"""
+        return self in {
+            SimBotIntentType.confirm_generic,
+            SimBotIntentType.confirm_before_act,
+        }
+
+    @property
     def is_clarification_question(self) -> bool:
         """Return True if intent is one that triggers a clarification question."""
         return self in {
@@ -111,11 +136,11 @@ class SimBotIntentType(Enum):
         }
 
     @property
-    def is_confirmation_question(self) -> bool:
-        """Return True if the intent is one from a confirmation question."""
+    def is_confirmation_response(self) -> bool:
+        """Return True if the intent is a response to a confirmation question."""
         return self in {
-            SimBotIntentType.confirm_generic,
-            SimBotIntentType.confirm_highlight,
+            SimBotIntentType.confirm_yes,
+            SimBotIntentType.confirm_no,
         }
 
     @property
