@@ -319,21 +319,13 @@ class SimBotSession(BaseModel):
     @classmethod
     def sort_session_turns(cls, turns: list[SimBotSessionTurn]) -> list[SimBotSessionTurn]:
         """Sort the session turns from oldest to newest."""
-        logger.debug(f"Sorting session turns; original idx order: {[turn.idx for turn in turns]}")
+        sorted_turns = sorted(turns, key=lambda turn: turn.idx)
 
-        # Sort from the oldest request to the newest request
-        turns = sorted(turns, key=lambda turn: turn.idx)
+        logger.debug(
+            f"Sorting session turns; {[turn.idx for turn in turns]} -> {[turn.idx for turn in sorted_turns]}"
+        )
 
-        logger.debug(f"Sorting session turns; new idx order {[turn.idx for turn in turns]}")
-
-        # Verify that indexes are in order
-        # if sorted(turns, key=lambda turn: turn.idx) != turns:
-        #     # TODO: Is this the best way to handle this?
-        #     raise AssertionError(
-        #         "Ordering turns in date order is not the same as ordering in index order. Something is wrong here."
-        #     )
-
-        return turns
+        return sorted_turns
 
     @property
     def current_turn(self) -> SimBotSessionTurn:
