@@ -55,7 +55,7 @@ id,conditions,response,is_lightweight
 54,agent_intent_type == "act_one_match" and not utterance_queue_not_empty,Alright what's next?,False
 55,agent_intent_type == "act_one_match" and not utterance_queue_not_empty,<say-as interpret-as="interjection">okey dokey</say-as>,False
 56,agent_intent_type == "act_one_match" and utterance_queue_not_empty,',True
-57,agent_intent_type == "search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,<say-as interpret-as="interjection">hmm</say-as> I think I found it over there. I'm moving closer.,True
+57,agent_intent_type == "search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,I think I found it over there! I'm moving closer.,True
 58,agent_intent_type == "search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,Found it! Let's get closer.,True
 59,agent_intent_type == "search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,I think it is right there.,True
 60,agent_intent_type == "search" and agent_interaction_action == "Highlight" and agent_interaction_entity != null,It looks like it's over there.,True
@@ -68,23 +68,29 @@ id,conditions,response,is_lightweight
 67,agent_intent_type == "search" and agent_interaction_action == "GotoObject" and not utterance_queue_not_empty,What are we doing next?,False
 68,agent_intent_type == "search" and agent_interaction_action == "GotoObject" and utterance_queue_not_empty,',True
 69,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I don't see it in front of me. Let me have a look around the room.,True
-70,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns == 1,I don't see it in front of me. Let me have a look around the room.,True
-71,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty,',True
-72,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and agent_intent_per_turn[-2]["type"] == "act_no_match",Let's find it!,True
-73,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and agent_intent_per_turn[-2]["type"] == "act_no_match",Okay I am searching.,True
-74,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
-75,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Still looking,True
-76,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Maybe it's somewhere here,True
-77,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,',True
-78,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I'll start looking!,True
-79,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let me have a look around the room.,True
-80,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let's search this room.,True
-81,user_intent_type == "only_wake_word",Yes?,False
-82,user_intent_type == "only_wake_word",Hi - how can I help?,False
-83,user_intent_type == "only_wake_word",<say-as interpret-as="interjection">huh</say-as> - what can i do for you?,False
-84,user_intent_type == "only_wake_word",<say-as interpret-as="interjection">ay</say-as> - what do you need?,False
-85,user_intent_type == "only_wake_word",<say-as interpret-as="interjection">hiya</say-as> - how can i help?,False
-86,user_intent_type == "empty_utterance",Did you say anything?,False
-87,user_intent_type == "empty_utterance",<say-as interpret-as="interjection">er</say-as> - Did you say anything?,False
-88,user_intent_type == "empty_utterance",<say-as interpret-as="interjection">hmm</say-as> - i didnt register anything there,False
-89,agent_intent_type != null,',True
+70,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Starting the search!,True
+71,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I'm looking around the room,True
+72,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let's search this room!,True
+73,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns == 1,I don't see it in front of me. Let me have a look around the room.,True
+74,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty,',True
+75,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and agent_intent_per_turn[-2]["type"] == "act_no_match",Let's find it!,True
+76,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and agent_intent_per_turn[-2]["type"] == "act_no_match",Okay I am searching.,True
+77,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
+78,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Still looking,True
+79,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Maybe it's somewhere here,True
+80,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Let's try one more spot,True
+81,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Searching from a new spot,True
+82,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,Maybe a new perspective will help!,True
+83,agent_intent_type == "search" and agent_interaction_action == "GotoViewpoint" and find_queue_not_empty,',True
+84,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I'll start looking!,True
+85,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let me have a look around the room.,True
+86,agent_intent_type == "search" and agent_interaction_action == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let's search this room.,True
+87,user_intent_type == "only_wake_word",Yes?,False
+88,user_intent_type == "only_wake_word",Hi - how can I help?,False
+89,user_intent_type == "only_wake_word",<say-as interpret-as="interjection">huh</say-as> - what can i do for you?,False
+90,user_intent_type == "only_wake_word",<say-as interpret-as="interjection">ay</say-as> - what do you need?,False
+91,user_intent_type == "only_wake_word",<say-as interpret-as="interjection">hiya</say-as> - how can i help?,False
+92,user_intent_type == "empty_utterance",Did you say anything?,False
+93,user_intent_type == "empty_utterance",<say-as interpret-as="interjection">er</say-as> - Did you say anything?,False
+94,user_intent_type == "empty_utterance",<say-as interpret-as="interjection">hmm</say-as> - i didnt register anything there,False
+95,agent_intent_type != null,',True

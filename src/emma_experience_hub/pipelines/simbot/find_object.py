@@ -64,7 +64,7 @@ class SimBotFindObjectPipeline:
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
         planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover,
         distance_threshold: float = 3,
-        viewpoint_budget: int = 2,
+        viewpoint_budget: int = 3,
         _enable_grab_from_history: bool = True,
     ) -> "SimBotFindObjectPipeline":
         """Instantiate the pipeline from the SearchPlannerType."""
