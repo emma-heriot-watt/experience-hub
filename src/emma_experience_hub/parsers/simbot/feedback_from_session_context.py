@@ -1,3 +1,5 @@
+import itertools
+import random
 from collections.abc import Iterator
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from typing import Optional
@@ -88,18 +90,26 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
         self, candidates: list[SimBotFeedbackRule], used_rule_ids: list[int]
     ) -> SimBotFeedbackRule:
         """Select the highest-scoring rule from the set of rules."""
+        # Try to filter out any rules that have already been used
         valid_candidates = [rule for rule in candidates if rule.id not in used_rule_ids]
+
         if not valid_candidates:
             logger.warning("No unused candidate rules! Will need to reuse a response.")
             valid_candidates = candidates
 
+        # Group all the rules by their scores
         sorted_candidates = sorted(valid_candidates, key=lambda x: x.score, reverse=True)
-        # TODO: check for ties
-        if sorted_candidates:
-            selected_rule = sorted_candidates[0]
-        else:
+        grouped_candidates = itertools.groupby(sorted_candidates, key=lambda x: x.score)
+
+        try:
+            # Get the group of rules with the highest score
+            highest_scoring_rules = list(next(grouped_candidates)[1])
+            # Choose one of the rules from the highest-scoring set
+            selected_rule = random.choice(highest_scoring_rules)
+        except (StopIteration, IndexError):
+            # If the list of rules is empty for some reason, then just return the default rule
             selected_rule = self._rules[self._default_rule_id]
-            logger.error(f"[NLG] No selected rule {selected_rule}")
+            logger.error(f"[NLG] No rules to choose, therefore using default {selected_rule}")
 
         logger.debug(f"[NLG] Selected rule {selected_rule}")
         return selected_rule
