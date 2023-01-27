@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.12.0](https://github.com/emma-simbot/experience-hub/compare/v6.11.0...v6.12.0) (2023-01-27)
+
+
+### Features
+
+* choose a rule from the bin of highest scoring rules with the same score ([#292](https://github.com/emma-simbot/experience-hub/issues/292)) ([913baff](https://github.com/emma-simbot/experience-hub/commit/913baff266ea69153413e90565076900efc37a1a))
+
+
+### Bug Fixes
+
+* add a default rule for the lightweight dialog ([#295](https://github.com/emma-simbot/experience-hub/issues/295)) ([7a6353d](https://github.com/emma-simbot/experience-hub/commit/7a6353d9679ec7ae616336d5c075efad4c18a449)), closes [#271](https://github.com/emma-simbot/experience-hub/issues/271)
+
 ## [6.11.0](https://github.com/emma-simbot/experience-hub/compare/v6.10.0...v6.11.0) (2023-01-26)
 
 
