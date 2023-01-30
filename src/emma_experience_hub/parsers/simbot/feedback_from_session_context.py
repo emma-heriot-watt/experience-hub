@@ -73,7 +73,7 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
                     if future.result():
                         compatible_rules.append(rule)  # noqa: WPS220
 
-        logger.debug(f"Got {len(compatible_rules)} matching feedback rules.")
+        logger.debug(f"Got {len(compatible_rules)} matching feedback rules: {compatible_rules}")
         return compatible_rules
 
     def _filter_rules(self, state: SimBotFeedbackState) -> Iterator[SimBotFeedbackRule]:
