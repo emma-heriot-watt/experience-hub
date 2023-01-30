@@ -3,7 +3,8 @@
 This class primarily has a bunch of generics which include methods to make data handling as simple
 and straightforward as possible.
 
-There are both Pydantic and non-Pydantic base classes so that clients can be composed to handle any data.
+There are both Pydantic and non-Pydantic base classes so that clients can be composed to handle any
+data.
 
 The main classes that should be used are the ones at the bottom of this module. All the generics
 are just there for keep things separated and clear.

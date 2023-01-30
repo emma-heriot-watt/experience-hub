@@ -347,7 +347,8 @@ class SimBotSession(BaseModel):
         The current turn does not need to be valid, but all previous ones MUST be.
 
         If a given turn has a user intent AND that intent is valid, ignore it.
-        If it doesn't have a user intent, or the user intent is valid, then let it through the filter.
+        If it doesn't have a user intent, or the user intent is valid, then let it through the
+        filter.
         """
         valid_turns = [
             turn
