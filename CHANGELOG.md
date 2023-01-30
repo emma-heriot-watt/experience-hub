@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.14.0](https://github.com/emma-simbot/experience-hub/compare/v6.13.0...v6.14.0) (2023-01-30)
+
+
+### Features
+
+* Update action, nlu models, and policy version ([#303](https://github.com/emma-simbot/experience-hub/issues/303)) ([031fb8b](https://github.com/emma-simbot/experience-hub/commit/031fb8b46c0f76513dcfc5a888532d159b41bb0c))
+
+
+### Bug Fixes
+
+* formatting and update pre-commit config ([e308cef](https://github.com/emma-simbot/experience-hub/commit/e308cef7ed934535dc48739126f20189c587d23b))
+
 ## [6.13.0](https://github.com/emma-simbot/experience-hub/compare/v6.12.0...v6.13.0) (2023-01-27)
 
 
