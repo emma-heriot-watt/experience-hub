@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.15.0](https://github.com/emma-simbot/experience-hub/compare/v6.14.0...v6.15.0) (2023-02-01)
+
+
+### Features
+
+* ensure every action from the previous turn has a status ([#306](https://github.com/emma-simbot/experience-hub/issues/306)) ([1f3eca1](https://github.com/emma-simbot/experience-hub/commit/1f3eca1335257e544640876ad3a90d8d86c1f497))
+
+
+### Reverts
+
+* simbot models ([#304](https://github.com/emma-simbot/experience-hub/issues/304)) ([1094700](https://github.com/emma-simbot/experience-hub/commit/109470075a7cb70359fe11c16a5e97e1ad54f93c))
+
 ## [6.14.0](https://github.com/emma-simbot/experience-hub/compare/v6.13.0...v6.14.0) (2023-01-30)
 
 
