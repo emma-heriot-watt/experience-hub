@@ -28,7 +28,7 @@ curl https://pyenv.run | bash
 curl -sSL https://install.python-poetry.org | python3 -
 
 # Add Poetry to the PATH
-echo "export PATH='/home/ubuntu/.local/bin:$PATH'" >>~/.bashrc
+echo 'export PATH="/home/ubuntu/.local/bin:$PATH"' >>~/.bashrc
 
 # Create venvs within the project
 poetry config virtualenvs.in-project true
