@@ -147,6 +147,14 @@ class SimBotSessionTurnActions(BaseModel, validate_assignment=True):
         """Return True is the interaction action was successful."""
         return self.interaction is not None and self.interaction.is_successful
 
+    @property
+    def any_action_failed(self) -> bool:
+        """Return True if any action contains an error status."""
+        is_interaction_failed = self.interaction and not self.interaction.is_successful
+        is_dialog_failed = self.dialog and not self.dialog.is_successful
+
+        return bool(is_interaction_failed or is_dialog_failed)
+
     def to_list(self) -> list[SimBotAction]:
         """Return actions as a list.
 
@@ -161,6 +169,20 @@ class SimBotSessionTurnActions(BaseModel, validate_assignment=True):
             actions_list.append(self.dialog)
 
         return actions_list
+
+    def mark_all_as_successful(self) -> None:
+        """Mark all the actions as successful, if they do not already have a status."""
+        if self.interaction and not self.interaction.status:
+            self.interaction.mark_as_successful()
+        if self.dialog and not self.dialog.status:
+            self.dialog.mark_as_successful()
+
+    def mark_remaining_as_blocked(self) -> None:
+        """Mark all actions without statuses as 'blocked', as they were never executed."""
+        if self.interaction and not self.interaction.status:
+            self.interaction.mark_as_blocked()
+        if self.dialog and not self.dialog.status:
+            self.dialog.mark_as_blocked()
 
 
 class SimBotSessionTurnEnvironment(BaseModel):

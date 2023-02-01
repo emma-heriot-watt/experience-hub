@@ -59,6 +59,7 @@ class SimBotIntentType(Enum):
     incorrect_action_format = "<failure><incorrect_action_format>"
     invalid_object_class = "<failure><invalid_object_class>"
     post_process_error = "<failure><post_process_error>"
+    blocked_by_previous_error = "<failure><blocked_by_previous_error>"
 
     @property
     def is_invalid_user_utterance(self) -> bool:
@@ -103,6 +104,7 @@ class SimBotIntentType(Enum):
             SimBotIntentType.incorrect_action_format,
             SimBotIntentType.invalid_object_class,
             SimBotIntentType.post_process_error,
+            SimBotIntentType.blocked_by_previous_error,
         }
 
     @property

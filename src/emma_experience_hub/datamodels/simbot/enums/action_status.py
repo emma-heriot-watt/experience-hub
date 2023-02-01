@@ -24,6 +24,9 @@ class SimBotActionStatusType(Enum):
     action_execution_error = "ActionExecutionError"
     post_process_error = "PostProcessError"
 
+    # Custom non-arena error type that indicates that the action was never performed
+    blocked_by_previous_error = "BlockedByPreviousError"
+
     @classmethod
     def reverse_mapping(cls) -> dict[str, str]:
         """Create a reversed mapping of the enum."""

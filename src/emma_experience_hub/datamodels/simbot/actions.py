@@ -1,6 +1,7 @@
 from contextlib import suppress
 from typing import Any, Optional, Union
 
+from loguru import logger
 from pydantic import BaseModel, Field, ValidationError, root_validator, validator
 
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
@@ -258,6 +259,37 @@ class SimBotAction(BaseModel):
         # Otherwise, return the default
         return SimBotObjectOutputType.default()
 
+    def mark_as_successful(self) -> None:
+        """Update the action status to indicate that it was successful.
+
+        This removes boilerplate from elsewhere, but it WILL error if an action status already
+        exists.
+        """
+        if self.status and not self.status.success:
+            logger.warning(
+                "Tried to make an action that is already regarded as a failure as a success. This shouldn't be happening."
+            )
+            return
+
+        self.status = SimBotActionStatus(  # noqa: WPS601
+            id=self.id or 0,
+            type=self.type,
+            success=True,
+            errorType=SimBotActionStatusType.action_successful,
+        )
+
+    def mark_as_blocked(self) -> None:
+        """Update the action status to indicate that it was blocked by another action failing."""
+        if self.status:
+            return
+
+        self.status = SimBotActionStatus(  # noqa: WPS601
+            id=self.id or 0,
+            type=self.type,
+            success=False,
+            errorType=SimBotActionStatusType.blocked_by_previous_error,
+        )
+
 
 class SimBotDialogAction(SimBotAction):
     """SimBot action with its fields typed for the dialog payload.
@@ -266,3 +298,8 @@ class SimBotDialogAction(SimBotAction):
     """
 
     payload: SimBotDialogPayload = Field(..., exclude=True)
+
+    @property
+    def is_lightweight_dialog(self) -> bool:
+        """Return True if the dialog action is a lightweight dialog."""
+        return self.type == SimBotActionType.LightweightDialog

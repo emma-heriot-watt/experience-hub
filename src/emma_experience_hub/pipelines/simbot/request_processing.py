@@ -62,30 +62,28 @@ class SimBotRequestProcessingPipeline:
     ) -> None:
         """Update the previous turn with the action status.
 
-        We are assuming that the order of actions is the exact same as the order of action
-        statuses.
+        If we do not receive an action status for the entire turn, then we must assume that all
+        previous actions completed successfully.
         """
+        # If the previous turn did NOT end is a lightweight dialog action And there is no action
+        # status, then assume all the actions completed successfully
         if not action_status:
-            logger.warning(
-                "Previous action status is empty, therefore cannot update status of previous session turn. Moving on..."
-            )
-            return
-
-        if len(action_status) != len(turn.actions):
-            logger.error(
-                f"The number of actions with the turn is not equal to the number of statuses available. There are {len(turn.actions)} actions within the turn, but {len(action_status)} statuses."
-            )
-            logger.warning(
-                "Trying to match the available actions to the available statuses anyway."
-            )
+            if turn.actions.dialog and not turn.actions.dialog.is_lightweight_dialog:
+                turn.actions.mark_all_as_successful()
 
         # Update the action status, ensuring we match the right one.
         action_status_id_map = {status.id: status for status in action_status}
-
         with suppress(KeyError):
             for action in turn.actions:
                 if action.id is not None:
                     action.status = action_status_id_map[action.id]
+
+        # If there are errors, mark any actions without statuses as blocked
+        if turn.actions.any_action_failed:
+            turn.actions.mark_remaining_as_blocked()
+        else:
+            # If there are no errors in the actions, then mark the rest as successful
+            turn.actions.mark_all_as_successful()
 
         # Put the updated session turn into the db
         self._session_db_client.put_session_turn(turn)
