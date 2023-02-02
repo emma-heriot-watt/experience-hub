@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.0](https://github.com/emma-simbot/experience-hub/compare/v6.17.0...v7.0.0) (2023-02-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* split `agent`  intent into `physical_interaction` and `verbal_interaction` (#297)
+
+### Features
+
+* split `agent`  intent into `physical_interaction` and `verbal_interaction` ([#297](https://github.com/emma-simbot/experience-hub/issues/297)) ([423192f](https://github.com/emma-simbot/experience-hub/commit/423192f3eb55cd401ff0957e0d4b8f4a5407f04a))
+* Update the OOD model ([#312](https://github.com/emma-simbot/experience-hub/issues/312)) ([e5d3ca1](https://github.com/emma-simbot/experience-hub/commit/e5d3ca1f2872e497d661df13889f221b31790a97))
+
 ## [6.17.0](https://github.com/emma-simbot/experience-hub/compare/v6.16.0...v6.17.0) (2023-02-02)
 
 
