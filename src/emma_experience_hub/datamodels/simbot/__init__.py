@@ -13,6 +13,7 @@ from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
 from emma_experience_hub.datamodels.simbot.session import (
+    SimBotInventory,
     SimBotSession,
     SimBotSessionState,
     SimBotSessionTurn,

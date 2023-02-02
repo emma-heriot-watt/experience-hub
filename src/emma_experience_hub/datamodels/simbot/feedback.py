@@ -91,7 +91,7 @@ class SimBotFeedbackRule(BaseModel):
         """Parse a dictionary into a SimBotFeedbackRule."""
         # If the rule is unable to resolve symbols, it defaults to None and returns False
         engine_context = Context(default_value=None)
-        rule = Rule(raw_dict["conditions"], context=engine_context)
+        rule = Rule(raw_dict["conditions"].lower(), context=engine_context)
 
         rule_id = int(raw_dict["id"])
 
@@ -146,6 +146,10 @@ class SimBotFeedbackState(BaseModel):
 
     # Location
     current_room: str
+
+    # Inventory
+    inventory_entity: Optional[str] = None
+    inventory_turn: int
 
     # Count all of the rooms visited
     visited_room_counter: Counter[str]
@@ -212,6 +216,8 @@ class SimBotFeedbackState(BaseModel):
         find_queue_not_empty: bool,
         previous_find_queue_not_empty: bool,
         used_rule_ids: list[int],
+        inventory_turn: int,
+        inventory_entity: Optional[str],
     ) -> "SimBotFeedbackState":
         """Create the state in a simple way."""
         return cls(
@@ -248,10 +254,14 @@ class SimBotFeedbackState(BaseModel):
             find_queue_not_empty=find_queue_not_empty,
             previous_find_queue_not_empty=previous_find_queue_not_empty,
             used_rule_ids=used_rule_ids,
+            inventory_turn=inventory_turn,
+            inventory_entity=inventory_entity,
         )
 
     def to_query(self) -> dict[str, Any]:
         """Convert the state to a dictionary for the feedback engine."""
-        model_as_json = self.json(exclude_unset=True, exclude_defaults=True, exclude_none=True)
+        model_as_json = self.json(
+            exclude_unset=True, exclude_defaults=True, exclude_none=True
+        ).lower()
         model_as_dict = orjson.loads(model_as_json)
         return model_as_dict

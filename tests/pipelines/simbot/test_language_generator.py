@@ -8,7 +8,7 @@ from emma_experience_hub.parsers.simbot.feedback_from_session_context import (
 )
 
 
-MIN_RULE_ID = 1
+MIN_RULE_ID = 2
 
 
 @fixture(scope="module")

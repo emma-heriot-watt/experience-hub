@@ -1,6 +1,7 @@
 import itertools
 from collections.abc import Iterator
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from contextlib import suppress
 from datetime import datetime
 from functools import cached_property
 from typing import Callable, Optional
@@ -217,6 +218,32 @@ class SimBotSessionTurnEnvironment(BaseModel):
         return viewpoint_name
 
 
+class SimBotInventory(BaseModel, validate_assignment=True):
+    """Track what is in the inventory of the SimBot agent.
+
+    The turn_idx and action_id inform when the inventory were last updated.
+    """
+
+    entity: Optional[str] = None
+    turn_idx: int = Field(default=0, ge=0, description="When the inventory was last updated.")
+
+    @property
+    def is_empty(self) -> bool:
+        """Return True if the agent inventory is empty."""
+        return not bool(self.entity)
+
+    @classmethod
+    def from_action(cls, action: SimBotAction, turn_idx: int) -> "SimBotInventory":
+        """Instantiate an inventory from the action."""
+        if action.adds_object_to_inventory and action.is_successful:
+            return cls(entity=action.payload.entity_name, turn_idx=turn_idx)
+
+        if action.removes_object_from_inventory and action.is_successful:
+            return cls(entity=None, turn_idx=turn_idx)
+
+        raise AssertionError("Action does not alter/change the inventory in any way")
+
+
 class SimBotSessionState(BaseModel, validate_assignment=True):
     """Track the state of the entire session, within each turn.
 
@@ -227,6 +254,7 @@ class SimBotSessionState(BaseModel, validate_assignment=True):
 
     utterance_queue: SimBotQueue[str] = SimBotQueue[str]()
     find_queue: SimBotQueue[SimBotAction] = SimBotQueue[SimBotAction]()
+    inventory: SimBotInventory = SimBotInventory()
 
 
 class SimBotSessionTurn(BaseModel):
@@ -407,6 +435,11 @@ class SimBotSession(BaseModel):
             and self.previous_valid_turn.actions.interaction.type == SimBotActionType.Highlight
         )
 
+    @property
+    def inventory(self) -> SimBotInventory:
+        """What object is the agent holding?"""
+        return self.current_turn.state.inventory
+
     def get_turns_within_interaction_window(self) -> list[SimBotSessionTurn]:
         """Get all the turns within the local interaction window.
 
@@ -428,6 +461,19 @@ class SimBotSession(BaseModel):
 
         return turns_within_window
 
+    def try_to_update_agent_inventory(self) -> None:
+        """Try to update the agent inventory given the actions from the previous turn."""
+        if not self.previous_valid_turn:
+            return
+
+        if not self.previous_valid_turn.actions.interaction:
+            return
+
+        with suppress(AssertionError):
+            self.current_turn.state.inventory = SimBotInventory.from_action(
+                self.previous_valid_turn.actions.interaction, self.previous_valid_turn.idx
+            )
+
     def to_feedback_state(self) -> SimBotFeedbackState:
         """Convert the session to the simplified state."""
         return SimBotFeedbackState.from_all_information(
@@ -448,6 +494,8 @@ class SimBotSession(BaseModel):
             if self.previous_turn
             else False,
             used_rule_ids=self._get_used_feedback_rule_ids(),
+            inventory_turn=self.inventory.turn_idx,
+            inventory_entity=self.inventory.entity,
         )
 
     @staticmethod

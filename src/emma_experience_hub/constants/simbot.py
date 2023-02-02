@@ -81,8 +81,8 @@ def get_feedback_rules() -> list[dict[str, str]]:
     """Load the feedback rules and responses from their file."""
     csv_path = constants_absolute_path.joinpath("simbot", "feedback_rules.csv")
     with open(csv_path, encoding="utf-8-sig") as csv_file:
-        reader = DictReader(csv_file)
-        return list(reader)
+        raw_rule_reader = DictReader(csv_file)
+        return [{**rule, "id": str(idx)} for idx, rule in enumerate(raw_rule_reader, 2)]
 
 
 ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(

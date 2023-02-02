@@ -230,6 +230,16 @@ class SimBotAction(BaseModel):
         return self.type == SimBotActionType.GotoObject
 
     @property
+    def adds_object_to_inventory(self) -> bool:
+        """Does the action add the object to the inventory?"""
+        return self.type == SimBotActionType.Pickup
+
+    @property
+    def removes_object_from_inventory(self) -> bool:
+        """Does the action remove the object from the inventory?"""
+        return self.type == SimBotActionType.Place
+
+    @property
     def is_low_level_navigation(self) -> bool:
         """Is the action for a low-level navigation movement?"""
         return self.type in SimBotActionType.low_level_navigation()

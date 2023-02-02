@@ -18,7 +18,7 @@ tracer = trace.get_tracer(__name__)
 class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFeedbackRule]):
     """Get the best response for the current session feedback state."""
 
-    _default_rule_id: int = 0
+    _default_rule_idx: int = 0
 
     def __init__(
         self, rules: list[SimBotFeedbackRule], _max_workers: Optional[int] = None
@@ -108,7 +108,7 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
             selected_rule = random.choice(highest_scoring_rules)
         except (StopIteration, IndexError):
             # If the list of rules is empty for some reason, then just return the default rule
-            selected_rule = self._rules[self._default_rule_id]
+            selected_rule = self._rules[self._default_rule_idx]
             logger.error(f"[NLG] No rules to choose, therefore using default {selected_rule}")
 
         logger.debug(f"[NLG] Selected rule {selected_rule}")

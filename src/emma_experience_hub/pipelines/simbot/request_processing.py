@@ -30,7 +30,6 @@ class SimBotRequestProcessingPipeline:
         # Create a turn for the current request and update the history
         session_turn = SimBotSessionTurn.new_from_simbot_request(request, idx=len(session_history))
         session_history.append(session_turn)
-
         logger.debug(f"Created session turn: {session_turn}")
 
         # Instantiate the session from the turns
@@ -40,6 +39,9 @@ class SimBotRequestProcessingPipeline:
         # where we start from.
         if session.previous_turn:
             session.current_turn.state = session.previous_turn.state.copy(deep=True)
+
+            # Check whether or not the agent inventory needs updating
+            session.try_to_update_agent_inventory()
 
         logger.debug(f"Current turn: {session.current_turn}")
 
