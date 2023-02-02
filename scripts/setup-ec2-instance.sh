@@ -28,6 +28,7 @@ curl https://pyenv.run | bash
 curl -sSL https://install.python-poetry.org | python3 -
 
 # Add Poetry to the PATH
+# shellcheck disable=SC2016
 echo 'export PATH="/home/ubuntu/.local/bin:$PATH"' >>~/.bashrc
 
 # Create venvs within the project
