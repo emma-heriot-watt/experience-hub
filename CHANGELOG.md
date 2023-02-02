@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.17.0](https://github.com/emma-simbot/experience-hub/compare/v6.16.0...v6.17.0) (2023-02-02)
+
+
+### Features
+
+* Add holding object to each turn ([#310](https://github.com/emma-simbot/experience-hub/issues/310)) ([615fa01](https://github.com/emma-simbot/experience-hub/commit/615fa018e18fa479631ddfa5c443a4854c674533)), closes [#307](https://github.com/emma-simbot/experience-hub/issues/307)
+
 ## [6.16.0](https://github.com/emma-simbot/experience-hub/compare/v6.15.0...v6.16.0) (2023-02-02)
 
 
