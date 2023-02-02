@@ -1,6 +1,11 @@
 from pytest_cases import fixture, param_fixture, parametrize_with_cases
 
-from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotIntent, SimBotIntentType
+from emma_experience_hub.datamodels.simbot import (
+    SimBotAction,
+    SimBotIntent,
+    SimBotIntentType,
+    SimBotNLUIntentType,
+)
 from emma_experience_hub.parsers.simbot import SimBotNLUOutputParser
 
 
@@ -19,30 +24,36 @@ class DecodedNLUOutputs:
 
     _entity: str = "mug"
 
-    def case_act(self) -> tuple[str, SimBotIntent]:
-        return "<act><one_match>", SimBotIntent(type=SimBotIntentType.act_one_match)
+    def case_act(self) -> tuple[str, SimBotIntent[SimBotNLUIntentType]]:
+        return "<act><one_match>", SimBotIntent[SimBotNLUIntentType](
+            type=SimBotIntentType.act_one_match
+        )
 
-    def case_search(self) -> tuple[str, SimBotIntent]:
-        return "<search>", SimBotIntent(type=SimBotIntentType.search)
+    def case_search(self) -> tuple[str, SimBotIntent[SimBotNLUIntentType]]:
+        return "<search>", SimBotIntent[SimBotNLUIntentType](type=SimBotIntentType.search)
 
-    def case_act_too_many_matches(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
+    def case_act_too_many_matches(
+        self, should_include_entity: bool
+    ) -> tuple[str, SimBotIntent[SimBotNLUIntentType]]:
         output = "<act><too_many_matches>"
         if should_include_entity:
             output = f"{output} {self._entity}"
 
-        intent = SimBotIntent(
+        intent = SimBotIntent[SimBotNLUIntentType](
             type=SimBotIntentType.act_too_many_matches,
             entity=self._entity if should_include_entity else None,
         )
 
         return output, intent
 
-    def case_act_no_match(self, should_include_entity: bool) -> tuple[str, SimBotIntent]:
+    def case_act_no_match(
+        self, should_include_entity: bool
+    ) -> tuple[str, SimBotIntent[SimBotNLUIntentType]]:
         output = "<act><no_match>"
         if should_include_entity:
             output = f"{output} {self._entity}"
 
-        intent = SimBotIntent(
+        intent = SimBotIntent[SimBotNLUIntentType](
             type=SimBotIntentType.act_no_match,
             entity=self._entity if should_include_entity else None,
         )

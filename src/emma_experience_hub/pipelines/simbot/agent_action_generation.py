@@ -11,6 +11,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
     SimBotIntent,
     SimBotIntentType,
+    SimBotPhysicalInteractionIntentType,
     SimBotSession,
 )
 from emma_experience_hub.parsers.simbot import (
@@ -46,16 +47,16 @@ class SimBotAgentActionGenerationPipeline:
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action to perform on the environment."""
-        if not session.current_turn.intent.agent:
+        if not session.current_turn.intent.physical_interaction:
             raise AssertionError("The agent should have an intent before calling this pipeline.")
 
         try:
             action_intent_handler = self._get_action_intent_handler(
-                session.current_turn.intent.agent
+                session.current_turn.intent.physical_interaction
             )
         except KeyError:
             logger.debug(
-                f"Agent intent ({session.current_turn.intent.agent}) does not require the agent to generate an action that interacts with the environment."
+                f"Agent intent ({session.current_turn.intent.physical_interaction}) does not require the agent to generate an action that interacts with the environment."
             )
             return None
 
@@ -86,7 +87,7 @@ class SimBotAgentActionGenerationPipeline:
         return self._find_object_pipeline.run(session)
 
     def _get_action_intent_handler(
-        self, intent: SimBotIntent
+        self, intent: SimBotIntent[SimBotPhysicalInteractionIntentType]
     ) -> Callable[[SimBotSession], Optional[SimBotAction]]:
         """Get the handler to use when generating an action to perform on the environment."""
         switcher = {

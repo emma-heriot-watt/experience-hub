@@ -4,7 +4,10 @@ from loguru import logger
 from opentelemetry import trace
 
 from emma_experience_hub.api.clients import OutOfDomainDetectorClient, ProfanityFilterClient
-from emma_experience_hub.datamodels.simbot import SimBotIntentType
+from emma_experience_hub.datamodels.simbot import (
+    SimBotIntentType,
+    SimBotInvalidUtteranceIntentType,
+)
 from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
 from emma_experience_hub.parsers import Parser
 
@@ -31,7 +34,7 @@ class SimBotUserUtteranceVerificationPipeline:
 
     def run(  # noqa: WPS212
         self, speech_recognition_payload: SimBotSpeechRecognitionPayload
-    ) -> Optional[SimBotIntentType]:
+    ) -> Optional[SimBotInvalidUtteranceIntentType]:
         """Check if the utterance is invalid, returning the type if it is invalid."""
         # Check whether or not the utterance contains profanity
         if self._utterance_contains_profanity(speech_recognition_payload):

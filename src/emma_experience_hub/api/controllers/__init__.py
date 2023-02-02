@@ -1,1 +1,1 @@
-from emma_experience_hub.api.controllers.simbot import SimBotController
+from emma_experience_hub.api.controllers.simbot.controller import SimBotController

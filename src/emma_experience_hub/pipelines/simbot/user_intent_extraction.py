@@ -8,6 +8,8 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
     SimBotSessionTurn,
+    SimBotUserIntentType,
+    SimBotVerbalInteractionIntentType,
 )
 
 
@@ -23,7 +25,7 @@ class SimBotUserIntentExtractionPipeline:
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
 
-    def run(self, session: SimBotSession) -> Optional[SimBotIntentType]:
+    def run(self, session: SimBotSession) -> Optional[SimBotUserIntentType]:
         """Run the pipeline to get the user's intent.
 
         We create assertions when processing questions responses, but if any of those occur, we
@@ -44,20 +46,22 @@ class SimBotUserIntentExtractionPipeline:
         # If nothing else, just let the model try to act.
         return SimBotIntentType.act
 
-    def handle_response_to_question(self, session: SimBotSession) -> SimBotIntentType:
+    def handle_response_to_question(self, session: SimBotSession) -> SimBotUserIntentType:
         """Handle responses to questions from the agent.
 
         This method refers to others that raise assertions and exceptions. These must be caught
         when calling this method.
         """
-        agent_intent_type = self._get_agent_intent_from_turn(session.previous_valid_turn)
+        language_condition_intent_type = self._get_language_condition_intent_from_turn(
+            session.previous_valid_turn
+        )
 
         # Did agent ask for disambiguation?
-        if agent_intent_type.triggers_disambiguation_question:
+        if language_condition_intent_type.triggers_disambiguation_question:
             return self.handle_clarification_response()
 
         # Did agent ask for confirmation?
-        if agent_intent_type.triggers_confirmation_question:
+        if language_condition_intent_type.triggers_confirmation_question:
             # Make sure the user utterance exists
             if not session.current_turn.speech:
                 raise AssertionError("There is no utterance from the user? That's not right")
@@ -66,7 +70,7 @@ class SimBotUserIntentExtractionPipeline:
 
         raise NotImplementedError("There is no known way to handle the type of question provided.")
 
-    def handle_clarification_response(self) -> SimBotIntentType:
+    def handle_clarification_response(self) -> SimBotUserIntentType:
         """Handle utterance that is responding to a clarification question.
 
         Note: Verify that the utterance _is_ responding to a question before calling this method.
@@ -74,7 +78,7 @@ class SimBotUserIntentExtractionPipeline:
         # Assume it's a clarification answerr
         return SimBotIntentType.clarify_answer
 
-    def handle_confirmation_request_approval(self, utterance: str) -> SimBotIntentType:
+    def handle_confirmation_request_approval(self, utterance: str) -> SimBotUserIntentType:
         """Check if the confirmation request was approved and return the correct intent."""
         confirmation_approved = self._confirmation_response_classifier.is_request_approved(
             utterance
@@ -97,14 +101,16 @@ class SimBotUserIntentExtractionPipeline:
         return (
             previous_turn is not None
             and previous_turn.actions.dialog is not None
-            and previous_turn.intent.agent is not None
-            and previous_turn.intent.agent.type.triggers_question_to_user
+            and previous_turn.intent.verbal_interaction is not None
+            and previous_turn.intent.verbal_interaction.type.triggers_question_to_user
         )
 
-    def _get_agent_intent_from_turn(self, turn: Optional[SimBotSessionTurn]) -> SimBotIntentType:
+    def _get_language_condition_intent_from_turn(
+        self, turn: Optional[SimBotSessionTurn]
+    ) -> SimBotVerbalInteractionIntentType:
         """Get the agent intent from the session turn, if it's available."""
         if turn is None:
             raise AssertionError()
-        if turn.intent.agent is None:
+        if turn.intent.verbal_interaction is None:
             raise AssertionError()
-        return turn.intent.agent.type
+        return turn.intent.verbal_interaction.type

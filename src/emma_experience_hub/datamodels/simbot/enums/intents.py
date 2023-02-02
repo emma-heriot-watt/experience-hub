@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 from enum import Enum
+from typing import Literal
+
+from typing_extensions import TypeGuard
 
 
 class SimBotIntentType(Enum):
@@ -22,20 +27,16 @@ class SimBotIntentType(Enum):
     act_too_many_matches = "<act><too_many_matches>"
 
     # Confirmation question triggers
-    confirm_before_act = "<confirm><act>"
     confirm_generic = "<confirm><generic>"
+    confirm_before_act = "<confirm><act>"
+    confirm_before_goto_object = "<confirm><goto_object>"
+    confirm_before_goto_viewpoint = "<confirm><goto_viewpoint>"
+    confirm_before_goto_room = "<confirm><goto_room>"
 
     # Question responses from the user
     clarify_answer = "<clarify><answer>"
     confirm_yes = "<confirm><yes>"
     confirm_no = "<confirm><no>"
-
-    # Feedback for search
-    search_found_object = "<search><highlight>"
-    search_not_found_object = "<search><not_found_object>"
-    search_look_around = "<search><look_around>"
-    search_goto_viewpoint = "<search><goto_viewpoint>"
-    search_goto_room = "<search><goto_room>"
 
     # Feedback for failure
     generic_failure = "<failure><generic>"
@@ -64,48 +65,22 @@ class SimBotIntentType(Enum):
     @property
     def is_invalid_user_utterance(self) -> bool:
         """Return True if the intent should not be used when generating an action."""
-        return self in {
-            SimBotIntentType.low_asr_confidence,
-            SimBotIntentType.out_of_domain,
-            SimBotIntentType.profanity,
-            SimBotIntentType.only_wake_word,
-            SimBotIntentType.empty_utterance,
-        }
+        return self.is_invalid_utterance_intent_type(self)
 
     @property
     def is_user_held_intent(self) -> bool:
         """Return True if the intent can be held by a user."""
-        return self.is_invalid_user_utterance or self in {
-            SimBotIntentType.clarify_answer,
-            SimBotIntentType.confirm_yes,
-            SimBotIntentType.confirm_no,
-            SimBotIntentType.act,
-        }
+        return self.is_user_intent_type(self)
 
     @property
     def is_environment_error(self) -> bool:
         """Return True if the intent is one of the Arena error types."""
-        return self in {
-            SimBotIntentType.unsupported_action,
-            SimBotIntentType.unsupported_navigation,
-            SimBotIntentType.already_holding_object,
-            SimBotIntentType.receptacle_is_full,
-            SimBotIntentType.receptacle_is_closed,
-            SimBotIntentType.target_inaccessible,
-            SimBotIntentType.killed_by_hazard,
-            SimBotIntentType.target_out_of_range,
-            SimBotIntentType.alternate_navigation_used,
-            SimBotIntentType.object_overloaded,
-            SimBotIntentType.object_unpowered,
-            SimBotIntentType.invalid_command,
-            SimBotIntentType.object_not_picked_up,
-            SimBotIntentType.arena_unavailable,
-            SimBotIntentType.action_execution_error,
-            SimBotIntentType.incorrect_action_format,
-            SimBotIntentType.invalid_object_class,
-            SimBotIntentType.post_process_error,
-            SimBotIntentType.blocked_by_previous_error,
-        }
+        return self.is_environment_intent_type(self)
+
+    @property
+    def is_actionable(self) -> bool:
+        """Return True if the intent is a type of instruction."""
+        return self.is_physical_interaction_intent_type(self)
 
     @property
     def triggers_question_to_user(self) -> bool:
@@ -127,6 +102,9 @@ class SimBotIntentType(Enum):
         return self in {
             SimBotIntentType.confirm_generic,
             SimBotIntentType.confirm_before_act,
+            SimBotIntentType.confirm_before_goto_object,
+            SimBotIntentType.confirm_before_goto_viewpoint,
+            SimBotIntentType.confirm_before_goto_room,
         }
 
     @property
@@ -145,22 +123,105 @@ class SimBotIntentType(Enum):
             SimBotIntentType.confirm_no,
         }
 
-    @property
-    def is_actionable(self) -> bool:
-        """Return True if the intent is a type of instruction."""
-        return self in {
-            SimBotIntentType.act,
-            SimBotIntentType.act_one_match,
-            SimBotIntentType.search,
-            SimBotIntentType.act_previous,
-        }
+    @staticmethod
+    def is_invalid_utterance_intent_type(  # noqa: WPS602
+        intent_type: SimBotIntentType,
+    ) -> TypeGuard[SimBotInvalidUtteranceIntentType]:
+        """Return True if the intent type matches `SimBotInvalidUtteranceIntentType`."""
+        return intent_type in SimBotInvalidUtteranceIntentType.__args__  # type: ignore[attr-defined]
 
-    @property
-    def is_search_feedback(self) -> bool:
-        """Return True if the intent is used for providing feedback during search sub-routine."""
-        return self in {
-            SimBotIntentType.search_not_found_object,
-            SimBotIntentType.search_look_around,
-            SimBotIntentType.search_goto_viewpoint,
-            SimBotIntentType.search_goto_room,
-        }
+    @staticmethod
+    def is_user_intent_type(  # noqa: WPS602
+        intent_type: SimBotIntentType,
+    ) -> TypeGuard[SimBotUserIntentType]:
+        """Return True if the intent type matches `SimBotUserIntentType`."""
+        return intent_type in SimBotUserIntentType.__args__  # type: ignore[attr-defined]
+
+    @staticmethod
+    def is_environment_intent_type(  # noqa: WPS602
+        intent_type: SimBotIntentType,
+    ) -> TypeGuard[SimBotEnvironmentIntentType]:
+        """Return True if the intent type matches `SimBotEnvironmentIntentType`."""
+        return intent_type in SimBotEnvironmentIntentType.__args__  # type: ignore[attr-defined]
+
+    @staticmethod
+    def is_physical_interaction_intent_type(  # noqa: WPS602
+        intent_type: SimBotIntentType,
+    ) -> TypeGuard[SimBotPhysicalInteractionIntentType]:
+        """Return True if the intent type matches `SimBotPhysicalInteractionIntentType`."""
+        return intent_type in SimBotPhysicalInteractionIntentType.__args__  # type: ignore[attr-defined]
+
+    @staticmethod
+    def is_verbal_interaction_intent_type(  # noqa: WPS602
+        intent_type: SimBotIntentType,
+    ) -> TypeGuard[SimBotVerbalInteractionIntentType]:
+        """Return True if the intent type matches `SimBotVerbalInteractionIntentType`."""
+        return intent_type in SimBotVerbalInteractionIntentType.__args__  # type: ignore[attr-defined]
+
+
+SimBotInvalidUtteranceIntentType = Literal[
+    SimBotIntentType.low_asr_confidence,
+    SimBotIntentType.out_of_domain,
+    SimBotIntentType.profanity,
+    SimBotIntentType.only_wake_word,
+    SimBotIntentType.empty_utterance,
+]
+
+
+SimBotUserIntentType = Literal[
+    SimBotIntentType.clarify_answer,
+    SimBotIntentType.confirm_yes,
+    SimBotIntentType.confirm_no,
+    SimBotIntentType.act,
+]
+
+SimBotAnyUserIntentType = Literal[
+    SimBotUserIntentType,
+    SimBotInvalidUtteranceIntentType,
+]
+
+SimBotEnvironmentIntentType = Literal[
+    SimBotIntentType.unsupported_action,
+    SimBotIntentType.unsupported_navigation,
+    SimBotIntentType.already_holding_object,
+    SimBotIntentType.receptacle_is_full,
+    SimBotIntentType.receptacle_is_closed,
+    SimBotIntentType.target_inaccessible,
+    SimBotIntentType.killed_by_hazard,
+    SimBotIntentType.target_out_of_range,
+    SimBotIntentType.alternate_navigation_used,
+    SimBotIntentType.object_overloaded,
+    SimBotIntentType.object_unpowered,
+    SimBotIntentType.invalid_command,
+    SimBotIntentType.object_not_picked_up,
+    SimBotIntentType.arena_unavailable,
+    SimBotIntentType.action_execution_error,
+    SimBotIntentType.incorrect_action_format,
+    SimBotIntentType.invalid_object_class,
+    SimBotIntentType.post_process_error,
+    SimBotIntentType.blocked_by_previous_error,
+]
+
+SimBotPhysicalInteractionIntentType = Literal[
+    SimBotIntentType.act,
+    SimBotIntentType.act_one_match,
+    SimBotIntentType.search,
+    SimBotIntentType.act_previous,
+]
+
+SimBotVerbalInteractionIntentType = Literal[
+    SimBotIntentType.confirm_generic,
+    SimBotIntentType.confirm_before_act,
+    SimBotIntentType.confirm_before_goto_room,
+    SimBotIntentType.confirm_before_goto_object,
+    SimBotIntentType.confirm_before_goto_viewpoint,
+    SimBotIntentType.act_no_match,
+    SimBotIntentType.act_too_many_matches,
+]
+
+SimBotNLUIntentType = Literal[
+    SimBotIntentType.act_no_match,
+    SimBotIntentType.act_too_many_matches,
+    SimBotIntentType.search,
+    SimBotIntentType.act_one_match,
+]

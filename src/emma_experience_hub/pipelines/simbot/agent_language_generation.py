@@ -28,11 +28,8 @@ class SimBotAgentLanguageGenerationPipeline:
     def __init__(self) -> None:
         self._feedback_parser = SimBotFeedbackFromSessionStateParser.from_rules_csv()
 
-    def run(self, session: SimBotSession) -> Optional[SimBotDialogAction]:
+    def run(self, session: SimBotSession) -> SimBotDialogAction:
         """Generate an utterance to send back to the user."""
-        if not session.current_turn.intent.agent:
-            raise AssertionError("The agent should have an intent before calling this module.")
-
         with tracer.start_as_current_span("Get feedback state"):
             feedback_state = session.to_feedback_state()
 

@@ -1,3 +1,4 @@
+import itertools
 import string
 from collections import Counter
 from typing import Any, Optional
@@ -8,7 +9,14 @@ from rule_engine import Context, Rule
 from rule_engine.ast import ExpressionBase, SymbolExpression
 
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
-from emma_experience_hub.datamodels.simbot.enums import SimBotActionType, SimBotIntentType
+from emma_experience_hub.datamodels.simbot.enums import (
+    SimBotActionType,
+    SimBotAnyUserIntentType,
+    SimBotEnvironmentIntentType,
+    SimBotIntentType,
+    SimBotPhysicalInteractionIntentType,
+    SimBotVerbalInteractionIntentType,
+)
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
 
 
@@ -155,18 +163,24 @@ class SimBotFeedbackState(BaseModel):
     visited_room_counter: Counter[str]
 
     # User intent
-    user_intent_type: Optional[SimBotIntentType] = None
+    user_intent_type: Optional[SimBotAnyUserIntentType] = None
 
     # Environment intent
-    environment_intent_type: Optional[SimBotIntentType] = None
+    environment_intent_type: Optional[SimBotEnvironmentIntentType] = None
     environment_intent_action_type: Optional[SimBotActionType] = None
     environment_intent_entity: Optional[str] = None
 
-    # Agent intent
-    agent_intent_type: Optional[SimBotIntentType] = None
-    agent_intent_entity: Optional[str] = None
-    agent_interaction_action: Optional[SimBotActionType] = None
-    agent_interaction_entity: Optional[str] = None
+    # Interaction intent
+    physical_interaction_intent_type: Optional[SimBotPhysicalInteractionIntentType] = None
+    physical_interaction_intent_entity: Optional[str] = None
+
+    # Language Condition intent
+    verbal_interaction_intent_type: Optional[SimBotVerbalInteractionIntentType] = None
+    verbal_interaction_intent_entity: Optional[str] = None
+
+    # Current interaction action
+    interaction_action_type: Optional[SimBotActionType] = None
+    interaction_action_entity: Optional[str] = None
 
     # History of actions taken in the session
     interaction_action_per_turn: list[SimBotAction]
@@ -174,11 +188,11 @@ class SimBotFeedbackState(BaseModel):
     # Counter of how many times each action was taken
     action_type_counter: Counter[str]
 
-    # History of all the AGENT intents in the session
-    agent_intent_per_turn: list[SimBotIntent]
+    # History of all the intents per turn in the session
+    intent_types_per_turn: list[list[SimBotIntentType]]
 
     # Counter of how many times each AGENT intent was held
-    agent_intent_type_counter: Counter[str]
+    intent_type_counter: Counter[str]
 
     # There are more instructions to execute from the latest user utterance
     utterance_queue_not_empty: bool
@@ -205,13 +219,14 @@ class SimBotFeedbackState(BaseModel):
         cls,
         num_turns: int,
         current_room: str,
-        user_intent_type: Optional[SimBotIntentType],
-        environment_intent: Optional[SimBotIntent],
-        agent_intent: Optional[SimBotIntent],
-        agent_interaction_action: Optional[SimBotAction],
+        user_intent_type: Optional[SimBotAnyUserIntentType],
+        environment_intent: Optional[SimBotIntent[SimBotEnvironmentIntentType]],
+        physical_interaction_intent: Optional[SimBotIntent[SimBotPhysicalInteractionIntentType]],
+        verbal_interaction_intent: Optional[SimBotIntent[SimBotVerbalInteractionIntentType]],
+        interaction_action: Optional[SimBotAction],
         current_room_per_turn: list[str],
         interaction_action_per_turn: list[SimBotAction],
-        agent_intent_per_turn: list[SimBotIntent],
+        intent_types_per_turn: list[list[SimBotIntentType]],
         utterance_queue_not_empty: bool,
         find_queue_not_empty: bool,
         previous_find_queue_not_empty: bool,
@@ -222,8 +237,8 @@ class SimBotFeedbackState(BaseModel):
         """Create the state in a simple way."""
         return cls(
             # Require a lightweight dialog action when the model does not decode a <stop token
-            require_lightweight_dialog=not agent_interaction_action.is_end_of_trajectory
-            if agent_interaction_action
+            require_lightweight_dialog=not interaction_action.is_end_of_trajectory
+            if interaction_action
             else False,
             num_turns=num_turns,
             current_room=current_room,
@@ -233,22 +248,30 @@ class SimBotFeedbackState(BaseModel):
             if environment_intent
             else None,
             environment_intent_entity=environment_intent.entity if environment_intent else None,
-            agent_intent_type=agent_intent.type if agent_intent else None,
-            agent_intent_entity=agent_intent.entity if agent_intent else None,
-            agent_interaction_action=agent_interaction_action.type
-            if agent_interaction_action
+            physical_interaction_intent_type=physical_interaction_intent.type
+            if physical_interaction_intent
             else None,
-            agent_interaction_entity=agent_interaction_action.payload.entity_name
-            if agent_interaction_action
+            physical_interaction_intent_entity=physical_interaction_intent.entity
+            if physical_interaction_intent
+            else None,
+            verbal_interaction_intent_type=verbal_interaction_intent.type
+            if verbal_interaction_intent
+            else None,
+            verbal_interaction_intent_entity=verbal_interaction_intent.entity
+            if verbal_interaction_intent
+            else None,
+            interaction_action_type=interaction_action.type if interaction_action else None,
+            interaction_action_entity=interaction_action.payload.entity_name
+            if interaction_action
             else None,
             visited_room_counter=Counter[str](current_room_per_turn),
             interaction_action_per_turn=interaction_action_per_turn,
             action_type_counter=Counter[str](
                 action.type.name for action in interaction_action_per_turn
             ),
-            agent_intent_per_turn=agent_intent_per_turn,
-            agent_intent_type_counter=Counter[str](
-                intent.type.name for intent in agent_intent_per_turn
+            intent_types_per_turn=intent_types_per_turn,
+            intent_type_counter=Counter[str](
+                intent.name for intent in itertools.chain.from_iterable(intent_types_per_turn)
             ),
             utterance_queue_not_empty=utterance_queue_not_empty,
             find_queue_not_empty=find_queue_not_empty,

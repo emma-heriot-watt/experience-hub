@@ -4,7 +4,7 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from contextlib import suppress
 from datetime import datetime
 from functools import cached_property
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 from loguru import logger
 from overrides import overrides
@@ -17,7 +17,14 @@ from emma_experience_hub.datamodels import (
 )
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotDialogAction
-from emma_experience_hub.datamodels.simbot.enums import SimBotActionType, SimBotIntentType
+from emma_experience_hub.datamodels.simbot.enums import (
+    SimBotActionType,
+    SimBotAnyUserIntentType,
+    SimBotEnvironmentIntentType,
+    SimBotIntentType,
+    SimBotPhysicalInteractionIntentType,
+    SimBotVerbalInteractionIntentType,
+)
 from emma_experience_hub.datamodels.simbot.feedback import SimBotFeedbackState
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -50,19 +57,57 @@ class SimBotSessionTurnTimestamp(BaseModel):
 class SimBotSessionTurnIntent(BaseModel):
     """Intents from each actor within the environment for the turn.."""
 
-    user: Optional[SimBotIntentType] = None
-    environment: Optional[SimBotIntent] = None
-    agent: Optional[SimBotIntent] = None
+    user: Optional[SimBotAnyUserIntentType] = None
+    environment: Optional[SimBotIntent[SimBotEnvironmentIntentType]] = None
+    physical_interaction: Optional[SimBotIntent[SimBotPhysicalInteractionIntentType]] = None
+    verbal_interaction: Optional[SimBotIntent[SimBotVerbalInteractionIntentType]] = None
+
+    @validator("user", pre=True)
+    @classmethod
+    def convert_user_intent_type_enum(
+        cls, intent_type: Union[str, SimBotIntentType, None]
+    ) -> Union[str, SimBotIntentType, None]:
+        """Check the incoming value for the intent type and ensure it will be an enum."""
+        if isinstance(intent_type, str):
+            # See if the intent type is already a value within the enum
+            with suppress(ValueError):
+                return SimBotIntentType(intent_type)
+
+            # See if the intent type is already a key within the enum
+            with suppress(KeyError):
+                return SimBotIntentType[intent_type]
+
+        # Otherwise just return it and let it error if it errors
+        return intent_type
 
     @property
     def should_generate_interaction_action(self) -> bool:
         """Return True is the agent should generate an interaction action."""
-        return self.agent is not None and self.agent.type.is_actionable
+        return self.physical_interaction is not None
 
     @property
     def agent_should_ask_question_to_user(self) -> bool:
         """Return True if the agent should ask for confirmation instead of just acting."""
-        return self.agent is not None and self.agent.type.triggers_question_to_user
+        return (
+            self.physical_interaction is not None
+            and self.physical_interaction.type.triggers_question_to_user
+        )
+
+    @property
+    def all_intent_types(self) -> list[SimBotIntentType]:
+        """Return a list of all the intent types parsed for the turn."""
+        all_intent_types: list[SimBotIntentType] = []
+
+        if self.user:
+            all_intent_types.append(self.user)
+        if self.environment:
+            all_intent_types.append(self.environment.type)
+        if self.physical_interaction:
+            all_intent_types.append(self.physical_interaction.type)
+        if self.verbal_interaction:
+            all_intent_types.append(self.verbal_interaction.type)
+
+        return all_intent_types
 
 
 class SimBotSessionTurnActions(BaseModel, validate_assignment=True):
@@ -481,13 +526,14 @@ class SimBotSession(BaseModel):
             current_room=self.current_turn.environment.current_room,
             user_intent_type=self.current_turn.intent.user,
             environment_intent=self.current_turn.intent.environment,
-            agent_intent=self.current_turn.intent.agent,
-            agent_interaction_action=self.current_turn.actions.interaction,
+            physical_interaction_intent=self.current_turn.intent.physical_interaction,
+            verbal_interaction_intent=self.current_turn.intent.verbal_interaction,
+            interaction_action=self.current_turn.actions.interaction,
             current_room_per_turn=[turn.environment.current_room for turn in self.turns],
             interaction_action_per_turn=[
                 turn.actions.interaction for turn in self.turns if turn.actions.interaction
             ],
-            agent_intent_per_turn=[turn.intent.agent for turn in self.turns if turn.intent.agent],
+            intent_types_per_turn=[turn.intent.all_intent_types for turn in self.turns],
             utterance_queue_not_empty=self.current_state.utterance_queue.is_not_empty,
             find_queue_not_empty=self.current_state.find_queue.is_not_empty,
             previous_find_queue_not_empty=self.previous_turn.state.find_queue.is_not_empty
@@ -531,7 +577,8 @@ class SimBotSession(BaseModel):
         relevant_turns: Iterator[SimBotSessionTurn] = (
             turn
             for turn in turns
-            if turn.intent.agent and turn.intent.agent.type == SimBotIntentType.act_one_match
+            if turn.intent.physical_interaction
+            and turn.intent.physical_interaction.type == SimBotIntentType.act_one_match
         )
 
         environment_history: dict[int, EnvironmentStateTurn] = {}

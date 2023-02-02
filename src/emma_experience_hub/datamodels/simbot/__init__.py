@@ -6,7 +6,13 @@ from emma_experience_hub.datamodels.simbot.actions import (
 from emma_experience_hub.datamodels.simbot.enums import (
     SimBotActionStatusType,
     SimBotActionType,
+    SimBotEnvironmentIntentType,
     SimBotIntentType,
+    SimBotInvalidUtteranceIntentType,
+    SimBotNLUIntentType,
+    SimBotPhysicalInteractionIntentType,
+    SimBotUserIntentType,
+    SimBotVerbalInteractionIntentType,
 )
 from emma_experience_hub.datamodels.simbot.feedback import SimBotFeedbackRule, SimBotFeedbackState
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent

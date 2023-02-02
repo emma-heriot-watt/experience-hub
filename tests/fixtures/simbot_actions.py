@@ -291,7 +291,9 @@ def simbot_session_turns(
     """Generate a session turn."""
     session_id = "amzn1.echo-api.session.3f55df67-01ac-48ad-aa5b-380dcd22b837_5"
     intents = SimBotSessionTurnIntent(
-        user=None, environment=None, agent=SimBotIntent(type=SimBotIntentType.act_one_match)
+        user=None,
+        environment=None,
+        physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match),
     )
     drawn_dialog_action = draw(dialog_action)
 
