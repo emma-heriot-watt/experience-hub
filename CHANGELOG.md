@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.16.0](https://github.com/emma-simbot/experience-hub/compare/v6.15.0...v6.16.0) (2023-02-02)
+
+
+### Features
+
+* add a debug mode which will always highlight the object before performing the action ([#298](https://github.com/emma-simbot/experience-hub/issues/298)) ([5595c54](https://github.com/emma-simbot/experience-hub/commit/5595c5414dc904e7e7bc312ea2621aae64a3c512))
+
 ## [6.15.0](https://github.com/emma-simbot/experience-hub/compare/v6.14.0...v6.15.0) (2023-02-01)
 
 
