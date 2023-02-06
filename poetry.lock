@@ -2530,21 +2530,21 @@ files = [
 
 [[package]]
 name = "methodtools"
-version = "0.4.5"
+version = "0.4.7"
 description = "Expand standard functools to methods"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "methodtools-0.4.5.tar.gz", hash = "sha256:9370156e9036789e98cf0e97355b3be3bcd7cc9e520d1e15893a1407719effb2"},
+    {file = "methodtools-0.4.7.tar.gz", hash = "sha256:e213439dd64cfe60213f7015da6efe5dd4003fd89376db3baa09fe13ec2bb0ba"},
 ]
 
 [package.dependencies]
-wirerope = ">=0.4.5"
+wirerope = ">=0.4.7"
 
 [package.extras]
 doc = ["sphinx"]
-test = ["functools32 (>=3.2.3-2)", "pytest (==4.6.7)", "pytest-cov (==2.6.1)"]
+test = ["functools32 (>=3.2.3-2)", "pytest (>=4.6.7)", "pytest-cov (>=2.6.1)"]
 
 [[package]]
 name = "more-itertools"
@@ -5609,13 +5609,13 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 
 [[package]]
 name = "wirerope"
-version = "0.4.6"
+version = "0.4.7"
 description = "'Turn functions and methods into fully controllable objects'"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "wirerope-0.4.6.tar.gz", hash = "sha256:bd1a151d4133b3ce30ecb76ed92f861505f688151173d22be2e29f4f02e60392"},
+    {file = "wirerope-0.4.7.tar.gz", hash = "sha256:f3961039218276283c5037da0fa164619def0327595f10892d562a61a8603990"},
 ]
 
 [package.dependencies]
@@ -5623,7 +5623,7 @@ six = ">=1.11.0"
 
 [package.extras]
 doc = ["sphinx"]
-test = ["pytest (==4.6.7)", "pytest-cov (==2.6.1)"]
+test = ["pytest (>=4.6.7)", "pytest-cov (>=2.6.1)"]
 
 [[package]]
 name = "wrapt"
