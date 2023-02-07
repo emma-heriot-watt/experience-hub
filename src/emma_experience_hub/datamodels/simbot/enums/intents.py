@@ -85,11 +85,7 @@ class SimBotIntentType(Enum):
     @property
     def triggers_question_to_user(self) -> bool:
         """Return True if the intent triggers a question to the user."""
-        return (
-            self.is_clarification_question
-            or self.triggers_confirmation_question
-            or self.triggers_disambiguation_question
-        )
+        return self.triggers_confirmation_question or self.triggers_disambiguation_question
 
     @property
     def triggers_disambiguation_question(self) -> bool:
@@ -105,14 +101,6 @@ class SimBotIntentType(Enum):
             SimBotIntentType.confirm_before_goto_object,
             SimBotIntentType.confirm_before_goto_viewpoint,
             SimBotIntentType.confirm_before_goto_room,
-        }
-
-    @property
-    def is_clarification_question(self) -> bool:
-        """Return True if intent is one that triggers a clarification question."""
-        return self in {
-            SimBotIntentType.act_no_match,
-            SimBotIntentType.act_too_many_matches,
         }
 
     @property

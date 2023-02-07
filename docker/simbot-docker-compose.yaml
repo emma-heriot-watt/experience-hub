@@ -94,7 +94,7 @@ services:
       <<: *observability-env-vars
       LOG_LEVEL: info
       EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
-      MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components2_data-1.joblib"
+      MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components.joblib"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6500/healthcheck"]
       <<: *healthcheck-defaults

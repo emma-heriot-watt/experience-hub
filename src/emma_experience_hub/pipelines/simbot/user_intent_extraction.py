@@ -52,16 +52,16 @@ class SimBotUserIntentExtractionPipeline:
         This method refers to others that raise assertions and exceptions. These must be caught
         when calling this method.
         """
-        language_condition_intent_type = self._get_language_condition_intent_from_turn(
+        verbal_interaction_intent_type = self._get_verbal_interaction_intent_from_turn(
             session.previous_valid_turn
         )
 
         # Did agent ask for disambiguation?
-        if language_condition_intent_type.triggers_disambiguation_question:
+        if verbal_interaction_intent_type.triggers_disambiguation_question:
             return self.handle_clarification_response()
 
         # Did agent ask for confirmation?
-        if language_condition_intent_type.triggers_confirmation_question:
+        if verbal_interaction_intent_type.triggers_confirmation_question:
             # Make sure the user utterance exists
             if not session.current_turn.speech:
                 raise AssertionError("There is no utterance from the user? That's not right")
@@ -105,7 +105,7 @@ class SimBotUserIntentExtractionPipeline:
             and previous_turn.intent.verbal_interaction.type.triggers_question_to_user
         )
 
-    def _get_language_condition_intent_from_turn(
+    def _get_verbal_interaction_intent_from_turn(
         self, turn: Optional[SimBotSessionTurn]
     ) -> SimBotVerbalInteractionIntentType:
         """Get the agent intent from the session turn, if it's available."""

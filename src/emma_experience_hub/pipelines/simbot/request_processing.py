@@ -26,11 +26,12 @@ class SimBotRequestProcessingPipeline:
             self.update_previous_turn_with_action_status(
                 session_history[-1], request.request.previous_actions
             )
+            logger.debug("Updated previous turn with action status")
 
         # Create a turn for the current request and update the history
         session_turn = SimBotSessionTurn.new_from_simbot_request(request, idx=len(session_history))
         session_history.append(session_turn)
-        logger.debug(f"Created session turn: {session_turn}")
+        logger.debug("Created new session turn")
 
         # Instantiate the session from the turns
         session = SimBotSession(session_id=request.header.session_id, turns=session_history)

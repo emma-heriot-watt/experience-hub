@@ -14,7 +14,7 @@ class SimBotCompoundSplitterPipeline:
         """Given the user instruction, updates the utterance queue with simpler instructions."""
         if not session.current_turn.speech:
             logger.warning(
-                "There is no utterance to extract intent from. Therefore the user has not explicitly told us to do anything. Why has this pipeline been called?"
+                "There is no utterance to extract intent from. Therefore the user has not explicitly told us to do anything."
             )
             return session
 

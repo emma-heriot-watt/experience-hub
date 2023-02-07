@@ -19,6 +19,7 @@ from emma_experience_hub.datamodels.simbot import (
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoViewpoint,
     SimBotGotoViewpointPayload,
+    SimBotLookAroundPayload,
     SimBotRotatePayload,
 )
 
@@ -73,6 +74,19 @@ class SearchPlanner(ABC):
             payload=SimBotRotatePayload(direction="Left", magnitude=self.rotation_magnitude),
         )
 
+    def _create_look_around_action(self, add_stop_token: bool = True) -> SimBotAction:
+        """Create a look around action."""
+        if add_stop_token:
+            raw_output = f"look around {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
+        else:
+            raw_output = f"look around{PREDICTED_ACTION_DELIMITER}"
+        return SimBotAction(
+            id=0,
+            type=SimBotActionType.LookAround,
+            raw_output=raw_output,
+            payload=SimBotLookAroundPayload(),
+        )
+
 
 class BasicSearchPlanner(SearchPlanner):
     """Basic search plan.
@@ -85,9 +99,12 @@ class BasicSearchPlanner(SearchPlanner):
 
     def run(self, session: SimBotSession) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
-        return self._create_look_around_actions()
+        # For search and no match, do a Look Around
+        if session.current_turn.intent.is_searching_after_not_seeing_object:
+            return [self._create_look_around_action()]
+        return self._create_rotation_actions()
 
-    def _create_look_around_actions(self) -> list[SimBotAction]:
+    def _create_rotation_actions(self) -> list[SimBotAction]:
         """Create actions to perform the look around."""
         actions = [
             self._create_turn_left_action(),
@@ -154,7 +171,7 @@ class GrabFromHistorySearchPlanner(BasicSearchPlanner):
         viewpoint_name = turn_with_entity.environment.get_closest_viewpoint_name()
 
         goto_closest_viewpoint = self._create_goto_viewpoint_action(viewpoint_name)
-        return [goto_closest_viewpoint, *self._create_look_around_actions()]
+        return [goto_closest_viewpoint, *self._create_rotation_actions()]
 
 
 class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
@@ -243,12 +260,14 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
                 location_candidates.append(coords.as_list())
         return name_candidates, location_candidates, first_selected_idx
 
-    def get_actions_for_viewpoint(self) -> list[SimBotAction]:
-        """Return the necessary actions needed to be done in a single viewpoint.
-
-        We only need to rotate 3 times to see all the objects in a single viewpoint.
-        """
-        return self._create_look_around_actions()
+    def get_actions_for_position(
+        self, session: SimBotSession, is_first_position: bool = False
+    ) -> list[SimBotAction]:
+        """Return the necessary actions needed to be done in a single viewpoint."""
+        # For search and no match, first do a Look Around
+        if is_first_position and session.current_turn.intent.is_searching_after_not_seeing_object:
+            return [self._create_look_around_action(add_stop_token=False)]
+        return self._create_rotation_actions()
 
     def run(self, session: SimBotSession) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
@@ -265,17 +284,18 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
             coverage_sets, first_selected_idx=first_selected_idx
         )
         # We need 3 turns for each planned location + 1 more for the last viewpoint
-        planned_actions = self.get_actions_for_viewpoint()
+        planned_actions = self.get_actions_for_position(session, is_first_position=True)
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:
                 planned_actions.append(self._create_goto_viewpoint_action(name))
-                planned_actions.extend(self.get_actions_for_viewpoint())
+                planned_actions.extend(self.get_actions_for_position(session))
 
-        planned_actions.append(self._create_turn_left_action(add_stop_token=True))
+        if self._planned_actions_should_end_with_rotation(planned_actions):
+            planned_actions.append(self._create_turn_left_action(add_stop_token=True))
         logger.debug(f"[SEARCH] Plan = {planned_actions}")
         return planned_actions
 
-    def _create_look_around_actions(self) -> list[SimBotAction]:
+    def _create_rotation_actions(self) -> list[SimBotAction]:
         """Create actions to perform the look around."""
         actions = [
             self._create_turn_left_action(),
@@ -284,3 +304,13 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         ]
 
         return actions
+
+    def _planned_actions_should_end_with_rotation(
+        self, planned_actions: list[SimBotAction]
+    ) -> bool:
+        """Does the agent need to rotate left if the object is not found?
+
+        If the last action is a rotate left and the object was not found, do a final rotation to
+        end in the original position.
+        """
+        return planned_actions[-1].type == SimBotActionType.RotateLeft

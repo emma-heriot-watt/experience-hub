@@ -140,7 +140,7 @@ class SimBotFindObjectPipeline:
 
         If the queue is empty, start a new one. If the queue is not empty, do not.
         """
-        return session.current_state.find_queue.is_empty
+        return not session.is_find_object_in_progress
 
     def _should_goto_found_object(self, session: SimBotSession) -> bool:
         """Should we go to the highlighted object?
@@ -206,7 +206,11 @@ class SimBotFindObjectPipeline:
             color_image_index=color_image_index,
             add_stop_token=True,
         )
-
+        # Do not highlight objects when the intent is a search and no_match
+        # Go straight to the object and execute the original instruction
+        if session.current_turn.intent.is_searching_after_not_seeing_object:
+            session.current_state.find_queue.reset()
+            return goto_action
         # Add the goto action to the head of the queue
         session.current_state.find_queue.append_to_head(goto_action)
         logger.debug(f"Appending to head goto action {session.current_state.find_queue.queue[0]}")

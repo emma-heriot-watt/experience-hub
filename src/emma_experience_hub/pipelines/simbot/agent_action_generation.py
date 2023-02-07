@@ -153,7 +153,7 @@ class SimBotAgentActionGenerationPipeline:
 
         # Parse the response into an action
         try:
-            return self._action_predictor_response_parser(
+            action = self._action_predictor_response_parser(
                 raw_action_prediction,
                 extracted_features=extracted_features,
                 num_frames_in_current_turn=len(environment_state_history[-1].features),
@@ -161,3 +161,28 @@ class SimBotAgentActionGenerationPipeline:
         except AssertionError:
             logger.error(f"Unable to parse a response for the output {raw_action_prediction}")
             return None
+
+        return action if self._should_execute_action(session, action) else None
+
+    def _should_execute_action(self, session: SimBotSession, action: SimBotAction) -> bool:
+        """Should the agent execute the action predicted by the emma policy model?
+
+        The agent should not execute a goto-object action after a successful search after not
+        seeing the object.
+        """
+        if not session.previous_turn:
+            return True
+        # Check if original instruction has already been fulfilled by search
+        # If it's not a goto-object action, always execute the predicted action
+        if not (action.type == SimBotAction.is_goto_object and action.is_end_of_trajectory):
+            return True
+
+        should_skip_goto_object_action = [
+            # The previous turn was search after not seeing the object
+            session.previous_turn.intent.is_searching_after_not_seeing_object,
+            # The object was found if the last action was a goto-object
+            session.previous_turn.actions is not None
+            and session.previous_turn.actions.interaction is not None
+            and session.previous_turn.actions.interaction.is_goto_object,
+        ]
+        return not should_skip_goto_object_action

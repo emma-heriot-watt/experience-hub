@@ -94,6 +94,24 @@ class SimBotSessionTurnIntent(BaseModel):
         )
 
     @property
+    def is_searching(self) -> bool:
+        """Return True if the agent is currently searching for an object."""
+        is_search = (
+            self.physical_interaction is not None
+            and self.physical_interaction.type == SimBotIntentType.search
+        )
+        return is_search
+
+    @property
+    def is_searching_after_not_seeing_object(self) -> bool:
+        """Return True if the agent is searching after not directly seeing the object ."""
+        is_act_no_match = (
+            self.verbal_interaction is not None
+            and self.verbal_interaction.type == SimBotIntentType.act_no_match
+        )
+        return self.is_searching and is_act_no_match
+
+    @property
     def all_intent_types(self) -> list[SimBotIntentType]:
         """Return a list of all the intent types parsed for the turn."""
         all_intent_types: list[SimBotIntentType] = []
@@ -393,6 +411,16 @@ class SimBotSessionTurn(BaseModel):
             objectOutputType=self.actions.object_output_type,
             actions=actions,
         )
+
+    @property
+    def is_going_to_found_object_from_search(self) -> bool:
+        """Return True if the agent is going to a found object from a search."""
+        is_goto_object_action = (
+            self.actions is not None
+            and self.actions.interaction is not None
+            and self.actions.interaction.is_goto_object
+        )
+        return self.intent.is_searching and is_goto_object_action
 
 
 class SimBotSession(BaseModel):
