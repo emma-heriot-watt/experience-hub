@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.0](https://github.com/emma-simbot/experience-hub/compare/v7.0.0...v7.1.0) (2023-02-07)
+
+
+### Features
+
+* act_no_match to search pipeline ([#317](https://github.com/emma-simbot/experience-hub/issues/317)) ([fb23bc1](https://github.com/emma-simbot/experience-hub/commit/fb23bc151e941e455a4c4886116075b670395dfa))
+
 ## [7.0.0](https://github.com/emma-simbot/experience-hub/compare/v6.17.0...v7.0.0) (2023-02-02)
 
 
