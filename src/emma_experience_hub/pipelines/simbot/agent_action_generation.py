@@ -170,19 +170,19 @@ class SimBotAgentActionGenerationPipeline:
         The agent should not execute a goto-object action after a successful search after not
         seeing the object.
         """
-        if not session.previous_turn:
-            return True
-        # Check if original instruction has already been fulfilled by search
         # If it's not a goto-object action, always execute the predicted action
         if not (action.type == SimBotAction.is_goto_object and action.is_end_of_trajectory):
             return True
 
-        should_skip_goto_object_action = [
+        # Check if original instruction has already been fulfilled by search
+        if not session.previous_turn:
+            return True
+
+        should_skip_goto_object_action = (
             # The previous turn was search after not seeing the object
-            session.previous_turn.intent.is_searching_after_not_seeing_object,
+            session.previous_turn.intent.is_searching_after_not_seeing_object
             # The object was found if the last action was a goto-object
-            session.previous_turn.actions is not None
-            and session.previous_turn.actions.interaction is not None
-            and session.previous_turn.actions.interaction.is_goto_object,
-        ]
+            and session.previous_turn.is_going_to_found_object_from_search
+            and session.previous_turn.actions.is_successful
+        )
         return not should_skip_goto_object_action

@@ -224,6 +224,7 @@ class SimBotController:
         if session.current_turn.speech and not self._user_is_responding_to_question(session):
             logger.debug("[REQUEST]: Received utterance from user; clearing the utterance queue")
             session.current_state.utterance_queue.reset()
+            session.current_state.find_queue.reset()
 
         return session
 

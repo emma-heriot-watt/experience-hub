@@ -25,6 +25,7 @@ class SimBotEnvironmentIntentExtractionPipeline:
 
         if intent is not None and intent.type.is_environment_error:
             session.current_state.utterance_queue.reset()
+            session.current_state.find_queue.reset()
         # TODO: Add ways to handle other environment-based intents here
 
         return intent

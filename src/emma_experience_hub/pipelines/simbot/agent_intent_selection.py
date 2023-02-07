@@ -44,6 +44,7 @@ class SimBotAgentIntentSelectionPipeline:
         action_predictor_client: SimbotActionPredictionClient,
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
+        _enable_search_after_no_match: bool = True,
     ) -> None:
         self._features_client = features_client
 
@@ -54,8 +55,9 @@ class SimBotAgentIntentSelectionPipeline:
 
         self._enable_clarification_questions = _enable_clarification_questions
         self._enable_search_actions = _enable_search_actions
+        self._enable_search_after_no_match = _enable_search_after_no_match
 
-    def run(self, session: SimBotSession) -> SimBotAgentIntents:
+    def run(self, session: SimBotSession) -> SimBotAgentIntents:  # noqa: WPS212
         """Decide next action for the agent."""
         # If the user has said something, give that priority.
         if session.current_turn.intent.user:
@@ -64,6 +66,13 @@ class SimBotAgentIntentSelectionPipeline:
             # If we have received an invalid utterance, the agent does not act
             if SimBotIntentType.is_invalid_utterance_intent_type(session.current_turn.intent.user):
                 return SimBotAgentIntents()
+
+            # Check if the utterance has already been processed by the NLU
+            if self._utterance_has_been_processed_by_nlu(session):
+                logger.debug("Executing utterance that triggered the search.")
+                return SimBotAgentIntents(
+                    physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
+                )
 
             # Otherwise, extract the intent from the user utterance
             if SimBotIntentType.is_user_intent_type(session.current_turn.intent.user):
@@ -194,6 +203,18 @@ class SimBotAgentIntentSelectionPipeline:
         )
         return raw_text_match_prediction is not None
 
+    def _utterance_has_been_processed_by_nlu(self, session: SimBotSession) -> bool:
+        """Determine if the utterance has already been processed by the NLU.
+
+        This happens when the intent was act no_match and search was completed.
+        """
+        return (
+            session.previous_turn is not None
+            and session.previous_turn.intent.is_searching_after_not_seeing_object
+            and session.previous_turn.is_going_to_found_object_from_search
+            and session.previous_turn.actions.is_successful
+        )
+
     def _agent_asked_for_confirm_before_acting(
         self, previous_turn: Optional[SimBotSessionTurn]
     ) -> bool:
@@ -212,7 +233,7 @@ class SimBotAgentIntentSelectionPipeline:
         For `act_no_match`, update the current utterance as well as the utterance queue, and set
         the physical interaction intent to `search`.
         """
-        if intents.verbal_interaction is None:
+        if intents.verbal_interaction is None or not self._enable_search_after_no_match:
             return intents
 
         target_entity = intents.verbal_interaction.entity
