@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.1](https://github.com/emma-simbot/experience-hub/compare/v7.1.0...v7.1.1) (2023-02-07)
+
+
+### Bug Fixes
+
+* Avoid infinite search-no match loop by forcing act_one_match ([#324](https://github.com/emma-simbot/experience-hub/issues/324)) ([6b333cb](https://github.com/emma-simbot/experience-hub/commit/6b333cb53237f86f14b0963dc76ecf61e9effa5d))
+
 ## [7.1.0](https://github.com/emma-simbot/experience-hub/compare/v7.0.0...v7.1.0) (2023-02-07)
 
 
