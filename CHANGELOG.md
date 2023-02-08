@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.0](https://github.com/emma-simbot/experience-hub/compare/v7.1.1...v7.2.0) (2023-02-08)
+
+
+### Features
+
+* Disable search after no match ([#327](https://github.com/emma-simbot/experience-hub/issues/327)) ([c463bfb](https://github.com/emma-simbot/experience-hub/commit/c463bfb8d38f8c8c3f2b225ae9181d1987bd0b86))
+
 ## [7.1.1](https://github.com/emma-simbot/experience-hub/compare/v7.1.0...v7.1.1) (2023-02-07)
 
 
