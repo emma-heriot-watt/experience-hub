@@ -6,9 +6,6 @@ from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectOutputType
 
 
-settings = SimBotSettings.from_env()
-
-
 class SimBotResponse(BaseModel):
     """API response for the SimBot arena."""
 
@@ -42,6 +39,8 @@ class SimBotResponse(BaseModel):
         cls, actions: list[SimBotAction]
     ) -> list[SimBotAction]:
         """If the feature is enabled, add a highlight action before every interaction action."""
+        settings = SimBotSettings.from_env()
+
         if not settings.feature_flags.enable_always_highlight_before_object_action:
             return actions
 
