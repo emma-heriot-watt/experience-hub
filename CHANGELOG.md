@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.1](https://github.com/emma-simbot/experience-hub/compare/v7.2.0...v7.2.1) (2023-02-08)
+
+
+### Bug Fixes
+
+* remove simbot settings from being a global ([8e5473d](https://github.com/emma-simbot/experience-hub/commit/8e5473df158c89a14d49f1336a98d503e2342077))
+
 ## [7.2.0](https://github.com/emma-simbot/experience-hub/compare/v7.1.1...v7.2.0) (2023-02-08)
 
 
