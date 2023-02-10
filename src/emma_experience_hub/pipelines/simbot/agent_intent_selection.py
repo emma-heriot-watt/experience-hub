@@ -257,15 +257,16 @@ class SimBotAgentIntentSelectionPipeline:
 
     def _set_find_object_in_progress_intent(self, session: SimBotSession) -> SimBotAgentIntents:
         """Set the intent when find is in progress."""
-        if not session.previous_turn:
+        if not session.previous_turn or session.previous_turn.intent.physical_interaction is None:
             return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search))
+
+        entity = session.previous_turn.intent.physical_interaction.entity
         # Retain the information that the search was triggered by an act_no_match
         is_search_after_not_seeing_object_in_progress = (
             session.previous_turn.intent.is_searching_after_not_seeing_object
             and not session.previous_turn.is_going_to_found_object_from_search
         )
         if is_search_after_not_seeing_object_in_progress:
-            entity = session.previous_turn.intent.verbal_interaction.entity  # type: ignore[union-attr]
             return SimBotAgentIntents(
                 SimBotIntent(type=SimBotIntentType.search, entity=entity),
                 SimBotIntent(
@@ -273,4 +274,4 @@ class SimBotAgentIntentSelectionPipeline:
                     entity=entity,
                 ),
             )
-        return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search))
+        return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search, entity=entity))

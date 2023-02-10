@@ -131,11 +131,11 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Hig
 physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",I think it is right there.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",It looks like it's over there.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",I think I found it. I'm going there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and interaction_action_entity != null,I think I found the {interaction_action_entity} over there! I'm moving closer.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and interaction_action_entity != null,Found the {interaction_action_entity}! Let's get closer.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and interaction_action_entity != null,I think the {interaction_action_entity} is right there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and interaction_action_entity != null,It looks like the {interaction_action_entity} over there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and interaction_action_entity != null,I think I found the {interaction_action_entity}. I'm going there.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,I think I found the {physical_interaction_intent_entity} over there! I'm moving closer.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,Found the {physical_interaction_intent_entity}! Let's get closer.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,I think the {physical_interaction_intent_entity} is right there.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,It looks like the {physical_interaction_intent_entity} over there.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,I think I found the {physical_interaction_intent_entity}. I'm going there.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,I couldn't find it.,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,Sorry I don't see it. Can you give me a different instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,I can't find it. Can you give me another instruction?,False
