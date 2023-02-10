@@ -82,6 +82,9 @@ class SimBotController:
                 )
                 session.current_turn.intent.user = user_intent
 
+        # Cache the auxiliary metadata for the turn
+        self.clients.features.get_auxiliary_metadata(session.current_turn)
+
         return session
 
     def extract_intent_from_user_utterance(self, session: SimBotSession) -> SimBotSession:

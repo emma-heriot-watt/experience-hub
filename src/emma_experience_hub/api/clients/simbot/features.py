@@ -55,7 +55,7 @@ class SimBotFeaturesClient(Client):
             features = self.features_cache_client.load(turn.session_id, turn.prediction_request_id)
         else:
             # Extract the features from the cache
-            auxiliary_metadata = self._get_auxiliary_metadata(turn)
+            auxiliary_metadata = self.get_auxiliary_metadata(turn)
             features = self._extract_features(auxiliary_metadata)
             # And save them in case they are needed again
             self.features_cache_client.save(features, turn.session_id, turn.prediction_request_id)
@@ -63,7 +63,7 @@ class SimBotFeaturesClient(Client):
         return features
 
     @tracer.start_as_current_span("Get auxiliary metadata")
-    def _get_auxiliary_metadata(self, turn: SimBotSessionTurn) -> SimBotAuxiliaryMetadataPayload:
+    def get_auxiliary_metadata(self, turn: SimBotSessionTurn) -> SimBotAuxiliaryMetadataPayload:
         """Cache the auxiliary metadata for the given turn."""
         # Check whether the auxiliary metadata exists within the cache
         with tracer.start_as_current_span("Check auxiliary metadata cache"):
