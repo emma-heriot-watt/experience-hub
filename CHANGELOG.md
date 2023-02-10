@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.3.0](https://github.com/emma-simbot/experience-hub/compare/v7.2.1...v7.3.0) (2023-02-10)
+
+
+### Features
+
+* always cache the auxiliary metadata for the current turn ([#335](https://github.com/emma-simbot/experience-hub/issues/335)) ([4768f27](https://github.com/emma-simbot/experience-hub/commit/4768f27cca522a23bb228a3e0642280fdb797f11))
+
 ## [7.2.1](https://github.com/emma-simbot/experience-hub/compare/v7.2.0...v7.2.1) (2023-02-08)
 
 
