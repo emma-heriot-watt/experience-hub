@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.0](https://github.com/emma-simbot/experience-hub/compare/v7.5.0...v7.6.0) (2023-02-10)
+
+
+### Features
+
+* bump policy to 1.26.0 ([#339](https://github.com/emma-simbot/experience-hub/issues/339)) ([f419066](https://github.com/emma-simbot/experience-hub/commit/f419066f4816d17815a1faf6fe77972e375a216c))
+
+
+### Bug Fixes
+
+* synonym casing matching with language ([#336](https://github.com/emma-simbot/experience-hub/issues/336)) ([f75d6e2](https://github.com/emma-simbot/experience-hub/commit/f75d6e2a618ef32bdda2c147abd03f57ec7ca37c))
+
 ## [7.5.0](https://github.com/emma-simbot/experience-hub/compare/v7.4.0...v7.5.0) (2023-02-10)
 
 
