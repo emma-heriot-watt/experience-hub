@@ -70,7 +70,7 @@ class SimBotAgentLanguageGenerationPipeline:
 
         # Create the slot value pairs for the response
         slot_value_pairs = {
-            slot_name: self._process_slot_name(query_dict[slot_name])
+            slot_name: self._process_slot_value(query_dict[slot_name])
             for slot_name in rule.slot_names
         }
 
@@ -80,8 +80,8 @@ class SimBotAgentLanguageGenerationPipeline:
         logger.debug(f"[NLG] Generated utterance from rule {rule.id}: {utterance}")
         return utterance
 
-    def _process_slot_name(self, entity: Optional[str]) -> str:
-        """Return a synonym for the entity name if possible."""
+    def _process_slot_value(self, entity: Optional[str]) -> str:
+        """Return a synonym for the slot value if possible."""
         if not entity:
             return self._default_entity
 

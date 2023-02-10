@@ -111,7 +111,7 @@ ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
     }
 )
 
-ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
+_ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
     {
         "GotoRoom": "go to",
         "MoveForward": "move forward",
@@ -126,8 +126,7 @@ ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
     }
 )
 
-
-ROOM_SYNONYNMS: Mapping[str, str] = MappingProxyType(
+_ROOM_SYNONYNMS: Mapping[str, str] = MappingProxyType(
     {
         "BreakRoom": "breakroom",
         "Lab1": "robotics lab",
@@ -136,5 +135,19 @@ ROOM_SYNONYNMS: Mapping[str, str] = MappingProxyType(
         "Reception": "reception",
         "SmallOffice": "small office",
         "Warehouse": "warehouse",
+    }
+)
+
+ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
+    {
+        **{k.lower(): v for k, v in _ACTION_SYNONYMS_FOR_GENERATION.items()},
+        **_ACTION_SYNONYMS_FOR_GENERATION,
+    }
+)
+
+ROOM_SYNONYNMS: Mapping[str, str] = MappingProxyType(
+    {
+        **{k.lower(): v for k, v in _ROOM_SYNONYNMS.items()},
+        **_ROOM_SYNONYNMS,
     }
 )
