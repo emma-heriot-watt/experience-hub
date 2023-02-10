@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.4.0](https://github.com/emma-simbot/experience-hub/compare/v7.3.0...v7.4.0) (2023-02-10)
+
+
+### Features
+
+* loosen conditions in feedback rules ([#330](https://github.com/emma-simbot/experience-hub/issues/330)) ([1b606a1](https://github.com/emma-simbot/experience-hub/commit/1b606a199ece738366c39f41022875b05ad1e967))
+
 ## [7.3.0](https://github.com/emma-simbot/experience-hub/compare/v7.2.1...v7.3.0) (2023-02-10)
 
 
