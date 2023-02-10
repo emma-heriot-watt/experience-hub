@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.1](https://github.com/emma-simbot/experience-hub/compare/v7.6.0...v7.6.1) (2023-02-10)
+
+
+### Bug Fixes
+
+* include-found-object-in-response ([#338](https://github.com/emma-simbot/experience-hub/issues/338)) ([b7e02df](https://github.com/emma-simbot/experience-hub/commit/b7e02df413e1851f16fc177907476b05f040e280))
+
 ## [7.6.0](https://github.com/emma-simbot/experience-hub/compare/v7.5.0...v7.6.0) (2023-02-10)
 
 
