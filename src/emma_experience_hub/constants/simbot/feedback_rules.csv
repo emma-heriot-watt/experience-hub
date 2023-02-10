@@ -33,6 +33,8 @@ verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I'm not sure which {verbal_interaction_intent_entity} you want?,False
 verbal_interaction_intent_type == "act_no_match",I don't see it in front of me. You can ask me to search for objects or give me another instruction,False
 verbal_interaction_intent_type == "act_no_match",I don't see it in front of me. You can ask me to look for it?,False
+verbal_interaction_intent_type == "act_no_match" and verbal_interaction_intent_entity != null,I don't see it in front of me. You can ask me to look for the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "act_no_match" and verbal_interaction_intent_entity != null,I don't see it in front of me. You can ask me to search for the {verbal_interaction_intent_entity} or give me another instruction,False
 environment_intent_type == "generic_failure",I'm struggling with this one. Are you able to give me a different instruction?,False
 environment_intent_type == "generic_failure",I'm having some trouble. Can you try rephrase that?,False
 environment_intent_type == "generic_failure",I'm having some trouble and I'm not sure what to do - can you give me another instruction?,False
