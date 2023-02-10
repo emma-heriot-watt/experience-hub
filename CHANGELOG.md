@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.5.0](https://github.com/emma-simbot/experience-hub/compare/v7.4.0...v7.5.0) (2023-02-10)
+
+
+### Features
+
+* add responses for `verbal_interaction_intent_entity` with `act_no_match` intent ([#337](https://github.com/emma-simbot/experience-hub/issues/337)) ([28be9af](https://github.com/emma-simbot/experience-hub/commit/28be9af702f5af9b87a394afebb5f7e13a430ef2))
+
 ## [7.4.0](https://github.com/emma-simbot/experience-hub/compare/v7.3.0...v7.4.0) (2023-02-10)
 
 
