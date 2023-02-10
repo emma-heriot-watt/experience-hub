@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.7.0](https://github.com/emma-simbot/experience-hub/compare/v7.6.1...v7.7.0) (2023-02-10)
+
+
+### Features
+
+* Confirmation Classifier Registry Changes ([#340](https://github.com/emma-simbot/experience-hub/issues/340)) ([afe95e8](https://github.com/emma-simbot/experience-hub/commit/afe95e84cdaa2c0ceefd45a06376d2280020b57a))
+
 ## [7.6.1](https://github.com/emma-simbot/experience-hub/compare/v7.6.0...v7.6.1) (2023-02-10)
 
 
