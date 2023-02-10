@@ -235,11 +235,15 @@ class SimBotFeedbackState(BaseModel):
         inventory_entity: Optional[str],
     ) -> "SimBotFeedbackState":
         """Create the state in a simple way."""
+        # Conditions under which we should try to find a lightweight dialog action
+        require_lightweight_dialog = (
+            (interaction_action and not interaction_action.is_end_of_trajectory)
+            or (utterance_queue_not_empty)
+            or (find_queue_not_empty)
+        )
         return cls(
             # Require a lightweight dialog action when the model does not decode a <stop token
-            require_lightweight_dialog=not interaction_action.is_end_of_trajectory
-            if interaction_action
-            else False,
+            require_lightweight_dialog=require_lightweight_dialog,
             num_turns=num_turns,
             current_room=current_room,
             user_intent_type=user_intent_type,
