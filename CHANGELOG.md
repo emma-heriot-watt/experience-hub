@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.8.0](https://github.com/emma-simbot/experience-hub/compare/v7.7.0...v7.8.0) (2023-02-11)
+
+
+### Features
+
+* new ood model ([#341](https://github.com/emma-simbot/experience-hub/issues/341)) ([a7cee45](https://github.com/emma-simbot/experience-hub/commit/a7cee45c3d80386ed92c65e2fcc099aeb159c0c6))
+
 ## [7.7.0](https://github.com/emma-simbot/experience-hub/compare/v7.6.1...v7.7.0) (2023-02-10)
 
 
