@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.8.1](https://github.com/emma-simbot/experience-hub/compare/v7.8.0...v7.8.1) (2023-02-12)
+
+
+### Bug Fixes
+
+* revert confirmation classifier registry changes ([ca2c243](https://github.com/emma-simbot/experience-hub/commit/ca2c2438735d163b32bdb75165116179e516588f))
+
 ## [7.8.0](https://github.com/emma-simbot/experience-hub/compare/v7.7.0...v7.8.0) (2023-02-11)
 
 
