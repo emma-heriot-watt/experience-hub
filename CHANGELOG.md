@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.9.0](https://github.com/emma-simbot/experience-hub/compare/v7.8.1...v7.9.0) (2023-02-13)
+
+
+### Features
+
+* Update confirmation classifier repo version to 1.3.0 and s3 endpoint ([#345](https://github.com/emma-simbot/experience-hub/issues/345)) ([fdc05e2](https://github.com/emma-simbot/experience-hub/commit/fdc05e234d80f7963bd97b5ed5df6f050c71ef80))
+
 ## [7.8.1](https://github.com/emma-simbot/experience-hub/compare/v7.8.0...v7.8.1) (2023-02-12)
 
 
