@@ -5,6 +5,7 @@ from loguru import logger
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
+    SimBotHacksClient,
     SimBotNLUIntentClient,
 )
 from emma_experience_hub.datamodels import EnvironmentStateTurn
@@ -42,6 +43,7 @@ class SimBotAgentIntentSelectionPipeline:
         nlu_intent_client: SimBotNLUIntentClient,
         nlu_intent_parser: NeuralParser[SimBotIntent[SimBotNLUIntentType]],
         action_predictor_client: SimbotActionPredictionClient,
+        simbot_hacks_client: SimBotHacksClient,
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
         _enable_search_after_no_match: bool = True,
@@ -50,7 +52,7 @@ class SimBotAgentIntentSelectionPipeline:
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
-
+        self._simbot_hacks_client = simbot_hacks_client
         self._action_predictor_client = action_predictor_client
 
         self._enable_clarification_questions = _enable_clarification_questions
@@ -195,10 +197,12 @@ class SimBotAgentIntentSelectionPipeline:
 
     def _does_utterance_match_known_template(self, session: SimBotSession) -> bool:
         """Determine what the agent should do next from the user intent."""
+        if not session.current_turn.speech:
+            return False
+
         raw_text_match_prediction = (
-            self._action_predictor_client.get_low_level_prediction_from_raw_text(
-                dialogue_history=session.current_turn.utterances,
-                environment_state_history=[],
+            self._simbot_hacks_client.get_low_level_prediction_from_raw_text(
+                utterance=session.current_turn.speech.utterance,
             )
         )
         return raw_text_match_prediction is not None

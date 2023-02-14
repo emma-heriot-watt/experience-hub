@@ -20,6 +20,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotAuxiliaryMetadataClient,
     SimBotExtractedFeaturesClient,
     SimBotFeaturesClient,
+    SimBotHacksClient,
     SimBotNLUIntentClient,
     SimBotSessionDbClient,
 )
@@ -39,6 +40,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     out_of_domain_detector: OutOfDomainDetectorClient
     confirmation_response_classifier: ConfirmationResponseClassifierClient
     compound_splitter: CompoundSplitterClient
+    simbot_hacks: SimBotHacksClient
 
     @classmethod
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
@@ -80,6 +82,10 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             ),
             compound_splitter=CompoundSplitterClient(
                 endpoint=simbot_settings.compound_splitter_url,
+                timeout=simbot_settings.client_timeout,
+            ),
+            simbot_hacks=SimBotHacksClient(
+                endpoint=simbot_settings.simbot_hacks_url,
                 timeout=simbot_settings.client_timeout,
             ),
         )

@@ -135,3 +135,20 @@ services:
     entrypoint: python
     command:
       - src/emma_compound_splitter/api/compound_splitter_api.py
+
+  simbot_hacks:
+    container_name: simbot_hacks
+    image: "${SIMBOT_HACKS_IMAGE}"
+    environment:
+      <<: *observability-env-vars
+      LOG_LEVEL: info
+      WORKERS: 20
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/healthcheck"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    ports:
+      - "5509:6000"
+    entrypoint: python
+    command:
+      - src/emma_simbot_hacks/run_api.py

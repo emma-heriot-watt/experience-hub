@@ -40,16 +40,14 @@ Assuming you have an EC2 instance already created, connect to the instance, and 
 run all the background services required for EMMA (e.g., policy, NLU, etc.). To do so we use Docker
 compose and it can be run as follows (for this you must use `sudo`):
 
-```
-sudo -E <PATH_TO_PYTHON_EXECUTABLE> -m emma_experience_hub simbot run-background-services
-
+```bash
+sudo -E env "PATH=$PATH" poetry run python -m emma_experience_hub simbot run-background-services
 ```
 
 Then, in the second tab you can run the experience hub:
 
-```
-python -m emma_experience_hub simbot run-controller-api --auxiliary-metadata-dir ../staging_auxiliary_metadata --auxiliary-metadata-cache-
-dir ../cache/auxiliary_metadata --extracted-features-cache-dir ../cache/features
+```bash
+python -m emma_experience_hub simbot run-controller-api --auxiliary-metadata-dir ../staging_auxiliary_metadata --auxiliary-metadata-cache-dir ../cache/auxiliary_metadata --extracted-features-cache-dir ../cache/features
 ```
 
 Make sure that all the services are up and running. Happy debugging!

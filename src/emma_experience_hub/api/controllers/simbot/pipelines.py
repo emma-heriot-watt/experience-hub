@@ -74,6 +74,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
                 ),
                 action_predictor_client=clients.action_predictor,
+                simbot_hacks_client=clients.simbot_hacks,
                 _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
                 _enable_search_actions=simbot_settings.feature_flags.enable_search_actions,
                 _enable_search_after_no_match=simbot_settings.feature_flags.enable_search_after_no_match,
@@ -84,6 +85,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 action_predictor_response_parser=action_predictor_response_parser,
                 previous_action_parser=SimBotPreviousActionParser(),
                 find_object_pipeline=find_object,
+                simbot_hacks_client=clients.simbot_hacks,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(),
         )

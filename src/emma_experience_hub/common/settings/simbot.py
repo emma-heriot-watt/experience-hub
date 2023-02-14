@@ -62,6 +62,8 @@ class SimBotSettings(BaseSettings):
 
     compound_splitter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5508", scheme="http")
 
+    simbot_hacks_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5509", scheme="http")
+
     otlp_endpoint: AnyHttpUrl = AnyHttpUrl(url="http://localhost:4317", scheme="http")
 
     class Config:

@@ -40,3 +40,7 @@ services:
   - name: compound_splitter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/compound-splitter
     image_version: 1.0.2
+
+  - name: simbot_hacks
+    image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-hacks
+    image_version: 1.1.0

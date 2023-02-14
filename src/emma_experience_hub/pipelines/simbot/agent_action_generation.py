@@ -6,6 +6,7 @@ from opentelemetry import trace
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
+    SimBotHacksClient,
 )
 from emma_experience_hub.datamodels.simbot import (
     SimBotAction,
@@ -37,12 +38,13 @@ class SimBotAgentActionGenerationPipeline:
         action_predictor_response_parser: SimBotActionPredictorOutputParser,
         previous_action_parser: SimBotPreviousActionParser,
         find_object_pipeline: SimBotFindObjectPipeline,
+        simbot_hacks_client: SimBotHacksClient,
     ) -> None:
         self._features_client = features_client
         self._action_predictor_client = action_predictor_client
         self._action_predictor_response_parser = action_predictor_response_parser
         self._previous_action_parser = previous_action_parser
-
+        self._simbot_hacks_client = simbot_hacks_client
         self._find_object_pipeline = find_object_pipeline
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
@@ -101,13 +103,12 @@ class SimBotAgentActionGenerationPipeline:
     @tracer.start_as_current_span("Predict from template matching")
     def _predict_action_from_template_matching(self, session: SimBotSession) -> SimBotAction:
         """Generate an action from the raw-text matching templater."""
-        if not session.current_turn.utterances:
+        if not session.current_turn.speech:
             raise AssertionError("No utterances to try match with")
 
         raw_text_match_prediction = (
-            self._action_predictor_client.get_low_level_prediction_from_raw_text(
-                dialogue_history=session.current_turn.utterances,
-                environment_state_history=[],
+            self._simbot_hacks_client.get_low_level_prediction_from_raw_text(
+                utterance=session.current_turn.speech.utterance
             )
         )
 
