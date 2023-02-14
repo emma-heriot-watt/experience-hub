@@ -15,7 +15,7 @@ class ConfirmationResponseClassifierClient(Client):
 
     def is_request_approved(self, text: str) -> Optional[bool]:
         """Return boolean to the incoming request, or None if it is not a confirmation request."""
-        with httpx.Client() as client:
+        with httpx.Client(timeout=self._timeout) as client:
             response = client.post(f"{self._endpoint}/is-confirmation", params={"text": text})
 
         try:

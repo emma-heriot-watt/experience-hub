@@ -97,17 +97,17 @@ class SimBotFindObjectPipeline:
             session.current_state.find_queue.reset()
             session.current_state.find_queue.extend_tail(search_plan)
 
+        if self._should_reset_utterance_queue(session):
+            logger.debug("Find queue is empty; returning None")
+            self._search_planner.reset_utterance_queue_if_object_not_found(session)
+            return None
+
         if self._should_goto_found_object(session):
             # Pop the gotoaction from the head and clear the plan.
             goto_action = session.current_state.find_queue.pop_from_head()
             logger.warning("Clearing the find queue of the session")
             session.current_state.find_queue.reset()
             return goto_action
-
-        if not session.current_state.find_queue:
-            logger.debug("Find queue is empty; returning None")
-            self._search_planner.reset_utterance_queue_if_object_not_found(session)
-            return None
 
         extracted_features = self._features_client.get_features(session.current_turn)
 
@@ -142,6 +142,17 @@ class SimBotFindObjectPipeline:
         """
         return not session.is_find_object_in_progress
 
+    def _should_reset_utterance_queue(self, session: SimBotSession) -> bool:
+        """Should we reset the utterance queue?
+
+        The queue is empty but the previous action ia not a look around.
+        """
+        is_previous_action_look_around = (
+            session.previous_valid_turn is not None
+            and session.previous_valid_turn.is_look_around_from_search
+        )
+        return session.current_state.find_queue.is_empty and not is_previous_action_look_around
+
     def _should_goto_found_object(self, session: SimBotSession) -> bool:
         """Should we go to the highlighted object?
 
@@ -160,8 +171,9 @@ class SimBotFindObjectPipeline:
         # Only use the incoming turn for visual features but get the utterances from the
         # interation window (i.e. since the search action started)
         dialogue_history = session.get_dialogue_history_from_session_turns(
-            session.get_turns_within_interaction_window(), include_agent_responses=False
+            session.get_turns_since_last_user_utterance(), include_agent_responses=False
         )
+
         raw_visual_grounding_output = self._action_predictor_client.find_object_in_scene(
             dialogue_history=dialogue_history,
             environment_state_history=[EnvironmentStateTurn(features=extracted_features)],
@@ -263,5 +275,6 @@ class SimBotFindObjectPipeline:
             next_action = session.current_state.find_queue.pop_from_head()
         except IndexError:
             logger.debug("No more actions remaining within the search plan")
+        # Reset the utterance queue if there is no next action or the next action is end-of-trajectory
         self._search_planner.reset_utterance_queue_if_object_not_found(session, next_action)
         return next_action

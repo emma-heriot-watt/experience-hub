@@ -123,6 +123,12 @@ class SimBotAgentIntentSelectionPipeline:
                 physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
             )
 
+        # If the agent asked for confirmation to search for an object required to act
+        if self._agent_asked_for_confirm_before_searching(session, user_intent):
+            return self._handle_confirm_before_search_intent(
+                session=session, user_intent=user_intent
+            )
+
         # If we are within a find routine AND received a confirmation response from the user
         if session.is_find_object_in_progress and user_intent.is_confirmation_response:
             # Then let the search routine decide how to handle it.
@@ -229,13 +235,33 @@ class SimBotAgentIntentSelectionPipeline:
             and previous_turn.intent.verbal_interaction.type.triggers_confirmation_question
         )
 
+    def _agent_asked_for_confirm_before_searching(
+        self, session: SimBotSession, user_intent: SimBotUserIntentType
+    ) -> bool:
+        """Did the agent explicitly ask for confirmation before searching for an unseen object?"""
+        if not self._enable_search_after_no_match:
+            return False
+
+        # Verify the user provided a confirmation response (Y/N)
+        if not user_intent.is_confirmation_response or session.previous_turn is None:
+            return False
+
+        # Verify the previous turn outputted an `confirm_before_search`
+        previous_verbal_intent = session.previous_turn.intent.verbal_interaction
+        is_previous_turn_confirm_before_search = (
+            previous_verbal_intent is not None
+            and previous_verbal_intent.type == SimBotIntentType.confirm_before_search
+        )
+
+        return is_previous_turn_confirm_before_search
+
     def _handle_act_no_match_intent(
         self, session: SimBotSession, intents: SimBotAgentIntents
     ) -> SimBotAgentIntents:
         """Update the session based on the NLU output.
 
-        For `act_no_match`, update the current utterance as well as the utterance queue, and set
-        the physical interaction intent to `search`.
+        For `act_no_match`, push the current utterance in the utterance queue, and set the verbal
+        interaction intent to `confirm_before_search`.
         """
         if intents.verbal_interaction is None or not self._enable_search_after_no_match:
             return intents
@@ -249,14 +275,34 @@ class SimBotAgentIntentSelectionPipeline:
         if not all(should_search_before_executing_instruction):
             return intents
 
+        return SimBotAgentIntents(
+            verbal_interaction=SimBotIntent(
+                type=SimBotIntentType.confirm_before_search, entity=target_entity
+            ),
+        )
+
+    def _handle_confirm_before_search_intent(
+        self, session: SimBotSession, user_intent: SimBotUserIntentType
+    ) -> SimBotAgentIntents:
+        """Handle a cofirmation to search."""
+        if user_intent != SimBotIntentType.confirm_yes:
+            return SimBotAgentIntents()
+
+        previous_turn = session.previous_turn
+        if previous_turn is None or previous_turn.intent.verbal_interaction is None:
+            raise AssertionError("User intent is confirmation without a previous verbal intent")
+
         # Do a search routine before executing the current instruction.
         session.current_state.utterance_queue.append_to_head(
-            session.current_turn.speech.utterance,  # type: ignore[union-attr]
+            previous_turn.speech.utterance,  # type: ignore[union-attr]
         )
+        target_entity = previous_turn.intent.verbal_interaction.entity
         session.current_turn.speech = SimBotUserSpeech(utterance=f"find the {target_entity}")
         return SimBotAgentIntents(
             physical_interaction=SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
-            verbal_interaction=intents.verbal_interaction,
+            verbal_interaction=SimBotIntent(
+                type=SimBotIntentType.act_no_match, entity=target_entity
+            ),
         )
 
     def _set_find_object_in_progress_intent(self, session: SimBotSession) -> SimBotAgentIntents:

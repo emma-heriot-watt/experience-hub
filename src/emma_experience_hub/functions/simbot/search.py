@@ -40,12 +40,12 @@ class SearchPlanner(ABC):
     ) -> None:
         """Reset the utterance queue if the object was not found."""
         # The object was not found if the find queue is empty and
-        if current_action is None:
+        action_is_final = (
             # there is no remaining action
-            action_is_final = True
-        else:
-            # the remaining action is the final Rotate Left
-            action_is_final = current_action.type == SimBotActionType.RotateLeft
+            current_action is None
+            # the remaining action ends with the end of trajectory token
+            or current_action.is_end_of_trajectory
+        )
 
         if not session.current_state.find_queue and action_is_final:
             session.current_state.utterance_queue.reset()

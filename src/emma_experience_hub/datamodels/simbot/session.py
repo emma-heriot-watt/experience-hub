@@ -89,8 +89,8 @@ class SimBotSessionTurnIntent(BaseModel):
     def agent_should_ask_question_to_user(self) -> bool:
         """Return True if the agent should ask for confirmation instead of just acting."""
         return (
-            self.physical_interaction is not None
-            and self.physical_interaction.type.triggers_question_to_user
+            self.verbal_interaction is not None
+            and self.verbal_interaction.type.triggers_question_to_user
         )
 
     @property
@@ -422,6 +422,16 @@ class SimBotSessionTurn(BaseModel):
         )
         return self.intent.is_searching and is_goto_object_action
 
+    @property
+    def is_look_around_from_search(self) -> bool:
+        """Return True if the agent is looking aroud from a search."""
+        is_look_around_action = (
+            self.actions is not None
+            and self.actions.interaction is not None
+            and self.actions.interaction.type == SimBotActionType.LookAround
+        )
+        return self.intent.is_searching and is_look_around_action
+
 
 class SimBotSession(BaseModel):
     """A single SimBot Game Session."""
@@ -497,7 +507,18 @@ class SimBotSession(BaseModel):
     @property
     def is_find_object_in_progress(self) -> bool:
         """Is the find object pipeline currently in progress?"""
-        return self.current_state.find_queue.is_not_empty
+        if self.current_state.find_queue.is_not_empty:
+            return True
+        did_look_around_from_search = (
+            # There hasn't been a new user utterance
+            self.current_turn.speech is None
+            # There is a previous turn
+            and self.previous_valid_turn is not None
+            # The previous action was a Look Around during Search
+            and self.previous_valid_turn.is_look_around_from_search
+        )
+
+        return did_look_around_from_search
 
     @property
     def has_found_object(self) -> bool:
@@ -527,6 +548,24 @@ class SimBotSession(BaseModel):
 
             # If the turn is the start of the local window, break
             if turn.intent.user and turn.intent.user == SimBotIntentType.act:
+                break
+
+        # Reverse the order within the list so that they are in the correct order
+        turns_within_window.reverse()
+
+        return turns_within_window
+
+    def get_turns_since_last_user_utterance(self) -> list[SimBotSessionTurn]:
+        """Get all the turns since the last user utterance."""
+        turns_within_window = []
+
+        # Iterate in reverse-order because we only care about the most recents turns
+        for turn in self.valid_turns[::-1]:
+            # Add the turn to the window
+            turns_within_window.append(turn)
+
+            # If the turn is the start of the local window, break
+            if turn.speech and turn.speech.utterance:
                 break
 
         # Reverse the order within the list so that they are in the correct order
