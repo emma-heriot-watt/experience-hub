@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.9.1](https://github.com/emma-simbot/experience-hub/compare/v7.9.0...v7.9.1) (2023-02-14)
+
+
+### Bug Fixes
+
+* lightweight feedback state ([#344](https://github.com/emma-simbot/experience-hub/issues/344)) ([f38e07a](https://github.com/emma-simbot/experience-hub/commit/f38e07a9015873df988a9bd5f8342ec9ca9b7139))
+
 ## [7.9.0](https://github.com/emma-simbot/experience-hub/compare/v7.8.1...v7.9.0) (2023-02-13)
 
 
