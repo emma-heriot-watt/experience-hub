@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.10.0](https://github.com/emma-simbot/experience-hub/compare/v7.9.1...v7.10.0) (2023-02-14)
+
+
+### Features
+
+* include the new `simbot-hacks` client with the raw text matching ([#316](https://github.com/emma-simbot/experience-hub/issues/316)) ([58893bd](https://github.com/emma-simbot/experience-hub/commit/58893bd977ca1f01561b7aed0369e1612d4a28cc))
+
+
+### Bug Fixes
+
+* Ignore environment errors when we get a new user utterance ([#348](https://github.com/emma-simbot/experience-hub/issues/348)) ([6f4ad7e](https://github.com/emma-simbot/experience-hub/commit/6f4ad7e5b0599c9178f39e2bf6b578c26b5cf972))
+
 ## [7.9.1](https://github.com/emma-simbot/experience-hub/compare/v7.9.0...v7.9.1) (2023-02-14)
 
 

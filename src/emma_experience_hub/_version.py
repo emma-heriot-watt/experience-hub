@@ -4,4 +4,4 @@
 # 3) we can import it into your module module
 #
 # This is automatic, therefore DO NOT manually change this file!
-__version__ = "7.9.1"
+__version__ = "7.10.0"
