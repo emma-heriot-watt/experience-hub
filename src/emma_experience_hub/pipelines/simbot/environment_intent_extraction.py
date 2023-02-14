@@ -16,8 +16,8 @@ class SimBotEnvironmentIntentExtractionPipeline:
 
     def run(self, session: SimBotSession) -> Optional[SimBotIntent[SimBotEnvironmentIntentType]]:
         """Process environment state changes to inform the agent of its standing in the world."""
-        # Return None if there is no previous turn
-        if not session.previous_turn:
+        # Return None if there is no previous turn or we got a new user utterance
+        if not session.previous_turn or session.current_turn.speech is not None:
             return None
 
         # If we received no action statuses, do nothing and return
