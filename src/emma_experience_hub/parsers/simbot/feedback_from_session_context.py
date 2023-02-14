@@ -78,11 +78,10 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
 
     def _filter_rules(self, state: SimBotFeedbackState) -> Iterator[SimBotFeedbackRule]:
         """Filter the rules if possible to ensure that certain rules are returned."""
-        filtered_rules = iter(self._rules)
-
         if state.require_lightweight_dialog:
             filtered_rules = (rule for rule in self._rules if rule.is_lightweight_dialog)
-
+        else:
+            filtered_rules = (rule for rule in self._rules if not rule.is_lightweight_dialog)
         return filtered_rules
 
     @tracer.start_as_current_span("Select feedback rule")
