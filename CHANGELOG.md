@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.0](https://github.com/emma-simbot/experience-hub/compare/v7.10.0...v7.11.0) (2023-02-14)
+
+
+### Features
+
+* Add confirmation with no match ([#331](https://github.com/emma-simbot/experience-hub/issues/331)) ([8e4a3c3](https://github.com/emma-simbot/experience-hub/commit/8e4a3c314f07e51364b02012d90959e048db31b4))
+
 ## [7.10.0](https://github.com/emma-simbot/experience-hub/compare/v7.9.1...v7.10.0) (2023-02-14)
 
 
