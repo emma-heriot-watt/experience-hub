@@ -35,6 +35,7 @@ jobs:
               - 'pyproject.toml'
               - 'poetry.lock'
               - '.github/workflows/tests.yml'
+              - 'src/emma_experience_hub/**/*'
 
   python:
     name: Run Python test suite
