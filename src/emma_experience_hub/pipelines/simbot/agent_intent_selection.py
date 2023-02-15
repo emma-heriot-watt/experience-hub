@@ -92,6 +92,13 @@ class SimBotAgentIntentSelectionPipeline:
             logger.debug("Setting agent intent to search since we are currently in progress")
             return self._set_find_object_in_progress_intent(session)
 
+        # If the previous action had a stop token and we used a lightweight dialog action, we need
+        # to skip the action generator
+        if self._used_lightweight_dialog_with_stop_token(session):
+            return SimBotAgentIntents(
+                verbal_interaction=SimBotIntent(type=SimBotIntentType.generic_success)
+            )
+
         return SimBotAgentIntents(
             physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
         )
@@ -224,6 +231,27 @@ class SimBotAgentIntentSelectionPipeline:
             and session.previous_turn.is_going_to_found_object_from_search
             and session.previous_turn.actions.is_successful
         )
+
+    def _used_lightweight_dialog_with_stop_token(self, session: SimBotSession) -> bool:
+        """Return True if we returned a lightweight dialog with the end of trajectory.
+
+        While it appears that the action generation model can handle this automatically, the time
+        it takes to extract the features for the action generation is taking too long. Therefore we
+        need to step-in and bypass that entire process.
+        """
+        if not session.previous_valid_turn:
+            return False
+
+        previous_dialog_was_lightweight = (
+            session.previous_valid_turn.actions.dialog is not None
+            and session.previous_valid_turn.actions.dialog.is_lightweight_dialog
+        )
+        previous_action_was_end_of_trajectory = (
+            session.previous_valid_turn.actions.interaction is not None
+            and session.previous_valid_turn.actions.interaction.is_end_of_trajectory
+        )
+
+        return previous_action_was_end_of_trajectory and previous_dialog_was_lightweight
 
     def _agent_asked_for_confirm_before_acting(
         self, previous_turn: Optional[SimBotSessionTurn]

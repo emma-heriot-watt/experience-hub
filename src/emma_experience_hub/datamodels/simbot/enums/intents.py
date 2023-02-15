@@ -39,6 +39,9 @@ class SimBotIntentType(Enum):
     confirm_yes = "<confirm><yes>"
     confirm_no = "<confirm><no>"
 
+    # Feedback for previous turn success
+    generic_success = "<success><generic>"
+
     # Feedback for failure
     generic_failure = "<failure><generic>"
 
@@ -208,6 +211,7 @@ SimBotVerbalInteractionIntentType = Literal[
     SimBotIntentType.confirm_before_search,
     SimBotIntentType.act_no_match,
     SimBotIntentType.act_too_many_matches,
+    SimBotIntentType.generic_success,
 ]
 
 SimBotNLUIntentType = Literal[
