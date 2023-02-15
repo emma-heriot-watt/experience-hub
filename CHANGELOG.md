@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.12.1](https://github.com/emma-simbot/experience-hub/compare/v7.12.0...v7.12.1) (2023-02-15)
+
+
+### Bug Fixes
+
+* broken rule condition ([b46fb40](https://github.com/emma-simbot/experience-hub/commit/b46fb4038cb6dfbb38113b9503bbc12c97b0fb17))
+
 ## [7.12.0](https://github.com/emma-simbot/experience-hub/compare/v7.11.1...v7.12.0) (2023-02-15)
 
 
