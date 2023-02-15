@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.13.0](https://github.com/emma-simbot/experience-hub/compare/v7.12.1...v7.13.0) (2023-02-15)
+
+
+### Features
+
+* avoid generating action when using lightweight dialog with a end of trajectory action ([#353](https://github.com/emma-simbot/experience-hub/issues/353)) ([628ab7d](https://github.com/emma-simbot/experience-hub/commit/628ab7d686dbfcbe35cdcc12721b78fcadda6cdf))
+* update policy ([#354](https://github.com/emma-simbot/experience-hub/issues/354)) ([6284afb](https://github.com/emma-simbot/experience-hub/commit/6284afbc20388893465cc990c01ddd669ce285b0))
+
 ## [7.12.1](https://github.com/emma-simbot/experience-hub/compare/v7.12.0...v7.12.1) (2023-02-15)
 
 
