@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.1](https://github.com/emma-simbot/experience-hub/compare/v7.11.0...v7.11.1) (2023-02-15)
+
+
+### Bug Fixes
+
+* outdated simbot hack image ([#351](https://github.com/emma-simbot/experience-hub/issues/351)) ([bd4a127](https://github.com/emma-simbot/experience-hub/commit/bd4a12714f68332c3708ce1fcc4a51f280173bc3))
+
 ## [7.11.0](https://github.com/emma-simbot/experience-hub/compare/v7.10.0...v7.11.0) (2023-02-14)
 
 
