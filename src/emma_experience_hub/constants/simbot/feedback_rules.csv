@@ -124,7 +124,7 @@ environment_intent_type == "alternate_navigation_used" and environment_intent_ac
 environment_intent_type == "object_overloaded",<say-as interpret-as="interjection">hmm</say-as> - it seems like it is currently overloaded. I think we need to fix that first?,False
 environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - it seems like it's not currently powered. I think we need to handle that first?,False
 environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - it seems like it's not currently powered. Try reading a sticky note for help on how to turn on the power!,False
--environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - seems like the power is off. Maybe you can get a useful hint by reading a sticky note,False
+environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - seems like the power is off. Maybe you can get a useful hint by reading a sticky note,False
 environment_intent_type == "object_not_picked_up",I didn't pick that up for some reason - can you give me a different instruction?,False
 environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity},False
 environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity} - can you give me a different instruction?,False
