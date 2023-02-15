@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.12.0](https://github.com/emma-simbot/experience-hub/compare/v7.11.1...v7.12.0) (2023-02-15)
+
+
+### Features
+
+* Add responses for unsupported action and all objects ([#349](https://github.com/emma-simbot/experience-hub/issues/349)) ([7b09630](https://github.com/emma-simbot/experience-hub/commit/7b09630cc93ff875043536a5802e2606292e9466))
+
 ## [7.11.1](https://github.com/emma-simbot/experience-hub/compare/v7.11.0...v7.11.1) (2023-02-15)
 
 
