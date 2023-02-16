@@ -2,13 +2,13 @@ from typing import NamedTuple, Optional
 
 from loguru import logger
 
+from emma_common.datamodels import EnvironmentStateTurn
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
     SimBotHacksClient,
     SimBotNLUIntentClient,
 )
-from emma_experience_hub.datamodels import EnvironmentStateTurn
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntent,
     SimBotIntentType,

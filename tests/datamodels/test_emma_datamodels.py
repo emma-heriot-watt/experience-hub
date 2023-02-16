@@ -1,12 +1,13 @@
-import orjson
 import torch
 
-from emma_experience_hub.datamodels import EmmaExtractedFeatures
-from emma_experience_hub.datamodels.emma import (
+from emma_common.datamodels import (
     DialogueUtterance,
     EmmaPolicyRequest,
     EnvironmentStateTurn,
+    SpeakerRole,
+    TorchDataMixin,
 )
+from emma_experience_hub.datamodels import EmmaExtractedFeatures
 
 
 def test_emma_extracted_features_parses_correctly() -> None:
@@ -36,10 +37,12 @@ def test_emma_extracted_features_converts_to_json_properly() -> None:
 
     assert features
 
-    assert isinstance(orjson.loads(features.json())["bbox_features"], list)
+    assert isinstance(
+        TorchDataMixin.get_object(TorchDataMixin.to_bytes(features)).bbox_features, torch.Tensor
+    )
 
 
-def test_emma_policy_request_converts_to_json_properly() -> None:
+def test_emma_policy_request_converts_to_bytes_properly() -> None:
     features = EmmaExtractedFeatures(
         bbox_features=torch.randn(3, 10),
         bbox_coords=torch.randn(3, 10),
@@ -51,10 +54,10 @@ def test_emma_policy_request_converts_to_json_properly() -> None:
     )
 
     emma_policy_request = EmmaPolicyRequest(
-        dialogue_history=[DialogueUtterance(utterance="look around", role="user")],
+        dialogue_history=[DialogueUtterance(utterance="look around", role=SpeakerRole.user)],
         environment_history=[EnvironmentStateTurn(features=[features])],
     )
 
-    request_json = emma_policy_request.json(models_as_dict=False)
-
-    assert request_json
+    assert isinstance(
+        TorchDataMixin.get_object(TorchDataMixin.to_bytes(emma_policy_request)), EmmaPolicyRequest
+    )

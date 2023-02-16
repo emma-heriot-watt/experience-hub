@@ -1,16 +1,16 @@
 from typing import Any
 
 import httpx
-import orjson
 from loguru import logger
 from pydantic import AnyHttpUrl
 
-from emma_experience_hub.api.clients.client import Client
-from emma_experience_hub.datamodels import (
+from emma_common.datamodels import (
     DialogueUtterance,
     EmmaPolicyRequest,
     EnvironmentStateTurn,
+    TorchDataMixin,
 )
+from emma_experience_hub.api.clients.client import Client
 
 
 class EmmaPolicyClient(Client):
@@ -46,14 +46,7 @@ class EmmaPolicyClient(Client):
         logger.debug(f"size of the history {len(environment_state_history)}")
 
         with httpx.Client(timeout=None) as client:
-            response = client.post(
-                endpoint,
-                json=orjson.loads(
-                    emma_policy_request.json(
-                        models_as_dict=True,
-                    )
-                ),
-            )
+            response = client.post(endpoint, content=TorchDataMixin.to_bytes(emma_policy_request))
 
         try:
             response.raise_for_status()

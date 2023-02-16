@@ -3,12 +3,12 @@ from typing import Optional
 from loguru import logger
 from opentelemetry import trace
 
+from emma_common.datamodels import EmmaExtractedFeatures, EnvironmentStateTurn
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
 )
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
-from emma_experience_hub.datamodels import EmmaExtractedFeatures, EnvironmentStateTurn
 from emma_experience_hub.datamodels.enums import SearchPlannerType
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (

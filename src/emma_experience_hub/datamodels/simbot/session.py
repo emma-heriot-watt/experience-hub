@@ -10,10 +10,11 @@ from loguru import logger
 from overrides import overrides
 from pydantic import BaseModel, Field, root_validator, validator
 
-from emma_experience_hub.datamodels import (
+from emma_common.datamodels import (
     DialogueUtterance,
     EmmaExtractedFeatures,
     EnvironmentStateTurn,
+    SpeakerRole,
 )
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotDialogAction
@@ -373,12 +374,16 @@ class SimBotSessionTurn(BaseModel):
 
         # If there is a user utterance, add it first.
         if self.speech is not None:
-            utterances.append(DialogueUtterance(utterance=self.speech.utterance, role="user"))
+            utterances.append(
+                DialogueUtterance(utterance=self.speech.utterance, role=SpeakerRole.user)
+            )
 
         # Do not include lightweight dialog actions within the utterances!
         if self.actions.dialog is not None:
             utterances.append(
-                DialogueUtterance(utterance=self.actions.dialog.payload.value, role="agent")
+                DialogueUtterance(
+                    utterance=self.actions.dialog.payload.value, role=SpeakerRole.agent
+                )
             )
 
         return utterances

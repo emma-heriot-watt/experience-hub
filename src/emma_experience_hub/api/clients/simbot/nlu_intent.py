@@ -1,7 +1,7 @@
 from opentelemetry import trace
 
+from emma_common.datamodels import DialogueUtterance, EnvironmentStateTurn
 from emma_experience_hub.api.clients.emma_policy import EmmaPolicyClient
-from emma_experience_hub.datamodels import DialogueUtterance, EnvironmentStateTurn
 
 
 tracer = trace.get_tracer(__name__)

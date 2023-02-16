@@ -3,12 +3,12 @@ from typing import Optional
 from hypothesis import HealthCheck, example, given, settings, strategies as st
 from pytest_cases import fixture, parametrize
 
+from emma_common.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.constants.simbot import (
     ACTION_SYNONYMS,
     get_simbot_object_label_to_class_name_map,
     get_simbot_room_name_map,
 )
-from emma_experience_hub.datamodels.emma import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoObject,

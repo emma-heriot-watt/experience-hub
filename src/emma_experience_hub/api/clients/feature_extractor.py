@@ -9,6 +9,7 @@ from numpy.typing import ArrayLike
 from opentelemetry import trace
 from PIL import Image
 
+from emma_common.datamodels import TorchDataMixin
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 
@@ -64,8 +65,7 @@ class FeatureExtractorClient(Client):
             raise err from None
 
         # Process the response
-        raw_response_data: dict[str, ArrayLike] = response.json()
-        feature_response = EmmaExtractedFeatures.from_raw_response(raw_response_data)
+        feature_response = TorchDataMixin.get_object(response.content)
 
         return feature_response
 
@@ -98,10 +98,10 @@ class FeatureExtractorClient(Client):
             raise err from None
 
         # Process the response
-        raw_response_data: list[dict[str, ArrayLike]] = response.json()
-        all_feature_responses = list(
-            map(EmmaExtractedFeatures.from_raw_response, raw_response_data)
+        all_feature_responses: list[EmmaExtractedFeatures] = TorchDataMixin.get_object(
+            response.content
         )
+
         return all_feature_responses
 
     def _convert_single_image_to_bytes(self, image: Union[Image.Image, ArrayLike]) -> bytes:
