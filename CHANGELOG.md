@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.0](https://github.com/emma-simbot/experience-hub/compare/v7.13.0...v8.0.0) (2023-02-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* torch serialisation format for neural model clients (#352)
+
+### Features
+
+* torch serialisation format for neural model clients ([#352](https://github.com/emma-simbot/experience-hub/issues/352)) ([ca31c91](https://github.com/emma-simbot/experience-hub/commit/ca31c91df69d695dd74d7539ade336affd4ce171))
+
 ## [7.13.0](https://github.com/emma-simbot/experience-hub/compare/v7.12.1...v7.13.0) (2023-02-15)
 
 
