@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.2.1](https://github.com/emma-simbot/experience-hub/compare/v8.2.0...v8.2.1) (2023-02-17)
+
+
+### Bug Fixes
+
+* perception bugfix and correct device for perception on staging ([#363](https://github.com/emma-simbot/experience-hub/issues/363)) ([5c72904](https://github.com/emma-simbot/experience-hub/commit/5c7290440a862b44d4e03177c8bcdd6bf6b94158))
+
 ## [8.2.0](https://github.com/emma-simbot/experience-hub/compare/v8.1.0...v8.2.0) (2023-02-17)
 
 
