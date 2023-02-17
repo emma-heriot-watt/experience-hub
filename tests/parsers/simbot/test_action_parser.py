@@ -4,11 +4,7 @@ from hypothesis import HealthCheck, example, given, settings, strategies as st
 from pytest_cases import fixture, parametrize
 
 from emma_common.datamodels import EmmaExtractedFeatures
-from emma_experience_hub.constants.simbot import (
-    ACTION_SYNONYMS,
-    get_simbot_object_label_to_class_name_map,
-    get_simbot_room_name_map,
-)
+from emma_experience_hub.constants.simbot import ACTION_SYNONYMS, get_simbot_room_name_map
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoObject,
@@ -206,6 +202,11 @@ def test_simbot_action_parser_object_navigation(
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object navigation actions."""
+    simbot_extracted_features[frame_token_id - 1].entity_labels[
+        visual_token_id - 1
+    ] = simbot_object_name
+    expected_name = simbot_object_name
+
     if simbot_object_name == "Sticky Note":
         raw_output = _build_raw_output(
             "goto",
@@ -218,7 +219,7 @@ def test_simbot_action_parser_object_navigation(
             raw_output=raw_output.removesuffix("</s>").removesuffix("."),
             payload=SimBotGotoPayload(
                 object=SimBotGotoObject(
-                    name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
+                    name=expected_name,
                     colorImageIndex=_get_expected_color_image_index(
                         simbot_object_name, frame_token_id
                     ),
@@ -239,7 +240,7 @@ def test_simbot_action_parser_object_navigation(
             raw_output=raw_output.removesuffix("</s>").removesuffix("."),
             payload=SimBotGotoPayload(
                 object=SimBotGotoObject(
-                    name=get_simbot_object_label_to_class_name_map()[simbot_object_name],
+                    name=expected_name,
                     colorImageIndex=_get_expected_color_image_index(
                         simbot_object_name, frame_token_id
                     ),
@@ -290,17 +291,21 @@ def test_simbot_action_parser_object_interaction(
             include_end_of_trajectory=include_end_of_trajectory,
         )
 
+    simbot_extracted_features[frame_token_id - 1].entity_labels[
+        visual_token_id - 1
+    ] = simbot_object_name
+
     parsed_action = simbot_action_parser(
         raw_output,
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
     )
 
-    try:
-        expected_object_name = get_simbot_object_label_to_class_name_map()[simbot_object_name]
-    except KeyError:
-        expected_object_name = simbot_object_name
-
+    # try:
+    #     expected_object_name = get_simbot_object_label_to_class_name_map()[simbot_object_name]
+    # except KeyError:
+    #     expected_object_name = simbot_object_name
+    expected_object_name = simbot_object_name
     expected_action = SimBotAction(
         id=0,
         type=SimBotActionType[simbot_interaction_action],
@@ -373,7 +378,7 @@ def test_simbot_action_parser_sticky_note(
         id=0,
         type=SimBotActionType.Examine,
         payload=SimBotObjectInteractionPayload(
-            object=SimBotInteractionObject(colorImageIndex=0, mask=None, name="stickynote")
+            object=SimBotInteractionObject(colorImageIndex=0, mask=None, name="Sticky Note")
         ),
         status=None,
         raw_output=raw_output.removesuffix("</s>").removesuffix("."),

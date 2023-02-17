@@ -201,8 +201,10 @@ class SimBotFeedbackState(BaseModel):
     find_queue_not_empty: bool = False
     previous_find_queue_not_empty: bool = False
 
-    # Histpry of used rule ids
+    # History of used rule ids
     used_rule_ids: list[int] = Field(default_factory=list)
+
+    current_turn_has_user_utterance: bool = False
 
     class Config:
         """Config for the model."""
@@ -233,6 +235,7 @@ class SimBotFeedbackState(BaseModel):
         used_rule_ids: list[int],
         inventory_turn: int,
         inventory_entity: Optional[str],
+        current_turn_has_user_utterance: bool,
     ) -> "SimBotFeedbackState":
         """Create the state in a simple way."""
         # Conditions under which we should try to find a lightweight dialog action
@@ -283,6 +286,7 @@ class SimBotFeedbackState(BaseModel):
             used_rule_ids=used_rule_ids,
             inventory_turn=inventory_turn,
             inventory_entity=inventory_entity,
+            current_turn_has_user_utterance=current_turn_has_user_utterance,
         )
 
     def to_query(self) -> dict[str, Any]:

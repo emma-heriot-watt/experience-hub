@@ -22,6 +22,7 @@ def create_placeholder_features_frames() -> list[EmmaExtractedFeatures]:
         "bbox_probas": torch.tensor([[0.35, 0.2, 0.25, 0.2], [0.2, 0.35, 0.25, 0.2]]),
         "cnn_features": torch.tensor([1, 2]),
         "class_labels": ["label1", "label2"],
+        "entity_labels": ["label1", "label2"],
         "width": 300,
         "height": 300,
     }
@@ -34,6 +35,7 @@ def create_placeholder_features_frames() -> list[EmmaExtractedFeatures]:
         "bbox_probas": torch.tensor([[0.2, 0.2, 0.35, 0.25], [0.2, 0.2, 0.25, 0.35]]),
         "cnn_features": torch.tensor([1, 2]),
         "class_labels": ["label3", "label4"],
+        "entity_labels": ["label3", "label4"],
         "width": 300,
         "height": 300,
     }

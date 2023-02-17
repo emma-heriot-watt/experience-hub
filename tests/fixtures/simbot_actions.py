@@ -121,6 +121,7 @@ def simbot_extracted_features(
                 bbox_probas=torch.tensor(bbox_probas),
                 cnn_features=torch.tensor(cnn_features),
                 class_labels=class_labels,
+                entity_labels=class_labels,
                 width=300,
                 height=300,
             )

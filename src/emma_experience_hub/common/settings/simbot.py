@@ -11,7 +11,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_clarification_questions: bool = True
     enable_confirmation_questions: bool = True
     enable_search_actions: bool = True
-    enable_grab_from_history: bool = False
+    enable_grab_from_history: bool = True
     enable_search_after_no_match: bool = True
 
     enable_always_highlight_before_object_action: bool = False

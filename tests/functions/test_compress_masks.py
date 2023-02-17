@@ -3,6 +3,7 @@ from hypothesis import given, strategies as st
 from pytest_benchmark.fixture import BenchmarkFixture
 from pytest_cases import fixture
 
+from emma_experience_hub.datamodels.simbot.agent_memory import SimBotObjectMemory
 from emma_experience_hub.functions.simbot.masks import (
     alexa_compress_segmentation_mask,
     tensor_compress_segmntation_mask,
@@ -39,3 +40,11 @@ def test_tensor_compress_mask_equals_alexa(mask: torch.Tensor) -> None:
     alexa_compressed_mask = alexa_compress_segmentation_mask(mask)
     tensor_compressed_mask = tensor_compress_segmntation_mask(mask)
     assert alexa_compressed_mask == tensor_compressed_mask
+
+
+@given(mask=create_random_mask())
+def test_get_area_from_compressed_mask(mask: torch.Tensor) -> None:
+    compressed_mask = tensor_compress_segmntation_mask(mask)
+    area_from_decompressed_mask = mask.sum().item()
+    area_from_compressed_mask = SimBotObjectMemory.get_area_from_compressed_mask(compressed_mask)
+    assert area_from_decompressed_mask == area_from_compressed_mask

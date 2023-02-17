@@ -18,7 +18,6 @@ from emma_experience_hub.datamodels.simbot.payloads import (
 )
 from emma_experience_hub.functions.simbot import (
     BasicSearchPlanner,
-    GrabFromHistorySearchPlanner,
     GreedyMaximumVertexCoverSearchPlanner,
     SearchPlanner,
     SimBotSceneObjectTokens,
@@ -44,8 +43,7 @@ class SimBotFindObjectPipeline:
         action_predictor_client: SimbotActionPredictionClient,
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
         search_planner: SearchPlanner,
-        grab_from_history_search_planner: SearchPlanner,
-        _enable_grab_from_history: bool = True,
+        enable_grab_from_history: bool = True,
     ) -> None:
         self._features_client = features_client
 
@@ -53,8 +51,7 @@ class SimBotFindObjectPipeline:
         self._visual_grounding_output_parser = visual_grounding_output_parser
 
         self._search_planner = search_planner
-        self._grab_from_history_search_planner = grab_from_history_search_planner
-        self._enable_grab_from_history = _enable_grab_from_history
+        self._enable_grab_from_history = enable_grab_from_history
 
     @classmethod
     def from_planner_type(
@@ -65,7 +62,7 @@ class SimBotFindObjectPipeline:
         planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover,
         distance_threshold: float = 3,
         viewpoint_budget: int = 3,
-        _enable_grab_from_history: bool = True,
+        enable_grab_from_history: bool = True,
     ) -> "SimBotFindObjectPipeline":
         """Instantiate the pipeline from the SearchPlannerType."""
         planners = {
@@ -80,10 +77,7 @@ class SimBotFindObjectPipeline:
             action_predictor_client=action_predictor_client,
             visual_grounding_output_parser=visual_grounding_output_parser,
             search_planner=planners[planner_type],
-            grab_from_history_search_planner=GrabFromHistorySearchPlanner(
-                features_client, action_predictor_client
-            ),
-            _enable_grab_from_history=_enable_grab_from_history,
+            enable_grab_from_history=enable_grab_from_history,
         )
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
@@ -110,6 +104,7 @@ class SimBotFindObjectPipeline:
             return goto_action
 
         extracted_features = self._features_client.get_features(session.current_turn)
+        session.update_agent_memory(extracted_features)
 
         # Try to find the object in the previous turn
         try:
@@ -124,16 +119,40 @@ class SimBotFindObjectPipeline:
             session, decoded_scene_object_tokens, extracted_features
         )
 
+    def _can_search_from_history(self, session: SimBotSession) -> bool:
+        """Determine if we should search in history."""
+        if not self._enable_grab_from_history:
+            return False
+        # Check that there is an entity to search history for
+        if session.current_turn.intent.physical_interaction is None:
+            return False
+
+        return session.current_turn.intent.physical_interaction.entity is not None
+
     def _build_search_plan(self, session: SimBotSession) -> list[SimBotAction]:
         """Build a plan of actions for the current session."""
-        if self._enable_grab_from_history:
-            try:
-                return self._grab_from_history_search_planner.run(session)
-            except AssertionError:
-                logger.info("Assertion Error. Failed to find object from history")
-            except Exception as err:
-                logger.exception("GFH failed", exc_info=err)
-        return self._search_planner.run(session)
+        gfh_viewpoint: Optional[str] = None
+        if self._can_search_from_history(session):
+            # In practice this should never happen, if the searchable_object is not populated then this isnt a problem in the find pipeline
+            if session.current_turn.intent.physical_interaction is None:
+                return self._search_planner.run(session, gfh_viewpoint=gfh_viewpoint)
+
+            searchable_object = session.current_turn.intent.physical_interaction.entity
+            if searchable_object is None:
+                return self._search_planner.run(session, gfh_viewpoint=gfh_viewpoint)
+
+            current_room = session.current_turn.environment.current_room
+
+            gfh_viewpoint = session.current_state.memory.read_memory_entity_in_room(
+                room_name=current_room, object_label=searchable_object
+            )
+            if gfh_viewpoint is not None:
+                logger.debug(f"Found viewpoint {gfh_viewpoint} for {searchable_object}")
+            else:
+                logger.debug(
+                    f"Could not retrieve {searchable_object} from memory {session.current_state.memory}"
+                )
+        return self._search_planner.run(session, gfh_viewpoint=gfh_viewpoint)
 
     def _should_start_new_search(self, session: SimBotSession) -> bool:
         """Should we be starting a new search?

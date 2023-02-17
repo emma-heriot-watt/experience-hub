@@ -5,13 +5,13 @@ from emma_experience_hub.functions.simbot.actions import (
 from emma_experience_hub.functions.simbot.masks import compress_segmentation_mask
 from emma_experience_hub.functions.simbot.search import (
     BasicSearchPlanner,
-    GrabFromHistorySearchPlanner,
     GreedyMaximumVertexCoverSearchPlanner,
     SearchPlanner,
 )
 from emma_experience_hub.functions.simbot.special_tokens import (
     SimBotSceneObjectTokens,
     extract_index_from_special_token,
+    get_class_name_from_special_tokens,
     get_correct_frame_index,
     get_mask_from_special_tokens,
 )

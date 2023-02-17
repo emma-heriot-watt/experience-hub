@@ -5,17 +5,8 @@ import numpy as np
 from loguru import logger
 from numpy import typing
 
-from emma_experience_hub.api.clients.simbot import (
-    SimbotActionPredictionClient,
-    SimBotFeaturesClient,
-)
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
-from emma_experience_hub.datamodels.simbot import (
-    SimBotAction,
-    SimBotActionType,
-    SimBotSession,
-    SimBotSessionTurn,
-)
+from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoViewpoint,
     SimBotGotoViewpointPayload,
@@ -31,7 +22,9 @@ class SearchPlanner(ABC):
         self.rotation_magnitude = rotation_magnitude
 
     @abstractmethod
-    def run(self, session: SimBotSession) -> list[SimBotAction]:
+    def run(
+        self, session: SimBotSession, gfh_viewpoint: Optional[str] = None
+    ) -> list[SimBotAction]:
         """Plan the actions needed to find an object for a given position."""
         raise NotImplementedError()
 
@@ -97,7 +90,9 @@ class BasicSearchPlanner(SearchPlanner):
     def __init__(self, rotation_magnitude: float = 90):
         super().__init__(rotation_magnitude=rotation_magnitude)
 
-    def run(self, session: SimBotSession) -> list[SimBotAction]:
+    def run(
+        self, session: SimBotSession, gfh_viewpoint: Optional[str] = None
+    ) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
         # For search and no match, do a Look Around
         if session.current_turn.intent.is_searching_after_not_seeing_object:
@@ -113,65 +108,6 @@ class BasicSearchPlanner(SearchPlanner):
             self._create_turn_left_action(add_stop_token=True),
         ]
         return actions
-
-
-class GrabFromHistorySearchPlanner(BasicSearchPlanner):
-    """Create a plan to go to the object if we've seen it before."""
-
-    def __init__(
-        self,
-        features_client: SimBotFeaturesClient,
-        action_predictor_client: SimbotActionPredictionClient,
-        num_turns_to_search_through: int = 10,
-        rotation_magnitude: int = 90,
-    ) -> None:
-        super().__init__(rotation_magnitude=rotation_magnitude)
-
-        self._features_client = features_client
-        self._action_predictor_client = action_predictor_client
-        self._num_turns_to_search_through = num_turns_to_search_through
-
-    def run(self, session: SimBotSession) -> list[SimBotAction]:
-        """Go to the object if we have seen it before.
-
-        If the entity cannot be found in the turns, an exception will be raised.
-        """
-        turn_with_entity = self._get_turn_with_entity(session)
-        return self._build_plan(turn_with_entity)
-
-    def _get_turns_to_search_through(self, session: SimBotSession) -> list[SimBotSessionTurn]:
-        """Get the list of turns to search for the entity in."""
-        return session.valid_turns[-self._num_turns_to_search_through :]
-
-    def _get_turn_with_entity(self, session: SimBotSession) -> SimBotSessionTurn:
-        """Get the turn where we previously saw the entity."""
-        turns_to_search_through = self._get_turns_to_search_through(session)
-
-        if not turns_to_search_through:
-            raise AssertionError("[GFH] turns_to_search_through is empty. Skipping GFH")
-
-        environment_state_history = session.get_environment_state_history_from_turns(
-            turns_to_search_through, self._features_client.get_features
-        )
-
-        if not environment_state_history:
-            raise AssertionError("[GFH] environment_state_history is empty. Skipping GFH")
-
-        turn_index = self._action_predictor_client.find_entity_from_history(
-            environment_state_history, session.current_turn.utterances
-        )
-
-        if turn_index is None:
-            raise AssertionError("[GFH] Unable to find entity in turns")
-
-        return turns_to_search_through[turn_index]
-
-    def _build_plan(self, turn_with_entity: SimBotSessionTurn) -> list[SimBotAction]:
-        """Build the plan to find the object."""
-        viewpoint_name = turn_with_entity.environment.get_closest_viewpoint_name()
-
-        goto_closest_viewpoint = self._create_goto_viewpoint_action(viewpoint_name)
-        return [goto_closest_viewpoint, *self._create_rotation_actions()]
 
 
 class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
@@ -269,11 +205,17 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
             return [self._create_look_around_action(add_stop_token=False)]
         return self._create_rotation_actions()
 
-    def run(self, session: SimBotSession) -> list[SimBotAction]:
+    def run(
+        self, session: SimBotSession, gfh_viewpoint: Optional[str] = None
+    ) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
         (name_candidates, location_candidates, first_selected_idx) = self.get_vertex_candidates(
             session
         )
+        planned_actions: list[SimBotAction] = []
+        if gfh_viewpoint is not None:
+            planned_actions.append(self._create_goto_viewpoint_action(gfh_viewpoint))
+            first_selected_idx = name_candidates.index(gfh_viewpoint)
 
         location_candidates_array = np.array(location_candidates)
         name_candidates_array = np.array(name_candidates)
@@ -284,7 +226,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
             coverage_sets, first_selected_idx=first_selected_idx
         )
         # We need 3 turns for each planned location + 1 more for the last viewpoint
-        planned_actions = self.get_actions_for_position(session, is_first_position=True)
+        planned_actions.extend(self.get_actions_for_position(session, is_first_position=True))
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:
                 planned_actions.append(self._create_goto_viewpoint_action(name))

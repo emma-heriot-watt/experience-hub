@@ -22,6 +22,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
 from emma_experience_hub.datamodels.simbot.payloads.navigation import SimBotGotoObjectPayload
 from emma_experience_hub.functions.simbot import (
     SimBotDeconstructedAction,
+    get_class_name_from_special_tokens,
     get_correct_frame_index,
     get_mask_from_special_tokens,
 )
@@ -106,7 +107,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         extracted_features: list[EmmaExtractedFeatures],
     ) -> SimBotAction:
         """Return an object interaction action."""
-        mask, color_image_index = self._prepare_interaction_object_payload(
+        mask, color_image_index, name = self._prepare_interaction_object_payload(
             deconstructed_action=deconstructed_action,
             num_frames_in_current_turn=num_frames_in_current_turn,
             extracted_features=extracted_features,
@@ -117,7 +118,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             raw_output=deconstructed_action.raw_action,
             payload=SimBotObjectInteractionPayload(
                 object=SimBotInteractionObject(
-                    name=deconstructed_action.class_name,
+                    name=name,
                     colorImageIndex=color_image_index,
                     mask=mask,
                 )
@@ -141,7 +142,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
                 ),
             )
 
-        mask, color_image_index = self._prepare_interaction_object_payload(
+        mask, color_image_index, name = self._prepare_interaction_object_payload(
             deconstructed_action=deconstructed_action,
             num_frames_in_current_turn=num_frames_in_current_turn,
             extracted_features=extracted_features,
@@ -153,7 +154,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             raw_output=deconstructed_action.raw_action,
             payload=SimBotGotoObjectPayload(
                 object=SimBotGotoObject(
-                    name=deconstructed_action.class_name,
+                    name=name,
                     colorImageIndex=color_image_index,
                     mask=mask,
                 )
@@ -177,10 +178,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         deconstructed_action: SimBotDeconstructedAction,
         extracted_features: list[EmmaExtractedFeatures],
         num_frames_in_current_turn: int,
-    ) -> tuple[Optional[SimBotObjectMaskType], int]:
+    ) -> tuple[Optional[SimBotObjectMaskType], int, str]:
         if deconstructed_action.class_name == "stickynote":
             # TODO: are we sure that we want to assume that the sticky note is in frame 0?
-            return None, 0
+            return None, 0, "Sticky Note"
 
         color_image_index = get_correct_frame_index(
             deconstructed_action.frame_index,
@@ -196,4 +197,10 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             extracted_features=extracted_features,
         )
 
-        return mask, color_image_index
+        class_name = get_class_name_from_special_tokens(
+            frame_index=deconstructed_action.frame_index,
+            object_index=deconstructed_action.object_index,
+            extracted_features=extracted_features,
+        )
+
+        return mask, color_image_index, class_name  # type: ignore[return-value]

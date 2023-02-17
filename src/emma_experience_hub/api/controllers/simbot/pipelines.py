@@ -45,7 +45,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             action_predictor_client=clients.action_predictor,
             planner_type=simbot_settings.feature_flags.search_planner_type,
             visual_grounding_output_parser=SimBotVisualGroundingOutputParser(),
-            _enable_grab_from_history=simbot_settings.feature_flags.enable_grab_from_history,
+            enable_grab_from_history=simbot_settings.feature_flags.enable_grab_from_history,
         )
 
         action_predictor_response_parser = SimBotActionPredictorOutputParser()

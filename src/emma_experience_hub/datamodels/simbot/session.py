@@ -18,6 +18,7 @@ from emma_common.datamodels import (
 )
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotDialogAction
+from emma_experience_hub.datamodels.simbot.agent_memory import SimBotInventory, SimBotObjectMemory
 from emma_experience_hub.datamodels.simbot.enums import (
     SimBotActionType,
     SimBotAnyUserIntentType,
@@ -282,32 +283,6 @@ class SimBotSessionTurnEnvironment(BaseModel):
         return viewpoint_name
 
 
-class SimBotInventory(BaseModel, validate_assignment=True):
-    """Track what is in the inventory of the SimBot agent.
-
-    The turn_idx and action_id inform when the inventory were last updated.
-    """
-
-    entity: Optional[str] = None
-    turn_idx: int = Field(default=0, ge=0, description="When the inventory was last updated.")
-
-    @property
-    def is_empty(self) -> bool:
-        """Return True if the agent inventory is empty."""
-        return not bool(self.entity)
-
-    @classmethod
-    def from_action(cls, action: SimBotAction, turn_idx: int) -> "SimBotInventory":
-        """Instantiate an inventory from the action."""
-        if action.adds_object_to_inventory and action.is_successful:
-            return cls(entity=action.payload.entity_name, turn_idx=turn_idx)
-
-        if action.removes_object_from_inventory and action.is_successful:
-            return cls(entity=None, turn_idx=turn_idx)
-
-        raise AssertionError("Action does not alter/change the inventory in any way")
-
-
 class SimBotSessionState(BaseModel, validate_assignment=True):
     """Track the state of the entire session, within each turn.
 
@@ -319,6 +294,7 @@ class SimBotSessionState(BaseModel, validate_assignment=True):
     utterance_queue: SimBotQueue[str] = SimBotQueue[str]()
     find_queue: SimBotQueue[SimBotAction] = SimBotQueue[SimBotAction]()
     inventory: SimBotInventory = SimBotInventory()
+    memory: SimBotObjectMemory = SimBotObjectMemory()
 
 
 class SimBotSessionTurn(BaseModel):
@@ -588,8 +564,26 @@ class SimBotSession(BaseModel):
 
         with suppress(AssertionError):
             self.current_turn.state.inventory = SimBotInventory.from_action(
-                self.previous_valid_turn.actions.interaction, self.previous_valid_turn.idx
+                self.previous_valid_turn.actions.interaction,
+                self.previous_valid_turn.idx,
             )
+            self.current_state.memory.update_from_action(
+                room_name=self.previous_valid_turn.environment.current_room,
+                viewpoint=self.previous_valid_turn.environment.get_closest_viewpoint_name(),
+                action=self.previous_valid_turn.actions.interaction,
+                inventory_entity=self.previous_valid_turn.state.inventory.entity,
+            )
+
+    def update_agent_memory(self, extracted_features: EmmaExtractedFeatures) -> None:
+        """Write to agent memory."""
+        current_room = self.current_turn.environment.current_room
+        closest_viewpoint = self.current_turn.environment.get_closest_viewpoint_name()
+
+        self.current_state.memory.write_memory_entities_in_room(
+            room_name=current_room,
+            viewpoint=closest_viewpoint,
+            extracted_features=extracted_features,
+        )
 
     def to_feedback_state(self) -> SimBotFeedbackState:
         """Convert the session to the simplified state."""
@@ -614,6 +608,7 @@ class SimBotSession(BaseModel):
             used_rule_ids=self._get_used_feedback_rule_ids(),
             inventory_turn=self.inventory.turn_idx,
             inventory_entity=self.inventory.entity,
+            current_turn_has_user_utterance=self.current_turn.speech is not None,
         )
 
     @staticmethod

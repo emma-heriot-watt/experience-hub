@@ -77,6 +77,18 @@ def get_mask_from_special_tokens(
     return compressed_mask
 
 
+def get_class_name_from_special_tokens(
+    frame_index: int,
+    object_index: int,
+    extracted_features: list[EmmaExtractedFeatures],
+) -> str:
+    """Get the object class name from the visual token."""
+    # Get the class labels for the correct frame index
+    object_class_labels = extracted_features[frame_index - 1].entity_labels
+    # Get the class label for the specified object
+    return object_class_labels[object_index - 1]
+
+
 def get_correct_frame_index(
     parsed_frame_index: int, num_frames_in_current_turn: int, num_total_frames: int
 ) -> int:

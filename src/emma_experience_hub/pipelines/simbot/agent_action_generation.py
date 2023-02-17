@@ -151,6 +151,7 @@ class SimBotAgentActionGenerationPipeline:
         extracted_features = [
             feats for turn in environment_state_history for feats in turn.features
         ]
+        session.update_agent_memory(environment_state_history[-1].features)
 
         # Parse the response into an action
         try:
