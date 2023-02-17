@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.2.0](https://github.com/emma-simbot/experience-hub/compare/v8.1.0...v8.2.0) (2023-02-17)
+
+
+### Features
+
+* include optimized raw text matcher ([#362](https://github.com/emma-simbot/experience-hub/issues/362)) ([2a8e9b1](https://github.com/emma-simbot/experience-hub/commit/2a8e9b1e7d723cbf85e7bb60365f4a9d04ed4265))
+
 ## [8.1.0](https://github.com/emma-simbot/experience-hub/compare/v8.0.0...v8.1.0) (2023-02-17)
 
 
