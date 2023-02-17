@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.1.0](https://github.com/emma-simbot/experience-hub/compare/v8.0.0...v8.1.0) (2023-02-17)
+
+
+### Features
+
+* Implementation of Gfh symbolic ([#355](https://github.com/emma-simbot/experience-hub/issues/355)) ([bc36244](https://github.com/emma-simbot/experience-hub/commit/bc36244f53c8f360438a004992d3ab15c9a1b4fd))
+
 ## [8.0.0](https://github.com/emma-simbot/experience-hub/compare/v7.13.0...v8.0.0) (2023-02-16)
 
 
