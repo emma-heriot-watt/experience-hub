@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.2.2](https://github.com/emma-simbot/experience-hub/compare/v8.2.1...v8.2.2) (2023-02-17)
+
+
+### Bug Fixes
+
+* Sticky note name in payload ([#364](https://github.com/emma-simbot/experience-hub/issues/364)) ([3e110cc](https://github.com/emma-simbot/experience-hub/commit/3e110cc752a16fa63f76e711dcada93f92510cd3))
+
 ## [8.2.1](https://github.com/emma-simbot/experience-hub/compare/v8.2.0...v8.2.1) (2023-02-17)
 
 
