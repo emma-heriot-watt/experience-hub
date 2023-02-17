@@ -205,7 +205,6 @@ def test_simbot_action_parser_object_navigation(
     simbot_extracted_features[frame_token_id - 1].entity_labels[
         visual_token_id - 1
     ] = simbot_object_name
-    expected_name = simbot_object_name
 
     if simbot_object_name == "Sticky Note":
         raw_output = _build_raw_output(
@@ -219,7 +218,7 @@ def test_simbot_action_parser_object_navigation(
             raw_output=raw_output.removesuffix("</s>").removesuffix("."),
             payload=SimBotGotoPayload(
                 object=SimBotGotoObject(
-                    name=expected_name,
+                    name="stickynote",
                     colorImageIndex=_get_expected_color_image_index(
                         simbot_object_name, frame_token_id
                     ),
@@ -240,7 +239,7 @@ def test_simbot_action_parser_object_navigation(
             raw_output=raw_output.removesuffix("</s>").removesuffix("."),
             payload=SimBotGotoPayload(
                 object=SimBotGotoObject(
-                    name=expected_name,
+                    name=simbot_object_name,
                     colorImageIndex=_get_expected_color_image_index(
                         simbot_object_name, frame_token_id
                     ),
@@ -279,9 +278,10 @@ def test_simbot_action_parser_object_interaction(
     if simbot_object_name == "Sticky Note":
         raw_output = _build_raw_output(
             simbot_interaction_action,
-            simbot_object_name,
+            "Sticky Note",
             include_end_of_trajectory=include_end_of_trajectory,
         )
+        expected_object_name = "stickynote"
     else:
         raw_output = _build_raw_output(
             simbot_interaction_action,
@@ -290,6 +290,7 @@ def test_simbot_action_parser_object_interaction(
             frame_token_id=frame_token_id,
             include_end_of_trajectory=include_end_of_trajectory,
         )
+        expected_object_name = simbot_object_name
 
     simbot_extracted_features[frame_token_id - 1].entity_labels[
         visual_token_id - 1
@@ -300,12 +301,6 @@ def test_simbot_action_parser_object_interaction(
         extracted_features=simbot_extracted_features,
         num_frames_in_current_turn=len(simbot_extracted_features),
     )
-
-    # try:
-    #     expected_object_name = get_simbot_object_label_to_class_name_map()[simbot_object_name]
-    # except KeyError:
-    #     expected_object_name = simbot_object_name
-    expected_object_name = simbot_object_name
     expected_action = SimBotAction(
         id=0,
         type=SimBotActionType[simbot_interaction_action],
@@ -378,7 +373,7 @@ def test_simbot_action_parser_sticky_note(
         id=0,
         type=SimBotActionType.Examine,
         payload=SimBotObjectInteractionPayload(
-            object=SimBotInteractionObject(colorImageIndex=0, mask=None, name="Sticky Note")
+            object=SimBotInteractionObject(colorImageIndex=0, mask=None, name="stickynote")
         ),
         status=None,
         raw_output=raw_output.removesuffix("</s>").removesuffix("."),

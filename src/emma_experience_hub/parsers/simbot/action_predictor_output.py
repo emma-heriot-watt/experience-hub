@@ -181,7 +181,7 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
     ) -> tuple[Optional[SimBotObjectMaskType], int, str]:
         if deconstructed_action.class_name == "stickynote":
             # TODO: are we sure that we want to assume that the sticky note is in frame 0?
-            return None, 0, "Sticky Note"
+            return None, 0, "stickynote"
 
         color_image_index = get_correct_frame_index(
             deconstructed_action.frame_index,
