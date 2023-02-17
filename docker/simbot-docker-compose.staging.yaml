@@ -9,7 +9,7 @@ x-deploy-gpu: &deploy-gpu
 services:
   feature_extractor:
     environment:
-      DEVICE: "cuda:0"
+      DEVICE_ID: "0"
     deploy: *deploy-gpu
 
   intent_extractor:
