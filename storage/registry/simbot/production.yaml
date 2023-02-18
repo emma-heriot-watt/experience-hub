@@ -25,7 +25,7 @@ services:
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/perception
     image_version: 1.10.1-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/vinvl_vg_x152c4_simbot_v124_customised.pth
+    model_url: s3://emma-simbot/misc_projects/floppy_aug/checkpoints/model_0300125.pth
 
   - name: profanity_filter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/profanity-filter
