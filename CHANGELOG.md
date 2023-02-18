@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.4.0](https://github.com/emma-simbot/experience-hub/compare/v8.3.0...v8.4.0) (2023-02-18)
+
+
+### Features
+
+* new vinvl model ([#365](https://github.com/emma-simbot/experience-hub/issues/365)) ([26e0063](https://github.com/emma-simbot/experience-hub/commit/26e00636b71d17096dd362d437758c1bc4b14b21))
+
 ## [8.3.0](https://github.com/emma-simbot/experience-hub/compare/v8.2.2...v8.3.0) (2023-02-18)
 
 
