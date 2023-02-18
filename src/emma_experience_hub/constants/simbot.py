@@ -123,6 +123,10 @@ _ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
         "LookAround": "look around",
         "TurnAround": "turn around",
         "Pickup": "pick up",
+        "Laser Shelf": "red shelf",
+        "Laser Monitor": "red monitor",
+        "Freeze Ray Shelf": "blue shelf",
+        "Freeze Ray Monitor": "blue monitor",
     }
 )
 
