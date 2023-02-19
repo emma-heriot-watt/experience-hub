@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.4.1](https://github.com/emma-simbot/experience-hub/compare/v8.4.0...v8.4.1) (2023-02-19)
+
+
+### Bug Fixes
+
+* Confusing responses for filling / pouring into the bowl ([#367](https://github.com/emma-simbot/experience-hub/issues/367)) ([a4826da](https://github.com/emma-simbot/experience-hub/commit/a4826da9c6d3ac4218cce75da71f7b523abaa17d))
+
 ## [8.4.0](https://github.com/emma-simbot/experience-hub/compare/v8.3.0...v8.4.0) (2023-02-18)
 
 
