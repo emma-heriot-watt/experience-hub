@@ -97,8 +97,7 @@ class SimBotFindObjectPipeline:
             return None
 
         if self._should_goto_found_object(session):
-            # Pop the gotoaction from the head and clear the plan.
-            goto_action = session.current_state.find_queue.pop_from_head()
+            goto_action = self._create_goto_action_for_found_object(session)
             logger.warning("Clearing the find queue of the session")
             session.current_state.find_queue.reset()
             return goto_action
@@ -255,6 +254,46 @@ class SimBotFindObjectPipeline:
         )
 
         return highlight_action
+
+    def _create_goto_action_for_found_object(
+        self,
+        session: SimBotSession,
+    ) -> SimBotAction:
+        """Create the goto action again after the hightlight."""
+        # Pop the gotoaction from the head and clear the plan.
+        goto_action = session.current_state.find_queue.pop_from_head()
+        extracted_features = self._features_client.get_features(session.current_turn)
+        try:
+            scene_object_tokens = self._get_object_from_turn(session, extracted_features)
+        except AssertionError:
+            # If the object has not been found, use the previous goto action
+            return goto_action
+
+        if scene_object_tokens.object_index is None:
+            return goto_action
+
+        object_mask = get_mask_from_special_tokens(
+            scene_object_tokens.frame_index,
+            scene_object_tokens.object_index,
+            extracted_features,
+        )
+
+        color_image_index = get_correct_frame_index(
+            parsed_frame_index=scene_object_tokens.frame_index,
+            num_frames_in_current_turn=len(extracted_features),
+            num_total_frames=len(extracted_features),
+        )
+
+        goto_action = self._create_action_from_scene_object(
+            action_type=SimBotActionType.GotoObject,
+            object_mask=object_mask,
+            frame_index=scene_object_tokens.frame_index,
+            object_index=scene_object_tokens.object_index,
+            color_image_index=color_image_index,
+            add_stop_token=True,
+        )
+
+        return goto_action
 
     def _create_action_from_scene_object(
         self,
