@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.5.0](https://github.com/emma-simbot/experience-hub/compare/v8.4.2...v8.5.0) (2023-02-20)
+
+
+### Features
+
+* Get room from text ([#373](https://github.com/emma-simbot/experience-hub/issues/373)) ([22f1b27](https://github.com/emma-simbot/experience-hub/commit/22f1b27d4e13ad009e84ad4c0d8877f3cff5bc61))
+* improve robot arm + button, search returns object name ([#368](https://github.com/emma-simbot/experience-hub/issues/368)) ([90e4b08](https://github.com/emma-simbot/experience-hub/commit/90e4b080d9dd2b9e86c80fb1c70f27e0b61312a2))
+
 ## [8.4.2](https://github.com/emma-simbot/experience-hub/compare/v8.4.1...v8.4.2) (2023-02-20)
 
 
