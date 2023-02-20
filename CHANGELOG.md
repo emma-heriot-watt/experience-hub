@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.4.2](https://github.com/emma-simbot/experience-hub/compare/v8.4.1...v8.4.2) (2023-02-20)
+
+
+### Bug Fixes
+
+* Re-extract the visual token after highlighting found object ([#366](https://github.com/emma-simbot/experience-hub/issues/366)) ([ce53f8e](https://github.com/emma-simbot/experience-hub/commit/ce53f8ebfecdd5766b975ea794b41e350c8a1f22))
+
 ## [8.4.1](https://github.com/emma-simbot/experience-hub/compare/v8.4.0...v8.4.1) (2023-02-19)
 
 
