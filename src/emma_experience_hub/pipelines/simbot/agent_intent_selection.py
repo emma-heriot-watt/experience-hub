@@ -212,13 +212,30 @@ class SimBotAgentIntentSelectionPipeline:
         """Determine what the agent should do next from the user intent."""
         if not session.current_turn.speech:
             return False
-
+        # Check if the instruction matches an instruction template
+        current_utterance = session.current_turn.speech.utterance
         raw_text_match_prediction = (
             self._simbot_hacks_client.get_low_level_prediction_from_raw_text(
-                utterance=session.current_turn.speech.utterance,
+                utterance=current_utterance,
             )
         )
-        return raw_text_match_prediction is not None
+
+        if raw_text_match_prediction is not None:
+            return True
+        # Check if the instruction requires us to change rooms
+        room_text_match = self._simbot_hacks_client.get_room_prediction_from_raw_text(
+            utterance=current_utterance,
+        )
+        if room_text_match is None:
+            return False
+
+        if room_text_match.arena_room == session.current_turn.environment.current_room:
+            return False
+        session.current_state.utterance_queue.append_to_head(room_text_match.modified_utterance)
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance=f"go to the {room_text_match.room_name}"
+        )
+        return True
 
     def _utterance_has_been_processed_by_nlu(self, session: SimBotSession) -> bool:
         """Determine if the utterance has already been processed by the NLU.
