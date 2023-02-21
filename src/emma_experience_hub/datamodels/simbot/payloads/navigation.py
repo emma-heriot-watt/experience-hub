@@ -2,6 +2,7 @@ from typing import Any, Literal, Optional, Union
 
 from pydantic import Field, PositiveFloat, validator
 
+from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
     SimBotInteractionObject,
 )
@@ -34,10 +35,17 @@ class SimBotGotoViewpoint(SimBotPayload):
         return self.go_to_point
 
 
+class SimBotGotoPosition(SimBotPayload):
+    """SimBot action for going to an object."""
+
+    position: Position
+    rotation: RotationQuaternion
+
+
 class SimBotGotoPayload(SimBotPayload, smart_union=True):
     """SimBot Goto action."""
 
-    object: Union[SimBotGotoObject, SimBotGotoRoom, SimBotGotoViewpoint]
+    object: Union[SimBotGotoObject, SimBotGotoRoom, SimBotGotoViewpoint, SimBotGotoPosition]
 
     @property
     def entity_name(self) -> Optional[str]:
@@ -61,6 +69,12 @@ class SimBotGotoObjectPayload(SimBotGotoPayload):
     """SimBot Goto object action."""
 
     object: SimBotGotoObject
+
+
+class SimBotGotoPositionPayload(SimBotGotoPayload):
+    """SimBot Goto object action."""
+
+    object: SimBotGotoPosition
 
 
 class SimBotNavigationPayload(SimBotPayload):

@@ -5,6 +5,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotDialogPayload,
     SimBotGotoObjectPayload,
     SimBotGotoPayload,
+    SimBotGotoPositionPayload,
     SimBotGotoRoomPayload,
     SimBotGotoViewpointPayload,
     SimBotLookAroundPayload,
@@ -45,6 +46,7 @@ class SimBotActionType(Enum):
     TurnAround = "turn around"  # noqa: WPS115
     GotoRoom = "goto room"  # noqa: WPS115
     GotoObject = "goto object"  # noqa: WPS115
+    GotoPosition = "goto position"  # noqa: WPS115
     GotoViewpoint = "goto viewpoint"  # noqa: WPS115
 
     # Object interaction
@@ -96,6 +98,7 @@ class SimBotActionType(Enum):
             SimBotActionType.TurnAround,
             SimBotActionType.GotoRoom,
             SimBotActionType.GotoObject,
+            SimBotActionType.GotoPosition,
             SimBotActionType.GotoViewpoint,
         ]
 
@@ -173,6 +176,7 @@ class SimBotActionType(Enum):
             "GotoRoom": SimBotGotoRoomPayload,
             "GotoObject": SimBotGotoObjectPayload,
             "GotoViewpoint": SimBotGotoViewpointPayload,
+            "GotoPosition": SimBotGotoPositionPayload,
             # Object interaction
             "Pickup": SimBotObjectInteractionPayload,
             "Open": SimBotObjectInteractionPayload,
@@ -220,6 +224,7 @@ class SimBotActionType(Enum):
                 SimBotActionType.GotoObject,
                 SimBotActionType.GotoRoom,
                 SimBotActionType.GotoViewpoint,
+                SimBotActionType.GotoPosition,
             },
         }
 
