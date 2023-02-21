@@ -203,4 +203,4 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             extracted_features=extracted_features,
         )
 
-        return mask, color_image_index, class_name  # type: ignore[return-value]
+        return mask, color_image_index, class_name
