@@ -20,6 +20,13 @@ class SimBotMemoryEntity(BaseModel):
 SimBotRoomMemoryType = dict[str, SimBotMemoryEntity]
 
 
+def get_area_from_compressed_mask(mask: SimBotObjectMaskType) -> float:
+    """Compute the area of a compressed mask."""
+    if not mask:
+        return 0
+    return sum([offset for _, offset in mask])
+
+
 class SimBotObjectMemory(BaseModel):
     """Track all the observed objects and their closest viewpoints."""
 
@@ -73,30 +80,27 @@ class SimBotObjectMemory(BaseModel):
         self, room_name: str, viewpoint: str, action: SimBotAction, inventory_entity: str
     ) -> None:
         """Write the new inventory object entity in memory."""
-        is_valid_inventory_object = (
-            isinstance(action.payload, SimBotObjectInteractionPayload)
-            and action.payload.object.mask is not None
-        )
-        if is_valid_inventory_object:
-            self._write(
-                room_name=room_name,
-                viewpoint=viewpoint,
-                object_label=inventory_entity,
-                area=self.get_area_from_compressed_mask(action.payload.object.mask),  # type: ignore[attr-defined]
-            )
+        if not isinstance(action.payload, SimBotObjectInteractionPayload):
+            return
+        if not action.payload.object.mask:
+            return
 
-    @staticmethod
-    def get_area_from_compressed_mask(mask: SimBotObjectMaskType) -> float:  # noqa: WPS602
-        """Compute the area of a compressed mask."""
-        if not mask:
-            return 0
-        return sum([offset for _, offset in mask])
+        self._write(
+            room_name=room_name,
+            viewpoint=viewpoint,
+            object_label=inventory_entity,
+            area=get_area_from_compressed_mask(action.payload.object.mask),
+        )
 
     def _write_frame_entities(
         self, room_name: str, viewpoint: str, frame_features: EmmaExtractedFeatures
     ) -> None:
         object_labels = frame_features.entity_labels
         bbox_areas = frame_features.bbox_areas.tolist()
+
+        if not object_labels:
+            raise AssertionError("Frame features does not have entity labels")
+
         for object_label, object_area in zip(object_labels, bbox_areas):
             memory_room = self.memory.get(room_name, None)
             # This is the first time an entity is written in memory for that room

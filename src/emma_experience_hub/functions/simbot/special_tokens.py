@@ -85,6 +85,10 @@ def get_class_name_from_special_tokens(
     """Get the object class name from the visual token."""
     # Get the class labels for the correct frame index
     object_class_labels = extracted_features[frame_index - 1].entity_labels
+
+    if not object_class_labels:
+        raise AssertionError("Entity labels do not exist for features")
+
     # Get the class label for the specified object
     return object_class_labels[object_index - 1]
 

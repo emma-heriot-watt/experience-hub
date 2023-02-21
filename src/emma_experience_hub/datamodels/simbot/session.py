@@ -574,7 +574,7 @@ class SimBotSession(BaseModel):
                 inventory_entity=self.previous_valid_turn.state.inventory.entity,
             )
 
-    def update_agent_memory(self, extracted_features: EmmaExtractedFeatures) -> None:
+    def update_agent_memory(self, extracted_features: list[EmmaExtractedFeatures]) -> None:
         """Write to agent memory."""
         current_room = self.current_turn.environment.current_room
         closest_viewpoint = self.current_turn.environment.get_closest_viewpoint_name()
