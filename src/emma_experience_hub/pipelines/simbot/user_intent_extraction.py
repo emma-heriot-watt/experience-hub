@@ -2,8 +2,10 @@ from contextlib import suppress
 from typing import Optional
 
 from loguru import logger
+from opentelemetry import trace
 
 from emma_experience_hub.api.clients import ConfirmationResponseClassifierClient
+from emma_experience_hub.api.clients.simbot import SimBotQAIntentClient
 from emma_experience_hub.datamodels.simbot import (
     SimBotIntentType,
     SimBotSession,
@@ -11,6 +13,11 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotUserIntentType,
     SimBotVerbalInteractionIntentType,
 )
+from emma_experience_hub.datamodels.simbot.enums.intents import SimBotUserQAType
+from emma_experience_hub.parsers.simbot import SimBotQAOutputParser
+
+
+tracer = trace.get_tracer(__name__)
 
 
 class SimBotUserIntentExtractionPipeline:
@@ -21,9 +28,18 @@ class SimBotUserIntentExtractionPipeline:
     """
 
     def __init__(
-        self, confirmation_response_classifier: ConfirmationResponseClassifierClient
+        self,
+        confirmation_response_classifier: ConfirmationResponseClassifierClient,
+        qa_intent_client: SimBotQAIntentClient,
+        qa_intent_parser: SimBotQAOutputParser,
+        _enable_object_related_questions: bool = False,
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
+
+        self._qa_intent_client = qa_intent_client
+        self._qa_intent_parser = qa_intent_parser
+
+        self._enable_object_related_questions = _enable_object_related_questions
 
     def run(self, session: SimBotSession) -> Optional[SimBotUserIntentType]:
         """Run the pipeline to get the user's intent.
@@ -37,6 +53,10 @@ class SimBotUserIntentExtractionPipeline:
             )
             return None
 
+        # Check if the user is asking about QA or similar?
+        with suppress(AssertionError):
+            return self.check_for_user_qa(session.current_turn.speech.utterance)
+
         # Did the agent as the user aquestion in the previous turn?
         if self._was_question_asked_in_previous_turn(session.previous_valid_turn):
             # Previous turn DID have a question to the user.
@@ -45,6 +65,25 @@ class SimBotUserIntentExtractionPipeline:
 
         # If nothing else, just let the model try to act.
         return SimBotIntentType.act
+
+    @tracer.start_as_current_span("Check for user QA")
+    def check_for_user_qa(self, utterance: str) -> Optional[SimBotUserQAType]:
+        """Check if the user is asking us a question or are unparsable utterances."""
+        raw_user_qa_intent = self._qa_intent_client.process_utterance(utterance)
+        if not raw_user_qa_intent:
+            raise AssertionError("No user QA intent")
+
+        user_qa_intent = self._qa_intent_parser(raw_user_qa_intent)
+        if not user_qa_intent:
+            raise AssertionError("No user QA intent")
+
+        # Ignore QAs about specific objects
+        if user_qa_intent.is_user_qa_about_object and not self._enable_object_related_questions:
+            logger.debug("Replacing user QA intent with ask_about_game.")
+            user_qa_intent = SimBotIntentType.ask_about_game
+
+        logger.debug(f"User QA Intent: {user_qa_intent}")
+        return user_qa_intent
 
     def handle_response_to_question(self, session: SimBotSession) -> SimBotUserIntentType:
         """Handle responses to questions from the agent.

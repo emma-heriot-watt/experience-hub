@@ -31,3 +31,8 @@ services:
     environment:
       DEVICE: "cuda:0"
     deploy: *deploy-gpu
+
+  simbot_qa:
+    environment:
+      DEVICE: "cuda:0"
+    deploy: *deploy-gpu

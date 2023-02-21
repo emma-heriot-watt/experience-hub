@@ -22,6 +22,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotFeaturesClient,
     SimBotHacksClient,
     SimBotNLUIntentClient,
+    SimBotQAIntentClient,
     SimBotSessionDbClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
@@ -41,6 +42,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     confirmation_response_classifier: ConfirmationResponseClassifierClient
     compound_splitter: CompoundSplitterClient
     simbot_hacks: SimBotHacksClient
+    simbot_qa: SimBotQAIntentClient
 
     @classmethod
     def from_simbot_settings(cls, simbot_settings: SimBotSettings) -> "SimBotControllerClients":
@@ -86,6 +88,10 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             ),
             simbot_hacks=SimBotHacksClient(
                 endpoint=simbot_settings.simbot_hacks_url,
+                timeout=simbot_settings.client_timeout,
+            ),
+            simbot_qa=SimBotQAIntentClient(
+                endpoint=simbot_settings.simbot_qa_url,
                 timeout=simbot_settings.client_timeout,
             ),
         )

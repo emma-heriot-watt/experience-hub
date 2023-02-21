@@ -7,6 +7,7 @@ from emma_experience_hub.parsers.simbot import (
     SimBotLowASRConfidenceDetector,
     SimBotNLUOutputParser,
     SimBotPreviousActionParser,
+    SimBotQAOutputParser,
     SimBotVisualGroundingOutputParser,
 )
 from emma_experience_hub.pipelines.simbot import (
@@ -64,7 +65,10 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 out_of_domain_detector_client=clients.out_of_domain_detector,
             ),
             user_intent_extractor=SimBotUserIntentExtractionPipeline(
-                confirmation_response_classifier=clients.confirmation_response_classifier
+                qa_intent_client=clients.simbot_qa,
+                qa_intent_parser=SimBotQAOutputParser(),
+                confirmation_response_classifier=clients.confirmation_response_classifier,
+                _enable_object_related_questions=simbot_settings.feature_flags.enable_object_related_questions_from_user,
             ),
             environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
             agent_intent_selector=SimBotAgentIntentSelectionPipeline(

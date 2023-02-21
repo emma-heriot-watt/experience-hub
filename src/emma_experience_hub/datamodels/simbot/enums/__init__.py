@@ -8,5 +8,6 @@ from emma_experience_hub.datamodels.simbot.enums.intents import (
     SimBotNLUIntentType,
     SimBotPhysicalInteractionIntentType,
     SimBotUserIntentType,
+    SimBotUserQAType,
     SimBotVerbalInteractionIntentType,
 )

@@ -13,6 +13,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_search_actions: bool = True
     enable_grab_from_history: bool = True
     enable_search_after_no_match: bool = True
+    enable_object_related_questions_from_user: bool = False
 
     enable_always_highlight_before_object_action: bool = False
 
@@ -63,6 +64,8 @@ class SimBotSettings(BaseSettings):
     compound_splitter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5508", scheme="http")
 
     simbot_hacks_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5509", scheme="http")
+
+    simbot_qa_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5510", scheme="http")
 
     otlp_endpoint: AnyHttpUrl = AnyHttpUrl(url="http://localhost:4317", scheme="http")
 

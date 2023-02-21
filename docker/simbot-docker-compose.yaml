@@ -152,3 +152,14 @@ services:
     entrypoint: python
     command:
       - src/emma_simbot_hacks/run_api.py
+
+  simbot_qa:
+    container_name: simbot_qa
+    image: "${SIMBOT_QA_IMAGE}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6600/"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    ports:
+      - "5510:6600"
+    entrypoint: rasa run --enable-api -p 6600 -m "/app/model/${SIMBOT_QA_MODEL}"

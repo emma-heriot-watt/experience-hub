@@ -10,6 +10,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotNLUIntentClient,
 )
 from emma_experience_hub.datamodels.simbot import (
+    SimBotAnyUserIntentType,
     SimBotIntent,
     SimBotIntentType,
     SimBotNLUIntentType,
@@ -66,7 +67,7 @@ class SimBotAgentIntentSelectionPipeline:
             logger.debug("Getting agent intent from user intent.")
 
             # If we have received an invalid utterance, the agent does not act
-            if SimBotIntentType.is_invalid_utterance_intent_type(session.current_turn.intent.user):
+            if self._should_skip_action_selection(session.current_turn.intent.user):
                 return SimBotAgentIntents()
 
             # Check if the utterance has already been processed by the NLU
@@ -370,3 +371,7 @@ class SimBotAgentIntentSelectionPipeline:
                 ),
             )
         return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search, entity=entity))
+
+    def _should_skip_action_selection(self, user_intent_type: SimBotAnyUserIntentType) -> bool:
+        """No action needed if the utterance is invalid or an environment question."""
+        return user_intent_type.is_invalid_user_utterance or user_intent_type.is_user_qa

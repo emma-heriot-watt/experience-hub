@@ -39,6 +39,14 @@ class SimBotIntentType(Enum):
     confirm_yes = "<confirm><yes>"
     confirm_no = "<confirm><no>"
 
+    # Utterances that require only verbal responses
+    ask_about_game = "<ask><about_game>"
+    ask_about_agent = "<ask><about_agent>"
+    ask_not_enough_information = "<not_enough_information>"
+    ask_about_affordance = "<ask><about_affordance>"
+    ask_about_appearance = "<ask><about_appearance>"
+    greeting = "<greeting>"
+
     # Feedback for previous turn success
     generic_success = "<success><generic>"
 
@@ -80,6 +88,19 @@ class SimBotIntentType(Enum):
     def is_environment_error(self) -> bool:
         """Return True if the intent is one of the Arena error types."""
         return self.is_environment_intent_type(self)
+
+    @property
+    def is_user_qa(self) -> bool:
+        """Return True if the intent is one of the QA types."""
+        return self.is_user_qa_type(self)
+
+    @property
+    def is_user_qa_about_object(self) -> bool:
+        """Return True if the user is asking about an object."""
+        return self in {
+            SimBotIntentType.ask_about_affordance,
+            SimBotIntentType.ask_about_appearance,
+        }
 
     @property
     def is_actionable(self) -> bool:
@@ -151,6 +172,13 @@ class SimBotIntentType(Enum):
         """Return True if the intent type matches `SimBotVerbalInteractionIntentType`."""
         return intent_type in SimBotVerbalInteractionIntentType.__args__  # type: ignore[attr-defined]
 
+    @staticmethod
+    def is_user_qa_type(  # noqa: WPS602
+        intent_type: SimBotIntentType,
+    ) -> TypeGuard[SimBotUserQAType]:
+        """Return True if the intent type matches `SimBotUserQAType`."""
+        return intent_type in SimBotUserQAType.__args__  # type: ignore[attr-defined]
+
 
 SimBotInvalidUtteranceIntentType = Literal[
     SimBotIntentType.low_asr_confidence,
@@ -160,17 +188,29 @@ SimBotInvalidUtteranceIntentType = Literal[
     SimBotIntentType.empty_utterance,
 ]
 
+SimBotUserQAType = Literal[
+    SimBotIntentType.ask_about_game,
+    SimBotIntentType.ask_about_agent,
+    SimBotIntentType.ask_about_affordance,
+    SimBotIntentType.ask_about_appearance,
+    SimBotIntentType.ask_not_enough_information,
+    SimBotIntentType.greeting,
+]
+
 
 SimBotUserIntentType = Literal[
     SimBotIntentType.clarify_answer,
     SimBotIntentType.confirm_yes,
     SimBotIntentType.confirm_no,
     SimBotIntentType.act,
+    SimBotUserQAType,
 ]
+
 
 SimBotAnyUserIntentType = Literal[
     SimBotUserIntentType,
     SimBotInvalidUtteranceIntentType,
+    SimBotUserQAType,
 ]
 
 SimBotEnvironmentIntentType = Literal[
