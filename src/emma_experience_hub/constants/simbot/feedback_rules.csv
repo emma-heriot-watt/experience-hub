@@ -175,8 +175,6 @@ verbal_interaction_intent_type == "generic_success",So what should I do next?,Fa
 verbal_interaction_intent_type == "generic_success",Now what?,False
 verbal_interaction_intent_type == "generic_success",<say-as interpret-as="interjection">righto</say-as>,False
 verbal_interaction_intent_type == "generic_success",Alright - what's next?,False
-verbal_interaction_intent_type == "generic_success",Where do we go from here?,False
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",I think I found it over there! I'm moving closer.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",Found it! Let's get closer.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",I think it is right there.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",It looks like it's over there.,True
@@ -196,14 +194,12 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Got
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Okay what next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,What are we doing next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and utterance_queue_not_empty,',True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let me have a look around the room. This might take a while.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Starting the search!,True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I'm looking around the room,True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let's search this room!,True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns == 1,I don't see it in front of me. Let me have a look around the room.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,Let me have a look around the room. This might take a while.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,Starting the search!,True
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,I'm looking around the room,True
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,Let's search this room!,True
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,I don't see it in front of me. Let me have a look around the room.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty,',True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and "act_no_match" in intent_types_per_turn[-2],Let's find it!,True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty and "act_no_match" in intent_types_per_turn[-2],Okay I am searching.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still looking,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe it's somewhere here,True
@@ -214,18 +210,19 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Got
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,I'll start looking!,True
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let me have a look around the room.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty and num_turns > 1 and not previous_find_queue_not_empty,Let's search this room.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and verbal_interaction_intent_entity != null,On it! I'll now search for the {verbal_interaction_intent_entity}.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and num_turns > 1 and verbal_interaction_intent_entity != null,Give me a moment to look for the {verbal_interaction_intent_entity}.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and num_turns > 1 and verbal_interaction_intent_entity != null,Let's find the {verbal_interaction_intent_entity}.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and num_turns == 1 and physical_interaction_intent_entity != null,I don't see the {physical_interaction_intent_entity} in front of me. Let's look around.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and verbal_interaction_intent_entity != null and current_turn_has_user_utterance, I think I saw it somewhere here.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and verbal_interaction_intent_entity != null and current_turn_has_user_utterance, It should be somewhere around here,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and verbal_interaction_intent_entity != null and current_turn_has_user_utterance, It should be somewhere here. Let's have a look,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and verbal_interaction_intent_entity != null and current_turn_has_user_utterance, It should be somewhere here. Let's get closer,True
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it?,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,Should I look for the {verbal_interaction_intent_entity}?,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,Should I start searching for the {verbal_interaction_intent_entity}?,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I'm going to the {verbal_interaction_intent_entity}. Is that okay?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] == "GotoPosition",',True
+physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] != "GotoPosition" and verbal_interaction_intent_entity != null,On it! I'll now search for the {verbal_interaction_intent_entity}.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] != "GotoPosition" and num_turns > 1 and verbal_interaction_intent_entity != null,Starting the search!,True
+physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] != "GotoPosition" and num_turns > 1 and verbal_interaction_intent_entity != null,Let's find it!,True
+physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] != "GotoPosition" and num_turns == 1 and verbal_interaction_intent_entity != null,<say-as interpret-as="interjection">alrighty</say-as> - Searching for the {verbal_interaction_intent_entity}.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and current_turn_has_user_utterance and interacted_entities_counter[physical_interaction_intent_entity] > 0,It should be somewhere around here,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and current_turn_has_user_utterance and physical_interaction_intent_entity != null and interacted_entities_counter[physical_interaction_intent_entity] > 0,On it! Moving to the {physical_interaction_intent_entity},True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and current_turn_has_user_utterance and interacted_entities_counter[physical_interaction_intent_entity] == 0,I think I saw it somewhere here.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and current_turn_has_user_utterance and interacted_entities_counter[physical_interaction_intent_entity] == 0,It should be somewhere here. Let's have a look,True
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it first?,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity} in front of me. Should I start by finding it?,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,The {verbal_interaction_intent_entity} is not in my view. I should first look for it - right?,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,My vision system is not detecting the {verbal_interaction_intent_entity}. Should I first search for it?,False
 verbal_interaction_intent_type == "act_no_match" and verbal_interaction_intent_entity == null and physical_interaction_intent_type == null,I'm not sure what to do. Can you give me another instruction?,False
 verbal_interaction_intent_type == "act_no_match" and verbal_interaction_intent_entity == null and physical_interaction_intent_type == null,I don't see it in front of me. You can ask me to search for objects or give me another instruction,False
 user_intent_type == "confirm_no", Okay so what should I do?, True

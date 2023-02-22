@@ -33,3 +33,11 @@ class RotationQuaternion(Rotation):
     def as_list(self) -> list[float]:
         """Return the coordinates as a list."""
         return [self.x, self.y, self.z, self.w]
+
+
+class ArenaLocation(BaseModel):
+    """Exact location within arena."""
+
+    room_name: str
+    position: Position
+    rotation: RotationQuaternion

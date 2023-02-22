@@ -508,6 +508,7 @@ class SimBotSession(BaseModel):
             self.previous_valid_turn is not None
             and self.previous_valid_turn.actions.interaction is not None
             and self.previous_valid_turn.actions.interaction.type == SimBotActionType.Highlight
+            and not self.previous_valid_turn.actions.interaction.is_end_of_trajectory
         )
 
     @property
@@ -569,6 +570,8 @@ class SimBotSession(BaseModel):
             )
             self.current_state.memory.update_from_action(
                 room_name=self.previous_valid_turn.environment.current_room,
+                position=self.current_turn.environment.current_position,
+                rotation=self.current_turn.environment.current_rotation,
                 viewpoint=self.previous_valid_turn.environment.get_closest_viewpoint_name(),
                 action=self.previous_valid_turn.actions.interaction,
                 inventory_entity=self.previous_valid_turn.state.inventory.entity,
@@ -577,10 +580,14 @@ class SimBotSession(BaseModel):
     def update_agent_memory(self, extracted_features: list[EmmaExtractedFeatures]) -> None:
         """Write to agent memory."""
         current_room = self.current_turn.environment.current_room
+        current_position = self.current_turn.environment.current_position
+        current_rotation = self.current_turn.environment.current_rotation
         closest_viewpoint = self.current_turn.environment.get_closest_viewpoint_name()
 
         self.current_state.memory.write_memory_entities_in_room(
             room_name=current_room,
+            position=current_position,
+            rotation=current_rotation,
             viewpoint=closest_viewpoint,
             extracted_features=extracted_features,
         )

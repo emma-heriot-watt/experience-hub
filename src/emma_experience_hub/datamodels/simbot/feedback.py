@@ -185,6 +185,9 @@ class SimBotFeedbackState(BaseModel):
     # History of actions taken in the session
     interaction_action_per_turn: list[SimBotAction]
 
+    # History of interacted entities in the session
+    interacted_entities_counter: Counter[str]
+
     # Counter of how many times each action was taken
     action_type_counter: Counter[str]
 
@@ -273,6 +276,13 @@ class SimBotFeedbackState(BaseModel):
             else None,
             visited_room_counter=Counter[str](current_room_per_turn),
             interaction_action_per_turn=interaction_action_per_turn,
+            interacted_entities_counter=Counter[str](
+                [
+                    action.payload.entity_name
+                    for action in interaction_action_per_turn
+                    if action.payload.entity_name is not None
+                ]
+            ),
             action_type_counter=Counter[str](
                 action.type.name for action in interaction_action_per_turn
             ),

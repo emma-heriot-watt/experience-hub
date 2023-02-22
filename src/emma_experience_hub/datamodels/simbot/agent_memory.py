@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
+from emma_experience_hub.datamodels.common import ArenaLocation, Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotObjectInteractionPayload,
@@ -15,6 +16,7 @@ class SimBotMemoryEntity(BaseModel):
 
     viewpoint: str
     area: float
+    location: ArenaLocation
 
 
 SimBotRoomMemoryType = dict[str, SimBotMemoryEntity]
@@ -35,6 +37,8 @@ class SimBotObjectMemory(BaseModel):
     def update_from_action(
         self,
         room_name: str,
+        position: Position,
+        rotation: RotationQuaternion,
         viewpoint: str,
         action: SimBotAction,
         inventory_entity: Optional[str] = None,
@@ -46,6 +50,8 @@ class SimBotObjectMemory(BaseModel):
         if action.removes_object_from_inventory and inventory_entity is not None:
             self.write_inventory_entity_in_room(
                 room_name=room_name,
+                position=position,
+                rotation=rotation,
                 viewpoint=viewpoint,
                 action=action,
                 inventory_entity=inventory_entity,
@@ -55,8 +61,10 @@ class SimBotObjectMemory(BaseModel):
         if action.adds_object_to_inventory and action.payload.entity_name is not None:
             self.memory[room_name].pop(action.payload.entity_name, None)
 
-    def read_memory_entity_in_room(self, room_name: str, object_label: str) -> Optional[str]:
-        """Read an object closest viewpoint from memory."""
+    def read_memory_entity_in_room(
+        self, room_name: str, object_label: str
+    ) -> Optional[ArenaLocation]:
+        """Read an object closest position from memory."""
         memory_room = self.memory.get(room_name, None)
         if memory_room is None:
             return None
@@ -65,19 +73,43 @@ class SimBotObjectMemory(BaseModel):
         if memory_entity is None:
             return None
 
-        return memory_entity.viewpoint
+        return memory_entity.location
+
+    def read_memory_entity_in_arena(self, object_label: str) -> list[ArenaLocation]:
+        """Find all objects in memory matching the object_label."""
+        found_object_locations = []
+        for room in self.memory:
+            memory_location = self.read_memory_entity_in_room(room, object_label)
+            if memory_location is not None:
+                found_object_locations.append(memory_location)
+        return found_object_locations
 
     def write_memory_entities_in_room(
-        self, room_name: str, viewpoint: str, extracted_features: list[EmmaExtractedFeatures]
+        self,
+        room_name: str,
+        position: Position,
+        rotation: RotationQuaternion,
+        viewpoint: str,
+        extracted_features: list[EmmaExtractedFeatures],
     ) -> None:
         """Write new object entities in memory."""
         for frame_features in extracted_features:
             self._write_frame_entities(
-                room_name=room_name, viewpoint=viewpoint, frame_features=frame_features
+                room_name=room_name,
+                position=position,
+                rotation=rotation,
+                viewpoint=viewpoint,
+                frame_features=frame_features,
             )
 
     def write_inventory_entity_in_room(
-        self, room_name: str, viewpoint: str, action: SimBotAction, inventory_entity: str
+        self,
+        room_name: str,
+        position: Position,
+        rotation: RotationQuaternion,
+        viewpoint: str,
+        action: SimBotAction,
+        inventory_entity: str,
     ) -> None:
         """Write the new inventory object entity in memory."""
         if not isinstance(action.payload, SimBotObjectInteractionPayload):
@@ -87,13 +119,20 @@ class SimBotObjectMemory(BaseModel):
 
         self._write(
             room_name=room_name,
+            position=position,
+            rotation=rotation,
             viewpoint=viewpoint,
             object_label=inventory_entity,
             area=get_area_from_compressed_mask(action.payload.object.mask),
         )
 
     def _write_frame_entities(
-        self, room_name: str, viewpoint: str, frame_features: EmmaExtractedFeatures
+        self,
+        room_name: str,
+        position: Position,
+        rotation: RotationQuaternion,
+        viewpoint: str,
+        frame_features: EmmaExtractedFeatures,
     ) -> None:
         object_labels = frame_features.entity_labels
         bbox_areas = frame_features.bbox_areas.tolist()
@@ -109,17 +148,28 @@ class SimBotObjectMemory(BaseModel):
 
             self._write(
                 room_name=room_name,
+                position=position,
+                rotation=rotation,
                 viewpoint=viewpoint,
                 object_label=object_label,
                 area=object_area,
             )
 
-    def _write(self, room_name: str, viewpoint: str, object_label: str, area: float) -> None:
+    def _write(
+        self,
+        room_name: str,
+        position: Position,
+        rotation: RotationQuaternion,
+        viewpoint: str,
+        object_label: str,
+        area: float,
+    ) -> None:
         object_label = object_label.lower()
         memory_entity = self.memory[room_name].get(object_label, None)
         if memory_entity is None or memory_entity.area < area:
+            location = ArenaLocation(room_name=room_name, position=position, rotation=rotation)
             self.memory[room_name][object_label] = SimBotMemoryEntity(
-                viewpoint=viewpoint, area=area
+                viewpoint=viewpoint, area=area, location=location
             )
 
 

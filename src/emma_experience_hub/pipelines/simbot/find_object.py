@@ -130,28 +130,29 @@ class SimBotFindObjectPipeline:
 
     def _build_search_plan(self, session: SimBotSession) -> list[SimBotAction]:
         """Build a plan of actions for the current session."""
-        gfh_viewpoint: Optional[str] = None
         if self._can_search_from_history(session):
             # In practice this should never happen, if the searchable_object is not populated then this isnt a problem in the find pipeline
             if session.current_turn.intent.physical_interaction is None:
-                return self._search_planner.run(session, gfh_viewpoint=gfh_viewpoint)
+                return self._search_planner.run(session)
 
             searchable_object = session.current_turn.intent.physical_interaction.entity
             if searchable_object is None:
-                return self._search_planner.run(session, gfh_viewpoint=gfh_viewpoint)
+                return self._search_planner.run(session)
 
             current_room = session.current_turn.environment.current_room
 
-            gfh_viewpoint = session.current_state.memory.read_memory_entity_in_room(
+            gfh_location = session.current_state.memory.read_memory_entity_in_room(
                 room_name=current_room, object_label=searchable_object
             )
-            if gfh_viewpoint is not None:
-                logger.debug(f"Found viewpoint {gfh_viewpoint} for {searchable_object}")
-            else:
+
+            if gfh_location is None:
                 logger.debug(
                     f"Could not retrieve {searchable_object} from memory {session.current_state.memory}"
                 )
-        return self._search_planner.run(session, gfh_viewpoint=gfh_viewpoint)
+                return self._search_planner.run(session)
+            logger.debug(f"Found object {searchable_object} in location {gfh_location}")
+            return self._search_planner.run(session, gfh_location=gfh_location)
+        return self._search_planner.run(session)
 
     def _should_start_new_search(self, session: SimBotSession) -> bool:
         """Should we be starting a new search?

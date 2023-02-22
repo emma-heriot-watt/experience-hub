@@ -6,8 +6,11 @@ from loguru import logger
 from numpy import typing
 
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.datamodels.common import ArenaLocation
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
+    SimBotGotoPosition,
+    SimBotGotoPositionPayload,
     SimBotGotoViewpoint,
     SimBotGotoViewpointPayload,
     SimBotLookAroundPayload,
@@ -23,7 +26,9 @@ class SearchPlanner(ABC):
 
     @abstractmethod
     def run(
-        self, session: SimBotSession, gfh_viewpoint: Optional[str] = None
+        self,
+        session: SimBotSession,
+        gfh_location: Optional[ArenaLocation] = None,
     ) -> list[SimBotAction]:
         """Plan the actions needed to find an object for a given position."""
         raise NotImplementedError()
@@ -51,6 +56,17 @@ class SearchPlanner(ABC):
             raw_output=f"goto {viewpoint_name}{PREDICTED_ACTION_DELIMITER}",
             payload=SimBotGotoViewpointPayload(
                 object=SimBotGotoViewpoint(goToPoint=viewpoint_name)
+            ),
+        )
+
+    def _create_goto_position_action(self, location: ArenaLocation) -> SimBotAction:
+        """Create action for going to a given position."""
+        return SimBotAction(
+            id=0,
+            type=SimBotActionType.GotoPosition,
+            raw_output=f"goto position{PREDICTED_ACTION_DELIMITER}",
+            payload=SimBotGotoPositionPayload(
+                object=SimBotGotoPosition(position=location.position, rotation=location.rotation)
             ),
         )
 
@@ -91,7 +107,9 @@ class BasicSearchPlanner(SearchPlanner):
         super().__init__(rotation_magnitude=rotation_magnitude)
 
     def run(
-        self, session: SimBotSession, gfh_viewpoint: Optional[str] = None
+        self,
+        session: SimBotSession,
+        gfh_location: Optional[ArenaLocation] = None,
     ) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
         # For search and no match, do a Look Around
@@ -196,27 +214,50 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
                 location_candidates.append(coords.as_list())
         return name_candidates, location_candidates, first_selected_idx
 
+    def add_gfh_postion_to_vertex_candidates(
+        self,
+        name_candidates: list[str],
+        location_candidates: list[list[float]],
+        gfh_location: ArenaLocation,
+    ) -> tuple[list[str], list[list[float]], int]:
+        """Update the vertex candidates with the GFH position."""
+        name_candidates.append("gfh_location")
+        location_candidates.append(gfh_location.position.as_list())
+        first_selected_idx = name_candidates.index("gfh_location")
+        return name_candidates, location_candidates, first_selected_idx
+
     def get_actions_for_position(
-        self, session: SimBotSession, is_first_position: bool = False
+        self,
+        session: SimBotSession,
+        location_from_gfh: bool = False,
     ) -> list[SimBotAction]:
         """Return the necessary actions needed to be done in a single viewpoint."""
-        # For search and no match, first do a Look Around
-        if is_first_position and session.current_turn.intent.is_searching_after_not_seeing_object:
+        # If the first position is from GFH, first do a Look Around
+        if location_from_gfh:
             return [self._create_look_around_action(add_stop_token=False)]
         return self._create_rotation_actions()
 
     def run(
-        self, session: SimBotSession, gfh_viewpoint: Optional[str] = None
+        self,
+        session: SimBotSession,
+        gfh_location: Optional[ArenaLocation] = None,
     ) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
         (name_candidates, location_candidates, first_selected_idx) = self.get_vertex_candidates(
             session
         )
+        first_location_from_gfh = False
         planned_actions: list[SimBotAction] = []
-        if gfh_viewpoint is not None:
-            planned_actions.append(self._create_goto_viewpoint_action(gfh_viewpoint))
-            first_selected_idx = name_candidates.index(gfh_viewpoint)
-
+        if gfh_location is not None:
+            planned_actions.append(self._create_goto_position_action(gfh_location))
+            (
+                name_candidates,
+                location_candidates,
+                first_selected_idx,
+            ) = self.add_gfh_postion_to_vertex_candidates(
+                name_candidates, location_candidates, gfh_location
+            )
+            first_location_from_gfh = True
         location_candidates_array = np.array(location_candidates)
         name_candidates_array = np.array(name_candidates)
 
@@ -226,7 +267,9 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
             coverage_sets, first_selected_idx=first_selected_idx
         )
         # We need 3 turns for each planned location + 1 more for the last viewpoint
-        planned_actions.extend(self.get_actions_for_position(session, is_first_position=True))
+        planned_actions.extend(
+            self.get_actions_for_position(session, location_from_gfh=first_location_from_gfh)
+        )
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:
                 planned_actions.append(self._create_goto_viewpoint_action(name))
