@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.7.0](https://github.com/emma-simbot/experience-hub/compare/v8.6.0...v8.7.0) (2023-02-22)
+
+
+### Features
+
+* Use the exact location for GFH ([#377](https://github.com/emma-simbot/experience-hub/issues/377)) ([328def2](https://github.com/emma-simbot/experience-hub/commit/328def2c70fb7c93f28acaa7050733ed84d5e303))
+
 ## [8.6.0](https://github.com/emma-simbot/experience-hub/compare/v8.5.0...v8.6.0) (2023-02-21)
 
 
