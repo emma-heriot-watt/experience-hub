@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.8.0](https://github.com/emma-simbot/experience-hub/compare/v8.7.0...v8.8.0) (2023-02-23)
+
+
+### Features
+
+* Add prompt for next instruction at the end of the QA response ([#381](https://github.com/emma-simbot/experience-hub/issues/381)) ([ce0f07b](https://github.com/emma-simbot/experience-hub/commit/ce0f07b1afc60bf26813b1ef36ebf313ee02b3d3))
+
 ## [8.7.0](https://github.com/emma-simbot/experience-hub/compare/v8.6.0...v8.7.0) (2023-02-22)
 
 
