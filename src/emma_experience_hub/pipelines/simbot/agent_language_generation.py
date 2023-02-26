@@ -50,7 +50,6 @@ class SimBotAgentLanguageGenerationPipeline:
         dialog_type = (
             SimBotActionType.LightweightDialog
             if feedback_state.require_lightweight_dialog
-            or feedback_state.utterance_queue_not_empty
             else SimBotActionType.Dialog
         )
 

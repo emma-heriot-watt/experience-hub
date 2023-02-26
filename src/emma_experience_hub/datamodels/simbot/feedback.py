@@ -143,6 +143,28 @@ class SimBotFeedbackRule(BaseModel):
             return False
 
 
+def turn_requires_lightweight_dialog(
+    verbal_interaction_intent: Optional[SimBotIntent[SimBotVerbalInteractionIntentType]],
+    utterance_queue_not_empty: bool,
+    find_queue_not_empty: bool,
+    interaction_action: Optional[SimBotAction],
+) -> bool:
+    """Does this turn require a lightweight dialog?"""
+    # If the verbal interaction intent triggers a question, ignore if the utterance queue is empty
+    triggers_question = (
+        verbal_interaction_intent is not None
+        and verbal_interaction_intent.type.triggers_question_to_user
+    )
+    utterance_queue_not_empty = utterance_queue_not_empty and not triggers_question
+
+    require_lightweight_dialog = (
+        (interaction_action and not interaction_action.is_end_of_trajectory)
+        or utterance_queue_not_empty
+        or (find_queue_not_empty)
+    )
+    return require_lightweight_dialog
+
+
 class SimBotFeedbackState(BaseModel):
     """Flattened representation of the session state for feedback generation."""
 
@@ -242,10 +264,11 @@ class SimBotFeedbackState(BaseModel):
     ) -> "SimBotFeedbackState":
         """Create the state in a simple way."""
         # Conditions under which we should try to find a lightweight dialog action
-        require_lightweight_dialog = (
-            (interaction_action and not interaction_action.is_end_of_trajectory)
-            or (utterance_queue_not_empty)
-            or (find_queue_not_empty)
+        require_lightweight_dialog = turn_requires_lightweight_dialog(
+            interaction_action=interaction_action,
+            utterance_queue_not_empty=utterance_queue_not_empty,
+            find_queue_not_empty=find_queue_not_empty,
+            verbal_interaction_intent=verbal_interaction_intent,
         )
         return cls(
             # Require a lightweight dialog action when the model does not decode a <stop token
