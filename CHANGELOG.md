@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.8.1](https://github.com/emma-simbot/experience-hub/compare/v8.8.0...v8.8.1) (2023-02-26)
+
+
+### Bug Fixes
+
+* Lightweight rules block questions to users ([#379](https://github.com/emma-simbot/experience-hub/issues/379)) ([20eaa6a](https://github.com/emma-simbot/experience-hub/commit/20eaa6a4a835b491e9811dd548932944fadf4ec0))
+
 ## [8.8.0](https://github.com/emma-simbot/experience-hub/compare/v8.7.0...v8.8.0) (2023-02-23)
 
 
