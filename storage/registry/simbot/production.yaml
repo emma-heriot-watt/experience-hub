@@ -47,6 +47,6 @@ services:
 
   - name: simbot_qa
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-qa
-    image_version: 1.3.1
+    image_version: 1.4.0
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_qa/simbot_qa_nlu_v7.tar.gz
+    model_url: s3://emma-simbot/model/checkpoints/simbot_qa/simbot_qa_nlu_v8.tar.gz

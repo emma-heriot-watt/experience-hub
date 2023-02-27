@@ -56,6 +56,10 @@
 			"source.fixAll": false
 		}
 	},
+	"[csv,tsv]": {
+		"rewrap.autoWrap.enabled": false,
+		"editor.wordWrap": "off"
+	},
 	"python.formatting.provider": "black",
 	"python.sortImports.args": ["--atomic"],
 	"python.linting.enabled": true,
