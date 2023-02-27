@@ -3,9 +3,10 @@ physical_interaction_intent_type != null,',False
 physical_interaction_intent_type != null,',True
 user_intent_type == "profanity",Sorry I can't help with that.,False
 user_intent_type == "out_of_domain",Sorry I can't help with that.,False
-user_intent_type == "out_of_domain" and intent_type_counter["user_intent_type"] > 2,Sorry I can't help with that. Try reading a sticky note for some hints.
-user_intent_type == "out_of_domain" and intent_type_counter["user_intent_type"] > 4,Sorry I can't help with that. Maybe read a sticky note?
-user_intent_type == "out_of_domain" and intent_type_counter["user_intent_type"] > 6,Sorry I can't help with that. Try reading a sticky note or say tutorial to learn how to play the game.
+user_intent_type == "out_of_domain" and num_turns < 5,Sorry I can't help with that. If you want to learn more about the game - ask me - how do I play this game? If you want to know about my capabilities - ask me - what can you do?,False
+user_intent_type == "out_of_domain" and intent_type_counter["user_intent_type"] > 2,Sorry I can't help with that. Try reading a sticky note for some hints.,False
+user_intent_type == "out_of_domain" and intent_type_counter["user_intent_type"] > 3,Sorry I can't help with that. Try reading a sticky note or ask me - how do I play this game?,False
+user_intent_type == "out_of_domain" and intent_type_counter["user_intent_type"] > 4,Sorry I can't help with that. If you want to learn more about the game - ask me - how do I play this game? If you want to know about my capabilities - ask me - what can you do?,Fasle
 user_intent_type == "low_asr_confidence",I'm not sure I got that,False
 user_intent_type == "low_asr_confidence",I'm not sure I got that - I'll wait here until you tell me what to do next,False
 user_intent_type == "low_asr_confidence",I didn't quite catch that properly - could you say it again?,False
@@ -141,7 +142,7 @@ environment_intent_type == "object_not_picked_up",I didn't pick that up for some
 environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity},False
 environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity} - can you give me a different instruction?,False
 environment_intent_type == "arena_unavailable",Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?,False
-environment_intent_type == "action_execution_error",Something went wrong when I tried to execute this action in the arena. Can you give me a different instruction?,False
+environment_intent_type == "action_execution_error", Oh no - it looks like something went wrong in the Simbot arena that's out of our control. We recommend quitting and starting the game again. You can skip providing feedback as we will be discussing your experience with the Alexa Team., False
 environment_intent_type == "post_process_error",Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?,False
 environment_intent_type == "incorrect_action_format",I tried to perform an action but looks like I don't remember how to do it. Can you give me a different instruction?,False
 environment_intent_type == "invalid_object_class",<say-as interpret-as="interjection">oops</say-as> - I made a mistake in interacting with that. Could you please give me a different instruction?,False
