@@ -547,7 +547,7 @@ class SimBotSession(BaseModel):
             turns_within_window.append(turn)
 
             # If the turn is the start of the local window, break
-            if turn.speech and turn.speech.utterance:
+            if turn.speech is not None:
                 break
 
         # Reverse the order within the list so that they are in the correct order
@@ -628,10 +628,10 @@ class SimBotSession(BaseModel):
             utterances_lists
         )
 
-        # Remvoe agent responses if they are not desired
+        # Remove agent responses if they are not desired
         if not include_agent_responses:
             dialogue_history = (
-                utterance for utterance in dialogue_history if utterance.role != "agent"
+                utterance for utterance in dialogue_history if utterance.role != SpeakerRole.agent
             )
 
         return list(dialogue_history)

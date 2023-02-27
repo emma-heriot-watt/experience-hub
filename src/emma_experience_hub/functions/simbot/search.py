@@ -14,6 +14,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoViewpoint,
     SimBotGotoViewpointPayload,
     SimBotLookAroundPayload,
+    SimBotMoveForwardPayload,
     SimBotRotatePayload,
 )
 
@@ -47,6 +48,10 @@ class SearchPlanner(ABC):
 
         if not session.current_state.find_queue and action_is_final:
             session.current_state.utterance_queue.reset()
+
+    def dummy_action(self) -> SimBotAction:
+        """Get a dummy action."""
+        return self._create_dummy_action()
 
     def _create_goto_viewpoint_action(self, viewpoint_name: str) -> SimBotAction:
         """Create action for going to a view point."""
@@ -94,6 +99,16 @@ class SearchPlanner(ABC):
             type=SimBotActionType.LookAround,
             raw_output=raw_output,
             payload=SimBotLookAroundPayload(),
+        )
+
+    def _create_dummy_action(self) -> SimBotAction:
+        """Dummy move forward action."""
+        raw_output = f"move forward{PREDICTED_ACTION_DELIMITER}"
+        return SimBotAction(
+            id=0,
+            type=SimBotActionType.MoveForward,
+            raw_output=raw_output,
+            payload=SimBotMoveForwardPayload(magnitude=0),
         )
 
 
@@ -228,13 +243,12 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
 
     def get_actions_for_position(
         self,
-        session: SimBotSession,
         location_from_gfh: bool = False,
     ) -> list[SimBotAction]:
         """Return the necessary actions needed to be done in a single viewpoint."""
         # If the first position is from GFH, first do a Look Around
-        if location_from_gfh:
-            return [self._create_look_around_action(add_stop_token=False)]
+        # if location_from_gfh:
+        #     return [self._create_look_around_action(add_stop_token=False)]
         return self._create_rotation_actions()
 
     def run(
@@ -258,6 +272,12 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
                 name_candidates, location_candidates, gfh_location
             )
             first_location_from_gfh = True
+
+        planned_actions.append(self._create_dummy_action())
+        # We need 3 turns for each planned location + 1 more for the last viewpoint
+        planned_actions.extend(
+            self.get_actions_for_position(location_from_gfh=first_location_from_gfh)
+        )
         location_candidates_array = np.array(location_candidates)
         name_candidates_array = np.array(name_candidates)
 
@@ -266,17 +286,14 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         selected_room_locations = self.select_based_on_maximum_coverage(
             coverage_sets, first_selected_idx=first_selected_idx
         )
-        # We need 3 turns for each planned location + 1 more for the last viewpoint
-        planned_actions.extend(
-            self.get_actions_for_position(session, location_from_gfh=first_location_from_gfh)
-        )
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:
                 planned_actions.append(self._create_goto_viewpoint_action(name))
-                planned_actions.extend(self.get_actions_for_position(session))
+                planned_actions.append(self._create_dummy_action())
+                planned_actions.extend(self.get_actions_for_position())
 
-        if self._planned_actions_should_end_with_rotation(planned_actions):
-            planned_actions.append(self._create_turn_left_action(add_stop_token=True))
+        planned_actions.append(self._create_turn_left_action(add_stop_token=True))
+
         logger.debug(f"[SEARCH] Plan = {planned_actions}")
         return planned_actions
 

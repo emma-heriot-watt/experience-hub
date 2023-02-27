@@ -80,7 +80,7 @@ class SimBotFindObjectPipeline:
             enable_grab_from_history=enable_grab_from_history,
         )
 
-    def run(self, session: SimBotSession) -> Optional[SimBotAction]:
+    def run(self, session: SimBotSession) -> Optional[SimBotAction]:  # noqa: WPS212
         """Handle the search through the environment."""
         if self._should_start_new_search(session):
             logger.debug("Preparing search plan...")
@@ -90,14 +90,20 @@ class SimBotFindObjectPipeline:
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
             session.current_state.find_queue.extend_tail(search_plan)
+            # Reset the camera
+            return self._get_next_action_from_plan(session)
 
         if self._should_reset_utterance_queue(session):
             logger.debug("Find queue is empty; returning None")
             self._search_planner.reset_utterance_queue_if_object_not_found(session)
             return None
 
+        # If the next action is a dummy to reset the camera, execute it before searching
+        if self._next_action_is_dummy(session):
+            return session.current_state.find_queue.pop_from_head()
+
         if self._should_goto_found_object(session):
-            goto_action = self._create_goto_action_for_found_object(session)
+            goto_action = session.current_state.find_queue.pop_from_head()
             logger.warning("Clearing the find queue of the session")
             session.current_state.find_queue.reset()
             return goto_action
@@ -180,6 +186,11 @@ class SimBotFindObjectPipeline:
         head_action = session.current_state.find_queue.queue[0]
         return head_action.type == SimBotActionType.GotoObject
 
+    def _next_action_is_dummy(self, session: SimBotSession) -> bool:
+        """Is the next action in the queue a dummy move forward?"""
+        head_action = session.current_state.find_queue.queue[0]
+        return head_action.type == SimBotActionType.MoveForward
+
     @tracer.start_as_current_span("Trying to find object from visuals")
     def _get_object_from_turn(
         self,
@@ -245,6 +256,8 @@ class SimBotFindObjectPipeline:
         # Add the goto action to the head of the queue
         session.current_state.find_queue.append_to_head(goto_action)
         logger.debug(f"Appending to head goto action {session.current_state.find_queue.queue[0]}")
+        session.current_state.find_queue.append_to_head(self._search_planner.dummy_action())
+        logger.debug(f"Appending to head dummy action {session.current_state.find_queue.queue[0]}")
 
         highlight_action = self._create_action_from_scene_object(
             action_type=SimBotActionType.Highlight,
@@ -253,48 +266,7 @@ class SimBotFindObjectPipeline:
             object_index=scene_object_tokens.object_index,
             color_image_index=color_image_index,
         )
-
         return highlight_action
-
-    def _create_goto_action_for_found_object(
-        self,
-        session: SimBotSession,
-    ) -> SimBotAction:
-        """Create the goto action again after the hightlight."""
-        # Pop the gotoaction from the head and clear the plan.
-        goto_action = session.current_state.find_queue.pop_from_head()
-        extracted_features = self._features_client.get_features(session.current_turn)
-        try:
-            scene_object_tokens = self._get_object_from_turn(session, extracted_features)
-        except AssertionError:
-            # If the object has not been found, use the previous goto action
-            return goto_action
-
-        if scene_object_tokens.object_index is None:
-            return goto_action
-
-        object_mask = get_mask_from_special_tokens(
-            scene_object_tokens.frame_index,
-            scene_object_tokens.object_index,
-            extracted_features,
-        )
-
-        color_image_index = get_correct_frame_index(
-            parsed_frame_index=scene_object_tokens.frame_index,
-            num_frames_in_current_turn=len(extracted_features),
-            num_total_frames=len(extracted_features),
-        )
-
-        goto_action = self._create_action_from_scene_object(
-            action_type=SimBotActionType.GotoObject,
-            object_mask=object_mask,
-            frame_index=scene_object_tokens.frame_index,
-            object_index=scene_object_tokens.object_index,
-            color_image_index=color_image_index,
-            add_stop_token=True,
-        )
-
-        return goto_action
 
     def _create_action_from_scene_object(
         self,

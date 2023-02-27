@@ -1,6 +1,6 @@
 from typing import Any, Literal, Optional, Union
 
-from pydantic import Field, PositiveFloat, validator
+from pydantic import Field, NonNegativeFloat, PositiveFloat, validator
 
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
@@ -88,7 +88,7 @@ class SimBotMovePayload(SimBotNavigationPayload):
     """SimBot action for walking forwards or backwards."""
 
     direction: Literal["Forward", "Backward"]
-    magnitude: PositiveFloat = 1
+    magnitude: NonNegativeFloat = 1
 
 
 class SimBotMoveForwardPayload(SimBotMovePayload):
