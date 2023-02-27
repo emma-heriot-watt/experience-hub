@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.9.0](https://github.com/emma-simbot/experience-hub/compare/v8.8.1...v8.9.0) (2023-02-27)
+
+
+### Features
+
+* Add more specific failure and ood responses ([#388](https://github.com/emma-simbot/experience-hub/issues/388)) ([f5b3541](https://github.com/emma-simbot/experience-hub/commit/f5b3541aed683aded9f39246f0b5b9f934f9a7d7))
+
+
+### Bug Fixes
+
+* Add dummy actions in search plan ([#387](https://github.com/emma-simbot/experience-hub/issues/387)) ([64abc71](https://github.com/emma-simbot/experience-hub/commit/64abc710383c81d9047e41454d19ef627430799f))
+
 ## [8.8.1](https://github.com/emma-simbot/experience-hub/compare/v8.8.0...v8.8.1) (2023-02-26)
 
 
