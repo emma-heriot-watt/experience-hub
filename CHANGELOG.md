@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.10.0](https://github.com/emma-simbot/experience-hub/compare/v8.9.0...v8.10.0) (2023-02-27)
+
+
+### Features
+
+* support for admiration and incomplete utterance intents ([#386](https://github.com/emma-simbot/experience-hub/issues/386)) ([22f4e26](https://github.com/emma-simbot/experience-hub/commit/22f4e2616d45399fc2de119d6110a1e47f20fa2b))
+
 ## [8.9.0](https://github.com/emma-simbot/experience-hub/compare/v8.8.1...v8.9.0) (2023-02-27)
 
 
