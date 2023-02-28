@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.11.0](https://github.com/emma-simbot/experience-hub/compare/v8.10.1...v8.11.0) (2023-02-28)
+
+
+### Features
+
+* Upgrade ood version ([#395](https://github.com/emma-simbot/experience-hub/issues/395)) ([354785d](https://github.com/emma-simbot/experience-hub/commit/354785d23c7d7b06a820818e69852c6b0d520e3b))
+
+
+### Bug Fixes
+
+* Feedback when room is not found ([#390](https://github.com/emma-simbot/experience-hub/issues/390)) ([b20c629](https://github.com/emma-simbot/experience-hub/commit/b20c62917843013a186188b13f76c00c54b90ef5))
+
 ## [8.10.1](https://github.com/emma-simbot/experience-hub/compare/v8.10.0...v8.10.1) (2023-02-28)
 
 
