@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.10.1](https://github.com/emma-simbot/experience-hub/compare/v8.10.0...v8.10.1) (2023-02-28)
+
+
+### Bug Fixes
+
+* Decrease the find budget ([#391](https://github.com/emma-simbot/experience-hub/issues/391)) ([9b70edf](https://github.com/emma-simbot/experience-hub/commit/9b70edfb18478dc1a07a434a33e343b0936350ae))
+
 ## [8.10.0](https://github.com/emma-simbot/experience-hub/compare/v8.9.0...v8.10.0) (2023-02-27)
 
 
