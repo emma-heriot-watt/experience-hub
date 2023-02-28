@@ -311,19 +311,35 @@ class SimBotAgentIntentSelectionPipeline:
         """
         if intents.verbal_interaction is None or not self._enable_search_after_no_match:
             return intents
-
+        # Check the intent is act_no_match from a new utterance
+        should_search_before_executing_instruction = (
+            intents.verbal_interaction.type == SimBotIntentType.act_no_match
+            and session.current_turn.speech is not None
+        )
+        if not should_search_before_executing_instruction:
+            return intents
+        # Make sure we know the object
         target_entity = intents.verbal_interaction.entity
-        should_search_before_executing_instruction = [
-            intents.verbal_interaction.type == SimBotIntentType.act_no_match,
-            target_entity is not None,
-            session.current_turn.speech is not None,
-        ]
-        if not all(should_search_before_executing_instruction):
+        if target_entity is None:
             return intents
 
+        # Confirm the search if needed
+        if self._should_confirm_before_search(session, target_entity):
+            return SimBotAgentIntents(
+                verbal_interaction=SimBotIntent(
+                    type=SimBotIntentType.confirm_before_search, entity=target_entity
+                ),
+            )
+        # Otherwise start the search
+        session.current_state.utterance_queue.append_to_head(
+            session.current_turn.speech.utterance,  # type: ignore[union-attr]
+        )
+        session.current_turn.speech = SimBotUserSpeech(utterance=f"find the {target_entity}")
         return SimBotAgentIntents(
-            verbal_interaction=SimBotIntent(
-                type=SimBotIntentType.confirm_before_search, entity=target_entity
+            SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
+            SimBotIntent(
+                type=SimBotIntentType.act_no_match,
+                entity=target_entity,
             ),
         )
 
@@ -375,3 +391,11 @@ class SimBotAgentIntentSelectionPipeline:
     def _should_skip_action_selection(self, user_intent_type: SimBotAnyUserIntentType) -> bool:
         """No action needed if the utterance is invalid or an environment question."""
         return user_intent_type.is_invalid_user_utterance or user_intent_type.is_user_qa
+
+    def _should_confirm_before_search(self, session: SimBotSession, target_entity: str) -> bool:
+        """Should the agent ask for confirmation before searching?"""
+        # Don't ask if we've seen the entity in the room
+        has_seen_object = session.current_state.memory.read_memory_entity_in_room(
+            session.current_turn.environment.current_room, target_entity
+        )
+        return has_seen_object is None

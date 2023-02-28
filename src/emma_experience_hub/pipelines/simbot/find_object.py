@@ -21,6 +21,7 @@ from emma_experience_hub.functions.simbot import (
     GreedyMaximumVertexCoverSearchPlanner,
     SearchPlanner,
     SimBotSceneObjectTokens,
+    get_class_name_from_special_tokens,
     get_correct_frame_index,
     get_mask_from_special_tokens,
 )
@@ -234,6 +235,12 @@ class SimBotFindObjectPipeline:
             extracted_features,
         )
 
+        object_name = get_class_name_from_special_tokens(
+            scene_object_tokens.frame_index,
+            scene_object_tokens.object_index,
+            extracted_features,
+        )
+
         color_image_index = get_correct_frame_index(
             parsed_frame_index=scene_object_tokens.frame_index,
             num_frames_in_current_turn=len(extracted_features),
@@ -246,6 +253,7 @@ class SimBotFindObjectPipeline:
             frame_index=scene_object_tokens.frame_index,
             object_index=scene_object_tokens.object_index,
             color_image_index=color_image_index,
+            name=object_name,
             add_stop_token=True,
         )
         # Do not highlight objects when the intent is a search and no_match
@@ -275,6 +283,7 @@ class SimBotFindObjectPipeline:
         frame_index: int,
         object_index: int,
         color_image_index: int,
+        name: str = "",
         add_stop_token: bool = False,
     ) -> SimBotAction:
         """Create an action from a found scene object."""
@@ -291,8 +300,7 @@ class SimBotFindObjectPipeline:
                 object=SimBotInteractionObject(
                     colorImageIndex=color_image_index,
                     mask=object_mask,
-                    # TODO: do we need an object name? What if we need the closest stickynote?
-                    name="",
+                    name=name,
                 )
             ),
         )
