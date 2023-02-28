@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.12.1](https://github.com/emma-simbot/experience-hub/compare/v8.12.0...v8.12.1) (2023-02-28)
+
+
+### Bug Fixes
+
+* Simbot-QA without incomplete utterances ([#396](https://github.com/emma-simbot/experience-hub/issues/396)) ([c0cfafa](https://github.com/emma-simbot/experience-hub/commit/c0cfafa769ab05b436f7be8135481362ef671d6c))
+
 ## [8.12.0](https://github.com/emma-simbot/experience-hub/compare/v8.11.0...v8.12.0) (2023-02-28)
 
 
