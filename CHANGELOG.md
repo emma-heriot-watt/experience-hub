@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.12.0](https://github.com/emma-simbot/experience-hub/compare/v8.11.0...v8.12.0) (2023-02-28)
+
+
+### Features
+
+* Remove confirmations when we the object is in the room memory ([#394](https://github.com/emma-simbot/experience-hub/issues/394)) ([612cfc1](https://github.com/emma-simbot/experience-hub/commit/612cfc17a017e9e31fab647dab41e1ea7d33d931))
+
 ## [8.11.0](https://github.com/emma-simbot/experience-hub/compare/v8.10.1...v8.11.0) (2023-02-28)
 
 
