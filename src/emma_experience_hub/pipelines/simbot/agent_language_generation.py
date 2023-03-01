@@ -27,8 +27,9 @@ class SimBotAgentLanguageGenerationPipeline:
 
     def __init__(self) -> None:
         self._feedback_parser = SimBotFeedbackFromSessionStateParser.from_rules_csv()
+        self._default_utterance = "'"
 
-    def run(self, session: SimBotSession) -> SimBotDialogAction:
+    def run(self, session: SimBotSession) -> Optional[SimBotDialogAction]:
         """Generate an utterance to send back to the user."""
         with tracer.start_as_current_span("Get feedback state"):
             feedback_state = session.to_feedback_state()
@@ -37,14 +38,17 @@ class SimBotAgentLanguageGenerationPipeline:
             matching_rule = self._feedback_parser(feedback_state)
 
         action = self._generate_dialog_action(matching_rule, feedback_state)
-
         return action
 
     def _generate_dialog_action(
         self, rule: SimBotFeedbackRule, feedback_state: SimBotFeedbackState
-    ) -> SimBotDialogAction:
+    ) -> Optional[SimBotDialogAction]:
         """Generate a dialog action."""
         utterance = self._generate_utterance(rule, feedback_state)
+
+        # Dont return the default utterance for lightweight dialog actions.
+        if feedback_state.require_lightweight_dialog and utterance == self._default_utterance:
+            return None
 
         # Determine the dialog type for the response
         dialog_type = (
