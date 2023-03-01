@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.13.1](https://github.com/emma-simbot/experience-hub/compare/v8.13.0...v8.13.1) (2023-03-01)
+
+
+### Bug Fixes
+
+* dont send the fallback utterance for lightweight dialog ([#398](https://github.com/emma-simbot/experience-hub/issues/398)) ([37afb76](https://github.com/emma-simbot/experience-hub/commit/37afb761e56760f734f2540eb168cd47629dc754))
+
 ## [8.13.0](https://github.com/emma-simbot/experience-hub/compare/v8.12.1...v8.13.0) (2023-03-01)
 
 
