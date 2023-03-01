@@ -31,7 +31,7 @@ curl -sSL https://install.python-poetry.org | python3 -
 
 # Add Poetry to the PATH
 # shellcheck disable=SC2016
-echo 'export PATH="/home/ubuntu/.local/bin:$PATH"' >>~/.bashrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >>~/.bashrc
 
 # Create venvs within the project
 /home/ubuntu/.local/bin/poetry config virtualenvs.in-project true
@@ -96,9 +96,6 @@ sudo ./aws/install
 # ------------------------------- Login to AWS ------------------------------- #
 aws configure --profile TeamProfile
 # TODO: Configure profile
-
-# ---------------------------- Enable AWS Profile ---------------------------- #ç
-export AUS_PROFILE=TeamProfile
 
 # ---------------------------- Install NFS common ---------------------------- #
 sudo apt-get -y install nfs-common
