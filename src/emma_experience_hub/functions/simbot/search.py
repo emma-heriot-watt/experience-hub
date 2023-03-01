@@ -273,7 +273,6 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
             )
             first_location_from_gfh = True
 
-        planned_actions.append(self._create_dummy_action())
         # We need 3 turns for each planned location + 1 more for the last viewpoint
         planned_actions.extend(
             self.get_actions_for_position(location_from_gfh=first_location_from_gfh)
@@ -289,7 +288,6 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:
                 planned_actions.append(self._create_goto_viewpoint_action(name))
-                planned_actions.append(self._create_dummy_action())
                 planned_actions.extend(self.get_actions_for_position())
 
         planned_actions.append(self._create_turn_left_action(add_stop_token=True))

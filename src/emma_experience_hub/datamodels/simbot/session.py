@@ -507,7 +507,7 @@ class SimBotSession(BaseModel):
         return (
             self.previous_valid_turn is not None
             and self.previous_valid_turn.actions.interaction is not None
-            and self.previous_valid_turn.actions.interaction.type == SimBotActionType.Highlight
+            and self.previous_valid_turn.actions.interaction.type == SimBotActionType.GotoObject
             and not self.previous_valid_turn.actions.interaction.is_end_of_trajectory
         )
 

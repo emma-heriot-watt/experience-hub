@@ -177,36 +177,34 @@ verbal_interaction_intent_type == "generic_success",So what should I do next?,Fa
 verbal_interaction_intent_type == "generic_success",Now what?,False
 verbal_interaction_intent_type == "generic_success",<say-as interpret-as="interjection">righto</say-as>,False
 verbal_interaction_intent_type == "generic_success",Alright - what's next?,False
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",Found it! Let's get closer.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",I think it is right there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",It looks like it's over there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight",I think I found it. I'm going there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,I think I found the {physical_interaction_intent_entity} over there! I'm moving closer.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,Found the {physical_interaction_intent_entity}! Let's get closer.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,I think the {physical_interaction_intent_entity} is right there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,It looks like the {physical_interaction_intent_entity} is over there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "Highlight" and physical_interaction_intent_entity != null,I think I found the {physical_interaction_intent_entity}. I'm going there.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,I couldn't find it.,False
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,Sorry I don't see it. Can you give me a different instruction?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,I couldn't find the {physical_interaction_intent_entity}.,False
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,Sorry I don't see the {physical_interaction_intent_entity}. Can you give me a different instruction?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,<amazon:emotion name="disappointed" intensity="medium"> I am sorry I couldn't find the bowl.</amazon:emotion><amazon:emotion name="disappointed" intensity="low">.</amazon:emotion> Can I get a different instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,I can't find it. Can you give me another instruction?,False
-physical_interaction_intent_type == "search" and interaction_action_type == null and not find_queue_not_empty,I couldn't find it.,False
-physical_interaction_intent_type == "search" and interaction_action_type == null and not find_queue_not_empty,Sorry I don't see it. Can you give me a different instruction?,False
-physical_interaction_intent_type == "search" and interaction_action_type == null and not find_queue_not_empty,I can't find it. Can you give me another instruction?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,Sorry I don't see. Can you give me another instruction?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,<amazon:emotion name="excited" intensity="medium">Search complete!</amazon:emotion> What should I do next?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,I think I found it - what are we doing next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Now what should I do?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Okay what's next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,What are we doing next?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Search complete! What are we doing next?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - what are we doing next?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - now what should I do?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and utterance_queue_not_empty,',True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "MoveForward" and current_turn_has_user_utterance,I'll start looking!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "MoveForward" and current_turn_has_user_utterance,Starting the search!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "MoveForward" and current_turn_has_user_utterance and current_room != null,Let's search the {current_room}!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "MoveForward" and current_turn_has_user_utterance and current_room != null,Let me have a look around the room!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "MoveForward" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,On it!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "MoveForward" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Starting the search!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "MoveForward" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Let's find it!,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "MoveForward" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Alright - Searching for the {verbal_interaction_intent_entity}.,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,I'll start looking!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,Starting the search!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null,Let's search the {current_room}!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null,Let me have a look around the room!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null and physical_interaction_intent_entity != null, Let's try to find the {physical_interaction_intent_entity}.
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,On it!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Starting the search!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Let's find it!,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Alright - Searching for the {verbal_interaction_intent_entity}.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty,',True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still looking,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still searching,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe it's somewhere here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's try one more spot,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Searching from a new spot,True
