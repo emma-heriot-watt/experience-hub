@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.13.0](https://github.com/emma-simbot/experience-hub/compare/v8.12.1...v8.13.0) (2023-03-01)
+
+
+### Features
+
+* remove highlight from search ([#397](https://github.com/emma-simbot/experience-hub/issues/397)) ([99c88b7](https://github.com/emma-simbot/experience-hub/commit/99c88b79ed8dfa7c3151f1ed15790f3eedd4a0bc))
+
 ## [8.12.1](https://github.com/emma-simbot/experience-hub/compare/v8.12.0...v8.12.1) (2023-02-28)
 
 
