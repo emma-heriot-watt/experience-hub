@@ -11,19 +11,19 @@ services:
 
   - name: intent_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.32.0-cu113
+    image_version: 1.32.1-cu113
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/nlu_annotations2_v2_iou0.1.ckpt
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.32.0-cu113
+    image_version: 1.32.1-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v6_annotation2_v4_iou0.5_bsz512_lr1e-4.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v8_annotation3_iou0.5_bsz512_lr1e-4.ckpt
 
   - name: feature_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/perception
-    image_version: 1.10.1-cu113
+    image_version: 1.10.2-cu113
 
     model_url: s3://emma-simbot/misc_projects/floppy_aug/checkpoints/model_0300125.pth
 
