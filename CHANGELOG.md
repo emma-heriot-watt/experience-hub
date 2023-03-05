@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.15.0](https://github.com/emma-simbot/experience-hub/compare/v8.14.0...v8.15.0) (2023-03-05)
+
+
+### Features
+
+* Bump simbot-qa checkpoint to v10 [added start tutorial] ([#403](https://github.com/emma-simbot/experience-hub/issues/403)) ([c0cb75b](https://github.com/emma-simbot/experience-hub/commit/c0cb75b68c33efbdcaccff12be660d0a1f7bd772))
+
 ## [8.14.0](https://github.com/emma-simbot/experience-hub/compare/v8.13.1...v8.14.0) (2023-03-03)
 
 
