@@ -7,6 +7,7 @@ class SimBotUserSpeech(BaseModel):
     """Utterance from the user for the SimBot challenge."""
 
     utterance: str
+    from_utterance_queue: bool = False
 
     @classmethod
     def from_speech_recognition_payload(

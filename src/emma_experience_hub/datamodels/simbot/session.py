@@ -96,6 +96,15 @@ class SimBotSessionTurnIntent(BaseModel):
         )
 
     @property
+    def agent_should_ask_question_without_acting(self) -> bool:
+        """Return True if the agent should ask for confirmation instead of just acting."""
+        return (
+            self.verbal_interaction is not None
+            and self.verbal_interaction.type.triggers_question_to_user
+            and self.verbal_interaction.type != SimBotIntentType.confirm_before_plan
+        )
+
+    @property
     def is_searching(self) -> bool:
         """Return True if the agent is currently searching for an object."""
         is_search = (
@@ -378,7 +387,7 @@ class SimBotSessionTurn(BaseModel):
 
         # If the agent wants to ask for confirmation before trying to act, then only return the
         # dialog action, which SHOULD have the confirmation question for the user
-        if self.intent.agent_should_ask_question_to_user:
+        if self.intent.agent_should_ask_question_without_acting:
             actions = [self.actions.dialog] if self.actions.dialog is not None else []
 
         if not actions:
@@ -412,6 +421,11 @@ class SimBotSessionTurn(BaseModel):
             and self.actions.interaction.type == SimBotActionType.LookAround
         )
         return self.intent.is_searching and is_look_around_action
+
+    @property
+    def utterance_from_queue(self) -> bool:
+        """Return True if the current utterance is coming from the utterance queue."""
+        return self.speech is not None and self.speech.from_utterance_queue
 
 
 class SimBotSession(BaseModel):

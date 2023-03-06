@@ -111,7 +111,7 @@ class SimBotController:
         logger.info(f"[INTENT] User: `{user_intent}`")
 
         session.current_turn.intent.user = user_intent
-        return session
+        return self._clear_queue_after_user_intent(session)
 
     def extract_intent_from_environment_feedback(self, session: SimBotSession) -> SimBotSession:
         """Determine what feedback from the environment tells us to do, if anything."""
@@ -148,7 +148,8 @@ class SimBotController:
                 f"[REQUEST]: Get utterance from the session queue ({len(session.current_state.utterance_queue) - 1} remaining"
             )
             session.current_turn.speech = SimBotUserSpeech(
-                utterance=session.current_state.utterance_queue.pop_from_head()
+                utterance=session.current_state.utterance_queue.pop_from_head(),
+                from_utterance_queue=True,
             )
 
         return session
@@ -184,6 +185,9 @@ class SimBotController:
                 session.current_turn.actions.interaction = (
                     self.pipelines.agent_action_generator.run(session)
                 )
+
+            with tracer.start_as_current_span("Anticipate instructions"):
+                self.pipelines.anticipator.run(session)
 
         logger.info(f"[ACTION] Interaction: `{session.current_turn.actions.interaction}`")
         return session
@@ -224,12 +228,52 @@ class SimBotController:
         That means if there is speech in the current turn and that is not in response to a
         question.
         """
-        if session.current_turn.speech and not self._user_is_responding_to_question(session):
-            logger.debug("[REQUEST]: Received utterance from user; clearing the utterance queue")
+        if session.current_turn.speech:
+            # Reset the queues if
+            reset_conditions = [
+                # 1) the current turn has an invalid utterance or
+                self._new_utterance_is_invalid(session),
+                # 2) is valid and not responding to a previous question
+                not self._user_is_responding_to_question(session),
+            ]
+            if any(reset_conditions):
+                logger.debug("[REQUEST]: Received utterance; clearing queues")
+                session.current_state.utterance_queue.reset()
+                session.current_state.find_queue.reset()
+                return session
+
+        return session
+
+    def _clear_queue_after_user_intent(self, session: SimBotSession) -> SimBotSession:
+        """Clear the queue if the user has provided us with a new instruction.
+
+        After the confirmation classifier, check if the user replied to a confirmation question
+        with a confirmation response or a new instruction.
+        """
+        new_instruction_after_confirmation = [
+            # We previously asked for confirmation
+            session.previous_turn is not None
+            and session.previous_turn.intent.verbal_interaction is not None
+            and session.previous_turn.intent.verbal_interaction.type.triggers_confirmation_question,
+            # But the user intent is not a confirmation response
+            session.current_turn.intent.user is not None
+            and not session.current_turn.intent.user.is_confirmation_response,
+        ]
+        if all(new_instruction_after_confirmation):
+            logger.debug(
+                "[REQUEST]: Received instruction utterance after confirmation; clearing the utterance queue"
+            )
             session.current_state.utterance_queue.reset()
             session.current_state.find_queue.reset()
 
         return session
+
+    def _new_utterance_is_invalid(self, session: SimBotSession) -> bool:
+        """Return True if the user is current utterance is invalid."""
+        return (
+            session.current_turn.intent.user is not None
+            and session.current_turn.intent.user.is_invalid_user_utterance
+        )
 
     def _user_is_responding_to_question(self, session: SimBotSession) -> bool:
         """Return True if the user is responding to question from previous turn."""

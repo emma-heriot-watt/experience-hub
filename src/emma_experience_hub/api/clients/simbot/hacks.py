@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import httpx
@@ -7,6 +8,7 @@ from opentelemetry import trace
 from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import Client
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 
 
 tracer = trace.get_tracer(__name__)
@@ -20,6 +22,13 @@ class SimBotHacksRoom(BaseModel):
     room_name: str
     arena_room: str
     modified_utterance: str
+
+
+class SimBotHacksAnticipator(BaseModel):
+    """SimBotHackAnticipator response."""
+
+    intent: str
+    utterances: list[str]
 
 
 class SimBotHacksClient(Client):
@@ -41,6 +50,18 @@ class SimBotHacksClient(Client):
         """Generate a room prediction from the provided language."""
         with tracer.start_as_current_span("Get room from raw text"):
             response = self._get_room_prediction_from_raw_text(utterance)
+
+        logger.debug(f"Cache info: {self._get_room_prediction_from_raw_text.cache_info()}")
+        return response
+
+    def get_anticipator_prediction_from_action(
+        self,
+        action: SimBotAction,
+        inventory_entity: Optional[str] = None,
+    ) -> Optional[SimBotHacksAnticipator]:
+        """Generate possible plan of instructions from the given action."""
+        with tracer.start_as_current_span("Get anticipator plan"):
+            response = self._get_anticipated_instructions(action, inventory_entity)
 
         logger.debug(f"Cache info: {self._get_room_prediction_from_raw_text.cache_info()}")
         return response
@@ -80,3 +101,34 @@ class SimBotHacksClient(Client):
         except Exception:
             return None
         return room
+
+    def _get_anticipated_instructions(
+        self,
+        action: SimBotAction,
+        inventory_entity: Optional[str] = None,
+    ) -> Optional[SimBotHacksAnticipator]:
+        with httpx.Client(timeout=self._timeout) as client:
+            response = client.post(
+                f"{self._endpoint}/generate_anticipated_actions",
+                json={
+                    "simbot_action": json.loads(action.json()),
+                    "holding_object": inventory_entity,
+                },
+            )
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPError as err:
+            logger.warning("Unable to get action plan.", exc_info=err)
+            return None
+
+        response_json = response.json()
+        if response_json is None:
+            return None
+
+        try:
+            anticipator_plan = SimBotHacksAnticipator.parse_obj(response.json())
+        except Exception as request_err:
+            logger.exception("Unable to parse the anticipator plan", exc_info=request_err)
+            return None
+        return anticipator_plan

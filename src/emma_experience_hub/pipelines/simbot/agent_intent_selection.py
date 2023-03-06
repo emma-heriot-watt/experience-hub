@@ -11,6 +11,7 @@ from emma_experience_hub.api.clients.simbot import (
 )
 from emma_experience_hub.datamodels.simbot import (
     SimBotAnyUserIntentType,
+    SimBotEnvironmentIntentType,
     SimBotIntent,
     SimBotIntentType,
     SimBotNLUIntentType,
@@ -67,7 +68,10 @@ class SimBotAgentIntentSelectionPipeline:
             logger.debug("Getting agent intent from user intent.")
 
             # If we have received an invalid utterance, the agent does not act
-            if self._should_skip_action_selection(session.current_turn.intent.user):
+            should_skip_action_selection = self._should_skip_action_selection(
+                session.current_turn.intent.user, session.current_turn.intent.environment
+            )
+            if should_skip_action_selection:
                 return SimBotAgentIntents()
 
             # Check if the utterance has already been processed by the NLU
@@ -104,7 +108,7 @@ class SimBotAgentIntentSelectionPipeline:
             physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
         )
 
-    def extract_intent_from_user_utterance(  # noqa: WPS212
+    def extract_intent_from_user_utterance(
         self, user_intent: SimBotUserIntentType, session: SimBotSession
     ) -> SimBotAgentIntents:
         """Determine what the agent should do next from the user intent.
@@ -131,6 +135,19 @@ class SimBotAgentIntentSelectionPipeline:
                 physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
             )
 
+        # If we are receiving a confirmation answer
+        if user_intent.is_confirmation_response:
+            return self.handle_confirmations(session, user_intent)
+
+        # In all other cases, just return the intent as the agent _should_ know how to act.
+        return SimBotAgentIntents(
+            physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
+        )
+
+    def handle_confirmations(
+        self, session: SimBotSession, user_intent: SimBotUserIntentType
+    ) -> SimBotAgentIntents:
+        """Handle a confirmation intent."""
         # If the agent asked for confirmation to search for an object required to act
         if self._agent_asked_for_confirm_before_searching(session, user_intent):
             return self._handle_confirm_before_search_intent(
@@ -142,22 +159,14 @@ class SimBotAgentIntentSelectionPipeline:
             # Then let the search routine decide how to handle it.
             return self._set_find_object_in_progress_intent(session)
 
+        # If the agent explicitly asked a confirmation question before executing a plan in the previous turn
+        if self._agent_asked_for_confirm_before_plan(session.previous_valid_turn):
+            return self._handle_confirm_before_plan_intent(session, user_intent)
+
         # If the agent explicitly asked a confirmation question in the previous turn
         if self._agent_asked_for_confirm_before_acting(session.previous_valid_turn):
-            # And the user approved
-            if user_intent == SimBotIntentType.confirm_yes:
-                return SimBotAgentIntents(
-                    physical_interaction=SimBotIntent(type=SimBotIntentType.act_previous)
-                )
-
-            # And the user didn't approve
-            if user_intent == SimBotIntentType.confirm_no:
-                return SimBotAgentIntents()
-
-        # In all other cases, just return the intent as the agent _should_ know how to act.
-        return SimBotAgentIntents(
-            physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
-        )
+            return self._handle_confirm_before_previous_act_intent(session, user_intent)
+        return SimBotAgentIntents()
 
     def _process_utterance_with_nlu(self, session: SimBotSession) -> SimBotAgentIntents:
         """Perform NLU on the utterance to determine what the agent should do next.
@@ -301,6 +310,17 @@ class SimBotAgentIntentSelectionPipeline:
 
         return is_previous_turn_confirm_before_search
 
+    def _agent_asked_for_confirm_before_plan(
+        self, previous_turn: Optional[SimBotSessionTurn]
+    ) -> bool:
+        """Did the agent explicitly ask for confirmation before performing an action?"""
+        return (
+            previous_turn is not None
+            and previous_turn.intent.verbal_interaction is not None
+            and previous_turn.intent.verbal_interaction.type
+            == SimBotIntentType.confirm_before_plan
+        )
+
     def _handle_act_no_match_intent(
         self, session: SimBotSession, intents: SimBotAgentIntents
     ) -> SimBotAgentIntents:
@@ -348,6 +368,7 @@ class SimBotAgentIntentSelectionPipeline:
     ) -> SimBotAgentIntents:
         """Handle a cofirmation to search."""
         if user_intent != SimBotIntentType.confirm_yes:
+            session.current_state.utterance_queue.reset()
             return SimBotAgentIntents()
 
         previous_turn = session.previous_turn
@@ -366,6 +387,38 @@ class SimBotAgentIntentSelectionPipeline:
                 type=SimBotIntentType.act_no_match, entity=target_entity
             ),
         )
+
+    def _handle_confirm_before_plan_intent(
+        self, session: SimBotSession, user_intent: SimBotUserIntentType
+    ) -> SimBotAgentIntents:
+        """Handle a cofirmation to execute the plan."""
+        # If the user approved
+        if user_intent == SimBotIntentType.confirm_yes:
+            # Pop the first element in the instruction plan and add it to the utterance speech
+            session.current_turn.speech = SimBotUserSpeech(
+                utterance=session.current_state.utterance_queue.pop_from_head(),
+                from_utterance_queue=True,
+            )
+            intents = self._process_utterance_with_nlu(session)
+            return intents
+
+        # If the user didn't approve
+        session.current_state.utterance_queue.reset()
+        return SimBotAgentIntents()
+
+    def _handle_confirm_before_previous_act_intent(
+        self, session: SimBotSession, user_intent: SimBotUserIntentType
+    ) -> SimBotAgentIntents:
+        """Handle a cofirmation to execute the previous action."""
+        # If the user approved
+        if user_intent == SimBotIntentType.confirm_yes:
+            return SimBotAgentIntents(
+                physical_interaction=SimBotIntent(type=SimBotIntentType.act_previous)
+            )
+
+        # If the user didn't approve
+        session.current_state.utterance_queue.reset()
+        return SimBotAgentIntents()
 
     def _set_find_object_in_progress_intent(self, session: SimBotSession) -> SimBotAgentIntents:
         """Set the intent when find is in progress."""
@@ -388,9 +441,21 @@ class SimBotAgentIntentSelectionPipeline:
             )
         return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search, entity=entity))
 
-    def _should_skip_action_selection(self, user_intent_type: SimBotAnyUserIntentType) -> bool:
-        """No action needed if the utterance is invalid or an environment question."""
-        return user_intent_type.is_invalid_user_utterance or user_intent_type.is_user_qa
+    def _should_skip_action_selection(
+        self,
+        user_intent_type: SimBotAnyUserIntentType,
+        environment_intent: Optional[SimBotIntent[SimBotEnvironmentIntentType]] = None,
+    ) -> bool:
+        """No action needed after an invalid utterance, QA or an environment error."""
+        envrionment_error = (
+            environment_intent is not None and environment_intent.type.is_environment_error
+        )
+
+        return (
+            user_intent_type.is_invalid_user_utterance
+            or user_intent_type.is_user_qa
+            or envrionment_error
+        )
 
     def _should_confirm_before_search(self, session: SimBotSession, target_entity: str) -> bool:
         """Should the agent ask for confirmation before searching?"""

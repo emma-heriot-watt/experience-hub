@@ -14,6 +14,7 @@ from emma_experience_hub.pipelines.simbot import (
     SimBotAgentActionGenerationPipeline,
     SimBotAgentIntentSelectionPipeline,
     SimBotAgentLanguageGenerationPipeline,
+    SimbotAnticipatorPipeline,
     SimBotCompoundSplitterPipeline,
     SimBotEnvironmentIntentExtractionPipeline,
     SimBotFindObjectPipeline,
@@ -35,6 +36,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
     agent_language_generator: SimBotAgentLanguageGenerationPipeline
     find_object: SimBotFindObjectPipeline
     compound_splitter: SimBotCompoundSplitterPipeline
+    anticipator: SimbotAnticipatorPipeline
 
     @classmethod
     def from_clients(
@@ -92,4 +94,5 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 simbot_hacks_client=clients.simbot_hacks,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(),
+            anticipator=SimbotAnticipatorPipeline(simbot_hacks_client=clients.simbot_hacks),
         )

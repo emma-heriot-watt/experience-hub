@@ -33,6 +33,7 @@ class SimBotIntentType(Enum):
     confirm_before_goto_viewpoint = "<confirm><goto_viewpoint>"
     confirm_before_goto_room = "<confirm><goto_room>"
     confirm_before_search = "<confirm><search>"
+    confirm_before_plan = "<confirm><plan>"
 
     # Question responses from the user
     clarify_answer = "<clarify><answer>"
@@ -128,6 +129,7 @@ class SimBotIntentType(Enum):
             SimBotIntentType.confirm_before_goto_viewpoint,
             SimBotIntentType.confirm_before_goto_room,
             SimBotIntentType.confirm_before_search,
+            SimBotIntentType.confirm_before_plan,
         }
 
     @property
@@ -251,6 +253,7 @@ SimBotVerbalInteractionIntentType = Literal[
     SimBotIntentType.confirm_before_goto_object,
     SimBotIntentType.confirm_before_goto_viewpoint,
     SimBotIntentType.confirm_before_search,
+    SimBotIntentType.confirm_before_plan,
     SimBotIntentType.act_no_match,
     SimBotIntentType.act_too_many_matches,
     SimBotIntentType.generic_success,

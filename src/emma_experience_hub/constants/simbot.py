@@ -114,6 +114,7 @@ ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(
 _ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
     {
         "GotoRoom": "go to",
+        "GotoObject": "go to",
         "MoveForward": "move forward",
         "MoveBackward": "move backward",
         "RotateLeft": "rotate left",
@@ -127,6 +128,9 @@ _ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
         "Laser Monitor": "red monitor",
         "Freeze Ray Shelf": "blue shelf",
         "Freeze Ray Monitor": "blue monitor",
+        "Gravity Monitor": "green monitor",
+        "Embiggenator Monitor": "pink monitor",
+        "Portal Generator Monitor": "black monitor",
     }
 )
 
