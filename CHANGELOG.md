@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.16.0](https://github.com/emma-simbot/experience-hub/compare/v8.15.0...v8.16.0) (2023-03-06)
+
+
+### Features
+
+* Anticipator that builds a plan based on the predicted action ([#402](https://github.com/emma-simbot/experience-hub/issues/402)) ([54609cd](https://github.com/emma-simbot/experience-hub/commit/54609cd8201f46e3d579cc6245a9dc1923290f45))
+
 ## [8.15.0](https://github.com/emma-simbot/experience-hub/compare/v8.14.0...v8.15.0) (2023-03-05)
 
 
