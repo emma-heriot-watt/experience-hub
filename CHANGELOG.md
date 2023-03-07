@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.18.0](https://github.com/emma-simbot/experience-hub/compare/v8.17.1...v8.18.0) (2023-03-07)
+
+
+### Features
+
+* improve responses for floppy disk and computer ([#413](https://github.com/emma-simbot/experience-hub/issues/413)) ([48e3341](https://github.com/emma-simbot/experience-hub/commit/48e3341ace0287933869e3eb97b49285a2f0b6ce))
+
 ## [8.17.1](https://github.com/emma-simbot/experience-hub/compare/v8.17.0...v8.17.1) (2023-03-07)
 
 
