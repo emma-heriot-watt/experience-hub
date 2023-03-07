@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.17.0](https://github.com/emma-simbot/experience-hub/compare/v8.16.1...v8.17.0) (2023-03-07)
+
+
+### Features
+
+* Filter utterances with missing info ([#407](https://github.com/emma-simbot/experience-hub/issues/407)) ([b8753d9](https://github.com/emma-simbot/experience-hub/commit/b8753d9637fa4d76ef913c9c4958ca329012f96b))
+
+
+### Bug Fixes
+
+* response when placing with empty inventory ([#409](https://github.com/emma-simbot/experience-hub/issues/409)) ([df5b33d](https://github.com/emma-simbot/experience-hub/commit/df5b33d7f501a3a9e6f4c710d2d03de0b0c3a09b))
+
 ## [8.16.1](https://github.com/emma-simbot/experience-hub/compare/v8.16.0...v8.16.1) (2023-03-07)
 
 
