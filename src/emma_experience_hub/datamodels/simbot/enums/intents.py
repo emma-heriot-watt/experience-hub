@@ -48,6 +48,9 @@ class SimBotIntentType(Enum):
     ask_about_appearance = "<ask><about_appearance>"
     greeting = "<greeting>"
     admiration = "<admiration>"
+    incomplete_utterance_find = "<incomplete_utterance_find>"
+    incomplete_utterance_goto = "<incomplete_utterance_goto>"
+    incomplete_utterance_pick = "<incomplete_utterance_pick>"
 
     # Feedback for previous turn success
     generic_success = "<success><generic>"
@@ -199,6 +202,9 @@ SimBotUserQAType = Literal[
     SimBotIntentType.ask_not_enough_information,
     SimBotIntentType.greeting,
     SimBotIntentType.admiration,
+    SimBotIntentType.incomplete_utterance_find,
+    SimBotIntentType.incomplete_utterance_goto,
+    SimBotIntentType.incomplete_utterance_pick,
 ]
 
 

@@ -19,6 +19,7 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
         # Get the intent from the response
         try:
             qa_intent_str: str = intent_entity_response["intent"]["name"]
+            qa_entities_response: list[Any] = intent_entity_response["entities"]
         except KeyError:
             logger.warning(
                 f"Intent key does not exist within the response: {intent_entity_response}"
@@ -26,8 +27,16 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
             return None
 
         # If it is a fallback or an instruction, ignore
-        if qa_intent_str == "nlu_fallback" or qa_intent_str.startswith(self._instruction_intent):
+        if qa_intent_str == "nlu_fallback":
             return None
+        if qa_intent_str.startswith(self._instruction_intent):
+            processed_intent = self._process_intent(
+                intent=qa_intent_str, entities=qa_entities_response
+            )
+            if processed_intent == qa_intent_str:
+                return None
+            else:
+                qa_intent_str = processed_intent
 
         # By the time we get here, the intents _should_ convert to the right form.
         try:
@@ -39,3 +48,11 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
         intent_type = cast(SimBotUserQAType, intent_type)
 
         return intent_type
+
+    def _process_intent(self, intent: str, entities: list[Any]) -> str:
+        # @TODO handle based on the extractor/entity. Reject if it can not be resolved to a known set of entities
+        if intent == "instruct_find" and not entities:
+            return "incomplete_utterance_find"
+        if intent == "instruct_goto" and not entities:
+            return "incomplete_utterance_goto"
+        return intent
