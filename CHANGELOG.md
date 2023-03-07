@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.17.1](https://github.com/emma-simbot/experience-hub/compare/v8.17.0...v8.17.1) (2023-03-07)
+
+
+### Bug Fixes
+
+* improve color changer prompt ([#412](https://github.com/emma-simbot/experience-hub/issues/412)) ([7717a9e](https://github.com/emma-simbot/experience-hub/commit/7717a9ec3217d41acefbef7ec25612e91fdbadd3))
+
 ## [8.17.0](https://github.com/emma-simbot/experience-hub/compare/v8.16.1...v8.17.0) (2023-03-07)
 
 
