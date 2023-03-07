@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.16.1](https://github.com/emma-simbot/experience-hub/compare/v8.16.0...v8.16.1) (2023-03-07)
+
+
+### Bug Fixes
+
+* update OOD version to include tracing within the inference step ([#408](https://github.com/emma-simbot/experience-hub/issues/408)) ([076d118](https://github.com/emma-simbot/experience-hub/commit/076d118a34722fd5e7334a45b01f3a27d52e2a76))
+
 ## [8.16.0](https://github.com/emma-simbot/experience-hub/compare/v8.15.0...v8.16.0) (2023-03-06)
 
 
