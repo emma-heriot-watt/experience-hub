@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.20.0](https://github.com/emma-simbot/experience-hub/compare/v8.19.0...v8.20.0) (2023-03-08)
+
+
+### Features
+
+* disable goto shelf plans ([#418](https://github.com/emma-simbot/experience-hub/issues/418)) ([032febb](https://github.com/emma-simbot/experience-hub/commit/032febb60f6cf0d585c35b54b02c09b61a8cb4d2))
+
+
+### Bug Fixes
+
+* Bump to v24 of Simbot-QA ([#416](https://github.com/emma-simbot/experience-hub/issues/416)) ([982f02b](https://github.com/emma-simbot/experience-hub/commit/982f02b9b9153e1524b176d12a7c68a8510e4a56))
+
 ## [8.19.0](https://github.com/emma-simbot/experience-hub/compare/v8.18.0...v8.19.0) (2023-03-08)
 
 
