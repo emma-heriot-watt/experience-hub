@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.19.0](https://github.com/emma-simbot/experience-hub/compare/v8.18.0...v8.19.0) (2023-03-08)
+
+
+### Features
+
+* bump perception ([#415](https://github.com/emma-simbot/experience-hub/issues/415)) ([8784fe2](https://github.com/emma-simbot/experience-hub/commit/8784fe236391650780b64f52f945f4bdac1ed816))
+
 ## [8.18.0](https://github.com/emma-simbot/experience-hub/compare/v8.17.1...v8.18.0) (2023-03-07)
 
 
