@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.20.1](https://github.com/emma-simbot/experience-hub/compare/v8.20.0...v8.20.1) (2023-03-08)
+
+
+### Bug Fixes
+
+* find object check ([#414](https://github.com/emma-simbot/experience-hub/issues/414)) ([5fe3ae2](https://github.com/emma-simbot/experience-hub/commit/5fe3ae257990073622e28ff0e48df8a898cd9bc5))
+
 ## [8.20.0](https://github.com/emma-simbot/experience-hub/compare/v8.19.0...v8.20.0) (2023-03-08)
 
 
