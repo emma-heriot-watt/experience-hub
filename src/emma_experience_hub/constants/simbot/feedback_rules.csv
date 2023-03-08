@@ -109,12 +109,12 @@ environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I'm already holding something and I can't hold anything else.</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can't hold anything else - my inventory space is limited</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",I can't hold anything else - my inventory space is limited,False
-environment_intent_type == "already_holding_object" and intent_type_counter["already_holding_object"] > 2,I can only hold on thing at a time - you can see what i'm holding in the bottom right of your screen!,False
-environment_intent_type == "already_holding_object" and environment_intent_entity != null,I can only hold one thing at a time so I can't hold the {environment_intent_entity}.,False
+environment_intent_type == "already_holding_object" and intent_type_counter["already_holding_object"] > 2 and not current_turn_has_user_utterance,I can only hold on thing at a time - you can see what i'm holding in the bottom right of your screen!,False
 environment_intent_type == "already_holding_object" and inventory_entity != null,I am already holding the {inventory_entity}. We should put it down first.,False
+environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. What's next?,False
+environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. Can you give me another instruction?,False
 environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null,I can only hold one thing at a time so I cannot pick up the {environment_intent_entity}.,False
 environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null and inventory_entity != null,I am already holding a {inventory_entity}. We need to put it down before I can pick up the {environment_intent_entity},False
-environment_intent_type == "already_holding_object" and environment_intent_entity != null and inventory_entity != null,I can't hold the {inventory_entity} and the {environment_intent_entity} at the same time,False
 environment_intent_type == "receptacle_is_full",It looks like that is already full.,False
 environment_intent_type == "receptacle_is_full",It looks full - any more and it would overflow!,False
 environment_intent_type == "receptacle_is_full",<amazon:emotion name="disappointed" intensity="low">If we added anything else - it would overflow.</amazon:emotion><prosody rate="fast">and that is a nono!</prosody>,False

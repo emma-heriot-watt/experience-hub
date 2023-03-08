@@ -127,7 +127,8 @@ class SimBotAgentIntentSelectionPipeline:
 
             # Otherwise, use the NLU to detect it
             intents = self._process_utterance_with_nlu(session)
-            return self._handle_act_no_match_intent(session=session, intents=intents)
+            intents = self._handle_act_no_match_intent(session=session, intents=intents)
+            return self._handle_search_holding_object(session=session, intents=intents)
 
         # If we are receiving an answer to a clarification question, then just act on it
         if user_intent == SimBotIntentType.clarify_answer:
@@ -419,6 +420,37 @@ class SimBotAgentIntentSelectionPipeline:
         # If the user didn't approve
         session.current_state.utterance_queue.reset()
         return SimBotAgentIntents()
+
+    def _handle_search_holding_object(
+        self, session: SimBotSession, intents: SimBotAgentIntents
+    ) -> SimBotAgentIntents:
+        """Avoid searching for what we are holding."""
+        # Are we holding an object?
+        holding_object = session.inventory.entity
+        if holding_object is None:
+            return intents
+        # Is the intent search or confirm before search?
+        # If yes, get the object we will search for
+        search_object = None
+        physical_interaction_intent = intents.physical_interaction
+        verbal_interaction_intent = intents.verbal_interaction
+        if physical_interaction_intent is not None:
+            if physical_interaction_intent.type == SimBotIntentType.search:
+                search_object = physical_interaction_intent.entity
+        elif verbal_interaction_intent is not None:
+            if verbal_interaction_intent.type == SimBotIntentType.confirm_before_search:
+                search_object = verbal_interaction_intent.entity
+        if search_object is None:
+            return intents
+        # Compare the search object with the holding object
+        if search_object == holding_object.lower():
+            session.current_state.utterance_queue.reset()
+            session.current_state.find_queue.reset()
+            session.current_turn.intent.environment = SimBotIntent(
+                type=SimBotIntentType.already_holding_object, entity=search_object
+            )
+            return SimBotAgentIntents()
+        return intents
 
     def _set_find_object_in_progress_intent(self, session: SimBotSession) -> SimBotAgentIntents:
         """Set the intent when find is in progress."""
