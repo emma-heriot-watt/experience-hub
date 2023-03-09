@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.21.0](https://github.com/emma-simbot/experience-hub/compare/v8.20.1...v8.21.0) (2023-03-09)
+
+
+### Features
+
+* Enable search across rooms ([#422](https://github.com/emma-simbot/experience-hub/issues/422)) ([d4fd504](https://github.com/emma-simbot/experience-hub/commit/d4fd504fb27c9d94887dc9c37359ec18be97d2fa))
+
 ## [8.20.1](https://github.com/emma-simbot/experience-hub/compare/v8.20.0...v8.20.1) (2023-03-08)
 
 
