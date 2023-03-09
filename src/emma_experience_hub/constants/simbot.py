@@ -1,3 +1,4 @@
+import json
 from collections.abc import Mapping
 from csv import DictReader
 from functools import lru_cache
@@ -83,6 +84,14 @@ def get_feedback_rules() -> list[dict[str, str]]:
     with open(csv_path, encoding="utf-8-sig") as csv_file:
         raw_rule_reader = DictReader(csv_file)
         return [{**rule, "id": str(idx)} for idx, rule in enumerate(raw_rule_reader, 2)]
+
+
+@lru_cache(maxsize=1)
+def get_prior_memory() -> dict[str, str]:
+    """Load prior memory of object location in rooms from file."""
+    json_path = constants_absolute_path.joinpath("simbot", "prior_memory.json")
+    with open(json_path) as json_file:
+        return json.load(json_file)
 
 
 ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(

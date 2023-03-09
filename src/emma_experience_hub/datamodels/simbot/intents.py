@@ -1,10 +1,15 @@
 from contextlib import suppress
-from typing import Generic, Optional, TypeVar, Union
+from typing import Generic, NamedTuple, Optional, TypeVar, Union
 
 from pydantic import validator
 from pydantic.generics import GenericModel
 
-from emma_experience_hub.datamodels.simbot.enums import SimBotActionType, SimBotIntentType
+from emma_experience_hub.datamodels.simbot import (
+    SimBotIntentType,
+    SimBotPhysicalInteractionIntentType,
+    SimBotVerbalInteractionIntentType,
+)
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 
 
 T = TypeVar("T", bound=SimBotIntentType)
@@ -34,3 +39,10 @@ class SimBotIntent(GenericModel, Generic[T]):
 
         # Otherwise just return it and let it error if it errors
         return intent_type
+
+
+class SimBotAgentIntents(NamedTuple):
+    """Tuple of selected agent intents."""
+
+    physical_interaction: Optional[SimBotIntent[SimBotPhysicalInteractionIntentType]] = None
+    verbal_interaction: Optional[SimBotIntent[SimBotVerbalInteractionIntentType]] = None

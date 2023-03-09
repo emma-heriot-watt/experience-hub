@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from emma_experience_hub.constants.simbot import get_prior_memory
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.common import ArenaLocation, Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
@@ -33,6 +34,7 @@ class SimBotObjectMemory(BaseModel):
     """Track all the observed objects and their closest viewpoints."""
 
     memory: dict[str, SimBotRoomMemoryType] = {}
+    _prior_memory: dict[str, str] = get_prior_memory()
 
     def update_from_action(
         self,
@@ -75,14 +77,24 @@ class SimBotObjectMemory(BaseModel):
 
         return memory_entity.location
 
-    def read_memory_entity_in_arena(self, object_label: str) -> list[ArenaLocation]:
+    def read_memory_entity_in_arena(self, object_label: str) -> list[tuple[str, ArenaLocation]]:
         """Find all objects in memory matching the object_label."""
         found_object_locations = []
         for room in self.memory:
             memory_location = self.read_memory_entity_in_room(room, object_label)
             if memory_location is not None:
-                found_object_locations.append(memory_location)
+                found_object_locations.append((room, memory_location))
         return found_object_locations
+
+    def read_prior_memory_entity_in_arena(self, object_label: str) -> Optional[str]:
+        """Find object room based on prior memory."""
+        return self._prior_memory.get(object_label.lower(), None)
+
+    def object_in_memory(self, object_label: str) -> bool:
+        """Is the object in the memory?"""
+        if self.read_memory_entity_in_arena(object_label):
+            return True
+        return self._prior_memory.get(object_label.lower(), None) is not None
 
     def write_memory_entities_in_room(
         self,

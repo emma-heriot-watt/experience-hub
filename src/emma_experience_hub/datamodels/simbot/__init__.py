@@ -17,7 +17,7 @@ from emma_experience_hub.datamodels.simbot.enums import (
     SimBotVerbalInteractionIntentType,
 )
 from emma_experience_hub.datamodels.simbot.feedback import SimBotFeedbackRule, SimBotFeedbackState
-from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
+from emma_experience_hub.datamodels.simbot.intents import SimBotAgentIntents, SimBotIntent
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
 from emma_experience_hub.datamodels.simbot.session import (

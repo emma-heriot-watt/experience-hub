@@ -152,21 +152,22 @@ environment_intent_type == "invalid_object_class" and environment_intent_entity 
 environment_intent_type == "killed_by_hazard",I am dead,False
 environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">no</say-as>,False
 environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">ouch</say-as>,False
-interaction_action_type == "GotoRoom",<amazon:emotion name="excited" intensity="medium">Made it!</amazon:emotion>,False
-interaction_action_type == "GotoRoom",So what should I do here?,False
-interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter,<amazon:emotion name="excited" intensity="low">New room - new task. so what next?</amazon:emotion>,False
-interaction_action_type == "GotoRoom" and interaction_action_entity != null,In the {interaction_action_entity} - now what?,False
-interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Still in the {current_room} - what next?,False
-interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Staying in the {current_room} - now what?,False
-interaction_action_type == "GotoRoom" and interaction_action_entity != null,I am in the {interaction_action_entity},False
-interaction_action_type == "GotoRoom" and interaction_action_entity != null,I got to the {interaction_action_entity},False
-interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
-interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and interaction_action_entity != null,Staying in the {interaction_action_entity},True
-interaction_action_type =~ "(GotoRoom|GotoObject)",On my way!,True
-interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,Going to the {interaction_action_entity},True
-interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,On my way to the {interaction_action_entity},True
-interaction_action_type == "GotoRoom" and interaction_action_entity != null,Moving to the {interaction_action_entity},True
-interaction_action_type == "GotoRoom" and interaction_action_entity != null,Let me get to the {interaction_action_entity},True
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom",<amazon:emotion name="excited" intensity="medium">Made it!</amazon:emotion>,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom",So what should I do here?,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter,<amazon:emotion name="excited" intensity="low">New room - new task. so what next?</amazon:emotion>,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,In the {interaction_action_entity} - now what?,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Still in the {current_room} - what next?,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Staying in the {current_room} - now what?,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I am in the {interaction_action_entity},False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I got to the {interaction_action_entity},False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and interaction_action_entity != null,Staying in the {interaction_action_entity},True
+interaction_action_type =~ "(GotoRoom|GotoObject)",Getting there!,True
+user_intent_type != "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,Going to the {interaction_action_entity},True
+user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Moving to the {interaction_action_entity},True
+user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Let me get to the {interaction_action_entity},True
+user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",On my way,True
+user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",I am on my way!,True
 physical_interaction_intent_type == "act_one_match",Done,False
 physical_interaction_intent_type == "act_one_match",Alright,False
 physical_interaction_intent_type == "act_one_match",So what should I do next?,False
@@ -185,7 +186,7 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Rot
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,Sorry I don't see the {physical_interaction_intent_entity}. Can you give me a different instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,<amazon:emotion name="disappointed" intensity="medium"> I am sorry I couldn't find the bowl.</amazon:emotion><amazon:emotion name="disappointed" intensity="low">.</amazon:emotion> Can I get a different instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,I can't find it. Can you give me another instruction?,False
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,Sorry I don't see. Can you give me another instruction?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,Sorry I don't see it. Can you give me another instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,<amazon:emotion name="excited" intensity="medium">Search complete!</amazon:emotion> What should I do next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,I think I found it - what are we doing next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Now what should I do?,False
@@ -205,6 +206,8 @@ physical_interaction_intent_type == "search" and verbal_interaction_intent_type 
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Starting the search!,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Let's find it!,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Alright - Searching for the {verbal_interaction_intent_entity}.,True
+user_intent_type == "confirm_no" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null, Searching in the current room then,True
+user_intent_type == "confirm_no" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null, Alright - searching in the current room then,True
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty,',True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still looking,True
@@ -304,3 +307,11 @@ interaction_action_type == "GotoObject" and interaction_action_entity != null an
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",Oops - not sure if this is an infected computer. Help me remove the floppy disk and move to another computer.,False
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",I think this is not an infected computer. Let's first remove the floppy disk and then help me move to another one.,False
 user_intent_type == "confirm_no" and interaction_action_per_turn[-1]["type"] == "GotoObject" and interaction_action_per_turn[-1]["goto"]["object"]["name"] == "Computer" and inventory_entity == "Floppy Disk",Alright - you can help me navigate to another computer. Start by telling me to turn left or right - or even go to a different room.,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoPosition" and verbal_interaction_intent_entity != null,I think we saw it before. Do you want me to search in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoPosition" and verbal_interaction_intent_entity != null and physical_interaction_intent_entity != null,If I remember correctly - we saw the {physical_interaction_intent_entity} in the {verbal_interaction_intent_entity}. Do you want me to search in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoPosition" and verbal_interaction_intent_entity != null and physical_interaction_intent_entity != null,I think that was in the {verbal_interaction_intent_entity}. Do you want me to search for the {physical_interaction_intent_entity} in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoPosition" and verbal_interaction_intent_entity != null and physical_interaction_intent_entity != null,I think we saw the {physical_interaction_intent_entity} in a different room. Do you want me to search in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoRoom" and verbal_interaction_intent_entity != null,That's usually in the {verbal_interaction_intent_entity}. Do you want me to search in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoRoom" and verbal_interaction_intent_entity != null,That should be in the {verbal_interaction_intent_entity}. Do you want me to look in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoRoom" and verbal_interaction_intent_entity != null and physical_interaction_intent_entity != null,The {physical_interaction_intent_entity} is usually located in the {verbal_interaction_intent_entity}. Do you want me to search in the {verbal_interaction_intent_entity}?,False
+verbal_interaction_intent_type == "confirm_before_goto_room" and interaction_action_type == "GotoRoom" and verbal_interaction_intent_entity != null and physical_interaction_intent_entity != null,I think the {physical_interaction_intent_entity} could be in the {verbal_interaction_intent_entity}. Do you want me to search the {verbal_interaction_intent_entity}?,False

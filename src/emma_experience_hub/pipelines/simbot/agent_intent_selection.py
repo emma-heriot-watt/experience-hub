@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import Optional
 
 from loguru import logger
 
@@ -10,26 +10,18 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotNLUIntentClient,
 )
 from emma_experience_hub.datamodels.simbot import (
+    SimBotAgentIntents,
     SimBotAnyUserIntentType,
     SimBotEnvironmentIntentType,
     SimBotIntent,
     SimBotIntentType,
     SimBotNLUIntentType,
-    SimBotPhysicalInteractionIntentType,
     SimBotSession,
     SimBotSessionTurn,
     SimBotUserIntentType,
     SimBotUserSpeech,
-    SimBotVerbalInteractionIntentType,
 )
 from emma_experience_hub.parsers import NeuralParser
-
-
-class SimBotAgentIntents(NamedTuple):
-    """Tuple of selected agent intents."""
-
-    physical_interaction: Optional[SimBotIntent[SimBotPhysicalInteractionIntentType]] = None
-    verbal_interaction: Optional[SimBotIntent[SimBotVerbalInteractionIntentType]] = None
 
 
 class SimBotAgentIntentSelectionPipeline:
@@ -175,16 +167,14 @@ class SimBotAgentIntentSelectionPipeline:
         This is primarily used to determine whether the agent should act or ask for more
         information.
         """
+        extracted_features = self._features_client.get_features(session.current_turn)
         intent = self._nlu_intent_parser(
             self._nlu_intent_client.generate(
                 dialogue_history=session.current_turn.utterances,
-                environment_state_history=[
-                    EnvironmentStateTurn(
-                        features=self._features_client.get_features(session.current_turn)
-                    )
-                ],
+                environment_state_history=[EnvironmentStateTurn(features=extracted_features)],
             )
         )
+        session.update_agent_memory(extracted_features)
         logger.debug(f"Extracted intent: {intent}")
 
         if not self._enable_clarification_questions and intent.type.triggers_question_to_user:
@@ -418,6 +408,21 @@ class SimBotAgentIntentSelectionPipeline:
             )
 
         # If the user didn't approve
+        user_negated_confirmation_for_gfh = (
+            session.previous_valid_turn is not None
+            and session.previous_valid_turn.intent.verbal_interaction is not None
+            and session.previous_valid_turn.intent.verbal_interaction.type
+            == SimBotIntentType.confirm_before_goto_room
+            and session.current_turn.intent.user == SimBotIntentType.confirm_no
+        )
+        if user_negated_confirmation_for_gfh:
+            session.current_turn.speech = SimBotUserSpeech(
+                utterance=session.current_state.utterance_queue.pop_from_head(),
+                from_utterance_queue=True,
+            )
+            return SimBotAgentIntents(
+                physical_interaction=SimBotIntent(type=SimBotIntentType.search)
+            )
         session.current_state.utterance_queue.reset()
         return SimBotAgentIntents()
 
@@ -491,8 +496,6 @@ class SimBotAgentIntentSelectionPipeline:
 
     def _should_confirm_before_search(self, session: SimBotSession, target_entity: str) -> bool:
         """Should the agent ask for confirmation before searching?"""
-        # Don't ask if we've seen the entity in the room
-        has_seen_object = session.current_state.memory.read_memory_entity_in_room(
-            session.current_turn.environment.current_room, target_entity
-        )
-        return has_seen_object is None
+        # Don't ask if we've seen the entity in any room or know it's possoble location from prior memory
+        has_seen_object = session.current_state.memory.object_in_memory(target_entity)
+        return not has_seen_object

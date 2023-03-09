@@ -1,0 +1,20 @@
+{
+	"coffee unmaker": "BreakRoom",
+	"color changer": "Lab2",
+	"fridge": "BreakRoom",
+	"freezer": "BreakRoom",
+	"freeze ray": "Lab1",
+	"freeze ray monitor": "Lab1",
+	"freeze ray shelf": "Lab1",
+	"laser": "Lab1",
+	"laser monitor": "Lab1",
+	"laser shelf": "Lab1",
+	"microwave": "BreakRoom",
+	"robot arm": "Lab1",
+	"time machine": "BreakRoom",
+	"pinter": "Lab1",
+	"gravity pad": "Lab2",
+	"gravity monitor": "Lab2",
+	"portal generator monitor": "Lab2",
+	"everything's a carrot machine": "Lab2"
+}

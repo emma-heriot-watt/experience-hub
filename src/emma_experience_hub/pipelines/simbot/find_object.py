@@ -18,6 +18,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
 )
 from emma_experience_hub.functions.simbot import (
     BasicSearchPlanner,
+    GrabFromHistory,
     GreedyMaximumVertexCoverSearchPlanner,
     SearchPlanner,
     SimBotSceneObjectTokens,
@@ -53,6 +54,7 @@ class SimBotFindObjectPipeline:
 
         self._search_planner = search_planner
         self._enable_grab_from_history = enable_grab_from_history
+        self._grab_from_history = GrabFromHistory()
 
     @classmethod
     def from_planner_type(
@@ -88,6 +90,8 @@ class SimBotFindObjectPipeline:
             with tracer.start_as_current_span("Building search plan"):
                 search_plan = self._build_search_plan(session)
 
+            if self._should_confirm_before_new_search(session, search_plan):
+                return search_plan[0]
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
             session.current_state.find_queue.extend_tail(search_plan)
@@ -125,27 +129,8 @@ class SimBotFindObjectPipeline:
     def _build_search_plan(self, session: SimBotSession) -> list[SimBotAction]:
         """Build a plan of actions for the current session."""
         if self._can_search_from_history(session):
-            # In practice this should never happen, if the searchable_object is not populated then this isnt a problem in the find pipeline
-            if session.current_turn.intent.physical_interaction is None:
-                return self._search_planner.run(session)
+            return self._grab_from_history(session, search_planner=self._search_planner)
 
-            searchable_object = session.current_turn.intent.physical_interaction.entity
-            if searchable_object is None:
-                return self._search_planner.run(session)
-
-            current_room = session.current_turn.environment.current_room
-
-            gfh_location = session.current_state.memory.read_memory_entity_in_room(
-                room_name=current_room, object_label=searchable_object
-            )
-
-            if gfh_location is None:
-                logger.debug(
-                    f"Could not retrieve {searchable_object} from memory {session.current_state.memory}"
-                )
-                return self._search_planner.run(session)
-            logger.debug(f"Found object {searchable_object} in location {gfh_location}")
-            return self._search_planner.run(session, gfh_location=gfh_location)
         return self._search_planner.run(session)
 
     def _should_start_new_search(self, session: SimBotSession) -> bool:
@@ -154,6 +139,19 @@ class SimBotFindObjectPipeline:
         If the queue is empty, start a new one. If the queue is not empty, do not.
         """
         return not session.is_find_object_in_progress
+
+    def _should_confirm_before_new_search(
+        self, session: SimBotSession, search_plan: list[SimBotAction]
+    ) -> bool:
+        """Should we confirm before starting the search?
+
+        If the verbal interaction intent triggers confirmation, ask before searching.
+        """
+        triggered_confirmation = (
+            session.current_turn.intent.verbal_interaction is not None
+            and session.current_turn.intent.verbal_interaction.type.triggers_confirmation_question
+        )
+        return triggered_confirmation and len(search_plan) > 0  # noqa: WPS507
 
     def _should_reset_utterance_queue(self, session: SimBotSession) -> bool:
         """Should we reset the utterance queue?
