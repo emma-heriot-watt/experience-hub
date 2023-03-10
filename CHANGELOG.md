@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.21.1](https://github.com/emma-simbot/experience-hub/compare/v8.21.0...v8.21.1) (2023-03-10)
+
+
+### Bug Fixes
+
+* I am sorry I couldnt find the bowl ([#426](https://github.com/emma-simbot/experience-hub/issues/426)) ([cff5c34](https://github.com/emma-simbot/experience-hub/commit/cff5c34b0891bb21d0604f2b544fb7f18edbf2cd))
+
 ## [8.21.0](https://github.com/emma-simbot/experience-hub/compare/v8.20.1...v8.21.0) (2023-03-09)
 
 
