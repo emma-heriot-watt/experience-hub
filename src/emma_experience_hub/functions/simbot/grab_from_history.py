@@ -49,6 +49,11 @@ class GrabFromHistory:
                 gfh_location = None
             return search_planner.run(session, gfh_location=gfh_location)
 
+        # If we just moved to a new room, search there
+        previous_turn = session.previous_valid_turn
+        if previous_turn and previous_turn.actions.interaction.is_goto_room:
+            return search_planner.run(session)
+
         #  Have we seen the object in a different room?
         gfh_other_room_locations = session.current_state.memory.read_memory_entity_in_arena(
             object_label=searchable_object
