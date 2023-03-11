@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.22.1](https://github.com/emma-simbot/experience-hub/compare/v8.22.0...v8.22.1) (2023-03-11)
+
+
+### Bug Fixes
+
+* Bug in check for moving rooms ([#428](https://github.com/emma-simbot/experience-hub/issues/428)) ([770b191](https://github.com/emma-simbot/experience-hub/commit/770b191bbaa887066f91cbd67f75c32cda040f94))
+
 ## [8.22.0](https://github.com/emma-simbot/experience-hub/compare/v8.21.2...v8.22.0) (2023-03-11)
 
 
