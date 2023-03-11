@@ -13,7 +13,7 @@ services:
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
     image_version: 1.33.0-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/nlu_annotations2_v2_iou0.1.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/simbot_nlu_v4.ckpt
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
@@ -39,7 +39,7 @@ services:
 
   - name: compound_splitter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/compound-splitter
-    image_version: 1.2.0
+    image_version: 1.4.0
 
   - name: simbot_hacks
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-hacks

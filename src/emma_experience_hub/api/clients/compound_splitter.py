@@ -26,3 +26,18 @@ class CompoundSplitterClient(Client):
             return []
 
         return response.json()
+
+    def resolve_coreferences(self, instructions: list[str]) -> str:
+        """Resolve coreferences."""
+        with httpx.Client(timeout=None) as client:
+            response = client.post(
+                f"{self._endpoint}/coreference_resolution", json={"instructions": instructions}
+            )
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPError as err:
+            logger.warning("Unable to perform coreference resolution.", exc_info=err)
+            return instructions[-1]
+
+        return response.json()

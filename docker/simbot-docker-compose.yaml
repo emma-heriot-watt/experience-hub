@@ -126,7 +126,7 @@ services:
     image: "${COMPOUND_SPLITTER_IMAGE}"
     environment:
       LOG_LEVEL: info
-      USE_HIGH_LEVEL_SPLITTER: True
+      USE_REGEX_HIGH_LEVEL_SPLITTER: True
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]
       <<: *healthcheck-defaults

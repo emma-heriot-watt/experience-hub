@@ -229,12 +229,12 @@ physical_interaction_intent_type == "search" and physical_interaction_intent_ent
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe a new perspective will help!,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,',True
 physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] == "GotoPosition",',True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and interacted_entities_counter[physical_interaction_intent_entity] > 0,It should be close to here,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and interacted_entities_counter[physical_interaction_intent_entity] > 0 and physical_interaction_intent_entity != null,Going back to the {physical_interaction_intent_entity}.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition",I think we saw it somewhere here.,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition",It should be somewhere here.,True
-physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition",I think we saw the {physical_interaction_intent_entity} somewhere here.,True
-physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition",I remember seeing the {physical_interaction_intent_entity} from here,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and interacted_entities_counter[physical_interaction_intent_entity] > 0 and visited_room_counter[current_room] > 1,It should be close to here,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and interacted_entities_counter[physical_interaction_intent_entity] > 0 and physical_interaction_intent_entity != null and visited_room_counter[current_room] > 1,Going back to the {physical_interaction_intent_entity}.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I think we saw it somewhere here.,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,It should be somewhere here.,True
+physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I think we saw the {physical_interaction_intent_entity} somewhere here.,True
+physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I remember seeing the {physical_interaction_intent_entity} from here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition",',True
 verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it first?,False
 verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity} in front of me. Should I start by finding it?,False

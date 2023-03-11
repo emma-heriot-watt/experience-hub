@@ -65,7 +65,8 @@ class SimBotController:
 
         logger.debug("Trying to split the instruction...")
         with tracer.start_as_current_span("Split compound utterance"):
-            return self.pipelines.compound_splitter.run(session)
+            session = self.pipelines.compound_splitter.run(session)
+            return self.pipelines.compound_splitter.run_coreference_resolution(session)
 
     def load_session_from_request(self, simbot_request: SimBotRequest) -> SimBotSession:
         """Load the entire session from the given request."""

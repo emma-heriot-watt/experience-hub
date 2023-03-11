@@ -551,6 +551,20 @@ class SimBotSession(BaseModel):
 
         return turns_within_window
 
+    def get_previous_user_intruction(self) -> Optional[str]:
+        """Get the previous user instruction."""
+        previous_turns = self.valid_turns[:-1]
+        # Iterate in reverse-order because we only care about the most recents turns
+        previous_instruction = None
+        for turn in previous_turns[::-1]:
+            # Add the turn to the window
+
+            # If the turn is an instruction
+            if turn.intent.user and turn.intent.user == SimBotIntentType.act and turn.speech:
+                return turn.speech.utterance
+
+        return previous_instruction
+
     def get_turns_since_last_user_utterance(self) -> list[SimBotSessionTurn]:
         """Get all the turns since the last user utterance."""
         turns_within_window = []
