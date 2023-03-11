@@ -50,8 +50,12 @@ class GrabFromHistory:
             return search_planner.run(session, gfh_location=gfh_location)
 
         # If we just moved to a new room, search there
-        previous_turn = session.previous_valid_turn
-        if previous_turn and previous_turn.actions.interaction.is_goto_room:
+        just_moved_rooms = (
+            session.previous_valid_turn
+            and session.previous_valid_turn.actions.interaction
+            and session.previous_valid_turn.actions.interaction.is_goto_room
+        )
+        if just_moved_rooms:
             return search_planner.run(session)
 
         #  Have we seen the object in a different room?
