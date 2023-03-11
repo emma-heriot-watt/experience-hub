@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.24.0](https://github.com/emma-simbot/experience-hub/compare/v8.23.0...v8.24.0) (2023-03-11)
+
+
+### Features
+
+* Coreference resolution and update models ([#432](https://github.com/emma-simbot/experience-hub/issues/432)) ([ba8f1e4](https://github.com/emma-simbot/experience-hub/commit/ba8f1e4bb99558885f96539068df02df876dbb28))
+
 ## [8.23.0](https://github.com/emma-simbot/experience-hub/compare/v8.22.1...v8.23.0) (2023-03-11)
 
 
