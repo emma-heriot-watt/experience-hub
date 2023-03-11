@@ -61,7 +61,7 @@ class SimBotObjectMemory(BaseModel):
 
         # if the action added something to the inventory then we cant find in the environment.
         if action.adds_object_to_inventory and action.payload.entity_name is not None:
-            self.memory[room_name].pop(action.payload.entity_name, None)
+            self.memory[room_name].pop(action.payload.entity_name.lower(), None)
 
     def read_memory_entity_in_room(
         self, room_name: str, object_label: str
@@ -203,7 +203,10 @@ class SimBotInventory(BaseModel, validate_assignment=True):
     def from_action(cls, action: SimBotAction, turn_idx: int) -> "SimBotInventory":
         """Instantiate an inventory from the action."""
         if action.adds_object_to_inventory and action.is_successful:
-            return cls(entity=action.payload.entity_name, turn_idx=turn_idx)
+            entity_name = action.payload.entity_name
+            if entity_name is not None:
+                entity_name = entity_name.lower()
+            return cls(entity=entity_name, turn_idx=turn_idx)
 
         if action.removes_object_from_inventory and action.is_successful:
             return cls(entity=None, turn_idx=turn_idx)

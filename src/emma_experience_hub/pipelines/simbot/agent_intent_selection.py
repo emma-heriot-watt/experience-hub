@@ -12,7 +12,6 @@ from emma_experience_hub.api.clients.simbot import (
 from emma_experience_hub.datamodels.simbot import (
     SimBotAgentIntents,
     SimBotAnyUserIntentType,
-    SimBotEnvironmentIntentType,
     SimBotIntent,
     SimBotIntentType,
     SimBotNLUIntentType,
@@ -22,6 +21,9 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotUserSpeech,
 )
 from emma_experience_hub.parsers import NeuralParser
+from emma_experience_hub.pipelines.simbot.environment_error_catching import (
+    SimBotEnvironmentErrorCatchingPipeline,
+)
 
 
 class SimBotAgentIntentSelectionPipeline:
@@ -37,6 +39,7 @@ class SimBotAgentIntentSelectionPipeline:
         nlu_intent_client: SimBotNLUIntentClient,
         nlu_intent_parser: NeuralParser[SimBotIntent[SimBotNLUIntentType]],
         action_predictor_client: SimbotActionPredictionClient,
+        environment_error_pipeline: SimBotEnvironmentErrorCatchingPipeline,
         simbot_hacks_client: SimBotHacksClient,
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
@@ -46,6 +49,7 @@ class SimBotAgentIntentSelectionPipeline:
 
         self._nlu_intent_client = nlu_intent_client
         self._nlu_intent_parser = nlu_intent_parser
+        self._environment_error_pipeline = environment_error_pipeline
         self._simbot_hacks_client = simbot_hacks_client
         self._action_predictor_client = action_predictor_client
 
@@ -55,13 +59,21 @@ class SimBotAgentIntentSelectionPipeline:
 
     def run(self, session: SimBotSession) -> SimBotAgentIntents:  # noqa: WPS212
         """Decide next action for the agent."""
-        # If the user has said something, give that priority.
+        # If there was an environment error, try to catch it and continue acting - else respond to it.
+        if session.current_turn.intent.environment:
+            if not self._environment_error_pipeline(session):
+                session.current_state.utterance_queue.reset()
+                logger.debug("Returning None as environment errors do not cause the agent to act.")
+                session.current_state.find_queue.reset()
+                return SimBotAgentIntents()
+
+        # If the user has said something, determine the agent intent
         if session.current_turn.intent.user:
             logger.debug("Getting agent intent from user intent.")
 
             # If we have received an invalid utterance, the agent does not act
             should_skip_action_selection = self._should_skip_action_selection(
-                session.current_turn.intent.user, session.current_turn.intent.environment
+                session.current_turn.intent.user
             )
             if should_skip_action_selection:
                 return SimBotAgentIntents()
@@ -78,11 +90,6 @@ class SimBotAgentIntentSelectionPipeline:
                 return self.extract_intent_from_user_utterance(
                     session.current_turn.intent.user, session
                 )
-
-        # If the environment has changed in a way that we did not want/expect, respond to it
-        if session.current_turn.intent.environment:
-            logger.debug("Returning None as environment errors do not cause the agent to act.")
-            return SimBotAgentIntents()
 
         # If we are currently in the middle of a search routine, continue it.
         if session.is_find_object_in_progress:
@@ -478,21 +485,9 @@ class SimBotAgentIntentSelectionPipeline:
             )
         return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search, entity=entity))
 
-    def _should_skip_action_selection(
-        self,
-        user_intent_type: SimBotAnyUserIntentType,
-        environment_intent: Optional[SimBotIntent[SimBotEnvironmentIntentType]] = None,
-    ) -> bool:
+    def _should_skip_action_selection(self, user_intent_type: SimBotAnyUserIntentType) -> bool:
         """No action needed after an invalid utterance, QA or an environment error."""
-        envrionment_error = (
-            environment_intent is not None and environment_intent.type.is_environment_error
-        )
-
-        return (
-            user_intent_type.is_invalid_user_utterance
-            or user_intent_type.is_user_qa
-            or envrionment_error
-        )
+        return user_intent_type.is_invalid_user_utterance or user_intent_type.is_user_qa
 
     def _should_confirm_before_search(self, session: SimBotSession, target_entity: str) -> bool:
         """Should the agent ask for confirmation before searching?"""

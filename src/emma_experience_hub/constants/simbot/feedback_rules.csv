@@ -93,6 +93,10 @@ environment_intent_type == "unsupported_action" and environment_intent_action_ty
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity != null and environment_intent_entity == "Color Changer",I can only use the color changer to place objects on it and change their color by pushing one of its buttons.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity == "Sink",I can place objects in the sink turn it on or fill up what I am holding.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity == "Button",Sorry I can only push the button.,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Clean|Fill)" and environment_intent_entity == "Sink",Let's try toggling the sink first.,True
+environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Clean|Fill)" and environment_intent_entity == "Sink",Let's try one more time.,True
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Open" and environment_intent_entity != null,Let's try one more time.,True
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Open" and environment_intent_entity != null,Oops - It's already open. Moving on.,True
 environment_intent_type == "unsupported_navigation",<amazon:domain name="conversational">Looks like I can't go there - can you give me another instruction?</amazon:domain>,False
 environment_intent_type == "unsupported_navigation",<amazon:domain name="conversational">I can't calculate a path without anything in the way</amazon:domain>,False
 environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">darn</say-as> - There's no clear path - do you have a different instruction?,False
@@ -114,7 +118,9 @@ environment_intent_type == "already_holding_object" and inventory_entity != null
 environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. What's next?,False
 environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. Can you give me another instruction?,False
 environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null,I can only hold one thing at a time so I cannot pick up the {environment_intent_entity}.,False
-environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null and inventory_entity != null,I am already holding a {inventory_entity}. We need to put it down before I can pick up the {environment_intent_entity},False
+environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null and inventory_entity != null and inventory_entity != environment_intent_entity,I am already holding a {inventory_entity}. We need to put it down before I can pick up the {environment_intent_entity},False
+environment_intent_type == "already_holding_object" and environment_intent_entity != null and inventory_entity != null,Already holding the {inventory_entity}. Let's keep going,True
+environment_intent_type == "already_holding_object" and environment_intent_entity != null and inventory_entity != null,Already holding the {inventory_entity}. Moving on with the plan,True
 environment_intent_type == "receptacle_is_full",It looks like that is already full.,False
 environment_intent_type == "receptacle_is_full",It looks full - any more and it would overflow!,False
 environment_intent_type == "receptacle_is_full",<amazon:emotion name="disappointed" intensity="low">If we added anything else - it would overflow.</amazon:emotion><prosody rate="fast">and that is a nono!</prosody>,False
@@ -124,11 +130,15 @@ environment_intent_type == "receptacle_is_full" and environment_intent_action_ty
 environment_intent_type == "receptacle_is_closed",I can't do that because the thing is closed,False
 environment_intent_type == "receptacle_is_closed",I can't do that because it's closed,False
 environment_intent_type == "receptacle_is_closed" and environment_intent_entity != null,I can't do that because the {environment_intent_entity} is closed.,False
+environment_intent_type == "receptacle_is_closed",Readjusting my plan,True
+environment_intent_type == "receptacle_is_closed" and environment_intent_entity != null,<say-as interpret-as="interjection">oops</say-as> Need to first open the {environment_intent_entity}.,True
 environment_intent_type == "target_inaccessible" and environment_intent_entity != null,I can't access the {environment_intent_entity} from here. Can you provide me an instruction so it's in my view?,False
 environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> it's too far. Can you tell me how to get closer?,False
 environment_intent_type == "target_out_of_range" and environment_intent_entity != null,The {environment_intent_entity} is too far away. I think we should get closer first.,False
 environment_intent_type == "target_out_of_range" and environment_intent_action_type == "Place" and environment_intent_entity != null,I can't reach the {environment_intent_entity} from here. Can you help me get closer?,False
-environment_intent_type == "target_out_of_range" and environment_intent_action_type == "Toggle" and environment_intent_entity != null,I can't toggle the {environment_intent_entity}. It's too far for these short robotic arms.,False
+environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> I was too far. Let's get closer,True
+environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> Let's get closer,True
+environment_intent_type == "target_out_of_range" and  environment_intent_entity != null,The {environment_intent_entity} was too far. Moving closer,True
 environment_intent_type == "alternate_navigation_used",I got as close as I could.,False
 environment_intent_type == "alternate_navigation_used",<say-as interpret-as="interjection">all righty</say-as> I think that's close enough,False
 environment_intent_type == "alternate_navigation_used",Hope that's close enough!,False

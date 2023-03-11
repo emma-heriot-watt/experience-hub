@@ -461,5 +461,18 @@
 		"Warehouse_Boxes": "warehouse boxes",
 		"Radio_01_Broken": "broken radio",
 		"LaserBase_toy": "laser toy"
-	}
+	},
+	"openable_objects": [
+		"Freezer",
+		"Cabinet",
+		"Counter",
+		"Microwave",
+		"Vending Machine",
+		"Fridge",
+		"Time Machine",
+		"Drawer",
+		"Fuse Box"
+	],
+	"cleanable_objects": ["Plate"],
+	"fillable_objects": ["Bowl", "Mug", "Coffee Pot"]
 }

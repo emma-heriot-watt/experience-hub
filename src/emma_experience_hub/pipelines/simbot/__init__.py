@@ -9,6 +9,9 @@ from emma_experience_hub.pipelines.simbot.agent_language_generation import (
 )
 from emma_experience_hub.pipelines.simbot.anticipator import SimbotAnticipatorPipeline
 from emma_experience_hub.pipelines.simbot.compound_splitter import SimBotCompoundSplitterPipeline
+from emma_experience_hub.pipelines.simbot.environment_error_catching import (
+    SimBotEnvironmentErrorCatchingPipeline,
+)
 from emma_experience_hub.pipelines.simbot.environment_intent_extraction import (
     SimBotEnvironmentIntentExtractionPipeline,
 )

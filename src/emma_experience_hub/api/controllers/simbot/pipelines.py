@@ -16,6 +16,7 @@ from emma_experience_hub.pipelines.simbot import (
     SimBotAgentLanguageGenerationPipeline,
     SimbotAnticipatorPipeline,
     SimBotCompoundSplitterPipeline,
+    SimBotEnvironmentErrorCatchingPipeline,
     SimBotEnvironmentIntentExtractionPipeline,
     SimBotFindObjectPipeline,
     SimBotRequestProcessingPipeline,
@@ -79,6 +80,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 nlu_intent_parser=SimBotNLUOutputParser(
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter
                 ),
+                environment_error_pipeline=SimBotEnvironmentErrorCatchingPipeline(),
                 action_predictor_client=clients.action_predictor,
                 simbot_hacks_client=clients.simbot_hacks,
                 _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,

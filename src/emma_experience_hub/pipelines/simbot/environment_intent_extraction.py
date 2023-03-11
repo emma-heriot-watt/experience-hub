@@ -27,11 +27,4 @@ class SimBotEnvironmentIntentExtractionPipeline:
         if not session.previous_turn:
             return None
         # If we received no action statuses, do nothing and return
-        intent = self._intent_from_action_status_parser(session.previous_turn)
-
-        if intent is not None and intent.type.is_environment_error:
-            session.current_state.utterance_queue.reset()
-            session.current_state.find_queue.reset()
-        # TODO: Add ways to handle other environment-based intents here
-
-        return intent
+        return self._intent_from_action_status_parser(session.previous_turn)
