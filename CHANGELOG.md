@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.22.0](https://github.com/emma-simbot/experience-hub/compare/v8.21.2...v8.22.0) (2023-03-11)
+
+
+### Features
+
+* Catch environment errors ([#424](https://github.com/emma-simbot/experience-hub/issues/424)) ([eb35c36](https://github.com/emma-simbot/experience-hub/commit/eb35c361da013f072b50c89661d381065910a9b1))
+
 ## [8.21.2](https://github.com/emma-simbot/experience-hub/compare/v8.21.1...v8.21.2) (2023-03-10)
 
 
