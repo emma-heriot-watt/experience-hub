@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.23.0](https://github.com/emma-simbot/experience-hub/compare/v8.22.1...v8.23.0) (2023-03-11)
+
+
+### Features
+
+* Update the simbot hacks version ([#431](https://github.com/emma-simbot/experience-hub/issues/431)) ([adf744d](https://github.com/emma-simbot/experience-hub/commit/adf744d53bc5b1621e1e9bd46376a0a043c92a22))
+
 ## [8.22.1](https://github.com/emma-simbot/experience-hub/compare/v8.22.0...v8.22.1) (2023-03-11)
 
 
