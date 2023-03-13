@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.25.0](https://github.com/emma-simbot/experience-hub/compare/v8.24.1...v8.25.0) (2023-03-13)
+
+
+### Features
+
+* new entity classifier in perception ([#435](https://github.com/emma-simbot/experience-hub/issues/435)) ([65548b7](https://github.com/emma-simbot/experience-hub/commit/65548b78be819df0dc9aec6567e5a6dee41c4ffc))
+
 ## [8.24.1](https://github.com/emma-simbot/experience-hub/compare/v8.24.0...v8.24.1) (2023-03-13)
 
 
