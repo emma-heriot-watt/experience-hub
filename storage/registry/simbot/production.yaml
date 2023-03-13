@@ -23,7 +23,7 @@ services:
 
   - name: feature_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/perception
-    image_version: 1.11.0-cu113
+    image_version: 1.12.0-cu113
 
     model_url: s3://emma-simbot/misc_projects/floppy_aug/checkpoints/model_0300125.pth
 
