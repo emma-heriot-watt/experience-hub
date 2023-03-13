@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.24.1](https://github.com/emma-simbot/experience-hub/compare/v8.24.0...v8.24.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* time machine prompt ([#433](https://github.com/emma-simbot/experience-hub/issues/433)) ([2813745](https://github.com/emma-simbot/experience-hub/commit/28137452b4d6fa4ac41da6dedbf78a4d2169dd7a))
+
 ## [8.24.0](https://github.com/emma-simbot/experience-hub/compare/v8.23.0...v8.24.0) (2023-03-11)
 
 
