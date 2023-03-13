@@ -44,10 +44,10 @@ class SimBotSessionDbClient(DynamoDbClient):
             )
             logger.debug(response)
         except ClientError as err:
-            error_code = err.response["Error"]["Code"]  # pyright: ignore
+            logger.exception("Could not add turn to table.", exc_info=err)
 
+            error_code = err.response["Error"]["Code"]  # pyright: ignore
             if error_code != "ConditionalCheckFailedException":
-                logger.exception("Could not add turn to table.", exc_info=err)
                 raise err
 
     def put_session_turn(self, session_turn: SimBotSessionTurn) -> None:
