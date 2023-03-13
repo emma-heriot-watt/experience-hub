@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.25.1](https://github.com/emma-simbot/experience-hub/compare/v8.25.0...v8.25.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* always log the error if we cannot add a turn to the dynamo db table ([4ee6cb5](https://github.com/emma-simbot/experience-hub/commit/4ee6cb57297900a10f91ec536b5879669686c379))
+
 ## [8.25.0](https://github.com/emma-simbot/experience-hub/compare/v8.24.1...v8.25.0) (2023-03-13)
 
 
