@@ -136,10 +136,12 @@ _ACTION_SYNONYMS_FOR_GENERATION: Mapping[str, str] = MappingProxyType(
         "Laser Shelf": "red shelf",
         "Laser Monitor": "red monitor",
         "Freeze Ray Shelf": "blue shelf",
-        "Freeze Ray Monitor": "blue monitor",
-        "Gravity Monitor": "green monitor",
-        "Embiggenator Monitor": "pink monitor",
-        "Portal Generator Monitor": "black monitor",
+        "Freeze Ray Monitor": "blue computer",
+        "Gravity Monitor": "green computer",
+        "Embiggenator Monitor": "pink computer",
+        "Portal Generator Monitor": "black computer",
+        "Everything's A Carrot Machine": "carrot machine",
+        "Coffee Unmaker": "coffee composer",
     }
 )
 

@@ -90,7 +90,7 @@ class SimBotFindObjectPipeline:
             with tracer.start_as_current_span("Building search plan"):
                 search_plan = self._build_search_plan(session)
 
-            if self._should_confirm_before_new_search(session, search_plan):
+            if self._should_goto_room_before_new_search(session, search_plan):
                 return search_plan[0]
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
@@ -140,18 +140,13 @@ class SimBotFindObjectPipeline:
         """
         return not session.is_find_object_in_progress
 
-    def _should_confirm_before_new_search(
+    def _should_goto_room_before_new_search(
         self, session: SimBotSession, search_plan: list[SimBotAction]
     ) -> bool:
-        """Should we confirm before starting the search?
-
-        If the verbal interaction intent triggers confirmation, ask before searching.
-        """
-        triggered_confirmation = (
-            session.current_turn.intent.verbal_interaction is not None
-            and session.current_turn.intent.verbal_interaction.type.triggers_confirmation_question
-        )
-        return triggered_confirmation and len(search_plan) > 0  # noqa: WPS507
+        """Should we go to another room before starting the search?"""
+        if not len(search_plan):
+            return False
+        return search_plan[0].type == SimBotActionType.GotoRoom
 
     def _should_reset_utterance_queue(self, session: SimBotSession) -> bool:
         """Should we reset the utterance queue?
