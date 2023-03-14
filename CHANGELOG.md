@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.27.0](https://github.com/emma-simbot/experience-hub/compare/v8.26.2...v8.27.0) (2023-03-14)
+
+
+### Features
+
+* special monitor patch ([#444](https://github.com/emma-simbot/experience-hub/issues/444)) ([ae6141d](https://github.com/emma-simbot/experience-hub/commit/ae6141d823c7702d0979efdd3caa9fde2b66911f))
+
 ## [8.26.2](https://github.com/emma-simbot/experience-hub/compare/v8.26.1...v8.26.2) (2023-03-14)
 
 
