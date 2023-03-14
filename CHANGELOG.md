@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.26.1](https://github.com/emma-simbot/experience-hub/compare/v8.26.0...v8.26.1) (2023-03-14)
+
+
+### Bug Fixes
+
+* Goto object from prior memory ([#441](https://github.com/emma-simbot/experience-hub/issues/441)) ([6e1e328](https://github.com/emma-simbot/experience-hub/commit/6e1e328b92832d7028251b63a8c3bd5c72ad79df))
+
 ## [8.26.0](https://github.com/emma-simbot/experience-hub/compare/v8.25.1...v8.26.0) (2023-03-14)
 
 
