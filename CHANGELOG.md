@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.27.2](https://github.com/emma-simbot/experience-hub/compare/v8.27.1...v8.27.2) (2023-03-14)
+
+
+### Bug Fixes
+
+* nlu special monitor patch ([#447](https://github.com/emma-simbot/experience-hub/issues/447)) ([79c9119](https://github.com/emma-simbot/experience-hub/commit/79c9119a43a60321eff02a48d3f20b8fe079cf0e))
+
 ## [8.27.1](https://github.com/emma-simbot/experience-hub/compare/v8.27.0...v8.27.1) (2023-03-14)
 
 
