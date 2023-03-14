@@ -1,8 +1,12 @@
 from loguru import logger
 
+from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
-from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
+from emma_experience_hub.datamodels.simbot import SimBotSession
+from emma_experience_hub.datamodels.simbot.actions import SimBotAction
+from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 from emma_experience_hub.datamodels.simbot.payloads import SimBotGotoRoom, SimBotGotoRoomPayload
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 from emma_experience_hub.functions.simbot.search import SearchPlanner
 
 
@@ -63,10 +67,14 @@ class GrabFromHistory:
         """Move to the correct room based on prior memory."""
         if session.current_turn.speech is not None:
             utterance = session.current_turn.speech.utterance
+            role = session.current_turn.speech.role
         else:
             utterance = f"find the {searchable_object}"
+            role = SpeakerRole.agent
 
-        session.current_state.utterance_queue.append_to_head(utterance)
+        session.current_state.utterance_queue.append_to_head(
+            SimBotQueueUtterance(utterance=utterance, role=role),
+        )
         return [self._create_goto_room_action(room)]
 
     def _create_goto_room_action(self, room: str) -> SimBotAction:

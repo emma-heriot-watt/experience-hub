@@ -1,5 +1,6 @@
 from typing import Optional
 
+from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.datamodels.simbot import (
     SimBotAgentIntents,
     SimBotIntent,
@@ -9,6 +10,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotUserIntentType,
     SimBotUserSpeech,
 )
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 
 
 def set_find_object_in_progress_intent(session: SimBotSession) -> SimBotAgentIntents:
@@ -77,22 +79,6 @@ class SimBotConfirmationHandler:
                 physical_interaction=SimBotIntent(type=SimBotIntentType.act_previous)
             )
 
-        # If the user didn't approve
-        user_negated_confirmation_for_gfh = (
-            session.previous_valid_turn is not None
-            and session.previous_valid_turn.intent.verbal_interaction is not None
-            and session.previous_valid_turn.intent.verbal_interaction.type
-            == SimBotIntentType.confirm_before_goto_room
-            and session.current_turn.intent.user == SimBotIntentType.confirm_no
-        )
-        if user_negated_confirmation_for_gfh:
-            session.current_turn.speech = SimBotUserSpeech(
-                utterance=session.current_state.utterance_queue.pop_from_head(),
-                from_utterance_queue=True,
-            )
-            return SimBotAgentIntents(
-                physical_interaction=SimBotIntent(type=SimBotIntentType.search)
-            )
         session.current_state.utterance_queue.reset()
         return SimBotAgentIntents()
 
@@ -110,7 +96,7 @@ class SimBotConfirmationHandler:
 
         # Do a search routine before executing the current instruction.
         session.current_state.utterance_queue.append_to_head(
-            previous_turn.speech.utterance,  # type: ignore[union-attr]
+            SimBotQueueUtterance(utterance=previous_turn.speech.utterance, role=SpeakerRole.agent),  # type: ignore[union-attr]
         )
         target_entity = previous_turn.intent.verbal_interaction.entity
         session.current_turn.speech = SimBotUserSpeech(utterance=f"find the {target_entity}")
@@ -128,9 +114,9 @@ class SimBotConfirmationHandler:
         # If the user approved
         if user_intent == SimBotIntentType.confirm_yes:
             # Pop the first element in the instruction plan and add it to the utterance speech
+            queue_elem = session.current_state.utterance_queue.pop_from_head()
             session.current_turn.speech = SimBotUserSpeech(
-                utterance=session.current_state.utterance_queue.pop_from_head(),
-                from_utterance_queue=True,
+                utterance=queue_elem.utterance, from_utterance_queue=True, role=queue_elem.role
             )
             return None
 

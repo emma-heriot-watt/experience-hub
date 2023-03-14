@@ -31,7 +31,6 @@ class SimBotIntentType(Enum):
     confirm_before_act = "<confirm><act>"
     confirm_before_goto_object = "<confirm><goto_object>"
     confirm_before_goto_viewpoint = "<confirm><goto_viewpoint>"
-    confirm_before_goto_room = "<confirm><goto_room>"
     confirm_before_search = "<confirm><search>"
     confirm_before_plan = "<confirm><plan>"
 
@@ -130,7 +129,6 @@ class SimBotIntentType(Enum):
             SimBotIntentType.confirm_before_act,
             SimBotIntentType.confirm_before_goto_object,
             SimBotIntentType.confirm_before_goto_viewpoint,
-            SimBotIntentType.confirm_before_goto_room,
             SimBotIntentType.confirm_before_search,
             SimBotIntentType.confirm_before_plan,
         }
@@ -255,7 +253,6 @@ SimBotPhysicalInteractionIntentType = Literal[
 SimBotVerbalInteractionIntentType = Literal[
     SimBotIntentType.confirm_generic,
     SimBotIntentType.confirm_before_act,
-    SimBotIntentType.confirm_before_goto_room,
     SimBotIntentType.confirm_before_goto_object,
     SimBotIntentType.confirm_before_goto_viewpoint,
     SimBotIntentType.confirm_before_search,

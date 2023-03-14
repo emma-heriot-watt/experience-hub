@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.datamodels.simbot.payloads import SimBotSpeechRecognitionPayload
 
 
@@ -8,6 +9,7 @@ class SimBotUserSpeech(BaseModel):
 
     utterance: str
     from_utterance_queue: bool = False
+    role: SpeakerRole = SpeakerRole.user
 
     @classmethod
     def from_speech_recognition_payload(

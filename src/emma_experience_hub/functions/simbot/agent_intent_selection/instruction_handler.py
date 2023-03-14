@@ -2,7 +2,7 @@ from typing import Optional
 
 from loguru import logger
 
-from emma_common.datamodels import EnvironmentStateTurn
+from emma_common.datamodels import EnvironmentStateTurn, SpeakerRole
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
     SimBotFeaturesClient,
@@ -17,6 +17,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
     SimBotUserSpeech,
 )
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 from emma_experience_hub.parsers import NeuralParser
 
 
@@ -99,7 +100,10 @@ class SimBotActHandler:
 
         if room_text_match.arena_room == session.current_turn.environment.current_room:
             return False
-        session.current_state.utterance_queue.append_to_head(room_text_match.modified_utterance)
+        queue_elem = SimBotQueueUtterance(
+            utterance=room_text_match.modified_utterance, role=SpeakerRole.agent
+        )
+        session.current_state.utterance_queue.append_to_head(queue_elem)
         session.current_turn.speech = SimBotUserSpeech(
             utterance=f"go to the {room_text_match.room_name}"
         )
@@ -183,9 +187,11 @@ class SimBotActHandler:
                 ),
             )
         # Otherwise start the search
-        session.current_state.utterance_queue.append_to_head(
-            session.current_turn.speech.utterance,  # type: ignore[union-attr]
+        queue_elem = SimBotQueueUtterance(
+            utterance=session.current_turn.speech.utterance,  # type: ignore[union-attr]
+            role=SpeakerRole.user,
         )
+        session.current_state.utterance_queue.append_to_head(queue_elem)
         session.current_turn.speech = SimBotUserSpeech(utterance=f"find the {target_entity}")
         return SimBotAgentIntents(
             SimBotIntent(type=SimBotIntentType.search, entity=target_entity),

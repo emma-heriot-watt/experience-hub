@@ -44,6 +44,11 @@ class SimBotRequestProcessingPipeline:
             # Check whether or not the agent inventory needs updating
             session.try_to_update_agent_inventory()
 
+            if session_turn.speech:
+                session.current_state.last_user_utterance.append_to_head(
+                    session_turn.speech.utterance
+                )
+
         logger.debug(f"Current turn: {session.current_turn}")
 
         if session_turn != session.current_turn:

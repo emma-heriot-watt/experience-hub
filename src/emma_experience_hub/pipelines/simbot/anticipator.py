@@ -1,8 +1,10 @@
 from loguru import logger
 from opentelemetry import trace
 
+from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.api.clients.simbot import SimBotHacksClient
 from emma_experience_hub.datamodels.simbot import SimBotIntent, SimBotIntentType, SimBotSession
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 
 
 tracer = trace.get_tracer(__name__)
@@ -38,8 +40,10 @@ class SimbotAnticipatorPipeline:
                 f"[Plan] Adding the plan utterances to the queue: {anticipator_output.utterances}"
             )
             session.current_state.utterance_queue.reset()
-            session.current_state.utterance_queue.extend_tail(anticipator_output.utterances)
-
+            session.current_state.utterance_queue.extend_tail(
+                SimBotQueueUtterance(utterance=utterance, role=SpeakerRole.agent)
+                for utterance in anticipator_output.utterances
+            )
             # We also need to update the verbal interaction intent to confirm in order to
             # get the confirmation from the user in the next turn
             session.current_turn.intent.verbal_interaction = SimBotIntent(

@@ -33,7 +33,7 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataUri,
     SimBotObjectOutputType,
 )
-from emma_experience_hub.datamodels.simbot.queue import SimBotQueue
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueue, SimBotQueueUtterance
 from emma_experience_hub.datamodels.simbot.request import SimBotRequest
 from emma_experience_hub.datamodels.simbot.response import SimBotResponse
 from emma_experience_hub.datamodels.simbot.speech import SimBotUserSpeech
@@ -300,10 +300,11 @@ class SimBotSessionState(BaseModel, validate_assignment=True):
     not needed in future turns.
     """
 
-    utterance_queue: SimBotQueue[str] = SimBotQueue[str]()
+    utterance_queue: SimBotQueue[SimBotQueueUtterance] = SimBotQueue[SimBotQueueUtterance]()
     find_queue: SimBotQueue[SimBotAction] = SimBotQueue[SimBotAction]()
     inventory: SimBotInventory = SimBotInventory()
     memory: SimBotObjectMemory = SimBotObjectMemory()
+    last_user_utterance: SimBotQueue[str] = SimBotQueue[str]()
 
 
 class SimBotSessionTurn(BaseModel):
@@ -550,20 +551,6 @@ class SimBotSession(BaseModel):
         turns_within_window.reverse()
 
         return turns_within_window
-
-    def get_previous_user_intruction(self) -> Optional[str]:
-        """Get the previous user instruction."""
-        previous_turns = self.valid_turns[:-1]
-        # Iterate in reverse-order because we only care about the most recents turns
-        previous_instruction = None
-        for turn in previous_turns[::-1]:
-            # Add the turn to the window
-
-            # If the turn is an instruction
-            if turn.intent.user and turn.intent.user == SimBotIntentType.act and turn.speech:
-                return turn.speech.utterance
-
-        return previous_instruction
 
     def get_turns_since_last_user_utterance(self) -> list[SimBotSessionTurn]:
         """Get all the turns since the last user utterance."""

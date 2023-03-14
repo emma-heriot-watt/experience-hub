@@ -1,3 +1,4 @@
+from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.constants.simbot import get_arena_definitions
 from emma_experience_hub.datamodels.simbot import (
     SimBotActionType,
@@ -6,6 +7,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSessionTurn,
     SimBotUserSpeech,
 )
+from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 
 
 class SimBotEnvironmentErrorCatchingPipeline:
@@ -123,8 +125,11 @@ class SimBotEnvironmentErrorCatchingPipeline:
         if target != "sink" and target is self._fillable_objects:
             return False
         self._store_current_utterance_if_needed(session)
-        session.current_state.utterance_queue.append_to_head(f"fill the {target}")
-        session.current_turn.speech = SimBotUserSpeech(utterance="toggle the sink")
+        queue_elem = SimBotQueueUtterance(utterance=f"fill the {target}", role=SpeakerRole.agent)
+        session.current_state.utterance_queue.append_to_head(queue_elem)
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance="toggle the sink", role=SpeakerRole.agent
+        )
         return True
 
     def _handle_clean_action_execution_error(self, session: SimBotSession, target: str) -> bool:
@@ -132,8 +137,11 @@ class SimBotEnvironmentErrorCatchingPipeline:
         if target != "sink" and target is self._cleanable_objects:
             return False
         self._store_current_utterance_if_needed(session)
-        session.current_state.utterance_queue.append_to_head(f"clean the {target}")
-        session.current_turn.speech = SimBotUserSpeech(utterance="toggle the sink")
+        queue_elem = SimBotQueueUtterance(utterance=f"clean the {target}", role=SpeakerRole.agent)
+        session.current_state.utterance_queue.append_to_head(queue_elem)
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance="toggle the sink", role=SpeakerRole.agent
+        )
         return True
 
     def _store_current_utterance_if_needed(self, session: SimBotSession) -> None:
@@ -142,9 +150,10 @@ class SimBotEnvironmentErrorCatchingPipeline:
             return
 
         if session.current_turn.speech is not None:
-            session.current_state.utterance_queue.append_to_head(
-                session.current_turn.speech.utterance
+            queue_elem = SimBotQueueUtterance(
+                utterance=session.current_turn.speech.utterance, role=SpeakerRole.agent
             )
+        session.current_state.utterance_queue.append_to_head(queue_elem)
 
     def _fix_and_repeat_failed_instruction(
         self, session: SimBotSession, previous_turn: SimBotSessionTurn, new_current_utterance: str
@@ -156,7 +165,12 @@ class SimBotEnvironmentErrorCatchingPipeline:
         # Add the current instruction to the utterrance queue
         self._store_current_utterance_if_needed(session)
         # Add the failed instruction to the utterance queue
-        session.current_state.utterance_queue.append_to_head(previous_speech.utterance)
+        queue_elem = SimBotQueueUtterance(
+            utterance=previous_speech.utterance, role=previous_speech.role
+        )
+        session.current_state.utterance_queue.append_to_head(queue_elem)
         # Add a new instruction to fix the state
-        session.current_turn.speech = SimBotUserSpeech(utterance=new_current_utterance)
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance=new_current_utterance, role=previous_speech.role
+        )
         return True

@@ -3,8 +3,10 @@ from collections.abc import Iterable
 from enum import Enum
 from typing import Callable, Generic, TypeVar
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
+
+from emma_common.datamodels import SpeakerRole
 
 
 QueueType = TypeVar("QueueType")
@@ -15,6 +17,20 @@ class QueueSide(Enum):
 
     head = "head"
     tail = "tail"
+
+
+class SimBotQueueUtterance(BaseModel):
+    """An element that populates the utterance queue of the system."""
+
+    utterance: str
+    role: SpeakerRole = SpeakerRole.user
+
+    class Config:
+        """Config for the model."""
+
+        json_encoders = {
+            SpeakerRole: lambda speaker_role: speaker_role.base_type.name,
+        }
 
 
 class SimBotQueue(GenericModel, Generic[QueueType], validate_assignment=True):

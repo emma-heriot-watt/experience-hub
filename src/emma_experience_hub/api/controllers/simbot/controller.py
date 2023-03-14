@@ -3,10 +3,12 @@ from contextlib import suppress
 from loguru import logger
 from opentelemetry import trace
 
+from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.api.controllers.simbot.clients import SimBotControllerClients
 from emma_experience_hub.api.controllers.simbot.pipelines import SimBotControllerPipelines
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels.simbot import (
+    SimBotIntentType,
     SimBotRequest,
     SimBotResponse,
     SimBotSession,
@@ -63,6 +65,15 @@ class SimBotController:
             logger.debug("Current turn already has user intent; utterance will not be split.")
             return session
 
+        # Current speech is from agent planner
+        speech_from_planner = (
+            session.current_turn.speech is None
+            or session.current_turn.speech.role == SpeakerRole.agent
+        )
+        if speech_from_planner:
+            logger.debug("Current turn is executing an utterance from the planner.")
+            return session
+
         logger.debug("Trying to split the instruction...")
         with tracer.start_as_current_span("Split compound utterance"):
             session = self.pipelines.compound_splitter.run(session)
@@ -101,6 +112,8 @@ class SimBotController:
             logger.debug(
                 f"User intent (`{session.current_turn.intent.user}`) already exists for turn; using that."
             )
+            if session.current_state.last_user_utterance.is_not_empty:
+                session.current_state.last_user_utterance.pop_from_head()
             return session
 
         # If the utterance is valid, extract the intent from it.
@@ -110,6 +123,8 @@ class SimBotController:
             user_intent = self.pipelines.user_intent_extractor.run(session)
 
         logger.info(f"[INTENT] User: `{user_intent}`")
+        if user_intent != SimBotIntentType.act:
+            session.current_state.last_user_utterance.pop_from_head()
 
         session.current_turn.intent.user = user_intent
         return self._clear_queue_after_user_intent(session)
@@ -148,9 +163,11 @@ class SimBotController:
             logger.info(
                 f"[REQUEST]: Get utterance from the session queue ({len(session.current_state.utterance_queue) - 1} remaining"
             )
+            queue_elem = session.current_state.utterance_queue.pop_from_head()
             session.current_turn.speech = SimBotUserSpeech(
-                utterance=session.current_state.utterance_queue.pop_from_head(),
+                utterance=queue_elem.utterance,
                 from_utterance_queue=True,
+                role=queue_elem.role,
             )
 
         return session
