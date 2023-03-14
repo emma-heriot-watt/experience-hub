@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.27.1](https://github.com/emma-simbot/experience-hub/compare/v8.27.0...v8.27.1) (2023-03-14)
+
+
+### Bug Fixes
+
+* get all turns from dynamo db, paginating if need be ([#446](https://github.com/emma-simbot/experience-hub/issues/446)) ([6a9de14](https://github.com/emma-simbot/experience-hub/commit/6a9de140cd306e8f106af2783794fab1013e2fe7))
+
 ## [8.27.0](https://github.com/emma-simbot/experience-hub/compare/v8.26.2...v8.27.0) (2023-03-14)
 
 
