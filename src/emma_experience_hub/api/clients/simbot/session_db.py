@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -80,9 +81,7 @@ class SimBotSessionDbClient(DynamoDbClient):
     def get_all_session_turns(self, session_id: str) -> list[SimBotSessionTurn]:
         """Get all the turns for a given session."""
         try:
-            response = self._table.query(
-                KeyConditionExpression=Key(self.primary_key).eq(session_id)
-            )
+            all_raw_turns = self._get_all_session_turns(session_id)
         except ClientError as query_err:
             logger.exception("Could not query for session turns", exc_info=query_err)
             raise query_err
@@ -93,7 +92,7 @@ class SimBotSessionDbClient(DynamoDbClient):
                 parsed_responses = list(
                     thread_pool.map(
                         SimBotSessionTurn.parse_raw,
-                        (response_item[self.data_key] for response_item in response["Items"]),
+                        (response_item[self.data_key] for response_item in all_raw_turns),
                     )
                 )
             except Exception as parse_err:
@@ -109,3 +108,19 @@ class SimBotSessionDbClient(DynamoDbClient):
         sorted_responses = sorted(parsed_responses, key=lambda turn: turn.idx)
 
         return sorted_responses
+
+    def _get_all_session_turns(self, session_id: str) -> list[dict[str, Any]]:
+        response = self._table.query(KeyConditionExpression=Key(self.primary_key).eq(session_id))
+
+        all_response_items = response["Items"]
+
+        # If not all the instances have been returned, get the next set
+        while "LastEvaluatedKey" in response:
+            response = self._table.query(
+                KeyConditionExpression=Key(self.primary_key).eq(session_id),
+                ExclusiveStartKey=response["LastEvaluatedKey"],
+            )
+
+            all_response_items.extend(response["Items"])
+
+        return all_response_items
