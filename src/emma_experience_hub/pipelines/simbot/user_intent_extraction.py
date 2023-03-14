@@ -101,11 +101,7 @@ class SimBotUserIntentExtractionPipeline:
 
         # Did agent ask for confirmation?
         if verbal_interaction_intent_type.triggers_confirmation_question:
-            # Make sure the user utterance exists
-            if not session.current_turn.speech:
-                raise AssertionError("There is no utterance from the user? That's not right")
-
-            return self.handle_confirmation_request_approval(session.current_turn.speech.utterance)
+            return self.handle_confirmation_request_approval(session)
 
         raise NotImplementedError("There is no known way to handle the type of question provided.")
 
@@ -117,10 +113,22 @@ class SimBotUserIntentExtractionPipeline:
         # Assume it's a clarification answerr
         return SimBotIntentType.clarify_answer
 
-    def handle_confirmation_request_approval(self, utterance: str) -> SimBotUserIntentType:
+    def handle_confirmation_request_approval(self, session: SimBotSession) -> SimBotUserIntentType:
         """Check if the confirmation request was approved and return the correct intent."""
+        # Make sure the user utterance exists
+        if not session.current_turn.speech:
+            raise AssertionError("There is no utterance from the user? That's not right")
+        utterance = session.current_turn.speech.utterance.lower()
+
+        # Make sure the agent question exists
+        if session.previous_turn is None or session.previous_turn.actions.dialog is None:
+            raise AssertionError("There is no question from the agent? That's not right")
+        previous_dialog_action = session.previous_turn.actions.dialog
+        previous_agent_utterance = previous_dialog_action.payload.value.lower()
+
+        # Run the confirmation classifier
         confirmation_approved = self._confirmation_response_classifier.is_request_approved(
-            utterance
+            " ".join([previous_agent_utterance, utterance]).lower()
         )
         # If the utterance is NOT a response to the confirmation request
         if confirmation_approved is None:
