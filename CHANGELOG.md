@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.26.0](https://github.com/emma-simbot/experience-hub/compare/v8.25.1...v8.26.0) (2023-03-14)
+
+
+### Features
+
+* anticipator for robot arm ([#438](https://github.com/emma-simbot/experience-hub/issues/438)) ([09b9361](https://github.com/emma-simbot/experience-hub/commit/09b936154b9fac8b394978228cf0ddd0f338fe44))
+* better prompts for robot arm ([#440](https://github.com/emma-simbot/experience-hub/issues/440)) ([5176472](https://github.com/emma-simbot/experience-hub/commit/5176472b45fb4f014ebe120ba01ad243fd177de1))
+* Update the coreference resolution ([#439](https://github.com/emma-simbot/experience-hub/issues/439)) ([dc01639](https://github.com/emma-simbot/experience-hub/commit/dc0163974d14d0a7f002d644e14d3c6d82516a1e))
+
 ## [8.25.1](https://github.com/emma-simbot/experience-hub/compare/v8.25.0...v8.25.1) (2023-03-13)
 
 
