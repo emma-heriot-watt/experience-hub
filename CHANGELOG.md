@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.27.3](https://github.com/emma-simbot/experience-hub/compare/v8.27.2...v8.27.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* last utterance for coreference ([#445](https://github.com/emma-simbot/experience-hub/issues/445)) ([a4b63c1](https://github.com/emma-simbot/experience-hub/commit/a4b63c1ed36dab7013058399490e0b8a7fa58fcc)), closes [#430](https://github.com/emma-simbot/experience-hub/issues/430)
+
 ## [8.27.2](https://github.com/emma-simbot/experience-hub/compare/v8.27.1...v8.27.2) (2023-03-14)
 
 
