@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.26.2](https://github.com/emma-simbot/experience-hub/compare/v8.26.1...v8.26.2) (2023-03-14)
+
+
+### Bug Fixes
+
+* Add the new contextual confirmation classifier ([#437](https://github.com/emma-simbot/experience-hub/issues/437)) ([bdaeeb0](https://github.com/emma-simbot/experience-hub/commit/bdaeeb00a98ffeb303259f81dcc9143cb7fb5b38))
+
 ## [8.26.1](https://github.com/emma-simbot/experience-hub/compare/v8.26.0...v8.26.1) (2023-03-14)
 
 
