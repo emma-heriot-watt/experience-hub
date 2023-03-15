@@ -39,9 +39,9 @@ services:
 
   - name: compound_splitter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/compound-splitter
-    image_version: 1.5.0
+    image_version: 1.5.1
 
-    model_url: s3://emma-simbot/model/checkpoints/generic_planner/nlu-20230314-135926-obvious-lumber.tar.gz
+    model_url: s3://emma-simbot/model/checkpoints/generic_planner/nlu-20230314-195801-calm-beagle.tar.gz
 
   - name: simbot_hacks
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-hacks
