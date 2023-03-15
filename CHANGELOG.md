@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.28.0](https://github.com/emma-simbot/experience-hub/compare/v8.27.3...v8.28.0) (2023-03-15)
+
+
+### Features
+
+* High level compound splitter (version 2) ([#448](https://github.com/emma-simbot/experience-hub/issues/448)) ([d3d6c80](https://github.com/emma-simbot/experience-hub/commit/d3d6c808b7a5960e4bcfbc8fba525db8b179b027))
+
 ## [8.27.3](https://github.com/emma-simbot/experience-hub/compare/v8.27.2...v8.27.3) (2023-03-14)
 
 
