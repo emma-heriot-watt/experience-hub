@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.29.0](https://github.com/emma-simbot/experience-hub/compare/v8.28.0...v8.29.0) (2023-03-15)
+
+
+### Features
+
+* format responses and add responses for exeucting plans ([#452](https://github.com/emma-simbot/experience-hub/issues/452)) ([88bdeaa](https://github.com/emma-simbot/experience-hub/commit/88bdeaa8df5bce4eae5b82caa0c6d16dd72cfe3f))
+
 ## [8.28.0](https://github.com/emma-simbot/experience-hub/compare/v8.27.3...v8.28.0) (2023-03-15)
 
 
