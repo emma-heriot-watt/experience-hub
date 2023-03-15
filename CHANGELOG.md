@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.33.0](https://github.com/emma-simbot/experience-hub/compare/v8.32.0...v8.33.0) (2023-03-15)
+
+
+### Features
+
+* improve the validation condition for the feedback rules ([#455](https://github.com/emma-simbot/experience-hub/issues/455)) ([6ad474e](https://github.com/emma-simbot/experience-hub/commit/6ad474eb49af10c6a6642d259fecd8cb2ee4d6a4))
+
 ## [8.32.0](https://github.com/emma-simbot/experience-hub/compare/v8.31.0...v8.32.0) (2023-03-15)
 
 
