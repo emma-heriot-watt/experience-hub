@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.30.0](https://github.com/emma-simbot/experience-hub/compare/v8.29.1...v8.30.0) (2023-03-15)
+
+
+### Features
+
+* Update the policy checkpoint ([#454](https://github.com/emma-simbot/experience-hub/issues/454)) ([7c5b666](https://github.com/emma-simbot/experience-hub/commit/7c5b6663e4c039297897ccc6b118dab046aa9a0b))
+
 ## [8.29.1](https://github.com/emma-simbot/experience-hub/compare/v8.29.0...v8.29.1) (2023-03-15)
 
 
