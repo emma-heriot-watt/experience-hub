@@ -51,7 +51,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             visual_grounding_output_parser=SimBotVisualGroundingOutputParser(),
             enable_grab_from_history=simbot_settings.feature_flags.enable_grab_from_history,
         )
-
         action_predictor_response_parser = SimBotActionPredictorOutputParser()
         compound_splitter = SimBotCompoundSplitterPipeline(clients.compound_splitter)
         return cls(

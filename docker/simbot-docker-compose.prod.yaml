@@ -62,3 +62,8 @@ services:
     environment:
       DEVICE: "cuda:0"
     deploy: *deploy-gpu-3
+
+  placeholder_vision_model:
+    environment:
+      DEVICE: "cuda:0"
+    deploy: *deploy-gpu-3

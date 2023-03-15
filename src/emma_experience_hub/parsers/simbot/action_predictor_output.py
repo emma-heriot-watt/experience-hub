@@ -202,5 +202,4 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             object_index=deconstructed_action.object_index,
             extracted_features=extracted_features,
         )
-
         return mask, color_image_index, class_name

@@ -15,6 +15,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotPhysicalInteractionIntentType,
     SimBotSession,
 )
+from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectInteractionPayload
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotPreviousActionParser,
@@ -30,6 +31,8 @@ class SimBotAgentActionGenerationPipeline:
 
     This class does not handle choosing or generating dialog actions.
     """
+
+    entities_we_should_replace_the_mask = ("embiggenator",)
 
     def __init__(
         self,
@@ -167,6 +170,11 @@ class SimBotAgentActionGenerationPipeline:
             logger.error(f"Unable to parse a response for the output {raw_action_prediction}")
             return None
 
+        try:
+            action = self._replace_mask_with_placeholder(session, action)
+        except AssertionError:
+            logger.debug("Do not need to replace the mask with the placeholder model")
+
         return action if self._should_execute_action(session, action) else None
 
     def _should_execute_action(self, session: SimBotSession, action: SimBotAction) -> bool:
@@ -191,3 +199,28 @@ class SimBotAgentActionGenerationPipeline:
             and session.previous_turn.actions.is_successful
         )
         return not should_skip_goto_object_action
+
+    @tracer.start_as_current_span("Try replace mask with placeholder")
+    def _replace_mask_with_placeholder(
+        self, session: SimBotSession, action: SimBotAction
+    ) -> SimBotAction:
+        """Try to replace the object mask with the placeholder model output if needed."""
+        # Get the class name for the object
+        if not isinstance(action.payload, SimBotObjectInteractionPayload):
+            raise AssertionError("There is no mask so we don't need to replace anything")
+        class_name = action.payload.entity_name
+
+        # If the classname is not one of the ones we support, raise assertion error
+        if class_name.lower() not in self.entities_we_should_replace_the_mask:
+            raise AssertionError("Entity name is not one of the ones we should replace")
+
+        # Replace the mask in the action
+        try:
+            action.payload.object.mask = self._features_client.get_mask_for_embiggenator(
+                session.current_turn
+            )
+        except Exception:
+            logger.warning(f"Unable to replace mask for the {class_name}")
+            return action
+
+        return action

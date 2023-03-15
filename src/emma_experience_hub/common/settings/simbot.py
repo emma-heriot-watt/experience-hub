@@ -27,6 +27,7 @@ class SimBotSettings(BaseSettings):
 
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000
+    scheme: str = "http"
 
     client_timeout: Optional[int] = 5
 
@@ -46,28 +47,34 @@ class SimBotSettings(BaseSettings):
     session_db_memory_table_name: str = "SIMBOT_MEMORY_TABLE"
     session_db_region: str = "us-east-1"
 
-    feature_extractor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5500", scheme="http")
+    feature_extractor_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5500", scheme=scheme)
 
-    nlu_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5501", scheme="http")
+    nlu_predictor_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5501", scheme=scheme)
     nlu_predictor_intent_type_delimiter: str = " "
 
-    profanity_filter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5503", scheme="http")
+    profanity_filter_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5503", scheme=scheme)
 
-    action_predictor_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5502", scheme="http")
+    action_predictor_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5502", scheme=scheme)
 
-    out_of_domain_detector_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5505", scheme="http")
+    out_of_domain_detector_url: AnyHttpUrl = AnyHttpUrl(
+        url=f"{scheme}://0.0.0.0:5505", scheme=scheme
+    )
 
     asr_avg_confidence_threshold: float = 0.55
 
-    confirmation_classifier_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5507", scheme="http")
+    confirmation_classifier_url: AnyHttpUrl = AnyHttpUrl(
+        url=f"{scheme}://0.0.0.0:5507", scheme=scheme
+    )
 
-    compound_splitter_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5508", scheme="http")
+    compound_splitter_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5508", scheme=scheme)
 
-    simbot_hacks_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5509", scheme="http")
+    simbot_hacks_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5509", scheme=scheme)
 
-    simbot_qa_url: AnyHttpUrl = AnyHttpUrl(url="http://0.0.0.0:5510", scheme="http")
+    simbot_qa_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5510", scheme=scheme)
 
-    otlp_endpoint: AnyHttpUrl = AnyHttpUrl(url="http://localhost:4317", scheme="http")
+    otlp_endpoint: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://localhost:4317", scheme=scheme)
+
+    placeholder_vision_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5506", scheme=scheme)
 
     class Config:
         """Config for the settings."""

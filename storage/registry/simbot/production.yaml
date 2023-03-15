@@ -52,3 +52,9 @@ services:
     image_version: 1.4.0
 
     model_url: s3://emma-simbot/model/checkpoints/simbot_qa/temp_cps/simbot_qa_nlu_v24_temp.tar.gz
+
+  - name: placeholder_vision_model
+    image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/color-matcher
+    image_version: 1.1.2
+
+    model_url: s3://emma-simbot/model/checkpoints/21.pth

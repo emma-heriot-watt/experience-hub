@@ -221,6 +221,12 @@ class SimBotFindObjectPipeline:
             extracted_features,
         )
 
+        if object_name.lower() == "embiggenator":
+            try:
+                object_mask = self._features_client.get_mask_for_embiggenator(session.current_turn)
+            except Exception:
+                logger.warning("Unable to replace mask for the embiggenator")
+
         color_image_index = get_correct_frame_index(
             parsed_frame_index=scene_object_tokens.frame_index,
             num_frames_in_current_turn=len(extracted_features),

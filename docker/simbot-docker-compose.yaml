@@ -166,3 +166,19 @@ services:
     ports:
       - "5510:6600"
     entrypoint: rasa run --enable-api -p 6600 -m "/app/model/${SIMBOT_QA_MODEL}"
+
+  placeholder_vision_model:
+    container_name: placeholder_vision_model
+    image: "${PLACEHOLDER_VISION_MODEL_IMAGE}"
+    environment:
+      LOG_LEVEL: info
+      MODEL_CHECKPOINT_PATH: "/app/model/${PLACEHOLDER_VISION_MODEL_MODEL}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5506/healthcheck"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    ports:
+      - "5506:5506"
+    entrypoint: python
+    command:
+      - src/emma_color_matcher/api/mask_extractor_api.py

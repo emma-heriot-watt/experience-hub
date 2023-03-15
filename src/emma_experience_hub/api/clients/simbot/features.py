@@ -7,6 +7,7 @@ from emma_experience_hub.api.clients.simbot.cache import (
     SimBotAuxiliaryMetadataClient,
     SimBotExtractedFeaturesClient,
 )
+from emma_experience_hub.api.clients.simbot.placeholder_vision import SimBotPlaceholderVisionClient
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot import SimBotSessionTurn
 from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetadataPayload
@@ -23,10 +24,12 @@ class SimBotFeaturesClient(Client):
         auxiliary_metadata_cache_client: SimBotAuxiliaryMetadataClient,
         feature_extractor_client: FeatureExtractorClient,
         features_cache_client: SimBotExtractedFeaturesClient,
+        placeholder_vision_client: SimBotPlaceholderVisionClient,
     ) -> None:
         self.auxiliary_metadata_cache_client = auxiliary_metadata_cache_client
         self.features_cache_client = features_cache_client
         self.feature_extractor_client = feature_extractor_client
+        self.placeholder_vision_client = placeholder_vision_client
 
     def healthcheck(self) -> bool:
         """Verify all clients are healthy."""
@@ -93,6 +96,13 @@ class SimBotFeaturesClient(Client):
                 )
 
         return auxiliary_metadata
+
+    @tracer.start_as_current_span("Get mask for embiggenator")
+    def get_mask_for_embiggenator(self, turn: SimBotSessionTurn) -> list[list[int]]:
+        """Try to replace the object mask with the placeholder model output if needed."""
+        image = next(iter(self.get_auxiliary_metadata(turn).images))
+        mask = self.placeholder_vision_client.get_embiggenator_mask(image)
+        return mask
 
     def _extract_features(
         self, auxiliary_metadata: SimBotAuxiliaryMetadataPayload

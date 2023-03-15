@@ -22,6 +22,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotFeaturesClient,
     SimBotHacksClient,
     SimBotNLUIntentClient,
+    SimBotPlaceholderVisionClient,
     SimBotQAIntentClient,
     SimBotSessionDbClient,
 )
@@ -60,6 +61,10 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 features_cache_client=SimBotExtractedFeaturesClient(
                     bucket_name=simbot_settings.simbot_cache_s3_bucket,
                     local_cache_dir=simbot_settings.extracted_features_cache_dir,
+                ),
+                placeholder_vision_client=SimBotPlaceholderVisionClient(
+                    endpoint=simbot_settings.placeholder_vision_url,
+                    timeout=simbot_settings.client_timeout,
                 ),
             ),
             session_db=SimBotSessionDbClient(
