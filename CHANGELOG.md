@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.31.0](https://github.com/emma-simbot/experience-hub/compare/v8.30.0...v8.31.0) (2023-03-15)
+
+
+### Features
+
+* embiggenator segmentation mask ([#449](https://github.com/emma-simbot/experience-hub/issues/449)) ([09b856a](https://github.com/emma-simbot/experience-hub/commit/09b856a0d6305cc17b004394a8d1f68c77023f05))
+
 ## [8.30.0](https://github.com/emma-simbot/experience-hub/compare/v8.29.1...v8.30.0) (2023-03-15)
 
 
