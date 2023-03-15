@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.32.0](https://github.com/emma-simbot/experience-hub/compare/v8.31.0...v8.32.0) (2023-03-15)
+
+
+### Features
+
+* Disable high level splitter ([#456](https://github.com/emma-simbot/experience-hub/issues/456)) ([6f2ee86](https://github.com/emma-simbot/experience-hub/commit/6f2ee8691f5c0bf8fd8ff01450570ac456b7abc9))
+* hotfix policy ([#457](https://github.com/emma-simbot/experience-hub/issues/457)) ([4754dc5](https://github.com/emma-simbot/experience-hub/commit/4754dc5d31040d1375f7ca197f31a4e9236acfde))
+
 ## [8.31.0](https://github.com/emma-simbot/experience-hub/compare/v8.30.0...v8.31.0) (2023-03-15)
 
 
