@@ -127,7 +127,7 @@ services:
     environment:
       LOG_LEVEL: info
       USE_REGEX_HIGH_LEVEL_SPLITTER: True
-      USE_RASA_HIGH_LEVEL_SPLITTER: True
+      USE_RASA_HIGH_LEVEL_SPLITTER: False
       SIMBOT_RASA_PARSER_MODEL: "/app/model/${COMPOUND_SPLITTER_MODEL}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6600/healthcheck"]

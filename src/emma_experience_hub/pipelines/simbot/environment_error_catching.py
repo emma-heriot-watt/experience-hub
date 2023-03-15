@@ -118,7 +118,16 @@ class SimBotEnvironmentErrorCatchingPipeline:
         """
         if target not in self._openable_objects:
             return False
-        return session.current_turn.intent.user is not None
+        # If we have a new user utterance, continue handling that
+        if session.current_turn.intent.user is not None:
+            return True
+        # If the action was not an end of trajectory, try executing the next action
+        previous_action_was_end_of_trajectory = (
+            session.previous_valid_turn is not None
+            and session.previous_valid_turn.actions.interaction is not None
+            and session.previous_valid_turn.actions.interaction.is_end_of_trajectory
+        )
+        return not previous_action_was_end_of_trajectory
 
     def _handle_fill_action_execution_error(self, session: SimBotSession, target: str) -> bool:
         """Retry to turn on the sink and fill the holding object."""

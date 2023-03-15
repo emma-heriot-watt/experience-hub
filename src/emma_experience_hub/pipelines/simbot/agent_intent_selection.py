@@ -49,6 +49,7 @@ class SimBotAgentIntentSelectionPipeline:
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
         _enable_search_after_no_match: bool = True,
+        _enable_high_level_planner: bool = True,
     ) -> None:
         self.clarification_handler = SimBotClarificationHandler()
         self._features_client = features_client
@@ -63,6 +64,7 @@ class SimBotAgentIntentSelectionPipeline:
             _enable_clarification_questions=_enable_clarification_questions,
             _enable_search_actions=_enable_search_actions,
             _enable_search_after_no_match=_enable_search_after_no_match,
+            _enable_high_level_planner=_enable_high_level_planner,
         )
         self._environment_error_pipeline = environment_error_pipeline
 
@@ -71,8 +73,8 @@ class SimBotAgentIntentSelectionPipeline:
         # If there was an environment error, try to catch it and continue acting - else respond to it.
         if session.current_turn.intent.environment:
             if not self._environment_error_pipeline(session):
-                session.current_state.utterance_queue.reset()
                 logger.debug("Returning None as environment errors do not cause the agent to act.")
+                session.current_state.utterance_queue.reset()
                 session.current_state.find_queue.reset()
                 return SimBotAgentIntents()
 

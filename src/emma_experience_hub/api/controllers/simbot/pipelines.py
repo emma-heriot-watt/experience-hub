@@ -86,6 +86,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
                 _enable_search_actions=simbot_settings.feature_flags.enable_search_actions,
                 _enable_search_after_no_match=simbot_settings.feature_flags.enable_search_after_no_match,
+                _enable_high_level_planner=simbot_settings.feature_flags.enable_rasa_high_level_planner,
             ),
             agent_action_generator=SimBotAgentActionGenerationPipeline(
                 features_client=clients.features,

@@ -36,6 +36,7 @@ class SimBotActHandler:
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
         _enable_search_after_no_match: bool = True,
+        _enable_high_level_planner: bool = True,
     ) -> None:
         self._features_client = features_client
 
@@ -48,6 +49,7 @@ class SimBotActHandler:
         self._enable_clarification_questions = _enable_clarification_questions
         self._enable_search_actions = _enable_search_actions
         self._enable_search_after_no_match = _enable_search_after_no_match
+        self._enable_high_level_planner = _enable_high_level_planner
 
     def run(self, session: SimBotSession) -> Optional[SimBotAgentIntents]:
         """Get the agent intent."""
@@ -59,7 +61,8 @@ class SimBotActHandler:
             )
 
         # Call the high-level planner
-        session = self._compound_splitter_pipeline.run_high_level_planner(session)
+        if self._enable_high_level_planner:
+            session = self._compound_splitter_pipeline.run_high_level_planner(session)
         # Check if the utterance matches one of the known templates
         if self._does_utterance_match_known_template(session):
             return SimBotAgentIntents(
