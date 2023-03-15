@@ -1,3 +1,5 @@
+from typing import Optional
+
 import httpx
 from loguru import logger
 
@@ -25,6 +27,22 @@ class CompoundSplitterClient(Client):
             )
             return []
 
+        return response.json()
+
+    def high_level_plan(self, instruction: str, inventory_entity: Optional[str]) -> list[str]:
+        """Given a complex instruction, returns a list of simpler instructions."""
+        with httpx.Client(timeout=None) as client:
+            response = client.post(
+                f"{self._endpoint}/high_level_planner",
+                json={"instruction": instruction, "inventory_entity": inventory_entity},
+            )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPError:
+            logger.exception(
+                "Unable to split the utterance using the high-level planner. Using speech utterance as is."
+            )
+            return []
         return response.json()
 
     def resolve_coreferences(self, instructions: list[str]) -> str:

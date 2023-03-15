@@ -94,12 +94,14 @@ class SimBotConfirmationHandler:
         if previous_turn is None or previous_turn.intent.verbal_interaction is None:
             raise AssertionError("User intent is confirmation without a previous verbal intent")
 
-        # Do a search routine before executing the current instruction.
+        # Do a search routine before executing the latest instruction.
         session.current_state.utterance_queue.append_to_head(
-            SimBotQueueUtterance(utterance=previous_turn.speech.utterance, role=SpeakerRole.agent),  # type: ignore[union-attr]
+            SimBotQueueUtterance(utterance=previous_turn.speech.utterance, role=previous_turn.speech.role),  # type: ignore[union-attr]
         )
         target_entity = previous_turn.intent.verbal_interaction.entity
-        session.current_turn.speech = SimBotUserSpeech(utterance=f"find the {target_entity}")
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance=f"find the {target_entity}", role=SpeakerRole.agent
+        )
         return SimBotAgentIntents(
             physical_interaction=SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
             verbal_interaction=SimBotIntent(

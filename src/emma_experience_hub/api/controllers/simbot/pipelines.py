@@ -53,9 +53,9 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
         )
 
         action_predictor_response_parser = SimBotActionPredictorOutputParser()
-
+        compound_splitter = SimBotCompoundSplitterPipeline(clients.compound_splitter)
         return cls(
-            compound_splitter=SimBotCompoundSplitterPipeline(clients.compound_splitter),
+            compound_splitter=compound_splitter,
             find_object=find_object,
             request_processing=SimBotRequestProcessingPipeline(
                 session_db_client=clients.session_db,
@@ -82,6 +82,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 ),
                 environment_error_pipeline=SimBotEnvironmentErrorCatchingPipeline(),
                 action_predictor_client=clients.action_predictor,
+                compound_splitter_pipeline=compound_splitter,
                 simbot_hacks_client=clients.simbot_hacks,
                 _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
                 _enable_search_actions=simbot_settings.feature_flags.enable_search_actions,

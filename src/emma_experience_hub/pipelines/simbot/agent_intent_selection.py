@@ -24,6 +24,7 @@ from emma_experience_hub.functions.simbot.agent_intent_selection import (
     set_find_object_in_progress_intent,
 )
 from emma_experience_hub.parsers import NeuralParser
+from emma_experience_hub.pipelines.simbot.compound_splitter import SimBotCompoundSplitterPipeline
 from emma_experience_hub.pipelines.simbot.environment_error_catching import (
     SimBotEnvironmentErrorCatchingPipeline,
 )
@@ -43,6 +44,7 @@ class SimBotAgentIntentSelectionPipeline:
         nlu_intent_parser: NeuralParser[SimBotIntent[SimBotNLUIntentType]],
         action_predictor_client: SimbotActionPredictionClient,
         environment_error_pipeline: SimBotEnvironmentErrorCatchingPipeline,
+        compound_splitter_pipeline: SimBotCompoundSplitterPipeline,
         simbot_hacks_client: SimBotHacksClient,
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
@@ -56,6 +58,7 @@ class SimBotAgentIntentSelectionPipeline:
             nlu_intent_client=nlu_intent_client,
             nlu_intent_parser=nlu_intent_parser,
             action_predictor_client=action_predictor_client,
+            compound_splitter_pipeline=compound_splitter_pipeline,
             simbot_hacks_client=simbot_hacks_client,
             _enable_clarification_questions=_enable_clarification_questions,
             _enable_search_actions=_enable_search_actions,

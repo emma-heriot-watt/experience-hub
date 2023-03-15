@@ -90,9 +90,9 @@ class SimBotObjectMemory(BaseModel):
         """Find object room based on prior memory."""
         return self._prior_memory.get(object_label.lower(), None)
 
-    def object_in_memory(self, object_label: str) -> bool:
-        """Is the object in the memory?"""
-        if self.read_memory_entity_in_arena(object_label):
+    def object_in_memory(self, object_label: str, current_room: str) -> bool:
+        """Is the object in the current room or prior memory?"""
+        if self.read_memory_entity_in_room(room_name=current_room, object_label=object_label):
             return True
         return self._prior_memory.get(object_label.lower(), None) is not None
 

@@ -36,6 +36,33 @@ class SimBotCompoundSplitterPipeline:
         self._replace_utterance_for_current_turn(session)
         return session
 
+    def run_high_level_planner(self, session: SimBotSession) -> SimBotSession:
+        """Given the user instruction, updates the utterance queue with simpler instructions."""
+        skip_high_level_conditions = [
+            not session.current_turn.speech
+            or session.current_turn.speech.role == SpeakerRole.agent
+        ]
+
+        if any(skip_high_level_conditions):
+            logger.warning("There is no utterance to split into simple instructions.")
+            return session
+
+        # Split the utterances
+        utterance_splits = self.compound_splitter_client.high_level_plan(
+            session.current_turn.speech.utterance, session.current_state.inventory.entity
+        )
+
+        # If there is less than 2 utterances after splitting, it means that the utterance cannot be split
+        if len(utterance_splits) < 2:
+            logger.debug("Utterance was already a simple instruction.")
+            return session
+
+        logger.debug(f"High-level split into {len(utterance_splits)} simple instructions.")
+
+        self._add_utterances_to_queue(utterance_splits, session)
+        self._replace_utterance_for_current_turn(session)
+        return session
+
     def run_coreference_resolution(self, session: SimBotSession) -> SimBotSession:
         """Given the current and previous user instruction, perform coreference resolution."""
         if len(session.current_state.last_user_utterance) <= 1:

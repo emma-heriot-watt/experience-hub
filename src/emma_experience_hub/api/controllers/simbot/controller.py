@@ -123,7 +123,8 @@ class SimBotController:
             user_intent = self.pipelines.user_intent_extractor.run(session)
 
         logger.info(f"[INTENT] User: `{user_intent}`")
-        if user_intent != SimBotIntentType.act:
+        user_intent_is_not_act = user_intent != SimBotIntentType.act
+        if user_intent_is_not_act and session.current_state.last_user_utterance.is_not_empty:
             session.current_state.last_user_utterance.pop_from_head()
 
         session.current_turn.intent.user = user_intent

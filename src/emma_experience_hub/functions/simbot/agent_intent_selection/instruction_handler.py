@@ -19,6 +19,7 @@ from emma_experience_hub.datamodels.simbot import (
 )
 from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 from emma_experience_hub.parsers import NeuralParser
+from emma_experience_hub.pipelines.simbot.compound_splitter import SimBotCompoundSplitterPipeline
 
 
 class SimBotActHandler:
@@ -30,6 +31,7 @@ class SimBotActHandler:
         nlu_intent_client: SimBotNLUIntentClient,
         nlu_intent_parser: NeuralParser[SimBotIntent[SimBotNLUIntentType]],
         action_predictor_client: SimbotActionPredictionClient,
+        compound_splitter_pipeline: SimBotCompoundSplitterPipeline,
         simbot_hacks_client: SimBotHacksClient,
         _enable_clarification_questions: bool = True,
         _enable_search_actions: bool = True,
@@ -41,6 +43,7 @@ class SimBotActHandler:
         self._nlu_intent_parser = nlu_intent_parser
         self._simbot_hacks_client = simbot_hacks_client
         self._action_predictor_client = action_predictor_client
+        self._compound_splitter_pipeline = compound_splitter_pipeline
 
         self._enable_clarification_questions = _enable_clarification_questions
         self._enable_search_actions = _enable_search_actions
@@ -54,6 +57,9 @@ class SimBotActHandler:
             return SimBotAgentIntents(
                 physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
             )
+
+        # Call the high-level planner
+        session = self._compound_splitter_pipeline.run_high_level_planner(session)
         # Check if the utterance matches one of the known templates
         if self._does_utterance_match_known_template(session):
             return SimBotAgentIntents(
@@ -95,11 +101,15 @@ class SimBotActHandler:
         room_text_match = self._simbot_hacks_client.get_room_prediction_from_raw_text(
             utterance=current_utterance,
         )
+        # No room in the instruction
         if room_text_match is None:
             return False
 
+        # Current room in the instruction
         if room_text_match.arena_room == session.current_turn.environment.current_room:
             return False
+
+        # Other room in the instruction
         queue_elem = SimBotQueueUtterance(
             utterance=room_text_match.modified_utterance, role=SpeakerRole.agent
         )
@@ -179,7 +189,7 @@ class SimBotActHandler:
         if target_entity is None:
             return intents
 
-        # Confirm the search if needed
+        # Confirm the search if we have not seen the object before
         if self._should_confirm_before_search(session, target_entity):
             return SimBotAgentIntents(
                 verbal_interaction=SimBotIntent(
@@ -192,7 +202,9 @@ class SimBotActHandler:
             role=SpeakerRole.user,
         )
         session.current_state.utterance_queue.append_to_head(queue_elem)
-        session.current_turn.speech = SimBotUserSpeech(utterance=f"find the {target_entity}")
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance=f"find the {target_entity}", role=SpeakerRole.agent
+        )
         return SimBotAgentIntents(
             SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
             SimBotIntent(
@@ -239,6 +251,8 @@ class SimBotActHandler:
 
     def _should_confirm_before_search(self, session: SimBotSession, target_entity: str) -> bool:
         """Should the agent ask for confirmation before searching?"""
-        # Don't ask if we've seen the entity in any room or know it's possoble location from prior memory
-        has_seen_object = session.current_state.memory.object_in_memory(target_entity)
+        # Don't ask if we've seen the entity in the current room or know its location from prior memory
+        has_seen_object = session.current_state.memory.object_in_memory(
+            target_entity, current_room=session.current_turn.environment.current_room
+        )
         return not has_seen_object
