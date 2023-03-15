@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.29.1](https://github.com/emma-simbot/experience-hub/compare/v8.29.0...v8.29.1) (2023-03-15)
+
+
+### Bug Fixes
+
+* bump compound splitter to version 1.5.1 ([#453](https://github.com/emma-simbot/experience-hub/issues/453)) ([54e28fc](https://github.com/emma-simbot/experience-hub/commit/54e28fc6af9b2871e1fb555a759a001f869f542d))
+
 ## [8.29.0](https://github.com/emma-simbot/experience-hub/compare/v8.28.0...v8.29.0) (2023-03-15)
 
 
