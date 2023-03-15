@@ -1,6 +1,4 @@
 conditions,response,is_lightweight
-environment_intent_type == "action_execution_error", Oh no - it looks like something went wrong in the Simbot arena that's out of our control. We recommend quitting and starting the game again. You can skip providing feedback as we will be discussing your experience with the Alexa Team., False
-
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can only hold one thing at a time - and I'm already holding something.</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I'm already holding something and I can't hold anything else.</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can't hold anything else - my inventory space is limited</amazon:emotion></prosody>,False
@@ -131,7 +129,7 @@ environment_intent_type == "unsupported_action" and environment_intent_action_ty
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity != null and environment_intent_entity =~ "(Cereal Box|Coffee Beans|Milk)" and inventory_entity == null,Sorry I can't {environment_intent_action_type} the {environment_intent_entity}. You can ask me to pick it up instead.,False
 
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity != null and environment_intent_entity =~ "(Coffee Maker|Coffee Maker)",When it comes to the {environment_intent_entity} I can only turn it on or pour what I'm holding into it.,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity != null and environment_intent_entity =~ "(Coffee Maker|Coffee Unmaker)",When it comes to the {environment_intent_entity} I can only turn it on or pour what I'm holding into it.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity != null and environment_intent_entity =~ "(Fire Alarm|Forklift|Light Switch|Robot Arm|Tesla Coil)",I can only turn on and off the {environment_intent_entity}.,False
 
@@ -195,7 +193,7 @@ environment_intent_type == "unsupported_navigation",<amazon:domain name="convers
 environment_intent_type == "unsupported_navigation",<amazon:domain name="conversational">I can't calculate a path without anything in the way</amazon:domain>,False
 environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">darn</say-as> - There's no clear path - do you have a different instruction?,False
 environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">le sigh</say-as> - I'm unable to figure out a clear route. Can you give me another instruction?,False
-environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">no</say-as> - I can't go where I wanted to go - do you have another instruction?,False
+environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">oops</say-as> - I can't go where I wanted to go - do you have another instruction?,False
 
 environment_intent_type == "unsupported_navigation" and current_room == "Lab1",Looks like the path is blocked. Say - go to the robot arm and toggle the button - to move the object that is blocking the way.,False
 
@@ -212,9 +210,23 @@ interaction_action_type == "Break" and interaction_action_entity != "Record",<am
 
 interaction_action_type == "Clean" and interaction_action_entity != null and inventory_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I'll get the {inventory_entity} sparkling clean in no time!</amazon:emotion>,True
 
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="medium"> Oh I got this! </amazon:emotion>Ask me to pour the coffee beans into the coffee maker,False
+
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == null,<amazon:emotion name="excited" intensity="medium">This machine can be used create the fuel for the world! </amazon:emotion>As far as I know we need to pour coffee beans and water from the sink into the coffee maker. Then - you can ask me to turn on the coffee maker for fresh coffee in the pot,False
+
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with water from the sink - we can pour it into the coffee maker. Ask me to pour the {inventory_entity} into the coffee maker. Then - ask me to turn on the coffee maker,False
+
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity == null,The coffee unmaker can be used to recycle coffee into fresh coffee beans. Let's find some coffee that we can pour into the machine before turning it on.,False
+
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with coffee we can pour it into the coffee unmaker. Ask me to pour the {inventory_entity} into the coffee unmaker. Then - ask me to turn on the coffee unmaker to create fresh coffee beans,False
+
 interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity == null,This time machine can be used to repair broken objects by turning back the time! Let's find something that we can repair before using the time machine.,False
 
 interaction_action_type == "Pickup" and current_room == "SmallOffice" and interaction_action_entity == "Floppy Disk",The floppy disk can be inserted in an infected computer to fix it. You can tell a computer is infected by the skull on its screen,False
+
+interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="low">We can make coffee by pouring the coffee beans into the coffee maker and filling it with water from the sink. Let's find the coffee maker and then ask me to pour the coffee beans into the coffee maker</amazon:emotion>,False
+
+interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Pot",<amazon:emotion name="excited" intensity="low">We can make coffee by pouring the coffee beans into the coffee maker and filling it with water from the sink. Let's first find the sink and fill the coffee pot with water. Then - ask me to find the coffee maker so that we can pour the water into it!</amazon:emotion>,False
 
 interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">{interaction_action_entity} retrieved!</amazon:emotion>,True
 interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I got the goods!</amazon:emotion>,True
@@ -456,6 +468,8 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Embiggenator" and inventory_entity != null,Shall we use the embiggenator on the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Embiggenator" and inventory_entity != null,I have an idea - shall we use the embiggenator on the {inventory_entity}?,False
+
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Everything's A Carrot Machine" and inventory_entity != null,Do you want me to turn the {inventory_entity} into a carrot?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Freezer" and inventory_entity != null,Should I place the {inventory_entity} into the freezer?,False
 
