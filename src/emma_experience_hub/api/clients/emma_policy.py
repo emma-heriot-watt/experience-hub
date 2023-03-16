@@ -36,10 +36,13 @@ class EmmaPolicyClient(Client):
         endpoint: str,
         environment_state_history: list[EnvironmentStateTurn],
         dialogue_history: list[DialogueUtterance],
+        force_stop_token: bool = False,
     ) -> Any:
         """Generate a response from the features and provided language."""
         emma_policy_request = EmmaPolicyRequest(
-            environment_history=environment_state_history, dialogue_history=dialogue_history
+            environment_history=environment_state_history,
+            dialogue_history=dialogue_history,
+            force_stop_token=force_stop_token,
         )
         logger.debug(f"Sending {emma_policy_request.num_images} images.")
         logger.debug(f"Sending dialogue history: {emma_policy_request.dialogue_history}")

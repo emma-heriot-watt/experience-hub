@@ -212,9 +212,9 @@ interaction_action_type == "Clean" and interaction_action_entity != null and inv
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="medium"> Oh I got this! </amazon:emotion>Ask me to pour the coffee beans into the coffee maker,False
 
-interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == null,<amazon:emotion name="excited" intensity="medium">This machine can be used create the fuel for the world! </amazon:emotion>As far as I know we need to pour coffee beans and water from the sink into the coffee maker. Then - you can ask me to turn on the coffee maker for fresh coffee in the pot,False
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == null,<amazon:emotion name="excited" intensity="medium">This machine can be used create the fuel for the world!</amazon:emotion>As far as I know - we need to pour coffee beans and water from the sink into the coffee maker. Then - you can ask me to turn it on,False
 
-interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with water from the sink - we can pour it into the coffee maker. Ask me to pour the {inventory_entity} into the coffee maker. Then - ask me to turn on the coffee maker,False
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with water from the sink - you can ask me to pour the {inventory_entity} into the coffee maker.,False
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity == null,The coffee unmaker can be used to recycle coffee into fresh coffee beans. Let's find some coffee that we can pour into the machine before turning it on.,False
 
@@ -224,12 +224,10 @@ interaction_action_type == "GotoObject" and interaction_action_entity == "Time M
 
 interaction_action_type == "Pickup" and current_room == "SmallOffice" and interaction_action_entity == "Floppy Disk",The floppy disk can be inserted in an infected computer to fix it. You can tell a computer is infected by the skull on its screen,False
 
-interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="low">We can make coffee by pouring the coffee beans into the coffee maker and filling it with water from the sink. Let's find the coffee maker and then ask me to pour the coffee beans into the coffee maker</amazon:emotion>,False
-
-interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Pot",<amazon:emotion name="excited" intensity="low">We can make coffee by pouring the coffee beans into the coffee maker and filling it with water from the sink. Let's first find the sink and fill the coffee pot with water. Then - ask me to find the coffee maker so that we can pour the water into it!</amazon:emotion>,False
+interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="low">We can make fresh coffee by pouring coffee beans and water into the coffee maker.</amazon:emotion>,False
 
 interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">{interaction_action_entity} retrieved!</amazon:emotion>,True
-interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I got the goods!</amazon:emotion>,True
+interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">Got the {interaction_action_entity}!</amazon:emotion>,True
 
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",Oops - not sure if this is an infected computer. Help me remove the floppy disk and move to another computer.,False
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",I think this is not an infected computer. Let's first remove the floppy disk and then help me move to another one.,False

@@ -428,6 +428,11 @@ class SimBotSessionTurn(BaseModel):
         """Return True if the current utterance is coming from the utterance queue."""
         return self.speech is not None and self.speech.from_utterance_queue
 
+    @property
+    def utterance_from_agent_plan(self) -> bool:
+        """Return True if the current utterance is coming from the agent's plan."""
+        return self.speech is not None and self.speech.role == SpeakerRole.agent
+
 
 class SimBotSession(BaseModel):
     """A single SimBot Game Session."""

@@ -150,7 +150,9 @@ class SimBotAgentActionGenerationPipeline:
             )
 
         raw_action_prediction = self._action_predictor_client.generate(
-            dialogue_history=dialogue_history, environment_state_history=environment_state_history
+            dialogue_history=dialogue_history,
+            environment_state_history=environment_state_history,
+            force_stop_token=session.current_turn.utterance_from_agent_plan,
         )
 
         # Get the flattened list of extracted features from the state history

@@ -23,8 +23,6 @@ class SimBotEnvironmentErrorCatchingPipeline:
 
         self.unsupported_action_handlers = {
             SimBotActionType.Open: self._handle_open_action_execution_error,
-            SimBotActionType.Fill: self._handle_fill_action_execution_error,
-            SimBotActionType.Clean: self._handle_clean_action_execution_error,
         }
         arena_definitions = get_arena_definitions()
         self._openable_objects = [
