@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.34.1](https://github.com/emma-simbot/experience-hub/compare/v8.34.0...v8.34.1) (2023-03-16)
+
+
+### Bug Fixes
+
+* Loops for clean and fill in the sink ([#459](https://github.com/emma-simbot/experience-hub/issues/459)) ([101646d](https://github.com/emma-simbot/experience-hub/commit/101646d4515a233ad18a00156a948a225b7b4257))
+
 ## [8.34.0](https://github.com/emma-simbot/experience-hub/compare/v8.33.0...v8.34.0) (2023-03-15)
 
 
