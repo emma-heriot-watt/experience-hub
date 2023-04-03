@@ -7,13 +7,13 @@ from pydantic import BaseModel
 PydanticT = TypeVar("PydanticT", bound=BaseModel)
 
 
-def default(py_obj: Any) -> Any:
+def conform_non_json_serializable_types(py_obj: Any) -> Any:
     """Conform non-JSON serializable types."""
     # Handle sets
     if isinstance(py_obj, set):
         return list(py_obj)
 
-    raise TypeError
+    raise TypeError(f"Object of type '{type(py_obj)} is not JSON serializable")
 
 
 class PydanticClientMixin(Generic[PydanticT]):
@@ -26,7 +26,7 @@ class PydanticClientMixin(Generic[PydanticT]):
         return orjson.dumps(
             data.dict(),
             option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
-            default=default,
+            default=conform_non_json_serializable_types,
         )
 
     def _pydantic_from_bytes(self, data: bytes) -> PydanticT:
