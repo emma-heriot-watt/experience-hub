@@ -22,11 +22,8 @@ class SimBotQAIntentClient(Client):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.warning(
-                "Unable to process utterance with QA client.",
-                exc_info=err,
-            )
+        except httpx.HTTPError:
+            logger.exception("Unable to process utterance with QA client.")
             return None
 
         response_json = response.json()

@@ -692,8 +692,8 @@ class SimBotSession(BaseModel):
                     environment_history[turn.idx] = EnvironmentStateTurn(
                         features=future.result(), output=raw_output
                     )
-                except Exception as err:
-                    logger.exception("Unable to get features for the turn", exc_info=err)
+                except Exception:
+                    logger.exception("Unable to get features for the turn")
 
         # Ensure the environment history is sorted properly and return them
         return list(dict(sorted(environment_history.items())).values())

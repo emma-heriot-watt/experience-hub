@@ -25,8 +25,8 @@ class Client(ABC):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            logger.exception("Unable to perform healthcheck", exc_info=err)
+        except httpx.HTTPStatusError:
+            logger.exception("Unable to perform healthcheck")
             return False
 
         return True

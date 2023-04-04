@@ -54,7 +54,7 @@ class EmmaPolicyClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception("Unable to get response from EMMA policy server", exc_info=err)
+            logger.exception("Unable to get response from EMMA policy server")
             raise err from None
 
         json_response = response.json()

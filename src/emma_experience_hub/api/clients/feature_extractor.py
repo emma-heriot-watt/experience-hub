@@ -42,7 +42,8 @@ class FeatureExtractorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.warning(f"Feature extractor model not moved to device `{device}`", exc_info=err)
+            logger.warning(f"Feature extractor model not moved to device `{device}`")
+            raise err
 
         if response.status_code == httpx.codes.OK:
             logger.info(f"Feature extractor model moved to device `{device}`")
@@ -61,7 +62,7 @@ class FeatureExtractorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception("Unable to extract features for a single image", exc_info=err)
+            logger.exception("Unable to extract features for a single image")
             raise err from None
 
         # Process the response
@@ -94,7 +95,7 @@ class FeatureExtractorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception("Unable to extract features for multiple images", exc_info=True)
+            logger.exception("Unable to extract features for multiple images")
             raise err from None
 
         # Process the response

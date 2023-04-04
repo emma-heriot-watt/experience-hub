@@ -27,12 +27,12 @@ class SimBotPlaceholderVisionClient(FeatureExtractorClient):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception("Unable to extract mask for the button", exc_info=err)
+            logger.exception("Unable to extract mask for the button")
             raise err from None
 
         # Process the response
         try:
             return response.json()[0]
         except KeyError as response_err:
-            logger.error("Unable to get the mask from the response", exc_info=response_err)
+            logger.error("Unable to get the mask from the response")
             raise response_err from None

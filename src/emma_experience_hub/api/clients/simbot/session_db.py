@@ -25,8 +25,8 @@ class SimBotSessionDbClient(DynamoDbClient):
 
         try:
             dynamodb_client.describe_table(TableName=self._table_name)
-        except dynamodb_client.exceptions.ResourceNotFoundException as err:
-            logger.exception("Cannot find DynamoDB table", exc_info=err)
+        except dynamodb_client.exceptions.ResourceNotFoundException:
+            logger.exception("Cannot find DynamoDB table")
             return False
 
         return True
@@ -45,7 +45,7 @@ class SimBotSessionDbClient(DynamoDbClient):
             )
             logger.debug(response)
         except ClientError as err:
-            logger.exception("Could not add turn to table.", exc_info=err)
+            logger.exception("Could not add turn to table.")
 
             error_code = err.response["Error"]["Code"]  # pyright: ignore
             if error_code != "ConditionalCheckFailedException":
@@ -65,7 +65,7 @@ class SimBotSessionDbClient(DynamoDbClient):
                 },
             )
         except ClientError as err:
-            logger.exception("Could not add turn to table.", exc_info=err)
+            logger.exception("Could not add turn to table.")
             raise err
 
     def get_session_turn(self, session_id: str, idx: int) -> SimBotSessionTurn:
@@ -73,7 +73,7 @@ class SimBotSessionDbClient(DynamoDbClient):
         try:
             response = self._table.get_item(Key={self.primary_key: session_id, self.sort_key: idx})
         except ClientError as err:
-            logger.exception("Could not get session turn from table", exc_info=err)
+            logger.exception("Could not get session turn from table")
             raise err
 
         return SimBotSessionTurn.parse_obj(response["Item"][self.data_key])
@@ -83,7 +83,7 @@ class SimBotSessionDbClient(DynamoDbClient):
         try:
             all_raw_turns = self._get_all_session_turns(session_id)
         except ClientError as query_err:
-            logger.exception("Could not query for session turns", exc_info=query_err)
+            logger.exception("Could not query for session turns")
             raise query_err
 
         with ThreadPoolExecutor() as thread_pool:
@@ -95,10 +95,9 @@ class SimBotSessionDbClient(DynamoDbClient):
                         (response_item[self.data_key] for response_item in all_raw_turns),
                     )
                 )
-            except Exception as parse_err:
+            except Exception:
                 logger.exception(
-                    "Could not parse session turns from response. Returning an empty list.",
-                    exc_info=parse_err,
+                    "Could not parse session turns from response. Returning an empty list."
                 )
                 return []
 

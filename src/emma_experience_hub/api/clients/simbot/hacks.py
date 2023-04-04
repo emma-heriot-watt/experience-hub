@@ -76,8 +76,8 @@ class SimBotHacksClient(Client):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.warning("Unable to get an action from the raw text.", exc_info=err)
+        except httpx.HTTPError:
+            logger.warning("Unable to get an action from the raw text.")
             return None
 
         return response.json()
@@ -92,8 +92,8 @@ class SimBotHacksClient(Client):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.warning("Unable to get a room from the raw text.", exc_info=err)
+        except httpx.HTTPError:
+            logger.warning("Unable to get a room from the raw text.")
             return None
 
         try:
@@ -118,8 +118,8 @@ class SimBotHacksClient(Client):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.warning("Unable to get action plan.", exc_info=err)
+        except httpx.HTTPError:
+            logger.warning("Unable to get action plan.")
             return None
 
         response_json = response.json()
@@ -128,7 +128,7 @@ class SimBotHacksClient(Client):
 
         try:
             anticipator_plan = SimBotHacksAnticipator.parse_obj(response.json())
-        except Exception as request_err:
-            logger.exception("Unable to parse the anticipator plan", exc_info=request_err)
+        except Exception:
+            logger.exception("Unable to parse the anticipator plan")
             return None
         return anticipator_plan

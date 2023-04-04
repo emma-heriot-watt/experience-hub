@@ -21,9 +21,7 @@ class ConfirmationResponseClassifierClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception(
-                "Unable to detect whether utterance is a confirmation response", exc_info=err
-            )
+            logger.exception("Unable to detect whether utterance is a confirmation response")
             raise err from None
 
         return response.json()

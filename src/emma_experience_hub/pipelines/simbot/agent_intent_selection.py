@@ -123,8 +123,8 @@ class SimBotAgentIntentSelectionPipeline:
         try:
             user_intent_handler = self._get_user_intent_handler(user_intent)
             agent_intents = user_intent_handler(session)
-        except Exception as err:
-            logger.error("Could not extract agent intent.", exc_info=err)
+        except Exception:
+            logger.exception("Could not extract agent intent.")
             agent_intents = None
 
         if agent_intents is not None:

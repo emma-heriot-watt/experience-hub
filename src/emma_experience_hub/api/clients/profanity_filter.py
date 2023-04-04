@@ -19,7 +19,7 @@ class ProfanityFilterClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception("Unable to detect whether utterance is profane", exc_info=err)
+            logger.exception("Unable to detect whether utterance is profane")
             raise err from None
 
         return response.json()

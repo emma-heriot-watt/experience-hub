@@ -19,7 +19,7 @@ class OutOfDomainDetectorClient(Client):
         try:
             response.raise_for_status()
         except httpx.HTTPError as err:
-            logger.exception("Failed to detect domain of text", exc_info=err)
+            logger.exception("Failed to detect domain of text")
             raise err from None
 
         return response.json()

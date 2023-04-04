@@ -20,10 +20,9 @@ class CompoundSplitterClient(Client):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as err:
+        except httpx.HTTPError:
             logger.warning(
                 "Unable to split the utterance further due to an issue in the splitter. Using speech utterance as is.",
-                exc_info=err,
             )
             return []
 
@@ -54,8 +53,8 @@ class CompoundSplitterClient(Client):
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as err:
-            logger.warning("Unable to perform coreference resolution.", exc_info=err)
+        except httpx.HTTPError:
+            logger.exception("Unable to perform coreference resolution.")
             return instructions[-1]
 
         return response.json()

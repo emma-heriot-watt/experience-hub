@@ -81,7 +81,7 @@ class SimBotUserUtteranceVerificationPipeline:
             return self._profanity_filter_client.is_profane(speech_recognition_payload.utterance)
         except Exception as err:
             # TODO: What to do if we cannot determine?
-            logger.exception("Unable to check for profanity.", exc_info=err)
+            logger.exception("Unable to check for profanity.")
             raise err
 
     @tracer.start_as_current_span("Check for out of domain")
@@ -95,7 +95,7 @@ class SimBotUserUtteranceVerificationPipeline:
             )
         except Exception as err:
             # TODO: What to do if we cannot determine?
-            logger.exception("Unable to check for out of domain utterance.", exc_info=err)
+            logger.exception("Unable to check for out of domain utterance.")
             raise err
 
     @tracer.start_as_current_span("Check for only wake word")
