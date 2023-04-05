@@ -9,6 +9,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotFeaturesClient,
 )
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.datamodels.common import GFHLocationType
 from emma_experience_hub.datamodels.enums import SearchPlannerType
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -66,12 +67,15 @@ class SimBotFindObjectPipeline:
         distance_threshold: float = 4,
         viewpoint_budget: int = 2,
         enable_grab_from_history: bool = True,
+        gfh_location_type: GFHLocationType = GFHLocationType.location,
     ) -> "SimBotFindObjectPipeline":
         """Instantiate the pipeline from the SearchPlannerType."""
         planners = {
             SearchPlannerType.basic: BasicSearchPlanner(),
             SearchPlannerType.greedy_max_vertex_cover: GreedyMaximumVertexCoverSearchPlanner(
-                distance_threshold=distance_threshold, vertex_budget=viewpoint_budget
+                distance_threshold=distance_threshold,
+                vertex_budget=viewpoint_budget,
+                gfh_location_type=gfh_location_type,
             ),
         }
 

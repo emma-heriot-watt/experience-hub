@@ -1,13 +1,23 @@
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import AnyHttpUrl, BaseModel, BaseSettings, DirectoryPath, Field, validator
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    BaseSettings,
+    DirectoryPath,
+    Field,
+    root_validator,
+    validator,
+)
 
+from emma_experience_hub.datamodels.common import GFHLocationType
 from emma_experience_hub.datamodels.enums import SearchPlannerType
 
 
 class SimBotFeatureFlags(BaseModel):
     """Feature flags for the SimBot agent."""
 
+    enable_offline_evaluation: bool = False
     enable_clarification_questions: bool = True
     enable_confirmation_questions: bool = True
     enable_search_actions: bool = True
@@ -18,6 +28,20 @@ class SimBotFeatureFlags(BaseModel):
     enable_always_highlight_before_object_action: bool = False
 
     search_planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover
+    gfh_location_type: GFHLocationType = GFHLocationType.location
+
+    @root_validator
+    @classmethod
+    def set_offline_evaluation_flags(
+        cls,
+        values: dict[str, Any],  # noqa: WPS110
+    ) -> dict[str, Any]:
+        """Make sure that flags are set correctly for the offline evaluation."""
+        if values.get("enable_offline_evaluation", False):
+            values["enable_clarification_questions"] = False
+            values["enable_confirmation_questions"] = False
+            values["gfh_location_type"] = GFHLocationType.viewpoint
+        return values
 
 
 class SimBotSettings(BaseSettings):
@@ -96,3 +120,8 @@ class SimBotSettings(BaseSettings):
             return None
 
         return timeout
+
+    @property
+    def is_not_offline_evaluation(self) -> bool:
+        """Are we not running the offline evaluation?"""
+        return not self.feature_flags.enable_offline_evaluation

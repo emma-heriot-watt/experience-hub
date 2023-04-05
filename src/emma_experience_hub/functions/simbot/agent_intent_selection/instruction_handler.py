@@ -34,6 +34,7 @@ class SimBotActHandler:
         compound_splitter_pipeline: SimBotCompoundSplitterPipeline,
         simbot_hacks_client: SimBotHacksClient,
         _enable_clarification_questions: bool = True,
+        _enable_confirmation_questions: bool = True,
         _enable_search_actions: bool = True,
         _enable_search_after_no_match: bool = True,
         _enable_high_level_planner: bool = True,
@@ -47,6 +48,7 @@ class SimBotActHandler:
         self._compound_splitter_pipeline = compound_splitter_pipeline
 
         self._enable_clarification_questions = _enable_clarification_questions
+        self._enable_confirmation_questions = _enable_confirmation_questions
         self._enable_search_actions = _enable_search_actions
         self._enable_search_after_no_match = _enable_search_after_no_match
         self._enable_high_level_planner = _enable_high_level_planner
@@ -254,6 +256,8 @@ class SimBotActHandler:
 
     def _should_confirm_before_search(self, session: SimBotSession, target_entity: str) -> bool:
         """Should the agent ask for confirmation before searching?"""
+        if not self._enable_confirmation_questions:
+            return False
         # Don't ask if we've seen the entity in the current room or know its location from prior memory
         has_seen_object = session.current_state.memory.object_in_memory(
             target_entity, current_room=session.current_turn.environment.current_room

@@ -50,6 +50,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             planner_type=simbot_settings.feature_flags.search_planner_type,
             visual_grounding_output_parser=SimBotVisualGroundingOutputParser(),
             enable_grab_from_history=simbot_settings.feature_flags.enable_grab_from_history,
+            gfh_location_type=simbot_settings.feature_flags.gfh_location_type,
         )
         action_predictor_response_parser = SimBotActionPredictorOutputParser()
         compound_splitter = SimBotCompoundSplitterPipeline(clients.compound_splitter)
@@ -84,6 +85,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 compound_splitter_pipeline=compound_splitter,
                 simbot_hacks_client=clients.simbot_hacks,
                 _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
+                _enable_confirmation_questions=simbot_settings.feature_flags.enable_confirmation_questions,
                 _enable_search_actions=simbot_settings.feature_flags.enable_search_actions,
                 _enable_search_after_no_match=simbot_settings.feature_flags.enable_search_after_no_match,
                 _enable_high_level_planner=simbot_settings.feature_flags.enable_rasa_high_level_planner,
@@ -97,5 +99,8 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 simbot_hacks_client=clients.simbot_hacks,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(),
-            anticipator=SimbotAnticipatorPipeline(simbot_hacks_client=clients.simbot_hacks),
+            anticipator=SimbotAnticipatorPipeline(
+                simbot_hacks_client=clients.simbot_hacks,
+                _is_offline_evaluation=simbot_settings.feature_flags.offline_evaluation,
+            ),
         )

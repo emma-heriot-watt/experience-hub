@@ -13,15 +13,22 @@ tracer = trace.get_tracer(__name__)
 class SimbotAnticipatorPipeline:
     """Generate a plan of instructions and appends them to the utterance queue."""
 
-    def __init__(self, simbot_hacks_client: SimBotHacksClient) -> None:
+    def __init__(
+        self, simbot_hacks_client: SimBotHacksClient, _is_offline_evaluation: bool = False
+    ) -> None:
         self._simbot_hacks_client = simbot_hacks_client
+        self._is_offline_evaluation = _is_offline_evaluation
 
     def run(self, session: SimBotSession) -> None:
         """Generate an action to perform on the environment."""
+        if not self._is_offline_evaluation:
+            return
+
         # Do not run the anticipator pipeline if there are utterances in queue.
         # We dont want to add the utterances produced by the anticipator if
         # 1) the previous utterance has been split by the compound splitter, meaning there are still actions that the user asked us to perform or
         # 2) in some previous turn the anticipator produced already a plan that are now executing, therefore we dont want to override that plan.
+
         if session.current_state.utterance_queue.is_not_empty:
             return
 

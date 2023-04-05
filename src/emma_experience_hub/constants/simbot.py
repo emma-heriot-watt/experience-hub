@@ -14,6 +14,11 @@ from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 constants_absolute_path = Path(__file__).parent.resolve()
 
 
+def get_service_registry_file_path() -> Path:
+    """Get the path to the service registry file."""
+    return constants_absolute_path.joinpath("simbot", "registry.yaml")
+
+
 @lru_cache(maxsize=1)
 def get_arena_definitions() -> dict[str, Any]:
     """Load the arena definitions from their file."""

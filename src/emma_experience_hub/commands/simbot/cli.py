@@ -24,12 +24,13 @@ from emma_common.logging import InstrumentedInterceptHandler, setup_logging, set
 from emma_experience_hub._version import __version__  # noqa: WPS436
 from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
+from emma_experience_hub.constants.simbot import get_service_registry_file_path
 from emma_experience_hub.datamodels import ServiceRegistry
 
 
 MODEL_STORAGE_DIR = Path("storage/models/")
 
-SERVICE_REGISTRY_PATH = Path("storage/registry/simbot/production.yaml")
+SERVICE_REGISTRY_PATH = get_service_registry_file_path()
 
 SERVICES_COMPOSE_PATH = Path("docker/simbot-docker-compose.yaml")
 SERVICES_STAGING_COMPOSE_PATH = Path("docker/simbot-docker-compose.staging.yaml")
@@ -241,6 +242,9 @@ def run_controller_api(
     workers: int = typer.Option(
         default=1, min=1, help="Set the number of workers to run the server with."
     ),
+    timeout: int = typer.Option(
+        default=100, min=10, help="Set the number of seconds until the timeout."
+    ),
 ) -> None:
     """Run the inference server."""
     os.environ["SIMBOT_AUXILIARY_METADATA_DIR"] = str(auxiliary_metadata_dir)
@@ -265,7 +269,11 @@ def run_controller_api(
         setup_rich_logging(rich_traceback_show_locals=False)
 
     server = create_gunicorn_server(
-        simbot_api, simbot_settings.host, simbot_settings.port, workers
+        simbot_api,
+        simbot_settings.host,
+        simbot_settings.port,
+        workers,
+        timeout=timeout,
     )
 
     if log_to_cloudwatch:

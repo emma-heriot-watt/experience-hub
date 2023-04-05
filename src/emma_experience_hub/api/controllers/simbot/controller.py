@@ -87,7 +87,7 @@ class SimBotController:
             session = self.pipelines.request_processing.run(simbot_request)
 
         # Verify user utterance is valid
-        if simbot_request.speech_recognition:
+        if self.settings.is_not_offline_evaluation and simbot_request.speech_recognition:
             with tracer.start_as_current_span("Verify incoming utterance"):
                 user_intent = self.pipelines.user_utterance_verifier.run(
                     simbot_request.speech_recognition

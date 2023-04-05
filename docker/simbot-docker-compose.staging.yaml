@@ -3,7 +3,7 @@ x-deploy-gpu: &deploy-gpu
     reservations:
       devices:
         - driver: nvidia
-          count: all
+          device_ids: ["all"]
           capabilities: [gpu]
 
 services:

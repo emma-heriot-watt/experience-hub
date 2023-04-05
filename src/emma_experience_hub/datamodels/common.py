@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pydantic import BaseModel
 
 
@@ -41,3 +43,10 @@ class ArenaLocation(BaseModel):
     room_name: str
     position: Position
     rotation: RotationQuaternion
+
+
+class GFHLocationType(Enum):
+    """The type of location used for GFH during the find routine."""
+
+    viewpoint = "viewpoint"
+    location = "location"
