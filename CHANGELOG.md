@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.35.0](https://github.com/emma-simbot/experience-hub/compare/v8.34.1...v8.35.0) (2023-04-05)
+
+
+### Features
+
+* Enable offline inference ([#483](https://github.com/emma-simbot/experience-hub/issues/483)) ([57ce375](https://github.com/emma-simbot/experience-hub/commit/57ce3755ae8fcd23e0aee96ea0e0f3e3a923dcc9))
+
 ## [8.34.1](https://github.com/emma-simbot/experience-hub/compare/v8.34.0...v8.34.1) (2023-03-16)
 
 
