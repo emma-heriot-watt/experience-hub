@@ -134,8 +134,12 @@ class SimBotEnvironmentErrorCatchingPipeline:
         self._store_current_utterance_if_needed(session)
         queue_elem = SimBotQueueUtterance(utterance=f"fill the {target}", role=SpeakerRole.agent)
         session.current_state.utterance_queue.append_to_head(queue_elem)
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance="toggle the sink", role=SpeakerRole.agent
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance="toggle the sink",
+            role=SpeakerRole.agent,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech is not None
+            else None,
         )
         return True
 
@@ -146,8 +150,12 @@ class SimBotEnvironmentErrorCatchingPipeline:
         self._store_current_utterance_if_needed(session)
         queue_elem = SimBotQueueUtterance(utterance=f"clean the {target}", role=SpeakerRole.agent)
         session.current_state.utterance_queue.append_to_head(queue_elem)
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance="toggle the sink", role=SpeakerRole.agent
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance="toggle the sink",
+            role=SpeakerRole.agent,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech is not None
+            else None,
         )
         return True
 
@@ -177,7 +185,11 @@ class SimBotEnvironmentErrorCatchingPipeline:
         )
         session.current_state.utterance_queue.append_to_head(queue_elem)
         # Add a new instruction to fix the state
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance=new_current_utterance, role=previous_speech.role
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=new_current_utterance,
+            role=previous_speech.role,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech
+            else None,
         )
         return True

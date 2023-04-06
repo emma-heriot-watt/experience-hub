@@ -119,8 +119,9 @@ class SimBotActHandler:
             utterance=room_text_match.modified_utterance, role=SpeakerRole.agent
         )
         session.current_state.utterance_queue.append_to_head(queue_elem)
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance=f"go to the {room_text_match.room_name}"
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=f"go to the {room_text_match.room_name}",
+            original_utterance=session.current_turn.speech.original_utterance,
         )
         return True
 
@@ -207,8 +208,12 @@ class SimBotActHandler:
             role=SpeakerRole.user,
         )
         session.current_state.utterance_queue.append_to_head(queue_elem)
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance=f"find the {target_entity}", role=SpeakerRole.agent
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=f"find the {target_entity}",
+            role=SpeakerRole.agent,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech is not None
+            else None,
         )
         return SimBotAgentIntents(
             SimBotIntent(type=SimBotIntentType.search, entity=target_entity),

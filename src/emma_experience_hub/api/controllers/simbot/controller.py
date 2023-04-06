@@ -165,7 +165,7 @@ class SimBotController:
                 f"[REQUEST]: Get utterance from the session queue ({len(session.current_state.utterance_queue) - 1} remaining"
             )
             queue_elem = session.current_state.utterance_queue.pop_from_head()
-            session.current_turn.speech = SimBotUserSpeech(
+            session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
                 utterance=queue_elem.utterance,
                 from_utterance_queue=True,
                 role=queue_elem.role,

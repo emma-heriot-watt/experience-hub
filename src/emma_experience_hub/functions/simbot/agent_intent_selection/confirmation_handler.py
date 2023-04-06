@@ -96,11 +96,21 @@ class SimBotConfirmationHandler:
 
         # Do a search routine before executing the latest instruction.
         session.current_state.utterance_queue.append_to_head(
-            SimBotQueueUtterance(utterance=previous_turn.speech.utterance, role=previous_turn.speech.role),  # type: ignore[union-attr]
+            SimBotQueueUtterance(
+                utterance=previous_turn.speech.utterance,  # type: ignore[union-attr]
+                role=previous_turn.speech.role,  # type: ignore[union-attr]
+                original_user_utterance=session.current_turn.speech.original_utterance
+                if session.current_turn.speech is not None
+                else None,
+            ),
         )
         target_entity = previous_turn.intent.verbal_interaction.entity
-        session.current_turn.speech = SimBotUserSpeech(
-            utterance=f"find the {target_entity}", role=SpeakerRole.agent
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=f"find the {target_entity}",
+            role=SpeakerRole.agent,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech
+            else None,
         )
         return SimBotAgentIntents(
             physical_interaction=SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
@@ -117,8 +127,13 @@ class SimBotConfirmationHandler:
         if user_intent == SimBotIntentType.confirm_yes:
             # Pop the first element in the instruction plan and add it to the utterance speech
             queue_elem = session.current_state.utterance_queue.pop_from_head()
-            session.current_turn.speech = SimBotUserSpeech(
-                utterance=queue_elem.utterance, from_utterance_queue=True, role=queue_elem.role
+            session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+                utterance=queue_elem.utterance,
+                from_utterance_queue=True,
+                role=queue_elem.role,
+                original_utterance=session.current_turn.speech.original_utterance
+                if session.current_turn.speech
+                else None,
             )
             return None
 

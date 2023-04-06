@@ -72,7 +72,12 @@ class SimBotCompoundSplitterPipeline:
         new_utterance = self.compound_splitter_client.resolve_coreferences(
             instructions=[previous_instruction, session.current_turn.speech.utterance]
         )
-        session.current_turn.speech = SimBotUserSpeech(utterance=new_utterance)
+        session.current_turn.speech = SimBotUserSpeech(
+            utterance=new_utterance,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech is not None
+            else None,
+        )
         return session
 
     def _add_utterances_to_queue(self, utterances: list[str], session: SimBotSession) -> None:
@@ -96,5 +101,8 @@ class SimBotCompoundSplitterPipeline:
         )
 
         session.current_turn.speech = SimBotUserSpeech(
-            utterance=new_utterance, from_utterance_queue=True, role=queue_elem.role
+            utterance=new_utterance,
+            from_utterance_queue=True,
+            role=queue_elem.role,
+            original_utterance=session.current_turn.speech.original_utterance,
         )
