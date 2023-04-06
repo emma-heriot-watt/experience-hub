@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.35.2](https://github.com/emma-simbot/experience-hub/compare/v8.35.1...v8.35.2) (2023-04-06)
+
+
+### Bug Fixes
+
+* Bugs from refactoring for offline evaluation ([#488](https://github.com/emma-simbot/experience-hub/issues/488)) ([db62c66](https://github.com/emma-simbot/experience-hub/commit/db62c66f6365a2cb17b85d0a8c11fd98b84fb144))
+
 ## [8.35.1](https://github.com/emma-simbot/experience-hub/compare/v8.35.0...v8.35.1) (2023-04-06)
 
 
