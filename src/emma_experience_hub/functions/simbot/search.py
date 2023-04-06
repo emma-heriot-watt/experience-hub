@@ -156,14 +156,14 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         vertex_budget: int = 2,
         use_current_position: bool = True,
         rotation_magnitude: float = 90,
-        _gfh_type: GFHLocationType = GFHLocationType.location,
+        gfh_location_type: GFHLocationType = GFHLocationType.location,
     ) -> None:
         super().__init__(rotation_magnitude=rotation_magnitude)
 
         self.distance_threshold = distance_threshold
         self.viewpoint_budget = vertex_budget
         self.use_current_position = use_current_position
-        self._gfh_type = _gfh_type
+        self.gfh_location_type = gfh_location_type
 
     def get_coverage_sets(self, coords: typing.NDArray[np.float64]) -> typing.NDArray[np.float64]:
         """Get the set of viewpoints covered by each other point."""
@@ -239,10 +239,16 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         gfh_location: Union[ArenaLocation, str],
     ) -> tuple[list[str], list[list[float]], int]:
         """Update the vertex candidates with the GFH position."""
-        if self._gfh_type == GFHLocationType.location:
+        if isinstance(gfh_location, ArenaLocation):
             name_candidates.append("gfh_location")
             location_candidates.append(gfh_location.position.as_list())
-        first_selected_idx = name_candidates.index(gfh_location)
+            first_selected_idx = name_candidates.index("gfh_location")
+        elif isinstance(gfh_location, str):
+            first_selected_idx = name_candidates.index(gfh_location)
+        else:
+            raise AssertionError(
+                "GFH location should be a viewpoint name (str) or an Arena Location."
+            )
         return name_candidates, location_candidates, first_selected_idx
 
     def get_actions_for_position(
@@ -250,9 +256,6 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         location_from_gfh: bool = False,
     ) -> list[SimBotAction]:
         """Return the necessary actions needed to be done in a single viewpoint."""
-        # If the first position is from GFH, first do a Look Around
-        # if location_from_gfh:
-        #     return [self._create_look_around_action(add_stop_token=False)]
         return self._create_rotation_actions()
 
     def run(
@@ -325,7 +328,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
 
     def _get_viewpoint_closest_to_location(
         self, gfh_location: ArenaLocation, session: SimBotSession
-    ):
+    ) -> str:
         viewpoints_in_current_room = session.current_turn.environment.viewpoints_in_current_room
         viewpoint_index = get_closest_position_index_to_reference(
             gfh_location.position, viewpoints_in_current_room.values()
@@ -340,7 +343,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         session: SimBotSession,
         planned_actions: list[SimBotAction],
     ) -> Union[ArenaLocation, str]:
-        if self._gfh_type == GFHLocationType.location:
+        if self.gfh_location_type == GFHLocationType.location:
             planned_actions.append(self._create_goto_arena_location_action(gfh_location))
             return gfh_location
 

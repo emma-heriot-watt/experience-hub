@@ -101,6 +101,6 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(),
             anticipator=SimbotAnticipatorPipeline(
                 simbot_hacks_client=clients.simbot_hacks,
-                _is_offline_evaluation=simbot_settings.feature_flags.offline_evaluation,
+                _is_offline_evaluation=simbot_settings.feature_flags.enable_offline_evaluation,
             ),
         )
