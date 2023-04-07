@@ -21,7 +21,8 @@ class SimbotAnticipatorPipeline:
 
     def run(self, session: SimBotSession) -> None:
         """Generate an action to perform on the environment."""
-        if not self._is_offline_evaluation:
+        # Skip the anticipator during the offline evaluation
+        if self._is_offline_evaluation:
             return
 
         # Do not run the anticipator pipeline if there are utterances in queue.
