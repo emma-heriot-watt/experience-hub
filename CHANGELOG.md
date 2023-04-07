@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.35.3](https://github.com/emma-simbot/experience-hub/compare/v8.35.2...v8.35.3) (2023-04-07)
+
+
+### Bug Fixes
+
+* Bug in disabling the anticipator for offline evaluation ([#491](https://github.com/emma-simbot/experience-hub/issues/491)) ([4b25652](https://github.com/emma-simbot/experience-hub/commit/4b25652166f89f707343b7ea95b777c8dd4b2658))
+
 ## [8.35.2](https://github.com/emma-simbot/experience-hub/compare/v8.35.1...v8.35.2) (2023-04-06)
 
 
