@@ -104,8 +104,7 @@ class SimBotSettings(BaseSettings):
         """Config for the settings."""
 
         env_prefix = "SIMBOT_"
-        env_file = ".env.simbot"
-        env_file_encoding = "utf-8"
+        env_nested_delimiter = "__"
 
     @classmethod
     def from_env(cls) -> "SimBotSettings":
