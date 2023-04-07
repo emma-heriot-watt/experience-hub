@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.35.4](https://github.com/emma-simbot/experience-hub/compare/v8.35.3...v8.35.4) (2023-04-07)
+
+
+### Bug Fixes
+
+* allow setting nested env vars using delimiter ([e6f831c](https://github.com/emma-simbot/experience-hub/commit/e6f831cc5953266f9cfa7d6560f5c64a971246ab))
+
 ## [8.35.3](https://github.com/emma-simbot/experience-hub/compare/v8.35.2...v8.35.3) (2023-04-07)
 
 
