@@ -114,13 +114,13 @@ class SimBotSessionTurnIntent(BaseModel):
         return is_search
 
     @property
-    def is_searching_after_not_seeing_object(self) -> bool:
-        """Return True if the agent is searching after not directly seeing the object ."""
-        is_act_no_match = (
+    def is_searching_inferred_object(self) -> bool:
+        """Return True if the agent is searching after act_no_match or act_missing_inventory."""
+        search_triggered_by_verbal_interaction_intent = (
             self.verbal_interaction is not None
-            and self.verbal_interaction.type == SimBotIntentType.act_no_match
+            and self.verbal_interaction.type.verbal_interaction_intent_triggers_search
         )
-        return self.is_searching and is_act_no_match
+        return self.is_searching and search_triggered_by_verbal_interaction_intent
 
     @property
     def all_intent_types(self) -> list[SimBotIntentType]:

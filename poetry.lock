@@ -1496,7 +1496,7 @@ idna = ">=2.0.0"
 
 [[package]]
 name = "emma-common"
-version = "2.1.0"
+version = "2.2.0"
 description = "Common modules which are used a lot throughout EMMA repositories"
 category = "main"
 optional = false
@@ -1520,15 +1520,15 @@ opentelemetry-instrumentation-system-metrics = "^0.35b0,!=0.36b0"
 opentelemetry-instrumentation-urllib3 = "^0.35b0,!=0.36b0"
 orjson = "^3.8.3"
 pydantic = {version = "^1.10.0", extras = ["dotenv"]}
-rich = "^12.6.0"
-torch = "^1.10,!=1.13.0"
+rich = ">=12.6.0"
+torch = ">=1.10,!=1.13.0"
 watchtower = "^3.0.0"
 
 [package.source]
 type = "git"
 url = "https://github.com/emma-simbot/common"
 reference = "HEAD"
-resolved_reference = "b0eed1ac7fa7a14380a275c22f171d329327c2bd"
+resolved_reference = "f43cae4631519f4ed375d135e3cfffcaca3a40e8"
 
 [[package]]
 name = "emma-datasets"
@@ -2518,7 +2518,6 @@ category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "junit-xml-1.9.tar.gz", hash = "sha256:de16a051990d4e25a3982b2dd9e89d671067548718866416faec14d9de56db9f"},
     {file = "junit_xml-1.9-py2.py3-none-any.whl", hash = "sha256:ec5ca1a55aefdd76d28fcc0b135251d156c7106fa979686a4b48d62b761b4732"},
 ]
 

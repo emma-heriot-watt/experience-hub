@@ -1,3 +1,5 @@
+from typing import Optional
+
 from opentelemetry import trace
 
 from emma_common.datamodels import DialogueUtterance, EnvironmentStateTurn
@@ -14,9 +16,13 @@ class SimBotNLUIntentClient(EmmaPolicyClient):
         self,
         environment_state_history: list[EnvironmentStateTurn],
         dialogue_history: list[DialogueUtterance],
+        inventory_entity: Optional[str] = None,
     ) -> str:
         """Generate a response from the features and provided language."""
         with tracer.start_as_current_span("Generate NLU intent"):
             return self._make_request(
-                f"{self._endpoint}/generate", environment_state_history, dialogue_history
+                f"{self._endpoint}/generate",
+                environment_state_history,
+                dialogue_history,
+                inventory_entity,
             )

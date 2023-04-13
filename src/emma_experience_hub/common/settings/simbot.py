@@ -23,6 +23,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_search_actions: bool = True
     enable_grab_from_history: bool = True
     enable_search_after_no_match: bool = True
+    enable_search_after_missing_inventory: bool = True
     enable_object_related_questions_from_user: bool = False
     enable_rasa_high_level_planner: bool = False
     enable_always_highlight_before_object_action: bool = False

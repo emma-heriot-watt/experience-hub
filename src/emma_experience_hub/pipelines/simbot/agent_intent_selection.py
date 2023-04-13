@@ -50,6 +50,7 @@ class SimBotAgentIntentSelectionPipeline:
         _enable_confirmation_questions: bool = True,
         _enable_search_actions: bool = True,
         _enable_search_after_no_match: bool = True,
+        _enable_search_after_missing_inventory: bool = True,
         _enable_high_level_planner: bool = True,
     ) -> None:
         self.clarification_handler = SimBotClarificationHandler()
@@ -66,6 +67,7 @@ class SimBotAgentIntentSelectionPipeline:
             _enable_confirmation_questions=_enable_confirmation_questions,
             _enable_search_actions=_enable_search_actions,
             _enable_search_after_no_match=_enable_search_after_no_match,
+            _enable_search_after_missing_inventory=_enable_search_after_missing_inventory,
             _enable_high_level_planner=_enable_high_level_planner,
         )
         self._environment_error_pipeline = environment_error_pipeline

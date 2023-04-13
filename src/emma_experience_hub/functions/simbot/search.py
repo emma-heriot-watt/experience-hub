@@ -129,7 +129,7 @@ class BasicSearchPlanner(SearchPlanner):
     ) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
         # For search and no match, do a Look Around
-        if session.current_turn.intent.is_searching_after_not_seeing_object:
+        if session.current_turn.intent.is_searching_inferred_object:
             return [self._create_look_around_action()]
         return self._create_rotation_actions()
 

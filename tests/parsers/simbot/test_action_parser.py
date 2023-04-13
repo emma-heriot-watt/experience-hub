@@ -202,9 +202,10 @@ def test_simbot_action_parser_object_navigation(
     simbot_extracted_features: list[EmmaExtractedFeatures],
 ) -> None:
     """Tests that the parser returns correct object navigation actions."""
-    simbot_extracted_features[frame_token_id - 1].entity_labels[
-        visual_token_id - 1
-    ] = simbot_object_name
+    if simbot_extracted_features[frame_token_id - 1].entity_labels is not None:
+        simbot_extracted_features[frame_token_id - 1].entity_labels[
+            visual_token_id - 1
+        ] = simbot_object_name
 
     if simbot_object_name == "Sticky Note":
         raw_output = _build_raw_output(
@@ -292,9 +293,10 @@ def test_simbot_action_parser_object_interaction(
         )
         expected_object_name = simbot_object_name
 
-    simbot_extracted_features[frame_token_id - 1].entity_labels[
-        visual_token_id - 1
-    ] = simbot_object_name
+    if simbot_extracted_features[frame_token_id - 1].entity_labels is not None:
+        simbot_extracted_features[frame_token_id - 1].entity_labels[
+            visual_token_id - 1
+        ] = simbot_object_name
 
     parsed_action = simbot_action_parser(
         raw_output,

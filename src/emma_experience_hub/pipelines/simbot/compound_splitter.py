@@ -2,7 +2,7 @@ from loguru import logger
 
 from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.api.clients import CompoundSplitterClient
-from emma_experience_hub.datamodels.simbot import SimBotSession, SimBotUserSpeech
+from emma_experience_hub.datamodels.simbot import SimBotSession, SimBotUserSpeech, SimBotUtterance
 from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 
 
@@ -39,7 +39,7 @@ class SimBotCompoundSplitterPipeline:
     def run_high_level_planner(self, session: SimBotSession) -> SimBotSession:
         """Given the user instruction, updates the utterance queue with simpler instructions."""
         skip_high_level_conditions = [
-            not session.current_turn.speech
+            session.current_turn.speech is None
             or session.current_turn.speech.role == SpeakerRole.agent
         ]
 
@@ -49,7 +49,7 @@ class SimBotCompoundSplitterPipeline:
 
         # Split the utterances
         utterance_splits = self.compound_splitter_client.high_level_plan(
-            session.current_turn.speech.utterance, session.current_state.inventory.entity
+            session.current_turn.speech.utterance, session.current_state.inventory.entity  # type: ignore[union-attr]
         )
 
         # If there is less than 2 utterances after splitting, it means that the utterance cannot be split
@@ -69,14 +69,17 @@ class SimBotCompoundSplitterPipeline:
             logger.warning("There are no utterances to resolve coreferences.")
             return session
         previous_instruction = session.current_state.last_user_utterance.queue[1]
+        if session.current_turn.speech is None:
+            return session
+
         new_utterance = self.compound_splitter_client.resolve_coreferences(
             instructions=[previous_instruction, session.current_turn.speech.utterance]
         )
         session.current_turn.speech = SimBotUserSpeech(
-            utterance=new_utterance,
-            original_utterance=session.current_turn.speech.original_utterance
-            if session.current_turn.speech is not None
-            else None,
+            modified_utterance=SimBotUtterance(
+                utterance=new_utterance, role=session.current_turn.speech.role
+            ),
+            original_utterance=session.current_turn.speech.original_utterance,
         )
         return session
 
@@ -101,8 +104,10 @@ class SimBotCompoundSplitterPipeline:
         )
 
         session.current_turn.speech = SimBotUserSpeech(
-            utterance=new_utterance,
-            from_utterance_queue=True,
-            role=queue_elem.role,
+            modified_utterance=SimBotUtterance(
+                utterance=new_utterance,
+                from_utterance_queue=True,
+                role=queue_elem.role,
+            ),
             original_utterance=session.current_turn.speech.original_utterance,
         )

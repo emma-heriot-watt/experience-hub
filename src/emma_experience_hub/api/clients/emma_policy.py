@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import httpx
 from loguru import logger
@@ -36,12 +36,14 @@ class EmmaPolicyClient(Client):
         endpoint: str,
         environment_state_history: list[EnvironmentStateTurn],
         dialogue_history: list[DialogueUtterance],
+        inventory_entity: Optional[str] = None,
         force_stop_token: bool = False,
     ) -> Any:
         """Generate a response from the features and provided language."""
         emma_policy_request = EmmaPolicyRequest(
             environment_history=environment_state_history,
             dialogue_history=dialogue_history,
+            inventory=inventory_entity,
             force_stop_token=force_stop_token,
         )
         logger.debug(f"Sending {emma_policy_request.num_images} images.")

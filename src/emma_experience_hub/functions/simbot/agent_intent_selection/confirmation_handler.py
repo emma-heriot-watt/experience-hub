@@ -19,16 +19,17 @@ def set_find_object_in_progress_intent(session: SimBotSession) -> SimBotAgentInt
         return SimBotAgentIntents(SimBotIntent(type=SimBotIntentType.search))
 
     entity = session.previous_turn.intent.physical_interaction.entity
-    # Retain the information that the search was triggered by an act_no_match
-    is_search_after_not_seeing_object_in_progress = (
-        session.previous_turn.intent.is_searching_after_not_seeing_object
+    previous_intent = session.previous_turn.intent
+    # Retain the information that the search was triggered by an act_no_match or act_missing_inventory
+    is_searching_inferred_object = (
+        previous_intent.is_searching_inferred_object
         and not session.previous_turn.is_going_to_found_object_from_search
     )
-    if is_search_after_not_seeing_object_in_progress:
+    if is_searching_inferred_object and previous_intent.verbal_interaction is not None:
         return SimBotAgentIntents(
             SimBotIntent(type=SimBotIntentType.search, entity=entity),
             SimBotIntent(
-                type=SimBotIntentType.act_no_match,
+                type=previous_intent.verbal_interaction.type,
                 entity=entity,
             ),
         )
@@ -99,9 +100,6 @@ class SimBotConfirmationHandler:
             SimBotQueueUtterance(
                 utterance=previous_turn.speech.utterance,  # type: ignore[union-attr]
                 role=previous_turn.speech.role,  # type: ignore[union-attr]
-                original_user_utterance=session.current_turn.speech.original_utterance
-                if session.current_turn.speech is not None
-                else None,
             ),
         )
         target_entity = previous_turn.intent.verbal_interaction.entity

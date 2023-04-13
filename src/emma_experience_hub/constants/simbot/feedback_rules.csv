@@ -335,6 +335,9 @@ physical_interaction_intent_type == "search" and physical_interaction_intent_ent
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,First things first - let's find the {verbal_interaction_intent_entity},True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">Let's first look for the {verbal_interaction_intent_entity}</amazon:emotion>,True
 
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_missing_inventory" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,First step - let's get the {verbal_interaction_intent_entity},True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_missing_inventory" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">I'll start by looking for the {verbal_interaction_intent_entity}</amazon:emotion>,True
+
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,I'll start looking!,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="medium">Starting the search!</amazon:emotion>,True
 

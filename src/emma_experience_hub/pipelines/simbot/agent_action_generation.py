@@ -195,7 +195,7 @@ class SimBotAgentActionGenerationPipeline:
 
         should_skip_goto_object_action = (
             # The previous turn was search after not seeing the object
-            session.previous_turn.intent.is_searching_after_not_seeing_object
+            session.previous_turn.intent.is_searching_inferred_object
             # The object was found if the last action was a goto-object
             and session.previous_turn.is_going_to_found_object_from_search
             and session.previous_turn.actions.is_successful

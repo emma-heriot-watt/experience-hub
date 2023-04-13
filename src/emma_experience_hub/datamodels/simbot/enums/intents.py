@@ -25,6 +25,7 @@ class SimBotIntentType(Enum):
     # Clarification question triggers
     act_no_match = "<act><no_match>"
     act_too_many_matches = "<act><too_many_matches>"
+    act_missing_inventory = "<act><missing_inventory>"
 
     # Confirmation question triggers
     confirm_generic = "<confirm><generic>"
@@ -139,6 +140,14 @@ class SimBotIntentType(Enum):
         return self in {
             SimBotIntentType.confirm_yes,
             SimBotIntentType.confirm_no,
+        }
+
+    @property
+    def verbal_interaction_intent_triggers_search(self) -> bool:
+        """Return True if the intent is a verbal interaction intent that triggers search."""
+        return self in {
+            SimBotIntentType.act_missing_inventory,
+            SimBotIntentType.act_no_match,
         }
 
     @staticmethod
@@ -259,11 +268,13 @@ SimBotVerbalInteractionIntentType = Literal[
     SimBotIntentType.confirm_before_plan,
     SimBotIntentType.act_no_match,
     SimBotIntentType.act_too_many_matches,
+    SimBotIntentType.act_missing_inventory,
     SimBotIntentType.generic_success,
 ]
 
 SimBotNLUIntentType = Literal[
     SimBotIntentType.act_no_match,
+    SimBotIntentType.act_missing_inventory,
     SimBotIntentType.act_too_many_matches,
     SimBotIntentType.search,
     SimBotIntentType.act_one_match,

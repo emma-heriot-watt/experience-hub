@@ -23,6 +23,7 @@ class SimBotNLUOutputParser(NeuralParser[SimBotIntent[SimBotNLUIntentType]]):
             - <act><one_match>
             - <act><no_match> object_name
             - <act><too_many_matches> object_name
+            - <act><missing_inventory> object_name
             - <search>
         """
         logger.debug(f"NLU output text: `{output_text}`")

@@ -37,6 +37,7 @@ class SimBotActHandler:
         _enable_confirmation_questions: bool = True,
         _enable_search_actions: bool = True,
         _enable_search_after_no_match: bool = True,
+        _enable_search_after_missing_inventory: bool = True,
         _enable_high_level_planner: bool = True,
     ) -> None:
         self._features_client = features_client
@@ -51,6 +52,7 @@ class SimBotActHandler:
         self._enable_confirmation_questions = _enable_confirmation_questions
         self._enable_search_actions = _enable_search_actions
         self._enable_search_after_no_match = _enable_search_after_no_match
+        self._enable_search_after_missing_inventory = _enable_search_after_missing_inventory
         self._enable_high_level_planner = _enable_high_level_planner
 
     def run(self, session: SimBotSession) -> Optional[SimBotAgentIntents]:
@@ -74,6 +76,7 @@ class SimBotActHandler:
         # Otherwise, use the NLU to detect it
         intents = self._process_utterance_with_nlu(session)
         intents = self._handle_act_no_match_intent(session=session, intents=intents)
+        intents = self._handle_act_missing_inventory_intent(session=session, intents=intents)
         return self._handle_search_holding_object(session=session, intents=intents)
 
     def _utterance_has_been_processed_by_nlu(self, session: SimBotSession) -> bool:
@@ -83,7 +86,7 @@ class SimBotActHandler:
         """
         return (
             session.previous_turn is not None
-            and session.previous_turn.intent.is_searching_after_not_seeing_object
+            and session.previous_turn.intent.is_searching_inferred_object
             and session.previous_turn.is_going_to_found_object_from_search
             and session.previous_turn.actions.is_successful
         )
@@ -136,6 +139,7 @@ class SimBotActHandler:
             self._nlu_intent_client.generate(
                 dialogue_history=session.current_turn.utterances,
                 environment_state_history=[EnvironmentStateTurn(features=extracted_features)],
+                inventory_entity=session.current_state.inventory.entity,
             )
         )
         session.update_agent_memory(extracted_features)
@@ -219,6 +223,64 @@ class SimBotActHandler:
             SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
             SimBotIntent(
                 type=SimBotIntentType.act_no_match,
+                entity=target_entity,
+            ),
+        )
+
+    def _handle_act_missing_inventory_intent(
+        self, session: SimBotSession, intents: SimBotAgentIntents
+    ) -> SimBotAgentIntents:
+        """Update the session for `act_missing_inventory` intent.
+
+        Search for the missing inventory, pick it up, and then execute the instruction.
+        """
+        if intents.verbal_interaction is None or not self._enable_search_after_missing_inventory:
+            return intents
+        # Check the intent is act_missing_inventory from a new utterance
+        should_search_before_executing_instruction = (
+            intents.verbal_interaction.type == SimBotIntentType.act_missing_inventory
+            and session.current_turn.speech is not None
+        )
+        if not should_search_before_executing_instruction:
+            return intents
+        # Make sure we know the missing object
+        target_entity = intents.verbal_interaction.entity
+        if target_entity is None:
+            return intents
+
+        # If the agent is already holding an object, inform the user that we need to put it down
+        if session.inventory.entity is not None:
+            session.current_state.utterance_queue.reset()
+            session.current_state.find_queue.reset()
+            session.current_turn.intent.environment = SimBotIntent(
+                type=SimBotIntentType.already_holding_object, entity=target_entity
+            )
+            return SimBotAgentIntents()
+
+        # Put the current utterance in the queue
+        queue_elem = SimBotQueueUtterance(
+            utterance=session.current_turn.speech.utterance,  # type: ignore[union-attr]
+            role=SpeakerRole.user,
+        )
+        session.current_state.utterance_queue.append_to_head(queue_elem)
+        # Put a "pick up" utterance in the queue
+        queue_elem = SimBotQueueUtterance(
+            utterance=f"pick up the {target_entity}",
+            role=SpeakerRole.agent,
+        )
+        session.current_state.utterance_queue.append_to_head(queue_elem)
+        # Update the current turn speech to be a "find" utterance
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=f"find the {target_entity}",
+            role=SpeakerRole.agent,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech is not None
+            else None,
+        )
+        return SimBotAgentIntents(
+            SimBotIntent(type=SimBotIntentType.search, entity=target_entity),
+            SimBotIntent(
+                type=SimBotIntentType.act_missing_inventory,
                 entity=target_entity,
             ),
         )

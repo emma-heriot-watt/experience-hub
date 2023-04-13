@@ -62,6 +62,8 @@ class SimBotEnvironmentErrorCatchingPipeline:
         self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
     ) -> bool:
         """Handle already holding object action error."""
+        if session.current_state.inventory.entity is None:
+            return False
         # Check if we are holding the same type of object
         if target == session.current_state.inventory.entity.lower():
             # Continue executing the current utterance if the user intent was set.
@@ -168,7 +170,7 @@ class SimBotEnvironmentErrorCatchingPipeline:
             queue_elem = SimBotQueueUtterance(
                 utterance=session.current_turn.speech.utterance, role=SpeakerRole.agent
             )
-        session.current_state.utterance_queue.append_to_head(queue_elem)
+            session.current_state.utterance_queue.append_to_head(queue_elem)
 
     def _fix_and_repeat_failed_instruction(
         self, session: SimBotSession, previous_turn: SimBotSessionTurn, new_current_utterance: str
