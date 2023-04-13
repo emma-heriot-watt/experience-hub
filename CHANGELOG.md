@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.36.0](https://github.com/emma-simbot/experience-hub/compare/v8.35.4...v8.36.0) (2023-04-13)
+
+
+### Features
+
+* Handle missing inventory ([#500](https://github.com/emma-simbot/experience-hub/issues/500)) ([6e8f2dd](https://github.com/emma-simbot/experience-hub/commit/6e8f2dd76ae0e985c1b8c8afff07faef7ed06ddf))
+
 ## [8.35.4](https://github.com/emma-simbot/experience-hub/compare/v8.35.3...v8.35.4) (2023-04-07)
 
 
