@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.36.1](https://github.com/emma-simbot/experience-hub/compare/v8.36.0...v8.36.1) (2023-04-14)
+
+
+### Bug Fixes
+
+* Check the nlu output before changing rooms ([#501](https://github.com/emma-simbot/experience-hub/issues/501)) ([e08b306](https://github.com/emma-simbot/experience-hub/commit/e08b306104fd9a0d1ce7a242a0c50bcc4b2010a3))
+
 ## [8.36.0](https://github.com/emma-simbot/experience-hub/compare/v8.35.4...v8.36.0) (2023-04-13)
 
 
