@@ -68,15 +68,17 @@ class SimBotActHandler:
         if self._enable_high_level_planner:
             session = self._compound_splitter_pipeline.run_high_level_planner(session)
         # Check if the utterance matches one of the known templates
-        if self._does_utterance_match_known_template(session):
-            return SimBotAgentIntents(
-                physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
-            )
+        intents = self._process_utterance_with_raw_text_matcher(session)
+        if intents is not None:
+            return intents
 
         # Otherwise, use the NLU to detect it
         intents = self._process_utterance_with_nlu(session)
-        intents = self._handle_act_no_match_intent(session=session, intents=intents)
-        intents = self._handle_act_missing_inventory_intent(session=session, intents=intents)
+        if self._should_search_target_object(session, intents):
+            intents = self._handle_act_no_match_intent(session=session, intents=intents)
+        elif self._should_search_missing_inventory(session, intents):
+            intents = self._handle_act_missing_inventory_intent(session=session, intents=intents)
+
         return self._handle_search_holding_object(session=session, intents=intents)
 
     def _utterance_has_been_processed_by_nlu(self, session: SimBotSession) -> bool:
@@ -91,31 +93,47 @@ class SimBotActHandler:
             and session.previous_turn.actions.is_successful
         )
 
-    def _does_utterance_match_known_template(self, session: SimBotSession) -> bool:
-        """Determine what the agent should do next from the user intent."""
+    def _process_utterance_with_raw_text_matcher(  # noqa: WPS212
+        self, session: SimBotSession
+    ) -> Optional[SimBotAgentIntents]:
+        """Use raw text matching to determine the agent's intent."""
         if not session.current_turn.speech:
-            return False
-        # Check if the instruction matches an instruction template
+            return None
         current_utterance = session.current_turn.speech.utterance
+
+        # Check if the instruction matches an instruction template
         raw_text_match_prediction = (
             self._simbot_hacks_client.get_low_level_prediction_from_raw_text(
                 utterance=current_utterance,
             )
         )
-
         if raw_text_match_prediction is not None:
-            return True
+            return SimBotAgentIntents(
+                physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
+            )
+
         # Check if the instruction requires us to change rooms
         room_text_match = self._simbot_hacks_client.get_room_prediction_from_raw_text(
             utterance=current_utterance,
         )
         # No room in the instruction
         if room_text_match is None:
-            return False
+            return None
 
         # Current room in the instruction
         if room_text_match.arena_room == session.current_turn.environment.current_room:
-            return False
+            return None
+
+        # Check if we need to search for the inventory before going to the other room
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=room_text_match.modified_utterance,
+            original_utterance=session.current_turn.speech.original_utterance,
+        )
+        intents = self._process_utterance_with_nlu(session)
+        if self._should_search_missing_inventory(session, intents):
+            return self._handle_act_missing_inventory_intent(
+                session=session, intents=intents, target_room=room_text_match.arena_room
+            )
 
         # Other room in the instruction
         queue_elem = SimBotQueueUtterance(
@@ -126,7 +144,9 @@ class SimBotActHandler:
             utterance=f"go to the {room_text_match.room_name}",
             original_utterance=session.current_turn.speech.original_utterance,
         )
-        return True
+        return SimBotAgentIntents(
+            physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
+        )
 
     def _process_utterance_with_nlu(self, session: SimBotSession) -> SimBotAgentIntents:
         """Perform NLU on the utterance to determine what the agent should do next.
@@ -185,14 +205,7 @@ class SimBotActHandler:
         For `act_no_match`, push the current utterance in the utterance queue, and set the verbal
         interaction intent to `confirm_before_search`.
         """
-        if intents.verbal_interaction is None or not self._enable_search_after_no_match:
-            return intents
-        # Check the intent is act_no_match from a new utterance
-        should_search_before_executing_instruction = (
-            intents.verbal_interaction.type == SimBotIntentType.act_no_match
-            and session.current_turn.speech is not None
-        )
-        if not should_search_before_executing_instruction:
+        if intents.verbal_interaction is None:
             return intents
         # Make sure we know the object
         target_entity = intents.verbal_interaction.entity
@@ -228,22 +241,18 @@ class SimBotActHandler:
         )
 
     def _handle_act_missing_inventory_intent(
-        self, session: SimBotSession, intents: SimBotAgentIntents
+        self,
+        session: SimBotSession,
+        intents: SimBotAgentIntents,
+        target_room: Optional[str] = None,
     ) -> SimBotAgentIntents:
         """Update the session for `act_missing_inventory` intent.
 
         Search for the missing inventory, pick it up, and then execute the instruction.
         """
-        if intents.verbal_interaction is None or not self._enable_search_after_missing_inventory:
-            return intents
-        # Check the intent is act_missing_inventory from a new utterance
-        should_search_before_executing_instruction = (
-            intents.verbal_interaction.type == SimBotIntentType.act_missing_inventory
-            and session.current_turn.speech is not None
-        )
-        if not should_search_before_executing_instruction:
-            return intents
         # Make sure we know the missing object
+        if intents.verbal_interaction is None:
+            return intents
         target_entity = intents.verbal_interaction.entity
         if target_entity is None:
             return intents
@@ -263,6 +272,13 @@ class SimBotActHandler:
             role=SpeakerRole.user,
         )
         session.current_state.utterance_queue.append_to_head(queue_elem)
+        # Add a goto room utterance in the queue
+        if target_room is not None:
+            queue_elem = SimBotQueueUtterance(
+                utterance=f"go to the {target_room}",
+                role=SpeakerRole.agent,
+            )
+            session.current_state.utterance_queue.append_to_head(queue_elem)
         # Put a "pick up" utterance in the queue
         queue_elem = SimBotQueueUtterance(
             utterance=f"pick up the {target_entity}",
@@ -330,3 +346,29 @@ class SimBotActHandler:
             target_entity, current_room=session.current_turn.environment.current_room
         )
         return not has_seen_object
+
+    def _should_search_target_object(
+        self, session: SimBotSession, intents: SimBotAgentIntents
+    ) -> bool:
+        """Check the conditions for an act_no_match intent to trigger a search."""
+        if intents.verbal_interaction is None or not self._enable_search_after_no_match:
+            return False
+        # Check the intent is act_no_match from a new utterance
+        should_search_before_executing_instruction = (
+            intents.verbal_interaction.type == SimBotIntentType.act_no_match
+            and session.current_turn.speech is not None
+        )
+        return should_search_before_executing_instruction
+
+    def _should_search_missing_inventory(
+        self, session: SimBotSession, intents: SimBotAgentIntents
+    ) -> bool:
+        """Check the conditions for an act_missing_inventory intent to trigger a search."""
+        if intents.verbal_interaction is None or not self._enable_search_after_missing_inventory:
+            return False
+        # Check the intent is act_missing_inventory from a new utterance
+        should_search_before_executing_instruction = (
+            intents.verbal_interaction.type == SimBotIntentType.act_missing_inventory
+            and session.current_turn.speech is not None
+        )
+        return should_search_before_executing_instruction
