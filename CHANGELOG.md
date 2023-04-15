@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.36.2](https://github.com/emma-simbot/experience-hub/compare/v8.36.1...v8.36.2) (2023-04-15)
+
+
+### Bug Fixes
+
+* Add default rule instead of default rule index ([#503](https://github.com/emma-simbot/experience-hub/issues/503)) ([cd571f5](https://github.com/emma-simbot/experience-hub/commit/cd571f506bcbdea131419b6364f47d7dfaf8cf64))
+
 ## [8.36.1](https://github.com/emma-simbot/experience-hub/compare/v8.36.0...v8.36.1) (2023-04-14)
 
 
