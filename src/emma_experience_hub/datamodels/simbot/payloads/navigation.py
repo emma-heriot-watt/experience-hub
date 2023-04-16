@@ -1,6 +1,6 @@
 from typing import Any, Literal, Optional, Union
 
-from pydantic import Field, NonNegativeFloat, PositiveFloat, validator
+from pydantic import Field, NonNegativeFloat, validator
 
 from emma_experience_hub.datamodels.common import Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.payloads.object_interaction import (
@@ -81,7 +81,7 @@ class SimBotNavigationPayload(SimBotPayload):
     """Base class for SimBot low-level navigation actions."""
 
     direction: Literal["Forward", "Backward", "Left", "Right", "Up", "Down", "Around"]
-    magnitude: PositiveFloat
+    magnitude: NonNegativeFloat
 
 
 class SimBotMovePayload(SimBotNavigationPayload):
@@ -107,7 +107,7 @@ class SimBotRotatePayload(SimBotNavigationPayload):
     """SimBot action for rotating on the spot (changing heading)."""
 
     direction: Literal["Right", "Left"]
-    magnitude: PositiveFloat = Field(min=0, max=359.0, help="Rotation degrees")  # noqa: WPS432
+    magnitude: NonNegativeFloat = Field(min=0, max=359.0, help="Rotation degrees")  # noqa: WPS432
 
 
 class SimBotRotateLeftPayload(SimBotRotatePayload):
@@ -117,7 +117,7 @@ class SimBotRotateLeftPayload(SimBotRotatePayload):
     """
 
     direction: Literal["Left"] = "Left"
-    magnitude: PositiveFloat = 45
+    magnitude: NonNegativeFloat = 45
 
 
 class SimBotTurnAroundPayload(SimBotRotateLeftPayload):
@@ -127,7 +127,7 @@ class SimBotTurnAroundPayload(SimBotRotateLeftPayload):
     """
 
     direction: Literal["Left"] = "Left"
-    magnitude: PositiveFloat = 180
+    magnitude: NonNegativeFloat = 180
 
 
 class SimBotRotateRightPayload(SimBotRotatePayload):
@@ -137,7 +137,7 @@ class SimBotRotateRightPayload(SimBotRotatePayload):
     """
 
     direction: Literal["Right"] = "Right"
-    magnitude: PositiveFloat = 45
+    magnitude: NonNegativeFloat = 45
 
 
 class SimBotLookPayload(SimBotNavigationPayload):
@@ -148,7 +148,7 @@ class SimBotLookPayload(SimBotNavigationPayload):
     """
 
     direction: Literal["Up", "Down", "Around"]
-    magnitude: PositiveFloat = Field(min=0, max=100, help="Rotation degrees")
+    magnitude: NonNegativeFloat = Field(min=0, max=100, help="Rotation degrees")
 
     @validator("magnitude")
     @classmethod
@@ -178,7 +178,7 @@ class SimBotLookUpPayload(SimBotLookPayload):
     """
 
     direction: Literal["Up"] = "Up"
-    magnitude: PositiveFloat = 30
+    magnitude: NonNegativeFloat = 30
 
 
 class SimBotLookDownPayload(SimBotLookPayload):
@@ -188,7 +188,7 @@ class SimBotLookDownPayload(SimBotLookPayload):
     """
 
     direction: Literal["Down"] = "Down"
-    magnitude: PositiveFloat = 30
+    magnitude: NonNegativeFloat = 30
 
 
 class SimBotLookAroundPayload(SimBotLookPayload):
@@ -198,4 +198,4 @@ class SimBotLookAroundPayload(SimBotLookPayload):
     """
 
     direction: Literal["Around"] = "Around"
-    magnitude: PositiveFloat = 100
+    magnitude: NonNegativeFloat = 100

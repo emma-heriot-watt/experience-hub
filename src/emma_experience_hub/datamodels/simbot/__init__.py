@@ -7,6 +7,7 @@ from emma_experience_hub.datamodels.simbot.enums import (
     SimBotActionStatusType,
     SimBotActionType,
     SimBotAnyUserIntentType,
+    SimBotDummyRawActions,
     SimBotEnvironmentIntentType,
     SimBotIntentType,
     SimBotInvalidUtteranceIntentType,

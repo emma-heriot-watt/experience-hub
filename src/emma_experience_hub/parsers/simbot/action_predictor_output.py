@@ -10,6 +10,7 @@ from emma_experience_hub.constants.simbot import (
 )
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction, SimBotActionType
+from emma_experience_hub.datamodels.simbot.enums import SimBotDummyRawActions
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotGotoObject,
     SimBotGotoRoom,
@@ -19,7 +20,10 @@ from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotObjectMaskType,
     SimBotPayload,
 )
-from emma_experience_hub.datamodels.simbot.payloads.navigation import SimBotGotoObjectPayload
+from emma_experience_hub.datamodels.simbot.payloads.navigation import (
+    SimBotGotoObjectPayload,
+    SimBotLookPayload,
+)
 from emma_experience_hub.functions.simbot import (
     SimBotDeconstructedAction,
     get_class_name_from_special_tokens,
@@ -53,6 +57,11 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
     ) -> SimBotAction:
         """Convert the decoded trajectory to a sequence of SimBot actions."""
         logger.debug(f"Decoded trajectory: `{decoded_trajectory}`")
+        dummy_action = self.should_return_dummy_action(decoded_trajectory)
+        if dummy_action is not None:
+            logger.debug("The decoded trajectory matches with a dummy action")
+            return dummy_action
+
         try:
             decoded_action = self._separate_decoded_trajectory(decoded_trajectory)[0]
         except IndexError:
@@ -160,6 +169,20 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
                 )
             ),
         )
+
+    def should_return_dummy_action(self, decoded_trajectory: str) -> Optional[SimBotAction]:
+        """Should we for some reason return a dummy action?"""
+        if decoded_trajectory == SimBotDummyRawActions.DummyLookDown.value:
+            return SimBotAction(
+                id=0,
+                type=SimBotActionType.LookDown,
+                raw_output=decoded_trajectory,
+                payload=SimBotLookPayload(
+                    direction="Down",
+                    magnitude=0,
+                ),
+            )
+        return None
 
     def _separate_decoded_trajectory(self, decoded_trajectory: str) -> list[str]:
         """Split the decoded trajectory string into a list of action strings.

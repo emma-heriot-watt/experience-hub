@@ -1,5 +1,6 @@
 from enum import Enum
 
+from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
 from emma_experience_hub.datamodels.simbot.payloads import (
     SimBotAuxiliaryMetadataPayload,
     SimBotDialogPayload,
@@ -277,3 +278,12 @@ class SimBotActionType(Enum):
     def payload_model(self) -> type[SimBotPayload]:
         """Get the corresponding payload for the SimBot action type."""
         return self.action_type_to_payload_model()[self.name]
+
+
+class SimBotDummyRawActions(Enum):
+    """The raw output of all dummy actions in the SimBot Arena."""
+
+    # Navigation
+    DummyLookDown = (  # noqa: WPS115
+        f"dummy look down {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
+    )
