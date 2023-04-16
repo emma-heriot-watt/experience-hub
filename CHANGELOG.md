@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.37.0](https://github.com/emma-simbot/experience-hub/compare/v8.36.3...v8.37.0) (2023-04-16)
+
+
+### Features
+
+* integrate dummy action ([#508](https://github.com/emma-simbot/experience-hub/issues/508)) ([cb7a909](https://github.com/emma-simbot/experience-hub/commit/cb7a90985981b72dcfe422dc9e3b7d5c829b83c7))
+
 ## [8.36.3](https://github.com/emma-simbot/experience-hub/compare/v8.36.2...v8.36.3) (2023-04-16)
 
 
