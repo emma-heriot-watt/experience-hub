@@ -182,7 +182,7 @@ environment_intent_type == "unsupported_action" and environment_intent_action_ty
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity != null and environment_intent_entity == "Freeze Ray",To activate the freeze ray we should find the blue computer and turn that on.,False
 
-environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity != null and environment_intent_entity == "Gravity Pad",To activate the embiggenator we should find the green computer and turn that on.,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity != null and environment_intent_entity == "Gravity Pad",To activate the gravity flipper we should find the green computer and turn that on.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity != null and environment_intent_entity == "Laser",To activate the laser we should find the red computer and turn that on.,False
 
@@ -206,7 +206,7 @@ environment_intent_type == "unsupported_navigation" and environment_intent_actio
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">well</say-as> - it looks like I can't go to the {environment_intent_entity} because there's no way to get there. Do you have a different instruction for me to try?,False
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">darn</say-as> - I can't find a route to the {environment_intent_entity} - can you give me a different instruction?,False
 
-interaction_action_type == "Break" and interaction_action_entity != "Record",<amazon:emotion name="excited" intensity="low">Let's break some records today</amazon:emotion>,False
+interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Let's break some records today</amazon:emotion>,False
 
 interaction_action_type == "Clean" and interaction_action_entity != null and inventory_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I'll get the {inventory_entity} sparkling clean in no time!</amazon:emotion>,True
 
@@ -220,7 +220,7 @@ interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with coffee we can pour it into the coffee unmaker. Ask me to pour the {inventory_entity} into the coffee unmaker. Then - ask me to turn on the coffee unmaker to create fresh coffee beans,False
 
-interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity == null,This time machine can be used to repair broken objects by turning back the time! Let's find something that we can repair before using the time machine.,False
+interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity == null,This time machine can be used to turn objects into their original state! Let's find something that we can repair before using the time machine.,False
 
 interaction_action_type == "Pickup" and current_room == "SmallOffice" and interaction_action_entity == "Floppy Disk",The floppy disk can be inserted in an infected computer to fix it. You can tell a computer is infected by the skull on its screen,False
 
@@ -270,9 +270,9 @@ physical_interaction_intent_type == "search" and current_room != null and intera
 
 physical_interaction_intent_type == "search" and current_room != null and physical_interaction_intent_entity != null and interaction_action_type == null,I searched for the {physical_interaction_intent_entity} in the {current_room} but I didn't see it. Maybe we should look in another room?,False
 
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - what are we doing next?,False
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - now what should I do?,False
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - what are we doing next?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - now what should I do?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
 
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,<amazon:emotion name="excited" intensity="medium">Search complete!</amazon:emotion> What should I do next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,I think I found it - what are we doing next?,False
@@ -332,11 +332,11 @@ physical_interaction_intent_type == "search" and physical_interaction_intent_ent
 
 physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and physical_interaction_intent_entity =~ "(Sink)" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and current_room != null and current_room == "BreakRoom",I couldn't find the {physical_interaction_intent_entity} in the {current_room} - but we might able to find it in the warehouse. You can ask me to search for the {physical_interaction_intent_entity} in the warehouse,False
 
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,First things first - let's find the {verbal_interaction_intent_entity},True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">Let's first look for the {verbal_interaction_intent_entity}</amazon:emotion>,True
-
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_missing_inventory" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,First step - let's get the {verbal_interaction_intent_entity},True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_missing_inventory" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">I'll start by looking for the {verbal_interaction_intent_entity}</amazon:emotion>,True
+
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,First things first - let's find the {verbal_interaction_intent_entity},True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">Let's first look for the {verbal_interaction_intent_entity}</amazon:emotion>,True
 
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,I'll start looking!,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="medium">Starting the search!</amazon:emotion>,True
@@ -486,8 +486,8 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Printer" and inventory_entity != "Printer Cartridge",Do you want me to 3D print the cartridge?,False
 
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Got to the robot arm. We should activate it now. Do you want me to press the button?,False
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",We should now activate the robot arm. Do you want me to press the button?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Got to the robot arm, should I activate it?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Do you want me to activate the robot arm?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity == "Plate" and inventory_entity != null,Do you want me to clean the plate?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity == "Plate" and inventory_entity != null,I see what we are trying to do here. Do you want me to clean the plate?,False
@@ -495,7 +495,11 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity =~ "(Bowl|Mug|Coffee Pot)" and inventory_entity != null,Do you want me to fill up the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity =~ "(Bowl|Mug|Coffee Pot)" and inventory_entity != null,I see what we are trying to do here. Do you want me to fill the {inventory_entity} with water?,False
 
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity != null,Do you want me to repair the {inventory_entity}?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity != null,Do you want me to use the time machine on the {inventory_entity}?,False
+
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity != null and inventory_entity == "Carrot",Do you want me to turn the carrot to its original object?,False
+
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity != null and inventory_entity =~ "(Bowl|Trophy|Record|Floppy Disk)",Do you want me to repair the {inventory_entity}?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Embiggenator" and inventory_entity != null,Shall we use the embiggenator on the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Embiggenator" and inventory_entity != null,Do you want me to activate the embiggenator?,False
@@ -513,7 +517,11 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Microwave" and inventory_entity != null,Shall I use the microwave to heat up the {inventory_entity}?,False
 
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Time Machine" and inventory_entity != null,Do you want me to repair the {inventory_entity}?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Time Machine" and inventory_entity != null,Do you want me to use the time machine on the {inventory_entity}?,False
+
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Time Machine" and inventory_entity != null and inventory_entity == "Carrot",Do you want me to turn the carrot to its original object?,False
+
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Time Machine" and inventory_entity != null and inventory_entity =~ "(Bowl|Trophy|Record|Floppy Disk)",Do you want me to repair the {inventory_entity}?,False
 
 verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it first?,False
 verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity} in front of me. Should I start by finding it?,False
