@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.36.3](https://github.com/emma-simbot/experience-hub/compare/v8.36.2...v8.36.3) (2023-04-16)
+
+
+### Bug Fixes
+
+* responses for odd combos with time machine ([#506](https://github.com/emma-simbot/experience-hub/issues/506)) ([f64a203](https://github.com/emma-simbot/experience-hub/commit/f64a20355a07b665b7c3a0d470ed598aa9db40f4))
+
 ## [8.36.2](https://github.com/emma-simbot/experience-hub/compare/v8.36.1...v8.36.2) (2023-04-15)
 
 
