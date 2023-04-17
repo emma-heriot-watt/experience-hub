@@ -13,7 +13,7 @@ services:
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
     image_version: 1.40.2-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/placeholder_inventory_nlu.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/simbot_nlu_v5.ckpt
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
