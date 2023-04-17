@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.40.0](https://github.com/emma-simbot/experience-hub/compare/v8.39.0...v8.40.0) (2023-04-17)
+
+
+### Features
+
+* make incomplete utterance intents optional and by default false ([#507](https://github.com/emma-simbot/experience-hub/issues/507)) ([4d97ff0](https://github.com/emma-simbot/experience-hub/commit/4d97ff033803c131074e637616665f432761f2e7))
+
 ## [8.39.0](https://github.com/emma-simbot/experience-hub/compare/v8.38.0...v8.39.0) (2023-04-17)
 
 
