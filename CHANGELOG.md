@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.39.0](https://github.com/emma-simbot/experience-hub/compare/v8.38.0...v8.39.0) (2023-04-17)
+
+
+### Features
+
+* Introduce scan in search ([#504](https://github.com/emma-simbot/experience-hub/issues/504)) ([aab5685](https://github.com/emma-simbot/experience-hub/commit/aab5685d7af686005386ff882ede849503150c3c))
+
 ## [8.38.0](https://github.com/emma-simbot/experience-hub/compare/v8.37.0...v8.38.0) (2023-04-17)
 
 
