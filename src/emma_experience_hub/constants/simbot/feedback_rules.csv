@@ -34,6 +34,8 @@ environment_intent_type == "generic_failure",I'm having some trouble and I'm not
 
 environment_intent_type == "incorrect_action_format",I tried to perform an action but looks like I don't remember how to do it. Can you give me a different instruction?,False
 
+environment_intent_type == "invalid_command",I had trouble executing the instruction. Could you please give me a different instruction?,False
+
 environment_intent_type == "invalid_object_class",<say-as interpret-as="interjection">oops</say-as> - I made a mistake in interacting with that. Could you please give me a different instruction?,False
 
 environment_intent_type == "invalid_object_class" and environment_intent_entity != null,<say-as interpret-as="interjection">oops</say-as> - I made a mistake in interacting with the {environment_intent_entity}. Could you please give me a different instruction?,False
@@ -270,9 +272,14 @@ physical_interaction_intent_type == "search" and current_room != null and intera
 
 physical_interaction_intent_type == "search" and current_room != null and physical_interaction_intent_entity != null and interaction_action_type == null,I searched for the {physical_interaction_intent_entity} in the {current_room} but I didn't see it. Maybe we should look in another room?,False
 
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - what are we doing next?,False
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - now what should I do?,False
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - what are we doing next?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - now what should I do?,False
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
+
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",Found the {interaction_action_entity},True
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",Found the {interaction_action_entity} - I am getting closer,True
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",Detected the {interaction_action_entity},True
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",{interaction_action_entity} detected,True
 
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,<amazon:emotion name="excited" intensity="medium">Search complete!</amazon:emotion> What should I do next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,I think I found it - what are we doing next?,False
@@ -318,7 +325,7 @@ physical_interaction_intent_type == "search" and physical_interaction_intent_ent
 physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoViewpoint" and find_queue_not_empty, Hmm - now where would the {physical_interaction_intent_entity} be?,True
 
 physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == null,I tried to find the {physical_interaction_intent_entity} but couldn't. Can you give me a different instruction?,False
-physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == null,I searched for the {physical_interaction_intent_entity} but couldn't. Maybe we should look in another room?,False
+physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == null,I searched for the {physical_interaction_intent_entity} but couldn't find it. Maybe we should look in another room?,False
 
 physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and physical_interaction_intent_entity =~ "(Color Changer|Gravity Pad|Everything's A Carrot Machine|Embiggenator)" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and current_room != null and current_room != "Lab2",I couldn't find the {physical_interaction_intent_entity} in the current room - but it's usually in the quantum lab. You can tell me to search for the {physical_interaction_intent_entity} in the quantum lab,False
 

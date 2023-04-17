@@ -27,6 +27,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_object_related_questions_from_user: bool = False
     enable_rasa_high_level_planner: bool = False
     enable_always_highlight_before_object_action: bool = False
+    enable_scanning_during_search: bool = True
 
     search_planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover
     gfh_location_type: GFHLocationType = GFHLocationType.location

@@ -109,3 +109,17 @@ def get_correct_frame_index(
         # Make sure that the predicted frame index is between 0 and 3.
         frame_index = min(max(frame_index, 0), 3)
     return frame_index
+
+
+def class_label_is_unique_in_frame(
+    frame_index: int,
+    class_label: str,
+    extracted_features: list[EmmaExtractedFeatures],
+) -> bool:
+    """Is there a unique object of the given class name in the frame?"""
+    # Get the class labels for the correct frame index
+    object_class_labels = extracted_features[frame_index - 1].entity_labels
+
+    if not object_class_labels:
+        raise AssertionError("Entity labels do not exist for features")
+    return object_class_labels.count(class_label) == 1

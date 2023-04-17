@@ -23,6 +23,7 @@ from emma_experience_hub.functions.simbot import (
     GreedyMaximumVertexCoverSearchPlanner,
     SearchPlanner,
     SimBotSceneObjectTokens,
+    class_label_is_unique_in_frame,
     get_class_name_from_special_tokens,
     get_correct_frame_index,
     get_mask_from_special_tokens,
@@ -47,6 +48,7 @@ class SimBotFindObjectPipeline:
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
         search_planner: SearchPlanner,
         enable_grab_from_history: bool = True,
+        _enable_scanning_found_object: bool = True,
     ) -> None:
         self._features_client = features_client
 
@@ -56,6 +58,7 @@ class SimBotFindObjectPipeline:
         self._search_planner = search_planner
         self._enable_grab_from_history = enable_grab_from_history
         self._grab_from_history = GrabFromHistory()
+        self._enable_scanning_found_object = _enable_scanning_found_object
 
     @classmethod
     def from_planner_type(
@@ -68,6 +71,7 @@ class SimBotFindObjectPipeline:
         viewpoint_budget: int = 2,
         enable_grab_from_history: bool = True,
         gfh_location_type: GFHLocationType = GFHLocationType.location,
+        _enable_scanning_found_object: bool = True,
     ) -> "SimBotFindObjectPipeline":
         """Instantiate the pipeline from the SearchPlannerType."""
         planners = {
@@ -85,6 +89,7 @@ class SimBotFindObjectPipeline:
             visual_grounding_output_parser=visual_grounding_output_parser,
             search_planner=planners[planner_type],
             enable_grab_from_history=enable_grab_from_history,
+            _enable_scanning_found_object=_enable_scanning_found_object,
         )
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
@@ -94,7 +99,7 @@ class SimBotFindObjectPipeline:
             with tracer.start_as_current_span("Building search plan"):
                 search_plan = self._build_search_plan(session)
 
-            if self._should_goto_room_before_new_search(session, search_plan):
+            if self._should_goto_room_before_new_search(search_plan):
                 return search_plan[0]
             # Reset the queue and counter and add the search plan
             session.current_state.find_queue.reset()
@@ -104,6 +109,9 @@ class SimBotFindObjectPipeline:
             logger.debug("Find queue is empty; returning None")
             self._search_planner.reset_utterance_queue_if_object_not_found(session)
             return None
+
+        if self._should_goto_found_object(session):
+            return self._goto_scanned_object(session)
 
         extracted_features = self._features_client.get_features(session.current_turn)
         session.update_agent_memory(extracted_features)
@@ -115,7 +123,7 @@ class SimBotFindObjectPipeline:
             # If the object has not been found, get the next action to perform
             return self._get_next_action_from_plan(session)
 
-        # If the object has been found create goto action
+        # If the object has been found create the sequence of actions
         return self._create_actions_for_found_object(
             session, decoded_scene_object_tokens, extracted_features
         )
@@ -144,11 +152,9 @@ class SimBotFindObjectPipeline:
         """
         return not session.is_find_object_in_progress
 
-    def _should_goto_room_before_new_search(
-        self, session: SimBotSession, search_plan: list[SimBotAction]
-    ) -> bool:
+    def _should_goto_room_before_new_search(self, search_plan: list[SimBotAction]) -> bool:
         """Should we go to another room before starting the search?"""
-        if not len(search_plan):
+        if not search_plan:
             return False
         return search_plan[0].type == SimBotActionType.GotoRoom
 
@@ -168,8 +174,30 @@ class SimBotFindObjectPipeline:
 
         The queue contain has a goto action at its head whenever we have found an object.
         """
+        if not self._enable_scanning_found_object:
+            return False
         head_action = session.current_state.find_queue.queue[0]
         return head_action.type == SimBotActionType.GotoObject
+
+    def _should_scan_found_object(
+        self,
+        session: SimBotSession,
+        frame_idx: int,
+        found_object_label: str,
+        extracted_features: list[EmmaExtractedFeatures],
+    ) -> bool:
+        """Should we highlight the found object?"""
+        if not self._enable_scanning_found_object:
+            return False
+        # Do not highlight objects when the intent is a search and no_match / missing_inventory
+        # Go straight to the object and execute the original instruction
+        if session.current_turn.intent.is_searching_inferred_object:
+            return False
+        return class_label_is_unique_in_frame(
+            frame_index=frame_idx,
+            class_label=found_object_label,
+            extracted_features=extracted_features,
+        )
 
     def _next_action_is_dummy(self, session: SimBotSession) -> bool:
         """Is the next action in the queue a dummy move forward?"""
@@ -237,6 +265,12 @@ class SimBotFindObjectPipeline:
             num_total_frames=len(extracted_features),
         )
 
+        should_scan_found_object = self._should_scan_found_object(
+            session,
+            frame_idx=scene_object_tokens.frame_index,
+            found_object_label=object_name,
+            extracted_features=extracted_features,
+        )
         goto_action = self._create_action_from_scene_object(
             action_type=SimBotActionType.GotoObject,
             object_mask=object_mask,
@@ -246,8 +280,71 @@ class SimBotFindObjectPipeline:
             name=object_name,
             add_stop_token=True,
         )
-        # Go straight to the object and execute the original instruction
+
         session.current_state.find_queue.reset()
+        if should_scan_found_object:
+            scan_action = self._create_action_from_scene_object(
+                action_type=SimBotActionType.Scan,
+                object_mask=object_mask,
+                frame_index=scene_object_tokens.frame_index,
+                object_index=scene_object_tokens.object_index,
+                color_image_index=color_image_index,
+                name=object_name,
+            )
+            session.current_state.find_queue.append_to_head(goto_action)
+            return scan_action
+        # Go straight to the object and execute the original instruction
+        return goto_action
+
+    def _goto_scanned_object(self, session: SimBotSession) -> Optional[SimBotAction]:
+        """Create the actions when the object has been found."""
+        logger.warning("Clearing the find queue of the session")
+        session.current_state.find_queue.reset()
+        extracted_features = self._features_client.get_features(session.current_turn)
+        session.update_agent_memory(extracted_features)
+        # Try to find the object in the current turn
+        try:
+            scene_object_tokens = self._get_object_from_turn(session, extracted_features)
+        except AssertionError:
+            # Skip the scan if the policy model fails to find the object
+            return None
+
+        if scene_object_tokens.object_index is None:
+            raise AssertionError("The object index for the object should not be None.")
+
+        object_mask = get_mask_from_special_tokens(
+            scene_object_tokens.frame_index,
+            scene_object_tokens.object_index,
+            extracted_features,
+        )
+
+        object_name = get_class_name_from_special_tokens(
+            scene_object_tokens.frame_index,
+            scene_object_tokens.object_index,
+            extracted_features,
+        )
+
+        if object_name.lower() == "embiggenator":
+            try:
+                object_mask = self._features_client.get_mask_for_embiggenator(session.current_turn)
+            except Exception:
+                logger.warning("Unable to replace mask for the embiggenator")
+
+        color_image_index = get_correct_frame_index(
+            parsed_frame_index=scene_object_tokens.frame_index,
+            num_frames_in_current_turn=len(extracted_features),
+            num_total_frames=len(extracted_features),
+        )
+
+        goto_action = self._create_action_from_scene_object(
+            action_type=SimBotActionType.GotoObject,
+            object_mask=object_mask,
+            frame_index=scene_object_tokens.frame_index,
+            object_index=scene_object_tokens.object_index,
+            color_image_index=color_image_index,
+            add_stop_token=True,
+            name=object_name,
+        )
         return goto_action
 
     def _create_action_from_scene_object(
