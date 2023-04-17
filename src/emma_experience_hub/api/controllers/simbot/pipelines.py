@@ -70,7 +70,9 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             ),
             user_intent_extractor=SimBotUserIntentExtractionPipeline(
                 qa_intent_client=clients.simbot_qa,
-                qa_intent_parser=SimBotQAOutputParser(),
+                qa_intent_parser=SimBotQAOutputParser(
+                    enable_incomplete_utterances_intent=simbot_settings.feature_flags.enable_incomplete_utterances_intent
+                ),
                 confirmation_response_classifier=clients.confirmation_response_classifier,
                 _enable_object_related_questions=simbot_settings.feature_flags.enable_object_related_questions_from_user,
             ),

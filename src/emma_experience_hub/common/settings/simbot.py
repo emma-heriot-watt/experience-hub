@@ -26,6 +26,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_search_after_missing_inventory: bool = True
     enable_object_related_questions_from_user: bool = False
     enable_rasa_high_level_planner: bool = False
+    enable_incomplete_utterances_intent: bool = False
     enable_always_highlight_before_object_action: bool = False
     enable_scanning_during_search: bool = True
 
