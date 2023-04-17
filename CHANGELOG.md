@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.38.0](https://github.com/emma-simbot/experience-hub/compare/v8.37.0...v8.38.0) (2023-04-17)
+
+
+### Features
+
+* new policy and entity classifier ([#505](https://github.com/emma-simbot/experience-hub/issues/505)) ([cf6c608](https://github.com/emma-simbot/experience-hub/commit/cf6c6084ad7998eab4df1db333daf55b9ff3f044))
+
 ## [8.37.0](https://github.com/emma-simbot/experience-hub/compare/v8.36.3...v8.37.0) (2023-04-16)
 
 
