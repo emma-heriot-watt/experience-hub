@@ -211,7 +211,12 @@ environment_intent_type == "unsupported_navigation" and environment_intent_actio
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">well</say-as> - it looks like I can't go to the {environment_intent_entity} because there's no way to get there. Do you have a different instruction for me to try?,False
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">darn</say-as> - I can't find a route to the {environment_intent_entity} - can you give me a different instruction?,False
 
+interaction_action_type == "Break",<say-as interpret-as="interjection">boom</say-as>,False
+
 interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Let's break some records today</amazon:emotion>,False
+interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="medium">Looks like we're smashing records today?</amazon:emotion>,False
+interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="medium">I'm hammering away at this task!</amazon:emotion>,False
+interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Breaking records is always music to my ears</amazon:emotion>,False
 
 interaction_action_type == "Clean" and interaction_action_entity != null and inventory_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I'll get the {inventory_entity} sparkling clean in no time!</amazon:emotion>,True
 
