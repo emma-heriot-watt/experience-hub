@@ -3,11 +3,11 @@ x-model-volume: &model-volume
     source: ../storage/models
     target: /app/model
   - type: bind
-    source: /home/ubuntu/.aws/credentials
+    source: "${HOME}/.aws/credentials"
     target: /root/.aws/credentials
     read_only: true
   - type: bind
-    source: /home/ubuntu/.aws/config
+    source: "${HOME}/.aws/config"
     target: /root/.aws/config
     read_only: true
 
@@ -17,18 +17,12 @@ x-healthcheck-defaults: &healthcheck-defaults
   retries: 3
   start_period: 30s
 
-x-observability-env-vars: &observability-env-vars
-  LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
-  TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
-  OTLP_ENDPOINT: "otel_collector:4317"
-  OTEL_PYTHON_EXCLUDED_URLS: "healthcheck,ping"
-
-version: "3.9"
-
 services:
   profanity_filter:
     container_name: profanity_filter
     image: "${PROFANITY_FILTER_IMAGE}"
+    profiles:
+      - not-offline-evaluation
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/healthcheck"]
       <<: *healthcheck-defaults
@@ -42,7 +36,6 @@ services:
     container_name: feature_extractor
     image: "${FEATURE_EXTRACTOR_IMAGE}"
     environment:
-      <<: *observability-env-vars
       LOG_LEVEL: "debug"
       CLASSMAP_TYPE: "simbot"
     ports:
@@ -58,7 +51,6 @@ services:
     container_name: intent_extractor
     image: "${INTENT_EXTRACTOR_IMAGE}"
     environment:
-      <<: *observability-env-vars
       LOG_LEVEL: debug
       MODEL_NAME: "heriot-watt/emma-base"
       MODEL_CHECKPOINT_PATH: "/app/model/${INTENT_EXTRACTOR_MODEL}"
@@ -75,7 +67,6 @@ services:
     container_name: instruction_predictor
     image: "${INSTRUCTION_PREDICTOR_IMAGE}"
     environment:
-      <<: *observability-env-vars
       LOG_LEVEL: debug
       MODEL_CHECKPOINT_PATH: "/app/model/${INSTRUCTION_PREDICTOR_MODEL}"
     ports:
@@ -90,8 +81,9 @@ services:
   out_of_domain_detector:
     container_name: out_of_domain_detector
     image: "${OUT_OF_DOMAIN_DETECTOR_IMAGE}"
+    profiles:
+      - not-offline-evaluation
     environment:
-      <<: *observability-env-vars
       LOG_LEVEL: info
       EMBEDDING_MODEL: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/sbert-simbot/"
       MODEL_CHECKPOINT_PATH: "/app/model/${OUT_OF_DOMAIN_DETECTOR_MODEL}/bgm_components.joblib"
@@ -108,6 +100,8 @@ services:
   confirmation_classifier:
     container_name: confirmation_classifier
     image: "${CONFIRMATION_CLASSIFIER_IMAGE}"
+    profiles:
+      - not-offline-evaluation
     environment:
       LOG_LEVEL: info
       MODEL_CHECKPOINT_PATH: "/app/model/${CONFIRMATION_CLASSIFIER_MODEL}/"
@@ -143,7 +137,6 @@ services:
     container_name: simbot_hacks
     image: "${SIMBOT_HACKS_IMAGE}"
     environment:
-      <<: *observability-env-vars
       LOG_LEVEL: info
       WORKERS: 20
     healthcheck:
@@ -159,6 +152,8 @@ services:
   simbot_qa:
     container_name: simbot_qa
     image: "${SIMBOT_QA_IMAGE}"
+    profiles:
+      - not-offline-evaluation
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6600/"]
       <<: *healthcheck-defaults

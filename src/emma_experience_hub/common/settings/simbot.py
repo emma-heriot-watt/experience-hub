@@ -18,17 +18,21 @@ class SimBotFeatureFlags(BaseModel):
     """Feature flags for the SimBot agent."""
 
     enable_offline_evaluation: bool = False
+
+    enable_always_highlight_before_object_action: bool = False
     enable_clarification_questions: bool = True
     enable_confirmation_questions: bool = True
-    enable_search_actions: bool = True
     enable_grab_from_history: bool = True
-    enable_search_after_no_match: bool = True
-    enable_search_after_missing_inventory: bool = True
-    enable_object_related_questions_from_user: bool = False
-    enable_rasa_high_level_planner: bool = False
     enable_incomplete_utterances_intent: bool = False
-    enable_always_highlight_before_object_action: bool = False
+    enable_object_related_questions_from_user: bool = False
+    enable_out_of_domain_detector: bool = True
+    enable_profanity_filter: bool = True
+    enable_rasa_high_level_planner: bool = False
     enable_scanning_during_search: bool = True
+    enable_search_actions: bool = True
+    enable_search_after_missing_inventory: bool = True
+    enable_search_after_no_match: bool = True
+    enable_simbot_qa: bool = True
 
     search_planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover
     gfh_location_type: GFHLocationType = GFHLocationType.location
@@ -43,6 +47,14 @@ class SimBotFeatureFlags(BaseModel):
         if values.get("enable_offline_evaluation", False):
             values["enable_clarification_questions"] = False
             values["enable_confirmation_questions"] = False
+            values["enable_incomplete_utterances_intent"] = False
+            values["enable_object_related_questions_from_user"] = False
+            values["enable_out_of_domain_detector"] = False
+            values["enable_profanity_filter"] = False
+            values["enable_scanning_during_search"] = False
+            values["enable_search_after_missing_inventory"] = False
+            values["enable_simbot_qa"] = False
+
             values["gfh_location_type"] = GFHLocationType.viewpoint
         return values
 

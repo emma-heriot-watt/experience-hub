@@ -9,9 +9,13 @@ from pydantic import AnyHttpUrl
 class Client(ABC):
     """Base client for all the API clients."""
 
-    def __init__(self, endpoint: AnyHttpUrl, timeout: Optional[int]) -> None:
+    def __init__(
+        self, endpoint: AnyHttpUrl, timeout: Optional[int], *, disable: bool = False
+    ) -> None:
         self._endpoint = endpoint
         self._timeout = timeout
+
+        self._is_disabled = disable
 
     @abstractmethod
     def healthcheck(self) -> bool:
@@ -20,6 +24,10 @@ class Client(ABC):
 
     def _run_healthcheck(self, endpoint: str) -> bool:
         """Verify the server is healthy."""
+        if self._is_disabled:
+            logger.debug(f"Client disabled for {self.__class__.__name__}")
+            return True
+
         with httpx.Client() as client:
             response = client.get(endpoint)
 

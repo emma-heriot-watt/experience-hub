@@ -1,5 +1,4 @@
 import signal
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Event
 from time import sleep
 from typing import Any
@@ -71,21 +70,28 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                 resource_region=simbot_settings.session_db_region,
                 table_name=simbot_settings.session_db_memory_table_name,
             ),
-            nlu_intent=SimBotNLUIntentClient(server_endpoint=simbot_settings.nlu_predictor_url),
+            nlu_intent=SimBotNLUIntentClient(
+                endpoint=simbot_settings.nlu_predictor_url,
+                timeout=simbot_settings.client_timeout,
+            ),
             action_predictor=SimbotActionPredictionClient(
-                server_endpoint=simbot_settings.action_predictor_url
+                endpoint=simbot_settings.action_predictor_url,
+                timeout=simbot_settings.client_timeout,
             ),
             profanity_filter=ProfanityFilterClient(
                 endpoint=simbot_settings.profanity_filter_url,
                 timeout=simbot_settings.client_timeout,
+                disable=not simbot_settings.feature_flags.enable_profanity_filter,
             ),
             out_of_domain_detector=OutOfDomainDetectorClient(
                 endpoint=simbot_settings.out_of_domain_detector_url,
                 timeout=simbot_settings.client_timeout,
+                disable=not simbot_settings.feature_flags.enable_out_of_domain_detector,
             ),
             confirmation_response_classifier=ConfirmationResponseClassifierClient(
                 endpoint=simbot_settings.confirmation_classifier_url,
                 timeout=simbot_settings.client_timeout,
+                disable=not simbot_settings.feature_flags.enable_confirmation_questions,
             ),
             compound_splitter=CompoundSplitterClient(
                 endpoint=simbot_settings.compound_splitter_url,
@@ -98,6 +104,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             simbot_qa=SimBotQAIntentClient(
                 endpoint=simbot_settings.simbot_qa_url,
                 timeout=simbot_settings.client_timeout,
+                disable=not simbot_settings.feature_flags.enable_simbot_qa,
             ),
         )
 
@@ -139,16 +146,11 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
 
     def _healthcheck_all_clients(self) -> bool:
         """Check all the clients are healthy and running."""
-        with ThreadPoolExecutor() as pool:
-            clients: list[Client] = list(self.dict().values())
-            healthcheck_futures = {pool.submit(client.healthcheck): client for client in clients}
+        clients: list[Client] = list(self.dict().values())
 
-            for future in as_completed(healthcheck_futures):
-                client = healthcheck_futures[future]
-                try:
-                    future.result()
-                except Exception:
-                    logger.error(f"Failed to verify the healthcheck for client `{client}`")
-                    return False
+        for client in clients:
+            if not client.healthcheck():
+                logger.exception(f"Failed to verify the healthcheck for client `{client}`")
+                return False
 
         return True

@@ -41,7 +41,7 @@ run all the background services required for EMMA (e.g., policy, NLU, etc.). To 
 compose and it can be run as follows (for this you must use `sudo`):
 
 ```bash
-sudo -E env "PATH=$PATH" poetry run python -m emma_experience_hub simbot run-background-services
+sudo -E env "PATH=$PATH" poetry run python -m emma_experience_hub simbot run-background-services --num-gpus 1
 ```
 
 Then, in the second tab you can run the experience hub:

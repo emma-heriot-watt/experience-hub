@@ -22,16 +22,6 @@ x-deploy-gpu-2: &deploy-gpu-2
           device_ids: ["2"]
           capabilities: [gpu]
 
-x-deploy-gpu-3: &deploy-gpu-3
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          device_ids: ["3"]
-          capabilities: [gpu]
-
-version: "3.9"
-
 services:
   feature_extractor:
     environment:
@@ -46,24 +36,24 @@ services:
   instruction_predictor:
     environment:
       DEVICE: "cuda:0"
-    deploy: *deploy-gpu-2
+    deploy: *deploy-gpu-1
 
   out_of_domain_detector:
     environment:
       DEVICE: "cuda:0"
-    deploy: *deploy-gpu-3
+    deploy: *deploy-gpu-2
 
   confirmation_classifier:
     environment:
       DEVICE: "cuda:0"
-    deploy: *deploy-gpu-3
+    deploy: *deploy-gpu-2
 
   simbot_qa:
     environment:
       DEVICE: "cuda:0"
-    deploy: *deploy-gpu-3
+    deploy: *deploy-gpu-2
 
   placeholder_vision_model:
     environment:
       DEVICE: "cuda:0"
-    deploy: *deploy-gpu-3
+    deploy: *deploy-gpu-0

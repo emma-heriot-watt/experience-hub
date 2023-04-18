@@ -1,0 +1,42 @@
+x-observability-env-vars: &observability-env-vars
+  LOG_TO_CLOUDWATCH: "${ENABLE_OBSERVABILITY}"
+  TRACES_TO_OPENSEARCH: "${ENABLE_OBSERVABILITY}"
+  OTLP_ENDPOINT: "otel_collector:4317"
+  OTEL_PYTHON_EXCLUDED_URLS: "healthcheck,ping"
+
+services:
+  otel_collector:
+    container_name: otel_collector
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+
+  data_prepper:
+    container_name: data_prepper
+    image: opensearchproject/data-prepper:latest
+    volumes:
+      - ./configs/data-prepper-pipelines.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml
+      - ./configs/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml
+
+  feature_extractor:
+    environment:
+      <<: *observability-env-vars
+
+  intent_extractor:
+    environment:
+      <<: *observability-env-vars
+
+  instruction_predictor:
+    environment:
+      <<: *observability-env-vars
+
+  out_of_domain_detector:
+    environment:
+      <<: *observability-env-vars
+
+  simbot_hacks:
+    environment:
+      <<: *observability-env-vars

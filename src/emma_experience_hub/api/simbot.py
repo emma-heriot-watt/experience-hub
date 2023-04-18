@@ -38,10 +38,10 @@ async def healthcheck(response: Response) -> str:
     try:
         healthcheck_result = state["controller"].healthcheck()
     except Exception:
+        logger.exception("The API is not currently healthy")
         healthcheck_result = False
 
     if not healthcheck_result:
-        logger.error("The API is not currently healthy")
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "failed"
 

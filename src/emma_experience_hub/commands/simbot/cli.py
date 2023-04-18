@@ -9,7 +9,10 @@ is happening and how to do things, and make it more DRY.
 import os
 import subprocess
 import sys
+from collections.abc import Mapping
 from pathlib import Path
+from types import MappingProxyType
+from typing import Literal, Optional, cast
 
 import typer
 import yaml
@@ -32,11 +35,48 @@ MODEL_STORAGE_DIR = Path("storage/models/")
 
 SERVICE_REGISTRY_PATH = get_service_registry_file_path()
 
-SERVICES_COMPOSE_PATH = Path("docker/simbot-docker-compose.yaml")
-SERVICES_STAGING_COMPOSE_PATH = Path("docker/simbot-docker-compose.staging.yaml")
-SERVICES_PROD_COMPOSE_PATH = Path("docker/simbot-docker-compose.prod.yaml")
+SERVICES_COMPOSE_PATH = Path("docker/docker-compose.yaml")
+OBSERVABILITY_OVERRIDES_COMPOSE_PATH = Path("docker/docker-compose.observability.yaml")
+GPU_OVERRIDES_PATH_SWITCHER: Mapping[int, Path] = MappingProxyType(
+    {
+        1: Path("docker/docker-compose.1gpu.yaml"),
+        2: Path("docker/docker-compose.2gpu.yaml"),
+        3: Path("docker/docker-compose.3gpu.yaml"),
+        4: Path("docker/docker-compose.4gpu.yaml"),
+    }
+)
 
-OBSERVABILITY_COMPOSE_PATH = Path("docker/observability-docker-compose.yaml")
+
+def build_compose_file_options(
+    *,
+    enable_observability: bool = False,
+    num_gpus: Optional[Literal[1, 2, 3, 4]] = None,
+    enable_offline_evaluation: bool = False,
+) -> str:
+    """Build the Docker Compose command to run the services."""
+    os.environ["ENABLE_OBSERVABILITY"] = str(enable_observability)
+
+    service_registry = ServiceRegistry.parse_obj(
+        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+    )
+
+    # Set env vars for the services
+    service_registry.update_all_env_vars()
+
+    compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
+
+    if num_gpus is not None:
+        compose_gpu_overrides = GPU_OVERRIDES_PATH_SWITCHER[num_gpus]
+        compose_file_option = f"{compose_file_option} -f {compose_gpu_overrides}"
+
+    if enable_observability:
+        compose_file_option = f"{compose_file_option} -f {OBSERVABILITY_OVERRIDES_COMPOSE_PATH}"
+
+    if not enable_offline_evaluation:
+        compose_file_option = f"{compose_file_option} --profile not-offline-evaluation"
+
+    return compose_file_option
+
 
 app = typer.Typer(
     add_completion=False,
@@ -48,38 +88,34 @@ app = typer.Typer(
 
 @app.command()
 def print_compose_config(
-    enable_observability: bool = typer.Option(
-        default=False, is_flag=True, help="Run the services with observability enabled."
-    ),
-    is_production: bool = typer.Option(
+    observability: bool = typer.Option(
         False,  # noqa: WPS425
-        "--production",
+        "--observability",
         is_flag=True,
-        help="Run the background services using the production config",
+        help="Run the services with observability enabled.",
+    ),
+    num_gpus: Optional[int] = typer.Option(
+        None, min=1, max=4, help="Run the services with the specified number of GPUs."
+    ),
+    offline_evaluation: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--offline-evaluation",
+        is_flag=True,
+        help="Run the services with offline evaluation enabled.",
     ),
 ) -> None:
     """Print the config for the docker compose."""
-    os.environ["ENABLE_OBSERVABILITY"] = str(enable_observability)
-
-    service_registry = ServiceRegistry.parse_obj(
-        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+    compose_file_options = build_compose_file_options(
+        enable_observability=observability,
+        num_gpus=cast(Optional[Literal[1, 2, 3, 4]], num_gpus),
+        enable_offline_evaluation=offline_evaluation,
     )
-
-    # Set env vars for the services
-    service_registry.update_all_env_vars()
-
-    compose_file_option = f"-f {SERVICES_COMPOSE_PATH}"
-    if is_production:
-        compose_file_option = f"{compose_file_option} -f {SERVICES_PROD_COMPOSE_PATH}"
-    else:
-        compose_file_option = f"{compose_file_option} -f {SERVICES_STAGING_COMPOSE_PATH}"
-
-    if enable_observability:
-        compose_file_option = f"{compose_file_option} -f {OBSERVABILITY_COMPOSE_PATH}"
-
     # Run services
     command_output = subprocess.run(
-        f"docker compose {compose_file_option} config", shell=True, check=True, capture_output=True
+        f"docker compose {compose_file_options} config",
+        shell=True,
+        check=True,
+        capture_output=True,
     )
 
     Console().print(
@@ -94,63 +130,55 @@ def print_compose_config(
 @app.command()
 def pull_service_images() -> None:
     """Pull images for the various services."""
-    # Load the registry for the services
-    service_registry = ServiceRegistry.parse_obj(
-        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
-    )
-
-    # Set env vars for the services
-    service_registry.update_all_env_vars()
+    compose_file_options = build_compose_file_options(enable_observability=True, num_gpus=None)
 
     # Pull service images
     subprocess.run(
-        f"docker compose -f {SERVICES_COMPOSE_PATH} -f {OBSERVABILITY_COMPOSE_PATH} pull",
+        f"docker compose {compose_file_options} pull",
         shell=True,
         check=True,
     )
 
 
-@app.command()
-def run_background_services(
-    service_registry_path: Path = typer.Option(
-        default=SERVICE_REGISTRY_PATH,
-        help="Location of the services registry",
-        rich_help_panel="Config",
-    ),
-    services_docker_compose_path: Path = typer.Option(
-        default=SERVICES_COMPOSE_PATH,
-        help="Docker Compose configuration for the background services.",
-        rich_help_panel="Config",
-    ),
-    staging_services_docker_compose_path: Path = typer.Option(
-        default=SERVICES_STAGING_COMPOSE_PATH,
-        help="Addiional configuration for the staging environment.",
-        rich_help_panel="Config",
-    ),
-    production_services_docker_compose_path: Path = typer.Option(
-        SERVICES_PROD_COMPOSE_PATH,
-        help="Additional configuration for the production environment.",
-        rich_help_panel="Config",
-    ),
-    observability_services_docker_compose_path: Path = typer.Option(
-        OBSERVABILITY_COMPOSE_PATH,
-        help="Observability services for the SimBot environment",
-        rich_help_panel="Config",
-    ),
+@app.command(name="download-models")
+def download_model_checkpoints(
     model_storage_dir: Path = typer.Option(
         default=MODEL_STORAGE_DIR, help="Directory to save models.", rich_help_panel="Models"
     ),
-    download_models: bool = typer.Option(
-        default=True,
-        help="Download all models for the services if necessary.",
-        rich_help_panel="Models",
-    ),
-    force_download: bool = typer.Option(
+    force_download_models: bool = typer.Option(
         False,  # noqa: WPS425
         "--force",
         "-f",
         is_flag=True,
         help="Force download all models for all services.",
+        rich_help_panel="Models",
+    ),
+) -> None:
+    """Download the model checkpoints."""
+    # Load the registry for the services
+    service_registry = ServiceRegistry.parse_obj(
+        yaml.safe_load(SERVICE_REGISTRY_PATH.read_bytes())
+    )
+    service_registry.update_all_env_vars()
+
+    # Create model storage dir
+    model_storage_dir.mkdir(exist_ok=True, parents=True)
+
+    # Download models
+    service_registry.download_all_models(model_storage_dir, force=force_download_models)
+
+
+@app.command()
+def run_background_services(
+    model_storage_dir: Path = typer.Option(
+        default=MODEL_STORAGE_DIR, help="Directory to save models.", rich_help_panel="Models"
+    ),
+    force_download_models: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--force",
+        "-f",
+        is_flag=False,
+        help="Force download models for all services.",
         rich_help_panel="Models",
     ),
     run_in_background: bool = typer.Option(
@@ -160,52 +188,40 @@ def run_background_services(
         is_flag=True,
         help="Run the services in the background.",
     ),
-    enable_observability: bool = typer.Option(
-        default=False, is_flag=True, help="Run the services with observability enabled."
-    ),
-    is_production: bool = typer.Option(
+    observability: bool = typer.Option(
         False,  # noqa: WPS425
-        "--production",
+        "--observability",
         is_flag=True,
-        help="Run the background services using the production config",
+        help="Run the services with observability enabled.",
+    ),
+    num_gpus: Optional[int] = typer.Option(
+        None, min=1, max=4, help="Run the services with the specified number of GPUs."
+    ),
+    offline_evaluation: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--offline-evaluation",
+        is_flag=True,
+        help="Run the services with offline evaluation enabled.",
     ),
 ) -> None:
     """Run all the services for SimBot inference."""
-    os.environ["ENABLE_OBSERVABILITY"] = str(enable_observability)
+    # Download the models if need be
+    download_model_checkpoints(model_storage_dir, force_download_models)
 
-    # Load the registry for the services
-    service_registry = ServiceRegistry.parse_obj(
-        yaml.safe_load(service_registry_path.read_bytes())
+    # Get the files to use for the run command
+    compose_file_options = build_compose_file_options(
+        enable_observability=observability,
+        num_gpus=cast(Optional[Literal[1, 2, 3, 4]], num_gpus),
+        enable_offline_evaluation=offline_evaluation,
     )
-
-    # Set env vars for the services
-    service_registry.update_all_env_vars()
-
-    if download_models:
-        # Create model storage dir
-        model_storage_dir.mkdir(exist_ok=True, parents=True)
-
-        # Download models
-        service_registry.download_all_models(model_storage_dir, force=force_download)
 
     # Build the run command
     run_command = "up"
     if run_in_background:
         run_command = f"{run_command} -d"
 
-    compose_file_option = f"-f {services_docker_compose_path}"
-    if is_production:
-        compose_file_option = f"{compose_file_option} -f {production_services_docker_compose_path}"
-    else:
-        compose_file_option = f"{compose_file_option} -f {staging_services_docker_compose_path}"
-
-    if enable_observability:
-        compose_file_option = (
-            f"{compose_file_option} -f {observability_services_docker_compose_path}"
-        )
-
     # Run services
-    subprocess.run(f"docker compose {compose_file_option} {run_command}", shell=True, check=True)
+    subprocess.run(f"docker compose {compose_file_options} {run_command}", shell=True, check=True)
 
 
 @app.command()
@@ -229,15 +245,11 @@ def run_controller_api(
         exists=True,
         rich_help_panel="Directories",
     ),
-    log_to_cloudwatch: bool = typer.Option(
-        default=False,
-        help="Send logs to CloudWatch",
-        rich_help_panel="Observability",
-    ),
-    traces_to_opensearch: bool = typer.Option(
-        default=False,
-        help="Send trace information to OpenSearch to track metrics and requests.",
-        rich_help_panel="Observability",
+    observability: bool = typer.Option(
+        False,  # noqa: WPS425
+        "--observability",
+        is_flag=True,
+        help="Run the services with observability enabled.",
     ),
     workers: int = typer.Option(
         default=1, min=1, help="Set the number of workers to run the server with."
@@ -256,7 +268,7 @@ def run_controller_api(
 
     simbot_settings = SimBotSettings.from_env()
 
-    if traces_to_opensearch:
+    if observability:
         instrument_app(
             simbot_api,
             otlp_endpoint=simbot_settings.otlp_endpoint,
@@ -276,13 +288,13 @@ def run_controller_api(
         timeout=timeout,
     )
 
-    if log_to_cloudwatch:
+    if observability:
         add_cloudwatch_handler_to_logger(
             boto3_profile_name=simbot_settings.aws_profile,
             log_stream_name=simbot_settings.watchtower_log_stream_name,
             log_group_name=simbot_settings.watchtower_log_group_name,
             send_interval=1,
-            enable_trace_logging=traces_to_opensearch,
+            enable_trace_logging=observability,
         )
 
     server.run()
@@ -304,24 +316,17 @@ def run_production_server(
     )
 
     run_background_services(
-        service_registry_path=SERVICE_REGISTRY_PATH,
-        services_docker_compose_path=SERVICES_COMPOSE_PATH,
-        staging_services_docker_compose_path=SERVICES_STAGING_COMPOSE_PATH,
-        production_services_docker_compose_path=SERVICES_PROD_COMPOSE_PATH,
-        observability_services_docker_compose_path=OBSERVABILITY_COMPOSE_PATH,
         model_storage_dir=MODEL_STORAGE_DIR,
-        download_models=True,
-        force_download=False,
+        force_download_models=False,
         run_in_background=True,
-        enable_observability=True,
-        is_production=True,
+        observability=True,
+        num_gpus=4,
     )
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
         auxiliary_metadata_cache_dir=Path("../cache/auxiliary_metadata"),
         extracted_features_cache_dir=Path("../cache/features"),
-        log_to_cloudwatch=True,
-        traces_to_opensearch=True,
+        observability=True,
         workers=workers,
     )
 

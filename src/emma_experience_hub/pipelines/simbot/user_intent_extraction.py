@@ -33,6 +33,7 @@ class SimBotUserIntentExtractionPipeline:
         qa_intent_client: SimBotQAIntentClient,
         qa_intent_parser: SimBotQAOutputParser,
         _enable_object_related_questions: bool = False,
+        _enable_simbot_qa: bool = True,
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
 
@@ -40,6 +41,7 @@ class SimBotUserIntentExtractionPipeline:
         self._qa_intent_parser = qa_intent_parser
 
         self._enable_object_related_questions = _enable_object_related_questions
+        self._enable_simbot_qa = _enable_simbot_qa
 
     def run(self, session: SimBotSession) -> Optional[SimBotUserIntentType]:
         """Run the pipeline to get the user's intent.
@@ -54,8 +56,9 @@ class SimBotUserIntentExtractionPipeline:
             return None
 
         # Check if the user is asking about QA or similar?
-        with suppress(AssertionError):
-            return self.check_for_user_qa(session.current_turn.speech.utterance)
+        if self._enable_simbot_qa:
+            with suppress(AssertionError):
+                return self.check_for_user_qa(session.current_turn.speech.utterance)
 
         # Did the agent as the user aquestion in the previous turn?
         if self._was_question_asked_in_previous_turn(session.previous_valid_turn):

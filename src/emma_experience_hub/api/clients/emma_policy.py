@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import httpx
 from loguru import logger
-from pydantic import AnyHttpUrl
 
 from emma_common.datamodels import (
     DialogueUtterance,
@@ -15,9 +14,6 @@ from emma_experience_hub.api.clients.client import Client
 
 class EmmaPolicyClient(Client):
     """API client for interfacing with an EMMA Policy model."""
-
-    def __init__(self, server_endpoint: AnyHttpUrl) -> None:
-        self._endpoint = server_endpoint
 
     def healthcheck(self) -> bool:
         """Verify the server is online and healthy."""
