@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.45.0](https://github.com/emma-simbot/experience-hub/compare/v8.44.0...v8.45.0) (2023-04-18)
+
+
+### Features
+
+* Object Related QA ([#510](https://github.com/emma-simbot/experience-hub/issues/510)) ([09afe60](https://github.com/emma-simbot/experience-hub/commit/09afe60fa6e3343770e1419ebb84dcbab303a0d4))
+
 ## [8.44.0](https://github.com/emma-simbot/experience-hub/compare/v8.43.2...v8.44.0) (2023-04-18)
 
 
