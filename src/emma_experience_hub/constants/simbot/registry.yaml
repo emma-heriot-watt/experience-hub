@@ -19,7 +19,7 @@ services:
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
     image_version: 1.40.2-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v9_annotation_v6_iou0.5_bsz512_lr1e-4.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v9.2_annotation_v6_iou0.5_bsz512_lr1e-4.ckpt
 
   - name: feature_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/perception
