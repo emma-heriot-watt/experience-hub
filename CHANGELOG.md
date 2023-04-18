@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.43.0](https://github.com/emma-simbot/experience-hub/compare/v8.42.0...v8.43.0) (2023-04-18)
+
+
+### Features
+
+* add more lines for breaking things/records ([#517](https://github.com/emma-simbot/experience-hub/issues/517)) ([51ed74e](https://github.com/emma-simbot/experience-hub/commit/51ed74e1027cd4c6278c98052fc921b01aa2fe88))
+* disable unnecessary clients during offline evaluation ([#520](https://github.com/emma-simbot/experience-hub/issues/520)) ([9f8f2ae](https://github.com/emma-simbot/experience-hub/commit/9f8f2ae96e086c501bf37887a07e3217415dd0ef))
+
+
+### Bug Fixes
+
+* Disable the missing inventory intent based on the flag ([#519](https://github.com/emma-simbot/experience-hub/issues/519)) ([64a3895](https://github.com/emma-simbot/experience-hub/commit/64a38958bd9add78c4981a4a97a6140555e290b4))
+
 ## [8.42.0](https://github.com/emma-simbot/experience-hub/compare/v8.41.0...v8.42.0) (2023-04-18)
 
 
