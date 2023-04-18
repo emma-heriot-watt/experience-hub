@@ -173,7 +173,7 @@ class SimBotActHandler:
                 physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
             )
 
-        if not self._enable_missing_inventory and intent == SimBotIntentType.act_missing_inventory:
+        if self._should_replace_missing_inventory_intent(intent):
             logger.info(
                 "Missing inventory search is disabled; returning the `<act><one_match>` intent."
             )
@@ -380,3 +380,12 @@ class SimBotActHandler:
             and session.current_turn.speech is not None
         )
         return should_search_before_executing_instruction
+
+    def _should_replace_missing_inventory_intent(
+        self, intent: SimBotIntent[SimBotNLUIntentType]
+    ) -> bool:
+        """Is the missing inventory intent disabled?"""
+        return (
+            not self._enable_missing_inventory
+            and intent.type == SimBotIntentType.act_missing_inventory
+        )
