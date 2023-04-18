@@ -12,6 +12,7 @@ from emma_experience_hub.parsers.simbot.low_asr_confidence_detector import (
 )
 from emma_experience_hub.parsers.simbot.nlu_output import SimBotNLUOutputParser
 from emma_experience_hub.parsers.simbot.previous_action import SimBotPreviousActionParser
+from emma_experience_hub.parsers.simbot.qa_entity_output import SimBotQAEntityParser
 from emma_experience_hub.parsers.simbot.qa_output import SimBotQAOutputParser
 from emma_experience_hub.parsers.simbot.visual_grounding_output import (
     SimBotVisualGroundingOutputParser,

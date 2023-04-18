@@ -7,6 +7,7 @@ from emma_experience_hub.parsers.simbot import (
     SimBotLowASRConfidenceDetector,
     SimBotNLUOutputParser,
     SimBotPreviousActionParser,
+    SimBotQAEntityParser,
     SimBotQAOutputParser,
     SimBotVisualGroundingOutputParser,
 )
@@ -80,6 +81,8 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
             agent_intent_selector=SimBotAgentIntentSelectionPipeline(
                 features_client=clients.features,
+                simbot_qa_client=clients.simbot_qa,
+                simbot_qa_entity_parser=SimBotQAEntityParser(),
                 nlu_intent_client=clients.nlu_intent,
                 nlu_intent_parser=SimBotNLUOutputParser(
                     intent_type_delimiter=simbot_settings.nlu_predictor_intent_type_delimiter

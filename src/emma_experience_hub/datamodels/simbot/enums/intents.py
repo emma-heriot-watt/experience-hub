@@ -46,6 +46,7 @@ class SimBotIntentType(Enum):
     ask_not_enough_information = "<not_enough_information>"
     ask_about_affordance = "<ask><about_affordance>"
     ask_about_appearance = "<ask><about_appearance>"
+    ask_about_location = "<ask><about_location>"
     greeting = "<greeting>"
     admiration = "<admiration>"
     incomplete_utterance_find = "<incomplete_utterance_find>"
@@ -105,6 +106,7 @@ class SimBotIntentType(Enum):
         return self in {
             SimBotIntentType.ask_about_affordance,
             SimBotIntentType.ask_about_appearance,
+            SimBotIntentType.ask_about_location,
         }
 
     @property
@@ -205,6 +207,7 @@ SimBotUserQAType = Literal[
     SimBotIntentType.ask_about_game,
     SimBotIntentType.ask_about_agent,
     SimBotIntentType.ask_about_affordance,
+    SimBotIntentType.ask_about_location,
     SimBotIntentType.ask_about_appearance,
     SimBotIntentType.ask_not_enough_information,
     SimBotIntentType.greeting,
@@ -270,6 +273,9 @@ SimBotVerbalInteractionIntentType = Literal[
     SimBotIntentType.act_too_many_matches,
     SimBotIntentType.act_missing_inventory,
     SimBotIntentType.generic_success,
+    SimBotIntentType.ask_about_affordance,
+    SimBotIntentType.ask_about_location,
+    SimBotIntentType.ask_about_appearance,
 ]
 
 SimBotNLUIntentType = Literal[

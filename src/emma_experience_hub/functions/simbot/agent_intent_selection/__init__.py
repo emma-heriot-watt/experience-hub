@@ -8,3 +8,6 @@ from emma_experience_hub.functions.simbot.agent_intent_selection.confirmation_ha
 from emma_experience_hub.functions.simbot.agent_intent_selection.instruction_handler import (
     SimBotActHandler,
 )
+from emma_experience_hub.functions.simbot.agent_intent_selection.object_qa_handler import (
+    SimBotObjectQAHandler,
+)

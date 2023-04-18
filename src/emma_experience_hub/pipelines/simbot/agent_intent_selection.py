@@ -7,6 +7,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotFeaturesClient,
     SimBotHacksClient,
     SimBotNLUIntentClient,
+    SimBotQAIntentClient,
 )
 from emma_experience_hub.datamodels.simbot import (
     SimBotAgentIntents,
@@ -21,9 +22,11 @@ from emma_experience_hub.functions.simbot.agent_intent_selection import (
     SimBotActHandler,
     SimBotClarificationHandler,
     SimBotConfirmationHandler,
+    SimBotObjectQAHandler,
     set_find_object_in_progress_intent,
 )
 from emma_experience_hub.parsers import NeuralParser
+from emma_experience_hub.parsers.simbot import SimBotQAEntityParser
 from emma_experience_hub.pipelines.simbot.compound_splitter import SimBotCompoundSplitterPipeline
 from emma_experience_hub.pipelines.simbot.environment_error_catching import (
     SimBotEnvironmentErrorCatchingPipeline,
@@ -40,6 +43,8 @@ class SimBotAgentIntentSelectionPipeline:
     def __init__(
         self,
         features_client: SimBotFeaturesClient,
+        simbot_qa_client: SimBotQAIntentClient,
+        simbot_qa_entity_parser: SimBotQAEntityParser,
         nlu_intent_client: SimBotNLUIntentClient,
         nlu_intent_parser: NeuralParser[SimBotIntent[SimBotNLUIntentType]],
         action_predictor_client: SimbotActionPredictionClient,
@@ -55,6 +60,9 @@ class SimBotAgentIntentSelectionPipeline:
     ) -> None:
         self.clarification_handler = SimBotClarificationHandler()
         self._features_client = features_client
+        self.simbot_object_qa_handler = SimBotObjectQAHandler(
+            simbot_qa_client=simbot_qa_client, simbot_qa_entity_parser=simbot_qa_entity_parser
+        )
         self.confirmation_handler = SimBotConfirmationHandler(_enable_search_after_no_match)
         self.act_handler = SimBotActHandler(
             features_client=features_client,
@@ -85,6 +93,10 @@ class SimBotAgentIntentSelectionPipeline:
         # If the user has said something, determine the agent intent
         if session.current_turn.intent.user:
             logger.debug("Getting agent intent from user intent.")
+
+            # check for object-qa and return
+            if session.current_turn.intent.user.is_user_qa_about_object:
+                return self.handle_object_qa_intent(session)
 
             # If we have received an invalid utterance, the agent does not act
             should_skip_action_selection = self._should_skip_action_selection(
@@ -152,6 +164,11 @@ class SimBotAgentIntentSelectionPipeline:
         # If the confirmation handler did not set the intent, use the act handler
         if intents is None:
             return self.handle_act_intent(session)
+        return intents
+
+    def handle_object_qa_intent(self, session: SimBotSession) -> Optional[SimBotAgentIntents]:
+        """Get the entities when the user_qa is related to objects."""
+        intents = self.simbot_object_qa_handler.run(session)
         return intents
 
     def _get_user_intent_handler(
