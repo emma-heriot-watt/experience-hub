@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.42.0](https://github.com/emma-simbot/experience-hub/compare/v8.41.0...v8.42.0) (2023-04-18)
+
+
+### Features
+
+* add more lines for the `already_holding_object` intent ([#516](https://github.com/emma-simbot/experience-hub/issues/516)) ([f7c9ac1](https://github.com/emma-simbot/experience-hub/commit/f7c9ac140a0aef5ce849abc4d90d57da96b39673))
+
 ## [8.41.0](https://github.com/emma-simbot/experience-hub/compare/v8.40.0...v8.41.0) (2023-04-18)
 
 
