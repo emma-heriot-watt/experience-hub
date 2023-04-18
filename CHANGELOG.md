@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.44.0](https://github.com/emma-simbot/experience-hub/compare/v8.43.2...v8.44.0) (2023-04-18)
+
+
+### Features
+
+* use policy 9.2 model ([#523](https://github.com/emma-simbot/experience-hub/issues/523)) ([2d5ab6b](https://github.com/emma-simbot/experience-hub/commit/2d5ab6b6fa73cb563d4b60d2c6253b80e1f79595))
+
 ## [8.43.2](https://github.com/emma-simbot/experience-hub/compare/v8.43.1...v8.43.2) (2023-04-18)
 
 
