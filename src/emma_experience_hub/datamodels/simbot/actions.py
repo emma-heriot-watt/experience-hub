@@ -240,6 +240,20 @@ class SimBotAction(BaseModel):
         return self.type == SimBotActionType.Place
 
     @property
+    def transforms_object(self) -> bool:
+        """Does the action tranform the object to a different type of object?"""
+        return (
+            self.type == SimBotActionType.Toggle
+            and self.payload is not None
+            and self.payload.entity_name in {"Time Machine", "Everything's A Carrot Machine"}
+        )
+
+    @property
+    def interacts_with_time_machine(self) -> bool:
+        """Does the action interact with the time machine?"""
+        return self.payload is not None and self.payload.entity_name == "Time Machine"
+
+    @property
     def is_low_level_navigation(self) -> bool:
         """Is the action for a low-level navigation movement?"""
         return self.type in SimBotActionType.low_level_navigation()

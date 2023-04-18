@@ -36,18 +36,21 @@ class SimBotObjectMemory(BaseModel):
     memory: dict[str, SimBotRoomMemoryType] = {}
     _prior_memory: dict[str, str] = get_prior_memory()
 
-    def update_from_action(
+    def update_from_action(  # noqa: WPS231
         self,
         room_name: str,
         position: Position,
         rotation: RotationQuaternion,
         viewpoint: str,
         action: SimBotAction,
+        action_history: list[SimBotAction],
+        inventory_history: list[Optional[str]],
         inventory_entity: Optional[str] = None,
     ) -> None:
         """Update the memory after action execution."""
         if not action.is_successful:
             return
+
         # if the action removed something from the inventory then we can find in the environment
         if action.removes_object_from_inventory and inventory_entity is not None:
             self.write_inventory_entity_in_room(
@@ -59,9 +62,30 @@ class SimBotObjectMemory(BaseModel):
                 inventory_entity=inventory_entity,
             )
 
-        # if the action added something to the inventory then we cant find in the environment.
+        # if the action added something to the inventory then we can't find in the environment.
         if action.adds_object_to_inventory and action.payload.entity_name is not None:
             self.memory[room_name].pop(action.payload.entity_name.lower(), None)
+        # if the action transformed the object type then we can't find in the environment.
+        if action.transforms_object and action.payload.entity_name is not None and action_history:
+            machine = action.payload.entity_name.lower()
+            # Go through past actions starting from the most recent one.
+            for past_action, past_inventory in zip(action_history[::-1], inventory_history[::-1]):
+                # Does the past action place the object on the machine?
+                should_update_memory = self._action_places_object_to_transform(
+                    past_action=past_action, machine=machine, past_inventory=past_inventory
+                )
+
+                if should_update_memory:
+                    self.memory[room_name].pop(past_inventory, None)  # type: ignore[union-attr]
+                    break
+                # Does the past action transform the object?
+                previous_interaction = (
+                    past_action.transforms_object
+                    and past_action.payload.entity_name is not None
+                    and past_action.payload.entity_name.lower() == machine
+                )
+                if previous_interaction:
+                    break
 
     def read_memory_entity_in_room(
         self, room_name: str, object_label: str
@@ -183,6 +207,26 @@ class SimBotObjectMemory(BaseModel):
             self.memory[room_name][object_label] = SimBotMemoryEntity(
                 viewpoint=viewpoint, area=area, location=location
             )
+
+    def _action_places_object_to_transform(
+        self, past_action: SimBotAction, machine: str, past_inventory: Optional[str]
+    ) -> bool:
+        """Return True if the memory should be updated based on a past place action.
+
+        If the past action successfuly places an object on a machine that can transform it.
+        """
+        action_places_object_on_machine = (
+            past_action.removes_object_from_inventory
+            and past_action.payload.entity_name is not None
+            and past_action.payload.entity_name.lower() == machine
+            and past_action.is_successful
+        )
+        if not action_places_object_on_machine:
+            return False
+
+        if past_action.interacts_with_time_machine:
+            return past_inventory == "carrot"
+        return True
 
 
 class SimBotInventory(BaseModel, validate_assignment=True):

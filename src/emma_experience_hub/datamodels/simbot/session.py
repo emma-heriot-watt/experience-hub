@@ -588,6 +588,8 @@ class SimBotSession(BaseModel):
                 self.previous_valid_turn.actions.interaction,
                 self.previous_valid_turn.idx,
             )
+
+            past_turns = self.get_past_turns_with_actions(self.turns)[:-1]
             self.current_state.memory.update_from_action(
                 room_name=self.previous_valid_turn.environment.current_room,
                 position=self.current_turn.environment.current_position,
@@ -595,6 +597,8 @@ class SimBotSession(BaseModel):
                 viewpoint=self.previous_valid_turn.environment.get_closest_viewpoint_name(),
                 action=self.previous_valid_turn.actions.interaction,
                 inventory_entity=self.previous_valid_turn.state.inventory.entity,
+                action_history=[turn.actions.interaction for turn in past_turns],  # type: ignore[union-attr]
+                inventory_history=[turn.state.inventory.entity for turn in past_turns],
             )
 
     def update_agent_memory(self, extracted_features: list[EmmaExtractedFeatures]) -> None:
@@ -655,6 +659,13 @@ class SimBotSession(BaseModel):
             )
 
         return list(dialogue_history)
+
+    @staticmethod
+    def get_past_turns_with_actions(  # noqa: WPS602
+        turns: list[SimBotSessionTurn],
+    ) -> list[SimBotSessionTurn]:
+        """Get a history of turns with interaction actions."""
+        return [turn for turn in turns if turn.actions.interaction is not None]
 
     @staticmethod
     def get_environment_state_history_from_turns(  # noqa: WPS602
