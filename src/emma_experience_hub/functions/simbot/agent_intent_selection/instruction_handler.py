@@ -52,7 +52,7 @@ class SimBotActHandler:
         self._enable_confirmation_questions = _enable_confirmation_questions
         self._enable_search_actions = _enable_search_actions
         self._enable_search_after_no_match = _enable_search_after_no_match
-        self._enable_search_after_missing_inventory = _enable_search_after_missing_inventory
+        self._enable_missing_inventory = _enable_search_after_missing_inventory
         self._enable_high_level_planner = _enable_high_level_planner
 
     def run(self, session: SimBotSession) -> Optional[SimBotAgentIntents]:
@@ -168,6 +168,14 @@ class SimBotActHandler:
         if not self._enable_clarification_questions and intent.type.triggers_question_to_user:
             logger.info(
                 "Clarification questions are disabled; returning the `<act><one_match>` intent."
+            )
+            return SimBotAgentIntents(
+                physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
+            )
+
+        if not self._enable_missing_inventory and intent == SimBotIntentType.act_missing_inventory:
+            logger.info(
+                "Missing inventory search is disabled; returning the `<act><one_match>` intent."
             )
             return SimBotAgentIntents(
                 physical_interaction=SimBotIntent(type=SimBotIntentType.act_one_match)
@@ -364,7 +372,7 @@ class SimBotActHandler:
         self, session: SimBotSession, intents: SimBotAgentIntents
     ) -> bool:
         """Check the conditions for an act_missing_inventory intent to trigger a search."""
-        if intents.verbal_interaction is None or not self._enable_search_after_missing_inventory:
+        if intents.verbal_interaction is None or not self._enable_missing_inventory:
             return False
         # Check the intent is act_missing_inventory from a new utterance
         should_search_before_executing_instruction = (
