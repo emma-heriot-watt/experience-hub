@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.43.1](https://github.com/emma-simbot/experience-hub/compare/v8.43.0...v8.43.1) (2023-04-18)
+
+
+### Bug Fixes
+
+* Update memory with transformed objects ([#513](https://github.com/emma-simbot/experience-hub/issues/513)) ([062c466](https://github.com/emma-simbot/experience-hub/commit/062c4667e97ecb0b7ca8b379d59cc1563435f0a4))
+
 ## [8.43.0](https://github.com/emma-simbot/experience-hub/compare/v8.42.0...v8.43.0) (2023-04-18)
 
 
