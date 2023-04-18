@@ -1,8 +1,8 @@
 conditions,response,is_lightweight
+environment_intent_type == "already_holding_object",<amazon:domain name="conversational">I can only hold one thing at a time!</amazon:domain>, False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can only hold one thing at a time - and I'm already holding something.</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I'm already holding something and I can't hold anything else.</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can't hold anything else - my inventory space is limited</amazon:emotion></prosody>,False
-environment_intent_type == "already_holding_object",I can't hold anything else - my inventory space is limited,False
 
 environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null,I can only hold one thing at a time so I cannot pick up the {environment_intent_entity}.,False
 
@@ -12,6 +12,9 @@ environment_intent_type == "already_holding_object" and environment_intent_entit
 environment_intent_type == "already_holding_object" and environment_intent_entity != null and inventory_entity != null,Already holding the {inventory_entity}. Moving on with the plan,True
 
 environment_intent_type == "already_holding_object" and intent_type_counter["already_holding_object"] > 2 and not current_turn_has_user_utterance,I can only hold on thing at a time - you can see what i'm holding in the bottom right of your screen!,False
+
+environment_intent_type == "already_holding_object" and intent_type_counter["low_asr_confidence"] > 1,I can't hold anything else - my inventory space is limited,False
+environment_intent_type == "already_holding_object" and intent_type_counter["low_asr_confidence"] > 1,<amazon:domain name="conversational">I'm already holding something!</amazon:domain>, False
 
 environment_intent_type == "already_holding_object" and inventory_entity != null,I am already holding the {inventory_entity}. We should put it down first.,False
 
