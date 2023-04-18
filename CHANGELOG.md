@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.43.2](https://github.com/emma-simbot/experience-hub/compare/v8.43.1...v8.43.2) (2023-04-18)
+
+
+### Bug Fixes
+
+* bug in disabling missing inventory ([#521](https://github.com/emma-simbot/experience-hub/issues/521)) ([4e44a8a](https://github.com/emma-simbot/experience-hub/commit/4e44a8a1cfeac9efc0504ac42b232f08240b507c))
+
 ## [8.43.1](https://github.com/emma-simbot/experience-hub/compare/v8.43.0...v8.43.1) (2023-04-18)
 
 
