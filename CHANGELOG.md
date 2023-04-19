@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.46.0](https://github.com/emma-simbot/experience-hub/compare/v8.45.0...v8.46.0) (2023-04-19)
+
+
+### Features
+
+* do not use scan on small objects ([#524](https://github.com/emma-simbot/experience-hub/issues/524)) ([e4eb432](https://github.com/emma-simbot/experience-hub/commit/e4eb4325fe428efc99cd9ade6a8d9a86ed769d96))
+
 ## [8.45.0](https://github.com/emma-simbot/experience-hub/compare/v8.44.0...v8.45.0) (2023-04-18)
 
 
