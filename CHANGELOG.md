@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.46.1](https://github.com/emma-simbot/experience-hub/compare/v8.46.0...v8.46.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* room conditioned responses for location qa ([#525](https://github.com/emma-simbot/experience-hub/issues/525)) ([2384952](https://github.com/emma-simbot/experience-hub/commit/23849528d38bc83dd5ef6a417f7dc93c8ab826db))
+
 ## [8.46.0](https://github.com/emma-simbot/experience-hub/compare/v8.45.0...v8.46.0) (2023-04-19)
 
 
