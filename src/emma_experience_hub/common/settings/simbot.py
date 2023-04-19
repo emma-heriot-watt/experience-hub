@@ -14,6 +14,12 @@ from emma_experience_hub.datamodels.common import GFHLocationType
 from emma_experience_hub.datamodels.enums import SearchPlannerType
 
 
+class SimBotFeatureArgs(BaseModel):
+    """Optional arguments for the SimBot agent."""
+
+    scan_area_threshold: float = 200
+
+
 class SimBotFeatureFlags(BaseModel):
     """Feature flags for the SimBot agent."""
 
@@ -63,6 +69,7 @@ class SimBotSettings(BaseSettings):
     """Settings for the SimBot-related modules."""
 
     feature_flags: SimBotFeatureFlags = SimBotFeatureFlags()
+    feature_arguments: SimBotFeatureArgs = SimBotFeatureArgs()
 
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 5000

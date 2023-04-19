@@ -53,6 +53,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             enable_grab_from_history=simbot_settings.feature_flags.enable_grab_from_history,
             gfh_location_type=simbot_settings.feature_flags.gfh_location_type,
             _enable_scanning_found_object=simbot_settings.feature_flags.enable_scanning_during_search,
+            scan_area_threshold=simbot_settings.feature_arguments.scan_area_threshold,
         )
         action_predictor_response_parser = SimBotActionPredictorOutputParser()
         compound_splitter = SimBotCompoundSplitterPipeline(clients.compound_splitter)

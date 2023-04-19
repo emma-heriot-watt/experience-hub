@@ -49,6 +49,7 @@ class SimBotFindObjectPipeline:
         search_planner: SearchPlanner,
         enable_grab_from_history: bool = True,
         _enable_scanning_found_object: bool = True,
+        scan_area_threshold: float = 200,
     ) -> None:
         self._features_client = features_client
 
@@ -59,6 +60,7 @@ class SimBotFindObjectPipeline:
         self._enable_grab_from_history = enable_grab_from_history
         self._grab_from_history = GrabFromHistory()
         self._enable_scanning_found_object = _enable_scanning_found_object
+        self._scan_area_threshold = scan_area_threshold
 
     @classmethod
     def from_planner_type(
@@ -72,6 +74,7 @@ class SimBotFindObjectPipeline:
         enable_grab_from_history: bool = True,
         gfh_location_type: GFHLocationType = GFHLocationType.location,
         _enable_scanning_found_object: bool = True,
+        scan_area_threshold: float = 200,
     ) -> "SimBotFindObjectPipeline":
         """Instantiate the pipeline from the SearchPlannerType."""
         planners = {
@@ -90,6 +93,7 @@ class SimBotFindObjectPipeline:
             search_planner=planners[planner_type],
             enable_grab_from_history=enable_grab_from_history,
             _enable_scanning_found_object=_enable_scanning_found_object,
+            scan_area_threshold=scan_area_threshold,
         )
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
@@ -182,7 +186,7 @@ class SimBotFindObjectPipeline:
     def _should_scan_found_object(
         self,
         session: SimBotSession,
-        frame_idx: int,
+        scene_object_tokens: SimBotSceneObjectTokens,
         found_object_label: str,
         extracted_features: list[EmmaExtractedFeatures],
     ) -> bool:
@@ -193,11 +197,18 @@ class SimBotFindObjectPipeline:
         # Go straight to the object and execute the original instruction
         if session.current_turn.intent.is_searching_inferred_object:
             return False
-        return class_label_is_unique_in_frame(
+
+        frame_idx = scene_object_tokens.frame_index
+
+        class_is_unique = class_label_is_unique_in_frame(
             frame_index=frame_idx,
             class_label=found_object_label,
             extracted_features=extracted_features,
         )
+
+        object_idx = scene_object_tokens.object_index - 1
+        area = extracted_features[frame_idx - 1].bbox_areas[object_idx].item()
+        return class_is_unique and area > self._scan_area_threshold
 
     def _next_action_is_dummy(self, session: SimBotSession) -> bool:
         """Is the next action in the queue a dummy move forward?"""
@@ -267,7 +278,7 @@ class SimBotFindObjectPipeline:
 
         should_scan_found_object = self._should_scan_found_object(
             session,
-            frame_idx=scene_object_tokens.frame_index,
+            scene_object_tokens=scene_object_tokens,
             found_object_label=object_name,
             extracted_features=extracted_features,
         )
