@@ -509,10 +509,6 @@ verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and not verbal_interaction_intent_entity =~ "(freeze ray|laser|printer|robot arm|wall shelf|fridge|freezer|time machine|toaster|microwave|vending machine|color changer|gravity pad|everything's a carrot machine|embiggenator|sink|milk|cereal box|cake|burger|sandwich|coffee beans)", Sorry - I can only help with selected set of machines and devices. Unfortunately - {verbal_interaction_intent_entity} isn't one of them,False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)",You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
-
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)",{verbal_interaction_intent_entity} may be placed inside the freezer,False
-
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(coffee beans)", I have seen {verbal_interaction_intent_entity} being placed in break drawers at times. But it can be any where though.  ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(color changer|gravity pad|everything's a carrot machine)",{verbal_interaction_intent_entity} can be usually found in the quantum lab,False
@@ -522,8 +518,6 @@ verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_in
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray|laser|printer|robot arm|wall shelf)",{verbal_interaction_intent_entity} can be usually found in the robotics lab,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(fridge|freezer|time machine|toaster|microwave|vending machine)",{verbal_interaction_intent_entity} can be usually found in the break room,False
-
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)",{verbal_interaction_intent_entity} may be placed inside the fridge,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(sink)",{verbal_interaction_intent_entity} is usually located in the break room. There may be a {verbal_interaction_intent_entity} in the warehouse as well,False
 
@@ -613,3 +607,9 @@ verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom"
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter,<amazon:emotion name="excited" intensity="low">New room - new task. so what next?</amazon:emotion>,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room != "Lab2",{verbal_interaction_intent_entity} may be placed inside the fridge,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - there is a good chance that it is inside the fridge in the break room. ,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room != "Lab2" ,{verbal_interaction_intent_entity} may be placed inside the freezer,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - you may find it inside the freezer - in the break room., False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2" ,You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2" ,I have seen {verbal_interaction_intent_entity}s being placed on the gravity flipper. If it is not there - it could be inside the fridge or the microwave - in the break room. ,False
