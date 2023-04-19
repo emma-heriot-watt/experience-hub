@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.46.2](https://github.com/emma-simbot/experience-hub/compare/v8.46.1...v8.46.2) (2023-04-19)
+
+
+### Bug Fixes
+
+* update compound splitter image ([#526](https://github.com/emma-simbot/experience-hub/issues/526)) ([fcd856b](https://github.com/emma-simbot/experience-hub/commit/fcd856b3c23250f7c0cfb9b182eb5cb3d61154a0))
+
 ## [8.46.1](https://github.com/emma-simbot/experience-hub/compare/v8.46.0...v8.46.1) (2023-04-19)
 
 
