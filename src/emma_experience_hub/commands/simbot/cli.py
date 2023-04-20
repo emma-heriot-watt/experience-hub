@@ -181,18 +181,12 @@ def run_background_services(
         help="Force download models for all services.",
         rich_help_panel="Models",
     ),
-    run_as_detached: bool = typer.Option(
-        False,  # noqa: WPS425
-        "--run-as-detached",
-        "-d",
-        is_flag=True,
-        help="Run the services detached.",
-    ),
     run_in_background: bool = typer.Option(
         False,  # noqa: WPS425
-        "--run-in_background",
+        "--run-in-background",
+        "-d",
         is_flag=True,
-        help="Run the services in the background but keep logging to the foreground.",
+        help="Run the services in the background.",
     ),
     observability: bool = typer.Option(
         False,  # noqa: WPS425
@@ -211,9 +205,6 @@ def run_background_services(
     ),
 ) -> None:
     """Run all the services for SimBot inference."""
-    if run_as_detached and run_in_background:
-        raise typer.BadParameter("Cannot run as detached and in the background at the same time.")
-
     # Download the models if need be
     download_model_checkpoints(model_storage_dir, force_download_models)
 
@@ -226,10 +217,8 @@ def run_background_services(
 
     # Build the run command
     run_command = "up"
-    if run_as_detached:
-        run_command = f"{run_command} -d"
     if run_in_background:
-        run_command = f"{run_command} &"
+        run_command = f"{run_command} -d"
 
     # Run services
     subprocess.run(f"docker compose {compose_file_options} {run_command}", shell=True, check=True)
@@ -329,7 +318,7 @@ def run_production_server(
     run_background_services(
         model_storage_dir=MODEL_STORAGE_DIR,
         force_download_models=False,
-        run_as_detached=True,
+        run_in_background=True,
         observability=True,
         num_gpus=4,
     )
