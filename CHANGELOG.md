@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.47.0](https://github.com/emma-simbot/experience-hub/compare/v8.46.2...v8.47.0) (2023-04-20)
+
+
+### Features
+
+* separate running in background from running as detached ([e914090](https://github.com/emma-simbot/experience-hub/commit/e9140902a18192236804bab24dd59e62087d6ed4))
+
 ## [8.46.2](https://github.com/emma-simbot/experience-hub/compare/v8.46.1...v8.46.2) (2023-04-19)
 
 
