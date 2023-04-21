@@ -76,7 +76,7 @@ class SimBotObjectMemory(BaseModel):
                 )
 
                 if should_update_memory:
-                    self.memory[room_name].pop(past_inventory, None)  # type: ignore[union-attr]
+                    self.memory[room_name].pop(past_inventory, None)  # type: ignore[arg-type]
                     break
                 # Does the past action transform the object?
                 previous_interaction = (

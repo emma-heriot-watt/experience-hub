@@ -61,7 +61,9 @@ class SimBotAgentIntentSelectionPipeline:
         self.clarification_handler = SimBotClarificationHandler()
         self._features_client = features_client
         self.simbot_object_qa_handler = SimBotObjectQAHandler(
-            simbot_qa_client=simbot_qa_client, simbot_qa_entity_parser=simbot_qa_entity_parser
+            simbot_qa_client=simbot_qa_client,
+            simbot_qa_entity_parser=simbot_qa_entity_parser,
+            _enable_confirmation_questions=_enable_confirmation_questions,
         )
         self.confirmation_handler = SimBotConfirmationHandler(_enable_search_after_no_match)
         self.act_handler = SimBotActHandler(
