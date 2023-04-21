@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.50.0](https://github.com/emma-simbot/experience-hub/compare/v8.49.0...v8.50.0) (2023-04-21)
+
+
+### Features
+
+* Handle ask_about_location based on memory ([#527](https://github.com/emma-simbot/experience-hub/issues/527)) ([543105d](https://github.com/emma-simbot/experience-hub/commit/543105d19ae765a11938f2e65c1bec096fd6a726))
+
 ## [8.49.0](https://github.com/emma-simbot/experience-hub/compare/v8.48.0...v8.49.0) (2023-04-21)
 
 
