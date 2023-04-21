@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.51.0](https://github.com/emma-simbot/experience-hub/compare/v8.50.0...v8.51.0) (2023-04-21)
+
+
+### Features
+
+* bump policy patch apis ([#534](https://github.com/emma-simbot/experience-hub/issues/534)) ([0a1e057](https://github.com/emma-simbot/experience-hub/commit/0a1e057771b42f2325bfdd4d354897502f6db24a))
+
 ## [8.50.0](https://github.com/emma-simbot/experience-hub/compare/v8.49.0...v8.50.0) (2023-04-21)
 
 
