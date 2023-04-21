@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.49.0](https://github.com/emma-simbot/experience-hub/compare/v8.48.0...v8.49.0) (2023-04-21)
+
+
+### Features
+
+* Toggle robot arm after navigation error ([#532](https://github.com/emma-simbot/experience-hub/issues/532)) ([c3172c0](https://github.com/emma-simbot/experience-hub/commit/c3172c093837f2baafc29d861a3202ba12596f05))
+
 ## [8.48.0](https://github.com/emma-simbot/experience-hub/compare/v8.47.1...v8.48.0) (2023-04-21)
 
 
