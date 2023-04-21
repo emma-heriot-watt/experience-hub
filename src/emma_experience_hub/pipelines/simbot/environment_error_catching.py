@@ -19,6 +19,7 @@ class SimBotEnvironmentErrorCatchingPipeline:
             SimBotIntentType.receptacle_is_closed: self._handle_receptacle_is_closed_action_error,
             SimBotIntentType.target_out_of_range: self._handle_target_out_of_range_error,
             SimBotIntentType.unsupported_action: self._handle_unsupported_action_error,
+            SimBotIntentType.unsupported_navigation: self._handle_unsupported_navigation_error,
         }
 
         self.unsupported_action_handlers = {
@@ -194,4 +195,43 @@ class SimBotEnvironmentErrorCatchingPipeline:
             if session.current_turn.speech
             else None,
         )
+        return True
+
+    def _handle_unsupported_navigation_error(
+        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
+    ) -> bool:
+        """Handle unsupported navigation error for the robotics lab."""
+        if session.current_turn.environment.current_room.lower() != "lab1":
+            return False
+        # Add the current instruction to the utterrance queue
+        self._store_current_utterance_if_needed(session)
+        # Add the failed instruction to the utterance queue
+        if previous_turn.intent.is_searching:
+            target_entity = previous_turn.intent.physical_interaction.entity  # type: ignore[union-attr]
+            if target_entity is None:
+                return False
+            previous_utterance = f"find the {target_entity}"
+            queue_elem = SimBotQueueUtterance(utterance=previous_utterance, role=SpeakerRole.agent)
+        else:
+            previous_speech = previous_turn.speech
+            if previous_speech is None:
+                return False
+            queue_elem = SimBotQueueUtterance(
+                utterance=previous_speech.utterance, role=previous_speech.role
+            )
+
+        session.current_state.utterance_queue.append_to_head(queue_elem)
+        # Add the instruction to toggle the robot arm
+        queue_elem = SimBotQueueUtterance(utterance="toggle the robot arm", role=SpeakerRole.agent)
+        session.current_state.utterance_queue.append_to_head(queue_elem)
+        # Add a new instruction to find the robot arm
+        new_current_utterance = "find the robot arm"
+        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
+            utterance=new_current_utterance,
+            role=SpeakerRole.agent,
+            original_utterance=session.current_turn.speech.original_utterance
+            if session.current_turn.speech
+            else None,
+        )
+
         return True

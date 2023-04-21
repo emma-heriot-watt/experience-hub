@@ -204,6 +204,8 @@ environment_intent_type == "unsupported_navigation" and current_room == "Lab1",L
 
 environment_intent_type == "unsupported_navigation" and current_room == "Lab1" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,The path to the {environment_intent_entity} is blocked. Say - go to the robot arm and toggle the button - to move the object that is blocking the way.,False
 
+environment_intent_type == "unsupported_navigation" and current_room == "Lab1" and physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity == "Robot Arm",Looks like the path is blocked. I am going to try toggling the robot arm to move the blocking object.,True
+
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject",I can't go to it because there's no clear path to it - can you give me another instruction?,False
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject",<say-as interpret-as="interjection">well</say-as> - it looks like there's no way to get there right now. Can you give me another instruction?,False
 
@@ -499,25 +501,80 @@ verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity == "time machine" ,The time machine can restore objects to their original state. For example - repair a broken bowl or undo a carrot transformation - by turning back the time,False
 
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(dino|dinosaur)", You can feed a dinosaur appearing from the past by operating the generator. To generate - go to the monitor with time portal generator written on it and turn it on. Now is the tricky part - Go to the generator only if you have something that can feed the dinosaur. If you disappoint the dino - it might eat you. I am not joking , False
+
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == null, Sorry I was unable to understand which machine you are referring to, False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "coffee maker" , coffee maker - no prizes for guessing - make coffee. To operate - you need to pour coffee beans and water into {verbal_interaction_intent_entity} and turn it on. , False
 
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "embiggenator monitor" , Embiggenator monitor is used to operate - you guessed it right - the embiggenator. Usually - this is a pink color monitor, False
+
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "freeze ray monitor" , Freeze ray monitor is used to operate - you guessed it right - the freeze ray machine. Usually - this is a blue color monitor , False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "freeze ray monitor" , Freeze ray monitor is used to operate - you guessed it right - the freeze ray machine. Usually - this is a blue color monitor , False
+
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "gravity monitor" , Gravity monitor is used to operate the gravity flipper. Usually - this is a green color monitor, False
+
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "laser monitor" , Laser monitor is used to operate the laser cannon. Usually - this is red, False
+
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "portal monitor" , Portal monitor also known as time portal generator is used to operate the generator. Usually - this is black , False
+
 verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and not verbal_interaction_intent_entity =~ "(portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)",I am unaware of any special features of the {verbal_interaction_intent_entity},False
+
+verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator monitor)", Embiggenator monitor is usually a pink monitor with embiggenator written on it ,False
+
+verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually a blue monitor with freeze ray written on it ,False
+verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually a blue monitor with freeze ray written on it ,False
+
+verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(gravity monitor)", Gravity monitor is usually a green color monitor with gravity flipper written on it ,False
+
+verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(laser monitor)", Laser cannon monitor is usually a red monitor with laser cannon written on it ,False
+
+verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(portal monitor)",  Portal monitor is usually a black monitor with time portal generator written on it ,False
 
 verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity == null, Sorry I was unable to understand which object you are referring to,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and not verbal_interaction_intent_entity =~ "(freeze ray|laser|printer|robot arm|wall shelf|fridge|freezer|time machine|toaster|microwave|vending machine|color changer|gravity pad|everything's a carrot machine|embiggenator|sink|milk|cereal box|cake|burger|sandwich|coffee beans|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)", Sorry - I can only help with selected set of machines and devices. Unfortunately - {verbal_interaction_intent_entity} isn't one of them,False
 
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2" ,You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2" ,You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2" ,I have seen {verbal_interaction_intent_entity}s being placed on the gravity flipper. If it is not there - it could be inside the fridge or the microwave - in the break room. ,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2" ,I have seen {verbal_interaction_intent_entity}s being placed on the gravity flipper. If it is not there - it could be inside the fridge or the microwave - in the break room. ,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room != "Lab2" ,{verbal_interaction_intent_entity} may be placed inside the freezer,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room != "Lab2" ,{verbal_interaction_intent_entity} may be placed inside the freezer,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - you may find it inside the freezer - in the break room., False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - you may find it inside the freezer - in the break room., False
+
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(coffee beans)", I have seen {verbal_interaction_intent_entity} being placed in break drawers at times. But it can be any where though.  ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(color changer|gravity pad|everything's a carrot machine)",{verbal_interaction_intent_entity} can be usually found in the quantum lab,False
 
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(dino|dinosaur)", In order for the dinosaur to appear from the past - you have to operate the generator. Go to the monitor with time portal generator written on it and turn it on. Then go to the generator with something that the dinosaur can eat. I repeat - go to the generator with something that the dinosaur can eat. If you go there without food - it may eat you., False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator monitor)", Embiggenator monitor is usually located in the quantum lab. ,False
+
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator)",{verbal_interaction_intent_entity} is usually located in the quantum lab.You may find an {verbal_interaction_intent_entity} in the warehouse as well,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually located in the robotics lab. ,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually located in the robotics lab. ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray|laser|printer|robot arm|wall shelf)",{verbal_interaction_intent_entity} can be usually found in the robotics lab,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(fridge|freezer|time machine|toaster|microwave|vending machine)",{verbal_interaction_intent_entity} can be usually found in the break room,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(gravity monitor)",  Gravity monitor is usually located in the quantum lab. ,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(laser monitor)", Laser cannon monitor is usually located in the robotics lab. ,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room != "Lab2",{verbal_interaction_intent_entity} may be placed inside the fridge,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room != "Lab2",{verbal_interaction_intent_entity} may be placed inside the fridge,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - there is a good chance that it is inside the fridge in the break room. ,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - there is a good chance that it is inside the fridge in the break room. ,False
+
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(portal monitor)", Portal monitor also known as time portal generator is usually located in the quantum lab.  ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(sink)",{verbal_interaction_intent_entity} is usually located in the break room. There may be a {verbal_interaction_intent_entity} in the warehouse as well,False
 
@@ -607,36 +664,3 @@ verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom"
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter,<amazon:emotion name="excited" intensity="low">New room - new task. so what next?</amazon:emotion>,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room != "Lab2",{verbal_interaction_intent_entity} may be placed inside the fridge,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - there is a good chance that it is inside the fridge in the break room. ,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room != "Lab2" ,{verbal_interaction_intent_entity} may be placed inside the freezer,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - you may find it inside the freezer - in the break room., False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2" ,You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2" ,I have seen {verbal_interaction_intent_entity}s being placed on the gravity flipper. If it is not there - it could be inside the fridge or the microwave - in the break room. ,False
-
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(dino|dinosaur)", In order for the dinosaur to appear from the past - you have to operate the generator. Go to the monitor with time portal generator written on it and turn it on. Then go to the generator with something that the dinosaur can eat. I repeat - go to the generator with something that the dinosaur can eat. If you go there without food - it may eat you., False
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(dino|dinosaur)", You can feed a dinosaur appearing from the past by operating the generator. To generate - go to the monitor with time portal generator written on it and turn it on. Now is the tricky part - Go to the generator only if you have something that can feed the dinosaur. If you disappoint the dino - it might eat you. I am not joking , False
-
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "portal monitor" , Portal monitor also known as time portal generator is used to operate the generator. Usually - this is black , False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(portal monitor)", Portal monitor also known as time portal generator is usually located in the quantum lab.  ,False
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(portal monitor)",  Portal monitor is usually a black monitor with time portal generator written on it ,False
-
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "freeze ray monitor" , Freeze ray monitor is used to operate - you guessed it right - the freeze ray machine. Usually - this is a blue color monitor , False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually located in the robotics lab. ,False
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually a blue monitor with freeze ray written on it ,False
-
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "freeze ray monitor" , Freeze ray monitor is used to operate - you guessed it right - the freeze ray machine. Usually - this is a blue color monitor , False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually located in the robotics lab. ,False
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually a blue monitor with freeze ray written on it ,False
-
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "laser monitor" , Laser monitor is used to operate the laser cannon. Usually - this is red, False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(laser monitor)", Laser cannon monitor is usually located in the robotics lab. ,False
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(laser monitor)", Laser cannon monitor is usually a red monitor with laser cannon written on it ,False
-
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "embiggenator monitor" , Embiggenator monitor is used to operate - you guessed it right - the embiggenator. Usually - this is a pink color monitor, False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator monitor)", Embiggenator monitor is usually located in the quantum lab. ,False
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator monitor)", Embiggenator monitor is usually a pink monitor with embiggenator written on it ,False
-
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "gravity monitor" , Gravity monitor is used to operate the gravity flipper. Usually - this is a green color monitor, False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(gravity monitor)",  Gravity monitor is usually located in the quantum lab. ,False
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(gravity monitor)", Gravity monitor is usually a green color monitor with gravity flipper written on it ,False
