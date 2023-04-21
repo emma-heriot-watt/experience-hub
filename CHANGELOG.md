@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.52.0](https://github.com/emma-simbot/experience-hub/compare/v8.51.0...v8.52.0) (2023-04-21)
+
+
+### Features
+
+* iterate over viewpoints ([#533](https://github.com/emma-simbot/experience-hub/issues/533)) ([61db5b9](https://github.com/emma-simbot/experience-hub/commit/61db5b9659a992e9508cba08fd315a3b45eaabb1))
+
 ## [8.51.0](https://github.com/emma-simbot/experience-hub/compare/v8.50.0...v8.51.0) (2023-04-21)
 
 
