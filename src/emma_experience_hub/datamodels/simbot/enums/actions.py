@@ -287,3 +287,7 @@ class SimBotDummyRawActions(Enum):
     DummyLookDown = (  # noqa: WPS115
         f"dummy look down {END_OF_TRAJECTORY_TOKEN}{PREDICTED_ACTION_DELIMITER}"
     )
+
+    # Next / Previous Viewpoint
+    DummyNextViewpoint = f"next viewpoint {END_OF_TRAJECTORY_TOKEN}"  # noqa: WPS115
+    DummyPreviousViewpoint = f"previous viewpoint {END_OF_TRAJECTORY_TOKEN}"  # noqa: WPS115

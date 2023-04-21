@@ -12,7 +12,7 @@ if __name__ == "__main__":
     all_lines_from_csv: list[str] = [line for line in feedback_csv.read_text().split("\n") if line]
 
     header_row = all_lines_from_csv[0]
-    rule_rows = all_lines_from_csv[1:]
+    rule_rows = list(set(all_lines_from_csv[1:]))
 
     logger.info(f"Loaded {len(rule_rows)} rules from the CSV")
 

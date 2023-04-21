@@ -184,6 +184,15 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
             )
         return None
 
+    def should_goto_viewpoint(self, decoded_trajectory: str) -> bool:
+        """Should we for some reason return a dummy action?"""
+        decoded_action_str = self._separate_decoded_trajectory(decoded_trajectory)[0]
+        if decoded_action_str == SimBotDummyRawActions.DummyNextViewpoint.value:
+            return True
+        elif decoded_action_str == SimBotDummyRawActions.DummyPreviousViewpoint.value:
+            return True
+        return False
+
     def _separate_decoded_trajectory(self, decoded_trajectory: str) -> list[str]:
         """Split the decoded trajectory string into a list of action strings.
 

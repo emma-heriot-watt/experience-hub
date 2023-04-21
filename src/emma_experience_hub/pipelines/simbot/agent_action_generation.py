@@ -16,6 +16,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
 )
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectInteractionPayload
+from emma_experience_hub.functions.simbot.viewpoint_iterator import ViewpointPlanner
 from emma_experience_hub.parsers.simbot import (
     SimBotActionPredictorOutputParser,
     SimBotPreviousActionParser,
@@ -49,6 +50,7 @@ class SimBotAgentActionGenerationPipeline:
         self._previous_action_parser = previous_action_parser
         self._simbot_hacks_client = simbot_hacks_client
         self._find_object_pipeline = find_object_pipeline
+        self._viewpoint_action_planner = ViewpointPlanner()
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action to perform on the environment."""
@@ -117,6 +119,9 @@ class SimBotAgentActionGenerationPipeline:
 
         if raw_text_match_prediction is None:
             raise AssertionError("Cannot match raw text to template.")
+
+        if self._action_predictor_response_parser.should_goto_viewpoint(raw_text_match_prediction):
+            return self._viewpoint_action_planner(session, raw_text_match_prediction)
 
         # Try to parse the outcome
         try:

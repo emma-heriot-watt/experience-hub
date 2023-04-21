@@ -1,8 +1,8 @@
 conditions,response,is_lightweight
 environment_intent_type == "already_holding_object",<amazon:domain name="conversational">I can only hold one thing at a time!</amazon:domain>, False
+environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can't hold anything else - my inventory space is limited</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can only hold one thing at a time - and I'm already holding something.</amazon:emotion></prosody>,False
 environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I'm already holding something and I can't hold anything else.</amazon:emotion></prosody>,False
-environment_intent_type == "already_holding_object",<prosody rate="115%"><amazon:emotion name="disappointed" intensity="medium">I can't hold anything else - my inventory space is limited</amazon:emotion></prosody>,False
 
 environment_intent_type == "already_holding_object" and environment_intent_action_type == "Pickup" and environment_intent_entity != null,I can only hold one thing at a time so I cannot pick up the {environment_intent_entity}.,False
 
@@ -18,22 +18,22 @@ environment_intent_type == "already_holding_object" and intent_type_counter["low
 
 environment_intent_type == "already_holding_object" and inventory_entity != null,I am already holding the {inventory_entity}. We should put it down first.,False
 
-environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. What's next?,False
 environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. Can you give me another instruction?,False
+environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. What's next?,False
 
-environment_intent_type == "alternate_navigation_used",I got as close as I could.,False
 environment_intent_type == "alternate_navigation_used",<say-as interpret-as="interjection">all righty</say-as> I think that's close enough,False
 environment_intent_type == "alternate_navigation_used",Hope that's close enough!,False
+environment_intent_type == "alternate_navigation_used",I got as close as I could.,False
 
 environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,I got as close as I could to the {environment_intent_entity},False
-environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">all righty</say-as> - I think that's close enough to the {environment_intent_entity},False
 environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,Hope that's close enough to the {environment_intent_entity}!,False
+environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">all righty</say-as> - I think that's close enough to the {environment_intent_entity},False
 
 environment_intent_type == "arena_unavailable",Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?,False
 
-environment_intent_type == "generic_failure",I'm struggling with this one. Are you able to give me a different instruction?,False
 environment_intent_type == "generic_failure",I'm having some trouble. Can you try rephrase that?,False
 environment_intent_type == "generic_failure",I'm having some trouble and I'm not sure what to do - can you give me another instruction?,False
+environment_intent_type == "generic_failure",I'm struggling with this one. Are you able to give me a different instruction?,False
 
 environment_intent_type == "incorrect_action_format",I tried to perform an action but looks like I don't remember how to do it. Can you give me a different instruction?,False
 
@@ -43,9 +43,9 @@ environment_intent_type == "invalid_object_class",<say-as interpret-as="interjec
 
 environment_intent_type == "invalid_object_class" and environment_intent_entity != null,<say-as interpret-as="interjection">oops</say-as> - I made a mistake in interacting with the {environment_intent_entity}. Could you please give me a different instruction?,False
 
+environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">ouch</say-as>,False
 environment_intent_type == "killed_by_hazard",I am dead,False
 environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">no</say-as>,False
-environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">ouch</say-as>,False
 
 environment_intent_type == "object_not_picked_up",I didn't pick that up for some reason - can you give me a different instruction?,False
 
@@ -62,17 +62,17 @@ environment_intent_type == "object_unpowered" and environment_intent_entity != n
 
 environment_intent_type == "post_process_error",Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?,False
 
-environment_intent_type == "receptacle_is_closed",I can't do that because the thing is closed,False
-environment_intent_type == "receptacle_is_closed",I can't do that because it's closed,False
 environment_intent_type == "receptacle_is_closed",Readjusting my plan,True
+environment_intent_type == "receptacle_is_closed",I can't do that because it's closed,False
+environment_intent_type == "receptacle_is_closed",I can't do that because the thing is closed,False
 
 environment_intent_type == "receptacle_is_closed" and environment_intent_entity != null,I can't do that because the {environment_intent_entity} is closed.,False
 environment_intent_type == "receptacle_is_closed" and environment_intent_entity != null,<say-as interpret-as="interjection">oops</say-as> Need to first open the {environment_intent_entity}.,True
 
-environment_intent_type == "receptacle_is_full",It looks like that is already full.,False
 environment_intent_type == "receptacle_is_full",It looks full - any more and it would overflow!,False
-environment_intent_type == "receptacle_is_full",<amazon:emotion name="disappointed" intensity="low">If we added anything else - it would overflow.</amazon:emotion><prosody rate="fast">and that is a nono!</prosody>,False
 environment_intent_type == "receptacle_is_full",<amazon:emotion name="disappointed" intensity="low">If we added anything else - it would overflow.</amazon:emotion><prosody rate="fast">and that is bad!</prosody>,False
+environment_intent_type == "receptacle_is_full",It looks like that is already full.,False
+environment_intent_type == "receptacle_is_full",<amazon:emotion name="disappointed" intensity="low">If we added anything else - it would overflow.</amazon:emotion><prosody rate="fast">and that is a nono!</prosody>,False
 
 environment_intent_type == "receptacle_is_full" and environment_intent_action_type == "Place" and environment_intent_entity != null,It looks like the {environment_intent_entity} is full.,False
 environment_intent_type == "receptacle_is_full" and environment_intent_action_type == "Place" and environment_intent_entity != null,There's not enough space in the {environment_intent_entity}.,False
@@ -80,8 +80,8 @@ environment_intent_type == "receptacle_is_full" and environment_intent_action_ty
 environment_intent_type == "target_inaccessible" and environment_intent_entity != null,I can't access the {environment_intent_entity} from here. Can you provide me an instruction so it's in my view?,False
 
 environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> it's too far. Can you tell me how to get closer?,False
-environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> I was too far. Let's get closer,True
 environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> Let's get closer,True
+environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> I was too far. Let's get closer,True
 
 environment_intent_type == "target_out_of_range" and  environment_intent_entity != null,The {environment_intent_entity} was too far. Moving closer,True
 
@@ -89,15 +89,15 @@ environment_intent_type == "target_out_of_range" and environment_intent_action_t
 
 environment_intent_type == "target_out_of_range" and environment_intent_entity != null,The {environment_intent_entity} is too far away. I think we should get closer first.,False
 
-environment_intent_type == "unsupported_action",I'm not allowed to perform that action on that object - do you have another instruction to perform?,False
 environment_intent_type == "unsupported_action",I'm not allowed to perform that action on that object - what do you want me to do next?,False
-environment_intent_type == "unsupported_action",I'm not able to perform that action on that object - what do you want me to do next?,False
 environment_intent_type == "unsupported_action",<amazon:domain name="conversational">I'm sorry - I'm afraid I can't do that</amazon:domain>,False
+environment_intent_type == "unsupported_action",I'm not allowed to perform that action on that object - do you have another instruction to perform?,False
+environment_intent_type == "unsupported_action",I'm not able to perform that action on that object - what do you want me to do next?,False
 
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,I'm unable to {environment_intent_action_type} the {environment_intent_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,I can't {environment_intent_action_type} the {environment_intent_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,I'm afraid that I can't {environment_intent_action_type} the {environment_intent_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,I'm not allowed to {environment_intent_action_type} the {environment_intent_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,I'm unable to {environment_intent_action_type} the {environment_intent_entity}.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity =~ "(Action Figure|Can|Dart|Fan|Fork|Hammer|Handsaw|Knife|Circuit Board|Control Panel|Laser Tip|Printer Cartridge|Radio|Screwdriver|Spoon)",Sorry I was unable to {environment_intent_action_type} it. I can only pick up the {environment_intent_entity}.,False
 
@@ -131,15 +131,15 @@ environment_intent_type == "unsupported_action" and environment_intent_action_ty
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and environment_intent_entity =~ "(Bowl|Mug)" and inventory_entity == null,I'm not holding anything to pour into the {environment_intent_entity}. We should first pick it up!,False
 
-environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity != null and environment_intent_entity != null,I was unable to pour the {inventory_entity} in the {environment_intent_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity != null and environment_intent_entity != null,I'm afraid  I can't pour the {inventory_entity} in the {environment_intent_entity}.,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity != null and environment_intent_entity != null,I was unable to pour the {inventory_entity} in the {environment_intent_entity}.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity == "Embiggenator",To activate the embiggenator we should find the pink computer and turn that on.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity == "Freeze Ray",To activate the freeze ray we should find the blue computer and turn that on.,False
 
-environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity == "Fuse Box",I can't turn on the fuse box. I can open it and if there's a lever inside I could turn that on.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity == "Fuse Box",I couldn't turn on the fuse box. If there's a lever inside I think I could turn that on.,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity == "Fuse Box",I can't turn on the fuse box. I can open it and if there's a lever inside I could turn that on.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Toggle" and environment_intent_entity == "Gravity Pad",To activate the gravity flipper we should find the green computer and turn that on.,False
 
@@ -148,11 +148,11 @@ environment_intent_type == "unsupported_action" and environment_intent_action_ty
 environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Clean|Fill)" and environment_intent_entity == "Sink",Let's try toggling the sink first.,True
 environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Clean|Fill)" and environment_intent_entity == "Sink",Let's try one more time.,True
 
+environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,I'm unable to {environment_intent_action_type} the {inventory_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,I can't {environment_intent_action_type} the {inventory_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,I'm afraid that I can't {environment_intent_action_type} the {inventory_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,I'm not allowed to {environment_intent_action_type} the {inventory_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,I'm unable to {environment_intent_action_type} the {inventory_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,Sorry - I can't {environment_intent_action_type} the {inventory_entity}.,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type =~ "(Place|Pour|Fill|Clean)" and inventory_entity != null,I'm not allowed to {environment_intent_action_type} the {inventory_entity}.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_entity == "Button",Sorry I can only push the button.,False
 
@@ -195,9 +195,9 @@ environment_intent_type == "unsupported_action" and environment_intent_entity =~
 environment_intent_type == "unsupported_action" and environment_intent_entity =~ "(Table|Shelf|Wall Shelf|Counter Top|Cutting Board|Dart Board|Tray|Gravity Pad|Embiggenator)",I can only place objects on the {environment_intent_entity}.,False
 
 environment_intent_type == "unsupported_navigation",<amazon:domain name="conversational">Looks like I can't go there - can you give me another instruction?</amazon:domain>,False
-environment_intent_type == "unsupported_navigation",<amazon:domain name="conversational">I can't calculate a path without anything in the way</amazon:domain>,False
 environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">darn</say-as> - There's no clear path - do you have a different instruction?,False
 environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">le sigh</say-as> - I'm unable to figure out a clear route. Can you give me another instruction?,False
+environment_intent_type == "unsupported_navigation",<amazon:domain name="conversational">I can't calculate a path without anything in the way</amazon:domain>,False
 environment_intent_type == "unsupported_navigation",<say-as interpret-as="interjection">oops</say-as> - I can't go where I wanted to go - do you have another instruction?,False
 
 environment_intent_type == "unsupported_navigation" and current_room == "Lab1",Looks like the path is blocked. Say - go to the robot arm and toggle the button - to move the object that is blocking the way.,False
@@ -210,14 +210,14 @@ environment_intent_type == "unsupported_navigation" and environment_intent_actio
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject",<say-as interpret-as="interjection">well</say-as> - it looks like there's no way to get there right now. Can you give me another instruction?,False
 
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,there's no clear path to the {environment_intent_entity} - can you give me a different instruction?,False
-environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">well</say-as> - it looks like I can't go to the {environment_intent_entity} because there's no way to get there. Do you have a different instruction for me to try?,False
 environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">darn</say-as> - I can't find a route to the {environment_intent_entity} - can you give me a different instruction?,False
+environment_intent_type == "unsupported_navigation" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">well</say-as> - it looks like I can't go to the {environment_intent_entity} because there's no way to get there. Do you have a different instruction for me to try?,False
 
 interaction_action_type == "Break",<say-as interpret-as="interjection">boom</say-as>,False
 
-interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Let's break some records today</amazon:emotion>,False
-interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="medium">Looks like we're smashing records today?</amazon:emotion>,False
 interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="medium">I'm hammering away at this task!</amazon:emotion>,False
+interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="medium">Looks like we're smashing records today?</amazon:emotion>,False
+interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Let's break some records today</amazon:emotion>,False
 interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Breaking records is always music to my ears</amazon:emotion>,False
 
 interaction_action_type == "Clean" and interaction_action_entity != null and inventory_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I'll get the {inventory_entity} sparkling clean in no time!</amazon:emotion>,True
@@ -234,12 +234,14 @@ interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity == null,This time machine can be used to turn objects into their original state! Let's find something that we can repair before using the time machine.,False
 
+interaction_action_type == "MoveForward" and action_type_counter["MoveForward"] > 1 and current_room != null,If you want to move faster through the {current_room} say - next viewpoint - and I will move to a new location in this room, False
+
 interaction_action_type == "Pickup" and current_room == "SmallOffice" and interaction_action_entity == "Floppy Disk",The floppy disk can be inserted in an infected computer to fix it. You can tell a computer is infected by the skull on its screen,False
 
 interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="low">We can make fresh coffee by pouring coffee beans and water into the coffee maker.</amazon:emotion>,False
 
-interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">{interaction_action_entity} retrieved!</amazon:emotion>,True
 interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">Got the {interaction_action_entity}!</amazon:emotion>,True
+interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">{interaction_action_entity} retrieved!</amazon:emotion>,True
 
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",Oops - not sure if this is an infected computer. Help me remove the floppy disk and move to another computer.,False
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",I think this is not an infected computer. Let's first remove the floppy disk and then help me move to another one.,False
@@ -266,15 +268,15 @@ interaction_action_type =~ "(GotoRoom|GotoObject)",Getting there!,True
 physical_interaction_intent_type != null,',False
 physical_interaction_intent_type != null,',True
 
-physical_interaction_intent_type == "act_one_match",Done,False
-physical_interaction_intent_type == "act_one_match",Alright,False
 physical_interaction_intent_type == "act_one_match",So what should I do next?,False
+physical_interaction_intent_type == "act_one_match",',True
+physical_interaction_intent_type == "act_one_match",Alright what's next?,False
 physical_interaction_intent_type == "act_one_match",So what's next?,False
+physical_interaction_intent_type == "act_one_match",Alright,False
+physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">okey dokey</say-as>,False
+physical_interaction_intent_type == "act_one_match",Done,False
 physical_interaction_intent_type == "act_one_match",Now what?,False
 physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">righto</say-as>,False
-physical_interaction_intent_type == "act_one_match",Alright what's next?,False
-physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">okey dokey</say-as>,False
-physical_interaction_intent_type == "act_one_match",',True
 
 physical_interaction_intent_type == "act_one_match" and interaction_action_type == "Pickup" and interaction_action_entity != null,So what are we doing with the {interaction_action_entity}?,False
 
@@ -282,21 +284,21 @@ physical_interaction_intent_type == "search" and current_room != null and intera
 
 physical_interaction_intent_type == "search" and current_room != null and physical_interaction_intent_entity != null and interaction_action_type == null,I searched for the {physical_interaction_intent_entity} in the {current_room} but I didn't see it. Maybe we should look in another room?,False
 
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
 physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - what are we doing next?,False
 physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - now what should I do?,False
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "GotoObject" and interaction_action_per_turn[-1]["type"] == "Scan" and not utterance_queue_not_empty,Found the {interaction_action_entity} - I should mark it with a cross on my map,False
 
+physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",{interaction_action_entity} detected,True
 physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",Found the {interaction_action_entity},True
 physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",Found the {interaction_action_entity} - I am getting closer,True
 physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",Detected the {interaction_action_entity},True
-physical_interaction_intent_type == "search" and interaction_action_entity != null and interaction_action_entity != "Background" and interaction_action_type == "Scan",{interaction_action_entity} detected,True
 
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,<amazon:emotion name="excited" intensity="medium">Search complete!</amazon:emotion> What should I do next?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Search complete! What are we doing next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,I think I found it - what are we doing next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Now what should I do?,False
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Okay what's next?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,What are we doing next?,False
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Search complete! What are we doing next?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,Okay what's next?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and not utterance_queue_not_empty,<amazon:emotion name="excited" intensity="medium">Search complete!</amazon:emotion> What should I do next?,False
 
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoObject" and utterance_queue_not_empty,',True
 
@@ -309,14 +311,14 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Got
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I think we saw it somewhere here.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,It should be somewhere here.,True
 
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still searching,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe a new perspective will help!,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still looking,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still searching,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Searching from a new spot,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,',True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe it's somewhere here,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's try one more spot,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Searching from a new spot,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe a new perspective will help!,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,',True
 
 physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] == "GotoPosition",',True
 
@@ -325,12 +327,12 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Rot
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,I can't find it. Can you give me another instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty,Sorry I don't see it. Can you give me another instruction?,False
 
-physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,I couldn't find the {physical_interaction_intent_entity}.,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,Sorry I don't see the {physical_interaction_intent_entity}. Can you give me a different instruction?,False
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,<amazon:emotion name="disappointed" intensity="medium"> I am sorry I couldn't find the {physical_interaction_intent_entity}.</amazon:emotion><amazon:emotion name="disappointed" intensity="low">.</amazon:emotion> Can I get a different instruction?,False
+physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and not find_queue_not_empty and physical_interaction_intent_entity != null,I couldn't find the {physical_interaction_intent_entity}.,False
 
-physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I think we saw the {physical_interaction_intent_entity} somewhere here.,True
 physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I remember seeing the {physical_interaction_intent_entity} from here,True
+physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I think we saw the {physical_interaction_intent_entity} somewhere here.,True
 
 physical_interaction_intent_type == "search" and physical_interaction_intent_entity != null and interaction_action_type == "GotoViewpoint" and find_queue_not_empty, Hmm - now where would the {physical_interaction_intent_entity} be?,True
 
@@ -361,12 +363,12 @@ physical_interaction_intent_type == "search" and verbal_interaction_intent_type 
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null,Let's search the {current_room}!,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and current_room != null,<amazon:emotion name="excited" intensity="low">Let me have a look around the room!</amazon:emotion>,True
 
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,Let's find the {physical_interaction_intent_entity}.,True
-physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,Looking for the {physical_interaction_intent_entity}.,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">Now let's find the {physical_interaction_intent_entity}.</amazon:emotion>,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,Looking for the {physical_interaction_intent_entity}.,True
+physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,Let's find the {physical_interaction_intent_entity}.,True
 
-user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Moving to the {interaction_action_entity},True
 user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Let me get to the {interaction_action_entity},True
+user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Moving to the {interaction_action_entity},True
 
 user_intent_type != "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,Going to the {interaction_action_entity},True
 
@@ -380,12 +382,12 @@ user_intent_type == "ask_about_agent" and current_room =~ "(Lab1|Lab2|Warehouse)
 
 user_intent_type == "ask_about_agent" and current_room =~ "(SmallOffice|MainOffice|Reception)",If you break down the tasks into step-by-step instructions - I'll do my best to follow! I can move around - turn - go to different rooms - or I can search for objects and go to them. With my hands - I can pick up small objects like a floppy disk - and then insert it in a computer with a slot. You can also ask me to scan nearby objects. So what's next?,False
 
-user_intent_type == "ask_about_game",Our mission is to complete the tasks on the upper-left of your screen. I don't know what the tasks are - you have to break them down and tell me what to do. If you want to know more about what I can do say - what can you do. Let's go!,False
 user_intent_type == "ask_about_game",We need to complete the tasks on your screen. Give me step-by-step instructions and I'll do my best to follow them. If you want to know more about what I can do - say - what can you do. For more hints - try reading a sticky note! So what's next?,False
+user_intent_type == "ask_about_game",Our mission is to complete the tasks on the upper-left of your screen. I don't know what the tasks are - you have to break them down and tell me what to do. If you want to know more about what I can do say - what can you do. Let's go!,False
 
-user_intent_type == "confirm_no", Okay so what should I do?, True
 user_intent_type == "confirm_no", Can you give me a different instruction?, True
 user_intent_type == "confirm_no", So what's next?, True
+user_intent_type == "confirm_no", Okay so what should I do?, True
 
 user_intent_type == "confirm_no" and interaction_action_per_turn[-1]["type"] == "GotoObject" and interaction_action_per_turn[-1]["goto"]["object"]["name"] == "Computer" and inventory_entity == "Floppy Disk",Alright - you can help me navigate to another computer. Start by telling me to turn left or right - or even go to a different room.,False
 
@@ -400,24 +402,24 @@ user_intent_type == "confirm_yes" and interaction_action_per_turn[-1]["type"] ==
 
 user_intent_type == "confirm_yes" and interaction_action_per_turn[-1]["type"] == "Place" and interaction_action_per_turn[-1]["place"]["object"]["name"] == "Gravity Pad",Going to the green computer. Get ready to see things <amazon:emotion name="excited" intensity="medium"> upside down!</amazon:emotion>,True
 
-user_intent_type == "confirm_yes" and interaction_action_per_turn[-1]["type"] == "Place" and interaction_action_per_turn[-1]["place"]["object"]["name"] == "Laser Shelf",Let me activate the laser. <amazon:emotion name="excited" intensity="medium">Hold tight!</amazon:emotion>,True
 user_intent_type == "confirm_yes" and interaction_action_per_turn[-1]["type"] == "Place" and interaction_action_per_turn[-1]["place"]["object"]["name"] == "Laser Shelf",<amazon:emotion name="excited" intensity="medium">Ok lets do it!</amazon:emotion>,True
+user_intent_type == "confirm_yes" and interaction_action_per_turn[-1]["type"] == "Place" and interaction_action_per_turn[-1]["place"]["object"]["name"] == "Laser Shelf",Let me activate the laser. <amazon:emotion name="excited" intensity="medium">Hold tight!</amazon:emotion>,True
 
 user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",On my way,True
 user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",I am on my way!,True
 
-user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="low">On it!</amazon:emotion>,True
 user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="low">Starting the search!</amazon:emotion>,True
 user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="low">Let's find it!</amazon:emotion>,True
+user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="low">On it!</amazon:emotion>,True
 
 user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and verbal_interaction_intent_entity != null,Alright - Searching for the {verbal_interaction_intent_entity}.,True
 
 user_intent_type == "empty_utterance",Did you say anything?,False
-user_intent_type == "empty_utterance",<say-as interpret-as="interjection">er</say-as> - Did you say anything?,False
 user_intent_type == "empty_utterance",<say-as interpret-as="interjection">hmm</say-as> - i didnt register anything there,False
+user_intent_type == "empty_utterance",<say-as interpret-as="interjection">er</say-as> - Did you say anything?,False
 
-user_intent_type == "greeting",Hi there - what's next?,False
 user_intent_type == "greeting",Hi - What should I do next?,False
+user_intent_type == "greeting",Hi there - what's next?,False
 
 user_intent_type == "greeting" and intent_type_counter["user_intent_type"] == 1,Hi - what would you like me to do? If you want to know more about the game ask me what is the game. If you want to know about my capabilities tell me what can you do.,False
 
@@ -435,11 +437,11 @@ user_intent_type == "incomplete_utterance_pick", Sorry I wasn't able to understa
 
 user_intent_type == "low_asr_confidence",I'm not sure I got that,False
 user_intent_type == "low_asr_confidence",I'm not sure I got that - I'll wait here until you tell me what to do next,False
-user_intent_type == "low_asr_confidence",I didn't quite catch that properly - could you say it again?,False
-user_intent_type == "low_asr_confidence",I didn't hear that properly - could you say it again?,False
-user_intent_type == "low_asr_confidence",I didn't hear that properly - can you say it again?,False
 user_intent_type == "low_asr_confidence",I didn't hear properly - can you repeat that?,False
+user_intent_type == "low_asr_confidence",I didn't quite catch that properly - could you say it again?,False
 user_intent_type == "low_asr_confidence",I didn't hear properly - can you say repeat that?,False
+user_intent_type == "low_asr_confidence",I didn't hear that properly - can you say it again?,False
+user_intent_type == "low_asr_confidence",I didn't hear that properly - could you say it again?,False
 
 user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] == 1,Sorry I wasn't able to understand what you said. Are you able to repeat that?,False
 
@@ -450,10 +452,10 @@ user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confid
 user_intent_type == "not_enough_information",Sorry what would you like me to do next?,False
 
 user_intent_type == "only_wake_word",Yes?,False
-user_intent_type == "only_wake_word",Hi - how can I help?,False
 user_intent_type == "only_wake_word",<say-as interpret-as="interjection">huh</say-as> - what can i do for you?,False
 user_intent_type == "only_wake_word",<say-as interpret-as="interjection">ay</say-as> - what do you need?,False
 user_intent_type == "only_wake_word",<say-as interpret-as="interjection">hiya</say-as> - how can i help?,False
+user_intent_type == "only_wake_word",Hi - how can I help?,False
 
 user_intent_type == "out_of_domain",Sorry I can't help with that.,False
 
@@ -470,16 +472,16 @@ user_intent_type == "profanity",Sorry I can't help with that.,False
 verbal_interaction_intent_type == "act_no_match" and verbal_interaction_intent_entity == null and physical_interaction_intent_type == null,I'm not sure what to do. Can you give me another instruction?,False
 verbal_interaction_intent_type == "act_no_match" and verbal_interaction_intent_entity == null and physical_interaction_intent_type == null,I don't see it in front of me. You can ask me to search for objects or give me another instruction,False
 
-verbal_interaction_intent_type == "act_too_many_matches",Which one are you referring to?,False
 verbal_interaction_intent_type == "act_too_many_matches",I can see several - which do you want?,False
 verbal_interaction_intent_type == "act_too_many_matches",I'm not sure which one you mean?,False
+verbal_interaction_intent_type == "act_too_many_matches",Which one are you referring to?,False
 
-verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} are you referring to?,False
-verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} do you mean?,False
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I can see more than one - which {verbal_interaction_intent_entity} do you mean?,False
-verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I can see several - which {verbal_interaction_intent_entity} do you want?,False
+verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} do you mean?,False
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I'm not sure which {verbal_interaction_intent_entity} you mean?,False
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I'm not sure which {verbal_interaction_intent_entity} you want?,False
+verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I can see several - which {verbal_interaction_intent_entity} do you want?,False
+verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} are you referring to?,False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and not verbal_interaction_intent_entity =~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)",I am unaware of any special capabilities of the {verbal_interaction_intent_entity},False
 
@@ -510,7 +512,6 @@ verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "embiggenator monitor" , Embiggenator monitor is used to operate - you guessed it right - the embiggenator. Usually - this is a pink color monitor, False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "freeze ray monitor" , Freeze ray monitor is used to operate - you guessed it right - the freeze ray machine. Usually - this is a blue color monitor , False
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "freeze ray monitor" , Freeze ray monitor is used to operate - you guessed it right - the freeze ray machine. Usually - this is a blue color monitor , False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "gravity monitor" , Gravity monitor is used to operate the gravity flipper. Usually - this is a green color monitor, False
 
@@ -522,7 +523,6 @@ verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_
 
 verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator monitor)", Embiggenator monitor is usually a pink monitor with embiggenator written on it ,False
 
-verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually a blue monitor with freeze ray written on it ,False
 verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually a blue monitor with freeze ray written on it ,False
 
 verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(gravity monitor)", Gravity monitor is usually a green color monitor with gravity flipper written on it ,False
@@ -536,15 +536,11 @@ verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and not verbal_interaction_intent_entity =~ "(freeze ray|laser|printer|robot arm|wall shelf|fridge|freezer|time machine|toaster|microwave|vending machine|color changer|gravity pad|everything's a carrot machine|embiggenator|sink|milk|cereal box|cake|burger|sandwich|coffee beans|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)", Sorry - I haven't encountered {verbal_interaction_intent_entity} during our mission. Neither I have any special clue on where {verbal_interaction_intent_entity} be., False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2" ,You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2" ,You may find {verbal_interaction_intent_entity} inside the fridge. However - there is a good chance that it is inside the microwave. ,False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2" ,I have seen {verbal_interaction_intent_entity}s being placed on the gravity flipper. If it is not there - it could be inside the fridge or the microwave - in the break room. ,False
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2" ,I have seen {verbal_interaction_intent_entity}s being placed on the gravity flipper. If it is not there - it could be inside the fridge or the microwave - in the break room. ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room != "Lab2" ,{verbal_interaction_intent_entity} may be placed inside the freezer,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room != "Lab2" ,{verbal_interaction_intent_entity} may be placed inside the freezer,False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - you may find it inside the freezer - in the break room., False
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - you may find it inside the freezer - in the break room., False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(coffee beans)", I have seen {verbal_interaction_intent_entity} being placed in break drawers at times. But it can be any where though.  ,False
@@ -558,7 +554,6 @@ verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_in
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(embiggenator)",{verbal_interaction_intent_entity} is usually located in the quantum lab.You may find an {verbal_interaction_intent_entity} in the warehouse as well,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually located in the robotics lab. ,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray monitor)", Freeze ray monitor is usually located in the robotics lab. ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(freeze ray|laser|printer|robot arm|wall shelf)",{verbal_interaction_intent_entity} can be usually found in the robotics lab,False
 
@@ -569,9 +564,7 @@ verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_in
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(laser monitor)", Laser cannon monitor is usually located in the robotics lab. ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room != "Lab2",{verbal_interaction_intent_entity} may be placed inside the fridge,False
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room != "Lab2",{verbal_interaction_intent_entity} may be placed inside the fridge,False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - there is a good chance that it is inside the fridge in the break room. ,False
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(milk|cereal box)" and current_room == "Lab2", I have seen {verbal_interaction_intent_entity} being placed on the gravity flipper. If it is not there - there is a good chance that it is inside the fridge in the break room. ,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity =~ "(portal monitor)", Portal monitor also known as time portal generator is usually located in the quantum lab.  ,False
@@ -580,8 +573,8 @@ verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_in
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity == null, Sorry I was unable to understand which object you are referring to,False
 
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",Hmm - is this an infected computer that we should fix with the floppy disk?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",I can't tell if this is an infected computer - does it look like one?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",Hmm - is this an infected computer that we should fix with the floppy disk?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Embiggenator" and inventory_entity != null,Shall we use the embiggenator on the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Embiggenator" and inventory_entity != null,I have an idea - shall we use the embiggenator on the {inventory_entity}?,False
@@ -605,11 +598,11 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Got to the robot arm, should I activate it?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Do you want me to activate the robot arm?,False
 
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity == "Plate" and inventory_entity != null,Do you want me to clean the plate?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity == "Plate" and inventory_entity != null,I see what we are trying to do here. Do you want me to clean the plate?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity == "Plate" and inventory_entity != null,Do you want me to clean the plate?,False
 
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity =~ "(Bowl|Mug|Coffee Pot)" and inventory_entity != null,Do you want me to fill up the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity =~ "(Bowl|Mug|Coffee Pot)" and inventory_entity != null,I see what we are trying to do here. Do you want me to fill the {inventory_entity} with water?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Sink" and inventory_entity =~ "(Bowl|Mug|Coffee Pot)" and inventory_entity != null,Do you want me to fill up the {inventory_entity}?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity != null,Do you want me to use the time machine on the {inventory_entity}?,False
 
@@ -620,16 +613,16 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Embiggenator" and inventory_entity != null,Shall we use the embiggenator on the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Embiggenator" and inventory_entity != null,Do you want me to activate the embiggenator?,False
 
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Freeze Ray Shelf" and inventory_entity != null,I see what we are trying to do here. Shall we freeze the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Freeze Ray Shelf" and inventory_entity != null,I think I know what to do - do you want me to freeze the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Freeze Ray Shelf" and inventory_entity != null,Shall we freeze the {inventory_entity}?,False
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Freeze Ray Shelf" and inventory_entity != null,I see what we are trying to do here. Shall we freeze the {inventory_entity}?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Gravity Pad" and inventory_entity != null,Shall we use the gravity flipper on the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Gravity Pad" and inventory_entity != null,Do you want me to activate the gravity flipper?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Laser Shelf" and inventory_entity != null,I think I know what to do - do you want me to defrost the {inventory_entity}?,False
-verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Laser Shelf" and inventory_entity != null,Shall we defrost the {inventory_entity}?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Laser Shelf" and inventory_entity != null,I see what we are trying to do here. Shall we defrost the {inventory_entity}?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Laser Shelf" and inventory_entity != null,Shall we defrost the {inventory_entity}?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Microwave" and inventory_entity != null,Shall I use the microwave to heat up the {inventory_entity}?,False
 
@@ -639,26 +632,26 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "Place" and interaction_action_entity == "Time Machine" and inventory_entity != null and inventory_entity =~ "(Bowl|Trophy|Record|Floppy Disk)",Do you want me to repair the {inventory_entity}?,False
 
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it first?,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity} in front of me. Should I start by finding it?,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,The {verbal_interaction_intent_entity} is not in my view. I should first look for it - right?,False
 verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,My vision system is not detecting the {verbal_interaction_intent_entity}. Should I first search for it?,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity} in front of me. Should I start by finding it?,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it first?,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,The {verbal_interaction_intent_entity} is not in my view. I should first look for it - right?,False
 
-verbal_interaction_intent_type == "generic_success",So what should I do next?,False
 verbal_interaction_intent_type == "generic_success",Now what?,False
 verbal_interaction_intent_type == "generic_success",<say-as interpret-as="interjection">righto</say-as>,False
 verbal_interaction_intent_type == "generic_success",Alright - what's next?,False
+verbal_interaction_intent_type == "generic_success",So what should I do next?,False
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom",<amazon:emotion name="excited" intensity="medium">Made it!</amazon:emotion>,False
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom",So what should I do here?,False
 
-verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Still in the {current_room} - what next?,False
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Staying in the {current_room} - now what?,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and current_room != null,Still in the {current_room} - what next?,False
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and interaction_action_entity != null,Staying in the {interaction_action_entity},True
 
-verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,In the {interaction_action_entity} - now what?,False
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I am in the {interaction_action_entity},False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,In the {interaction_action_entity} - now what?,False
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I got to the {interaction_action_entity},False
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
