@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.48.0](https://github.com/emma-simbot/experience-hub/compare/v8.47.1...v8.48.0) (2023-04-21)
+
+
+### Features
+
+* QA enhancements and dinasaur related responses ([#530](https://github.com/emma-simbot/experience-hub/issues/530)) ([e36a322](https://github.com/emma-simbot/experience-hub/commit/e36a322c924a399f26874e0369d9ca4abc285c5f))
+
 ## [8.47.1](https://github.com/emma-simbot/experience-hub/compare/v8.47.0...v8.47.1) (2023-04-20)
 
 
