@@ -240,6 +240,11 @@ class SimBotAction(BaseModel):
         return self.type == SimBotActionType.Place
 
     @property
+    def is_pour(self) -> bool:
+        """Does the action remove the object from the inventory?"""
+        return self.type == SimBotActionType.Pour
+
+    @property
     def transforms_object(self) -> bool:
         """Does the action tranform the object to a different type of object?"""
         return (

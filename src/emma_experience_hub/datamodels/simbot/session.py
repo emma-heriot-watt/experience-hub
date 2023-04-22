@@ -587,6 +587,7 @@ class SimBotSession(BaseModel):
             self.current_turn.state.inventory = SimBotInventory.from_action(
                 self.previous_valid_turn.actions.interaction,
                 self.previous_valid_turn.idx,
+                self.previous_valid_turn.state.inventory.entity,
             )
 
             past_turns = self.get_past_turns_with_actions(self.turns)[:-1]

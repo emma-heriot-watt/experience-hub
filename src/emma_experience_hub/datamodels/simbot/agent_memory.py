@@ -244,7 +244,9 @@ class SimBotInventory(BaseModel, validate_assignment=True):
         return not bool(self.entity)
 
     @classmethod
-    def from_action(cls, action: SimBotAction, turn_idx: int) -> "SimBotInventory":
+    def from_action(
+        cls, action: SimBotAction, turn_idx: int, previous_inventory: Optional[str]
+    ) -> "SimBotInventory":
         """Instantiate an inventory from the action."""
         if action.adds_object_to_inventory and action.is_successful:
             entity_name = action.payload.entity_name
@@ -253,6 +255,9 @@ class SimBotInventory(BaseModel, validate_assignment=True):
             return cls(entity=entity_name, turn_idx=turn_idx)
 
         if action.removes_object_from_inventory and action.is_successful:
+            return cls(entity=None, turn_idx=turn_idx)
+
+        if action.is_pour and previous_inventory == "coffee beans" and action.is_successful:
             return cls(entity=None, turn_idx=turn_idx)
 
         raise AssertionError("Action does not alter/change the inventory in any way")
