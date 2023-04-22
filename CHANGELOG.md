@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.54.1](https://github.com/emma-simbot/experience-hub/compare/v8.54.0...v8.54.1) (2023-04-22)
+
+
+### Bug Fixes
+
+* remove coffee beans from inventory after pour ([#536](https://github.com/emma-simbot/experience-hub/issues/536)) ([92ff2c2](https://github.com/emma-simbot/experience-hub/commit/92ff2c2d91084cdafb068b4dc5d1b597988a0040))
+
 ## [8.54.0](https://github.com/emma-simbot/experience-hub/compare/v8.53.0...v8.54.0) (2023-04-22)
 
 
