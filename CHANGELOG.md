@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.54.0](https://github.com/emma-simbot/experience-hub/compare/v8.53.0...v8.54.0) (2023-04-22)
+
+
+### Features
+
+* Allow anticipator to place objects after pouring without confirmation ([#537](https://github.com/emma-simbot/experience-hub/issues/537)) ([66264a6](https://github.com/emma-simbot/experience-hub/commit/66264a62532a12ed2a84c72488ad912a679d45fe))
+
 ## [8.53.0](https://github.com/emma-simbot/experience-hub/compare/v8.52.0...v8.53.0) (2023-04-22)
 
 
