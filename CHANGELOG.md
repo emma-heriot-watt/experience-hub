@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.53.0](https://github.com/emma-simbot/experience-hub/compare/v8.52.0...v8.53.0) (2023-04-22)
+
+
+### Features
+
+* Different search budget per room ([#535](https://github.com/emma-simbot/experience-hub/issues/535)) ([b88e03c](https://github.com/emma-simbot/experience-hub/commit/b88e03c33761d212ff3da44012309e308b972292))
+
 ## [8.52.0](https://github.com/emma-simbot/experience-hub/compare/v8.51.0...v8.52.0) (2023-04-21)
 
 
