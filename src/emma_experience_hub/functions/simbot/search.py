@@ -6,6 +6,7 @@ from loguru import logger
 from numpy import typing
 
 from emma_experience_hub.constants.model import END_OF_TRAJECTORY_TOKEN, PREDICTED_ACTION_DELIMITER
+from emma_experience_hub.constants.simbot import get_search_budget
 from emma_experience_hub.datamodels.common import ArenaLocation, GFHLocationType
 from emma_experience_hub.datamodels.simbot import SimBotAction, SimBotActionType, SimBotSession
 from emma_experience_hub.datamodels.simbot.payloads import (
@@ -152,30 +153,33 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
 
     def __init__(
         self,
-        distance_threshold: float = 3.0,
-        vertex_budget: int = 2,
         use_current_position: bool = True,
         rotation_magnitude: float = 90,
         gfh_location_type: GFHLocationType = GFHLocationType.location,
     ) -> None:
         super().__init__(rotation_magnitude=rotation_magnitude)
-
-        self.distance_threshold = distance_threshold
-        self.viewpoint_budget = vertex_budget
+        self.search_budget = get_search_budget()
         self.use_current_position = use_current_position
         self.gfh_location_type = gfh_location_type
 
-    def get_coverage_sets(self, coords: typing.NDArray[np.float64]) -> typing.NDArray[np.float64]:
+    def get_coverage_sets(
+        self, coords: typing.NDArray[np.float64], current_room: str
+    ) -> typing.NDArray[np.float64]:
         """Get the set of viewpoints covered by each other point."""
         # Fast pairwise euclidean distance instead of computing 1-by-1.
         pairwise_distances = np.sqrt(
             ((coords[:, :, None] - coords[:, :, None].T) ** 2).sum(1)  # noqa: WPS221
         )
-        coverage_sets = np.array(pairwise_distances <= self.distance_threshold, dtype=int)
+        coverage_sets = np.array(
+            pairwise_distances <= self.search_budget[current_room].distance_threshold, dtype=int
+        )
         return coverage_sets
 
     def select_based_on_maximum_coverage(
-        self, coverage_sets: typing.NDArray[np.float64], first_selected_idx: Optional[int] = None
+        self,
+        coverage_sets: typing.NDArray[np.float64],
+        current_room: str,
+        first_selected_idx: Optional[int] = None,
     ) -> list[int]:
         """Greedy algorithm for selecting the viewpoints resulting in maximum coverage.
 
@@ -184,7 +188,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         selected by the algorithm.
         """
         selected_viewpoints = []
-        for iteration in range(self.viewpoint_budget):
+        for iteration in range(self.search_budget[current_room].viewpoint_budget):
             if np.all(coverage_sets.sum(1) == 0):
                 break
             if iteration == 0 and first_selected_idx is not None:
@@ -264,6 +268,7 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         gfh_location: Optional[ArenaLocation] = None,
     ) -> list[SimBotAction]:
         """Get the actions produced by the planner."""
+        current_room = session.current_turn.environment.current_room
         (name_candidates, location_candidates, first_selected_idx) = self.get_vertex_candidates(
             session
         )
@@ -291,10 +296,12 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         location_candidates_array = np.array(location_candidates)
         name_candidates_array = np.array(name_candidates)
 
-        coverage_sets = self.get_coverage_sets(location_candidates_array)
+        coverage_sets = self.get_coverage_sets(
+            location_candidates_array, current_room=current_room
+        )
         # Select the maximum coverage location, force the first one to be the robot location
         selected_room_locations = self.select_based_on_maximum_coverage(
-            coverage_sets, first_selected_idx=first_selected_idx
+            coverage_sets, current_room=current_room, first_selected_idx=first_selected_idx
         )
         if selected_room_locations:
             for name in name_candidates_array[selected_room_locations]:

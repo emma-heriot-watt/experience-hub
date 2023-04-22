@@ -1,0 +1,9 @@
+{
+	"BreakRoom": { "vertex_budget": 2, "distance_threshold": 4 },
+	"Lab1": { "vertex_budget": 2, "distance_threshold": 4 },
+	"Lab2": { "vertex_budget": 3, "distance_threshold": 3 },
+	"MainOffice": { "vertex_budget": 3, "distance_threshold": 3 },
+	"Reception": { "vertex_budget": 2, "distance_threshold": 4 },
+	"SmallOffice": { "vertex_budget": 2, "distance_threshold": 3 },
+	"Warehouse": { "vertex_budget": 3, "distance_threshold": 3 }
+}

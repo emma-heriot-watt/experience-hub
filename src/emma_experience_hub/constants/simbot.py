@@ -8,6 +8,7 @@ from typing import Any
 
 import orjson
 
+from emma_experience_hub.common.settings.simbot import SimBotRoomSearchBudget
 from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 
 
@@ -97,6 +98,16 @@ def get_prior_memory() -> dict[str, str]:
     json_path = constants_absolute_path.joinpath("simbot", "prior_memory.json")
     with open(json_path) as json_file:
         return json.load(json_file)
+
+
+@lru_cache(maxsize=1)
+def get_search_budget() -> dict[str, SimBotRoomSearchBudget]:
+    """Load the search_budget per room from file."""
+    json_path = constants_absolute_path.joinpath("simbot", "search_budget.json")
+    rooms = get_simbot_room_names()
+    with open(json_path) as json_file:
+        search_budget = json.load(json_file)
+    return {room: SimBotRoomSearchBudget(**search_budget[room]) for room in rooms}
 
 
 ACTION_SYNONYMS: Mapping[SimBotActionType, set[str]] = MappingProxyType(

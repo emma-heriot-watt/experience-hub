@@ -146,3 +146,10 @@ class SimBotSettings(BaseSettings):
     def is_not_offline_evaluation(self) -> bool:
         """Are we not running the offline evaluation?"""
         return not self.feature_flags.enable_offline_evaluation
+
+
+class SimBotRoomSearchBudget(BaseModel):
+    """Seach budget settings."""
+
+    viewpoint_budget: int = 3
+    distance_threshold: float = 3.0

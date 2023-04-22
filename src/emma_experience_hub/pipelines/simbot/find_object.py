@@ -69,8 +69,6 @@ class SimBotFindObjectPipeline:
         action_predictor_client: SimbotActionPredictionClient,
         visual_grounding_output_parser: SimBotVisualGroundingOutputParser,
         planner_type: SearchPlannerType = SearchPlannerType.greedy_max_vertex_cover,
-        distance_threshold: float = 4,
-        viewpoint_budget: int = 2,
         enable_grab_from_history: bool = True,
         gfh_location_type: GFHLocationType = GFHLocationType.location,
         _enable_scanning_found_object: bool = True,
@@ -80,8 +78,6 @@ class SimBotFindObjectPipeline:
         planners = {
             SearchPlannerType.basic: BasicSearchPlanner(),
             SearchPlannerType.greedy_max_vertex_cover: GreedyMaximumVertexCoverSearchPlanner(
-                distance_threshold=distance_threshold,
-                vertex_budget=viewpoint_budget,
                 gfh_location_type=gfh_location_type,
             ),
         }
