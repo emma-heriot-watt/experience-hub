@@ -224,13 +224,9 @@ interaction_action_type == "Clean" and interaction_action_entity != null and inv
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="medium"> Oh I got this! </amazon:emotion>Ask me to pour the coffee beans into the coffee maker,False
 
-interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == null,<amazon:emotion name="excited" intensity="medium">This machine can be used create the fuel for the world!</amazon:emotion>As far as I know - we need to pour coffee beans and water from the sink into the coffee maker. Then - you can ask me to turn it on,False
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == null,<amazon:emotion name="excited" intensity="medium">This machine can be used create the fuel for the world!</amazon:emotion>If you want to know more - ask me - how can I use the coffee maker?,False
 
-interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with water from the sink - you can ask me to pour the {inventory_entity} into the coffee maker.,False
-
-interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity == null,The coffee unmaker can be used to recycle coffee into fresh coffee beans. Let's find some coffee that we can pour into the machine before turning it on.,False
-
-interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity =~ "(Mug|Bowl|Coffee Pot)",Let me see. If the {inventory_entity} is filled with coffee we can pour it into the coffee unmaker. Ask me to pour the {inventory_entity} into the coffee unmaker. Then - ask me to turn on the coffee unmaker to create fresh coffee beans,False
+interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Unmaker" and inventory_entity == null,The coffee composer can be used to recycle coffee into fresh coffee beans. If you want to know more - ask me - how can I use the coffee composer?,False
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity == null,This time machine can be used to turn objects into their original state! Let's find something that we can repair before using the time machine.,False
 
@@ -507,7 +503,7 @@ verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == null, Sorry I was unable to understand which machine you are referring to, False
 
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "coffee maker" , coffee maker - no prizes for guessing - make coffee. To operate - you need to pour coffee beans and water into {verbal_interaction_intent_entity} and turn it on. , False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity == "coffee maker",To operate the coffe maker - you need to pour coffee beans and water into it and then turn it on. , False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity!= null and verbal_interaction_intent_entity == "embiggenator monitor" , Embiggenator monitor is used to operate - you guessed it right - the embiggenator. Usually - this is a pink color monitor, False
 

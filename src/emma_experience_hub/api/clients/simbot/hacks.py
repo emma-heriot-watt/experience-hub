@@ -58,10 +58,11 @@ class SimBotHacksClient(Client):
         self,
         action: SimBotAction,
         inventory_entity: Optional[str] = None,
+        entity_labels: Optional[list[str]] = None,
     ) -> Optional[SimBotHacksAnticipator]:
         """Generate possible plan of instructions from the given action."""
         with tracer.start_as_current_span("Get anticipator plan"):
-            response = self._get_anticipated_instructions(action, inventory_entity)
+            response = self._get_anticipated_instructions(action, inventory_entity, entity_labels)
 
         logger.debug(f"Cache info: {self._get_room_prediction_from_raw_text.cache_info()}")
         return response
@@ -106,6 +107,7 @@ class SimBotHacksClient(Client):
         self,
         action: SimBotAction,
         inventory_entity: Optional[str] = None,
+        entity_labels: Optional[list[str]] = None,
     ) -> Optional[SimBotHacksAnticipator]:
         with httpx.Client(timeout=self._timeout) as client:
             response = client.post(
@@ -113,6 +115,7 @@ class SimBotHacksClient(Client):
                 json={
                     "simbot_action": json.loads(action.json()),
                     "holding_object": inventory_entity,
+                    "entity_labels": entity_labels,
                 },
             )
 
