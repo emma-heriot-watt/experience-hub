@@ -58,7 +58,7 @@ environment_intent_type == "object_unpowered",<say-as interpret-as="interjection
 environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - it seems like it's not currently powered. Try reading a sticky note for help on how to turn on the power!,False
 environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - seems like the power is off. Maybe you can get a useful hint by reading a sticky note,False
 
-environment_intent_type == "object_unpowered" and environment_intent_entity != null,It seems like the {environment_intent_entity} is not powered. Try reading a sticky note for help on how to turn on the power!,False
+environment_intent_type == "object_unpowered" and environment_intent_entity != null,It seems like the {environment_intent_entity} is not powered. Say 'Turn on the power' to bring back the electricity in this lab. Otherwise, try reading a sticky note for help on how to turn on the power,False
 
 environment_intent_type == "post_process_error",Something went wrong when I tried to execute this action in the Arena. Can you give me a different instruction?,False
 
