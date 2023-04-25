@@ -227,6 +227,7 @@ class SimBotFindObjectPipeline:
         raw_visual_grounding_output = self._action_predictor_client.find_object_in_scene(
             dialogue_history=dialogue_history,
             environment_state_history=[EnvironmentStateTurn(features=extracted_features)],
+            inventory_entity=session.current_state.inventory.entity,
         )
 
         with tracer.start_as_current_span("Parse visual grounding output"):

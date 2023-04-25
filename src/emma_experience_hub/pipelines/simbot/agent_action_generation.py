@@ -158,6 +158,7 @@ class SimBotAgentActionGenerationPipeline:
             dialogue_history=dialogue_history,
             environment_state_history=environment_state_history,
             force_stop_token=session.current_turn.utterance_from_agent_plan,
+            inventory_entity=session.current_state.inventory.entity,
         )
 
         # Get the flattened list of extracted features from the state history
