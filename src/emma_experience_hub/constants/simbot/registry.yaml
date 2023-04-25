@@ -11,21 +11,21 @@ services:
 
   - name: intent_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.43.3-cu113
+    image_version: 1.44.2-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/simbot_nlu_v5.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_nlu/simbot_nlu_batch8_9_10_epoch35.ckpt
 
   - name: instruction_predictor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/policy
-    image_version: 1.43.3-cu113
+    image_version: 1.44.2-cu113
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_action/simbot_action_v9.2_annotation_v6_iou0.5_bsz512_lr1e-4.ckpt
+    model_url: s3://emma-simbot/model/checkpoints/simbot_action/action_cdf_053.ckpt
 
   - name: feature_extractor
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/perception
     image_version: 1.13.0-cu113
 
-    model_url: s3://emma-simbot/misc_projects/floppy_aug/checkpoints/model_0300125.pth
+    model_url: s3://emma-simbot/model/checkpoints/vinvl_hammer_aug_model_0300180.pth
 
   - name: profanity_filter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/profanity-filter
@@ -39,19 +39,19 @@ services:
 
   - name: compound_splitter
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/compound-splitter
-    image_version: 1.6.2
+    image_version: 1.6.4
 
     model_url: s3://emma-simbot/model/checkpoints/generic_planner/nlu-20230314-195801-calm-beagle.tar.gz
 
   - name: simbot_hacks
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-hacks
-    image_version: 1.19.1
+    image_version: 1.20.0
 
   - name: simbot_qa
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-qa
     image_version: 1.4.0
 
-    model_url: s3://emma-simbot/model/checkpoints/simbot_qa/simbot_qa_with_objects_v3.tar.gz
+    model_url: s3://emma-simbot/model/checkpoints/simbot_qa/simbot_qa_with_objects_v4.tar.gz
 
   - name: placeholder_vision_model
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/color-matcher
