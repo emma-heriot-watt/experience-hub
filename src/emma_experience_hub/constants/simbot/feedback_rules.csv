@@ -131,6 +131,9 @@ environment_intent_type == "unsupported_action" and environment_intent_action_ty
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and environment_intent_entity =~ "(Bowl|Mug)" and inventory_entity == null,I'm not holding anything to pour into the {environment_intent_entity}. We should first pick it up!,False
 
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity == "(Bowl|Mug)" and environment_intent_entity != null,I could not pour the {inventory_entity} into the {environment_intent_entity}. If the {environment_intent_entity} is broken, we should repair it first using the time machine. If that's the case, ask me to repair the {environment_intent_entity} using the time machine, or you can give me another instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity == "(Coffe Maker|Coffee Unmaker)" and environment_intent_entity != null,I could not pour the {inventory_entity} into the {environment_intent_entity}. If the {environment_intent_entity} is not powered, we should turn on the power first. If that's the case, ask me to turn on the power, or you can give me another instruction?,False
+
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity != null and environment_intent_entity != null,I'm afraid  I can't pour the {inventory_entity} in the {environment_intent_entity}.,False
 environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pour" and inventory_entity != null and environment_intent_entity != null,I was unable to pour the {inventory_entity} in the {environment_intent_entity}.,False
 
