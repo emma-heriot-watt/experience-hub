@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.54.2](https://github.com/emma-simbot/experience-hub/compare/v8.54.1...v8.54.2) (2023-04-25)
+
+
+### Bug Fixes
+
+* Pass inventory to policy ([#548](https://github.com/emma-simbot/experience-hub/issues/548)) ([ef35c80](https://github.com/emma-simbot/experience-hub/commit/ef35c80f8541ef584fd4cff96e7505812df81458))
+
 ## [8.54.1](https://github.com/emma-simbot/experience-hub/compare/v8.54.0...v8.54.1) (2023-04-22)
 
 
