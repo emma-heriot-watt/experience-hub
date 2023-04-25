@@ -223,6 +223,9 @@ interaction_action_type == "Break" and interaction_action_entity == "Record",<am
 interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Let's break some records today</amazon:emotion>,False
 interaction_action_type == "Break" and interaction_action_entity == "Record",<amazon:emotion name="excited" intensity="low">Breaking records is always music to my ears</amazon:emotion>,False
 
+environment_intent_type == "unsupported_action" and interaction_action_type == "Break" and inventory_entity == null and interaction_action_entity != null,We need to pick up a hammer in order to break the {interaction_action_entity}. Let's first find a hammer, or print one using the 3D printer.,False
+environment_intent_type == "unsupported_action" and interaction_action_type == "Break" and inventory_entity == "Hammer" and interaction_action_entity =~ "(Record|Floppy Disk|Trophy|Mug|Bowl|Plate)",We cannot break the {interaction_action_entity} using the hammer. Can you give me a different instruction?,False
+
 interaction_action_type == "Clean" and interaction_action_entity != null and inventory_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">I'll get the {inventory_entity} sparkling clean in no time!</amazon:emotion>,True
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee Maker" and inventory_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="medium"> Oh I got this! </amazon:emotion>Ask me to pour the coffee beans into the coffee maker,False
