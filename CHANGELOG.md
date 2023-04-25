@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.57.0](https://github.com/emma-simbot/experience-hub/compare/v8.56.1...v8.57.0) (2023-04-25)
+
+
+### Features
+
+* **feedback:** add more 'done' one-liners ([#551](https://github.com/emma-simbot/experience-hub/issues/551)) ([aed9b14](https://github.com/emma-simbot/experience-hub/commit/aed9b146e87804a0df534053f4df62e77c8bc922))
+
 ## [8.56.1](https://github.com/emma-simbot/experience-hub/compare/v8.56.0...v8.56.1) (2023-04-25)
 
 
