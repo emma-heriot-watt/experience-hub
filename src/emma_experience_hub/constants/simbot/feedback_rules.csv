@@ -236,8 +236,8 @@ interaction_action_type == "Pickup" and current_room == "SmallOffice" and intera
 
 interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="low">We can make fresh coffee by pouring coffee beans and water into the coffee maker.</amazon:emotion>,False
 
-interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">Got the {interaction_action_entity}!</amazon:emotion>,True
-interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty,<amazon:emotion name="excited" intensity="low">{interaction_action_entity} retrieved!</amazon:emotion>,True
+interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty and environment_intent_type == null,<amazon:emotion name="excited" intensity="low">Got the {interaction_action_entity}!</amazon:emotion>,False
+interaction_action_type == "Pickup" and interaction_action_entity != null and utterance_queue_not_empty and environment_intent_type == null,<amazon:emotion name="excited" intensity="low">{interaction_action_entity} retrieved!</amazon:emotion>,False
 
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",Oops - not sure if this is an infected computer. Help me remove the floppy disk and move to another computer.,False
 interaction_action_type == "Place" and interaction_action_entity != null and interaction_action_entity == "Computer" and inventory_entity == "Floppy Disk",I think this is not an infected computer. Let's first remove the floppy disk and then help me move to another one.,False

@@ -98,7 +98,7 @@ repos:
 
   # ------------------------------ Python imports ------------------------------ #
   - repo: https://github.com/hakancelik96/unimport
-    rev: 0.14.1
+    rev: 0.16.0
     hooks:
       - id: unimport
         name: Remove any unused imports
@@ -134,14 +134,14 @@ repos:
         name: Prettier
         exclude: ^.*/?CHANGELOG\.md$
   - repo: https://github.com/myint/docformatter
-    rev: v1.5.1
+    rev: v1.6.1
     hooks:
       - id: docformatter
         name: Format docstrings
         types: [python]
         args: [--in-place, --wrap-summaries=99, --wrap-descriptions=99]
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black-jupyter
         types: [python]

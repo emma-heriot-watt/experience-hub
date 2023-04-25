@@ -29,6 +29,7 @@ class SimBotAuxiliaryMetadataUri(AnyUrl):
 
         This follows the provided example:
 
+
         https://us-east-1.console.aws.amazon.com/codesuite/codecommit/repositories/AlexaSimbotModelInferenceService/browse/refs/heads/main/--/alexa_simbot_action_inference_model_wrapper/service/models/V103.py?region=us-east-1&lines=1479-1481
         """
         # Perform the replace as they've done (from the example)
