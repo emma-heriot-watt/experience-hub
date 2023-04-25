@@ -270,8 +270,12 @@ physical_interaction_intent_type == "act_one_match",So what's next?,False
 physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">okey dokey</say-as>,False
 physical_interaction_intent_type == "act_one_match",So what should I do next?,False
 physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">righto</say-as>,False
+physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">all righty</say-as>.,False
+physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">alrighty</say-as> - <amazon:domain name="conversational">What's next?</amazon:domain>,False
 physical_interaction_intent_type == "act_one_match",Done,False
 physical_interaction_intent_type == "act_one_match",',True
+
+
 
 physical_interaction_intent_type == "act_one_match" and interaction_action_type == "Pickup" and interaction_action_entity != null,So what are we doing with the {interaction_action_entity}?,False
 
