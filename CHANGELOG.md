@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.55.0](https://github.com/emma-simbot/experience-hub/compare/v8.54.2...v8.55.0) (2023-04-25)
+
+
+### Features
+
+* disable lightweight for pickup ([#538](https://github.com/emma-simbot/experience-hub/issues/538)) ([b86522a](https://github.com/emma-simbot/experience-hub/commit/b86522a27295853c0090d54c8f2e30c1e7035e33))
+* improved feedback pour in broken bowl ([#544](https://github.com/emma-simbot/experience-hub/issues/544)) ([5f2f6ca](https://github.com/emma-simbot/experience-hub/commit/5f2f6ca7f961b2f41859ed171da4eb50feb7a0d2))
+* update policy ([#549](https://github.com/emma-simbot/experience-hub/issues/549)) ([5a32e09](https://github.com/emma-simbot/experience-hub/commit/5a32e0924657ff3a0e97d996fec8edcb59caec27))
+
+
+### Bug Fixes
+
+* more verbose response for unpowered objects ([#539](https://github.com/emma-simbot/experience-hub/issues/539)) ([2237e2f](https://github.com/emma-simbot/experience-hub/commit/2237e2f95bb1541ce671bf8a4040b60dcb32cf3a))
+
 ## [8.54.2](https://github.com/emma-simbot/experience-hub/compare/v8.54.1...v8.54.2) (2023-04-25)
 
 
