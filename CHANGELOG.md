@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.59.2](https://github.com/emma-simbot/experience-hub/compare/v8.59.1...v8.59.2) (2023-04-26)
+
+
+### Bug Fixes
+
+* Do not scan the same object class twice ([#555](https://github.com/emma-simbot/experience-hub/issues/555)) ([5546e9a](https://github.com/emma-simbot/experience-hub/commit/5546e9ae04abb0ab13f4f5721d51394ec2de405d))
+
 ## [8.59.1](https://github.com/emma-simbot/experience-hub/compare/v8.59.0...v8.59.1) (2023-04-26)
 
 
