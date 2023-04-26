@@ -77,6 +77,14 @@ environment_intent_type == "receptacle_is_full",<amazon:emotion name="disappoint
 environment_intent_type == "receptacle_is_full" and environment_intent_action_type == "Place" and environment_intent_entity != null,It looks like the {environment_intent_entity} is full.,False
 environment_intent_type == "receptacle_is_full" and environment_intent_action_type == "Place" and environment_intent_entity != null,There's not enough space in the {environment_intent_entity}.,False
 
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity =~ "(Table|Counter|Desk|Freeze Ray Shelf|Laser Shelf|Carrot Maker|Gravity Pad|Shelf|Bookshelf)",We cannot place objects onto the {environment_intent_type}. Looks like it is full. Can you give me a different instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity == "Coffee Maker" and inventory_entity =~ "Coffee Pot",I can only place the coffee pot in the coffee maker. Can you give me a different instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity == "Printer" and inventory_entity =~ "Printer Cartridge",I can only place a printer cartridge in the printer. Can you give me a different instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity == "Computer" and inventory_entity =~ "Floppy Disk",I can only place a floppy disk in the computer. Can you give me a different instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity == "Fuse Box" and inventory_entity =~ "Lever",I can only place a lever in the fuse box. Can you give me a different instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity == "Toaster" and inventory_entity =~ "Bread",I can only place bread in the toaster. Can you give me a different instruction?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Place" and environment_intent_entity == "Laser" and inventory_entity =~ "(Laser Tip|Control Panel)",I can only place a laser tip or a control panel in the laser. Can you give me a different instruction?,False
+
 environment_intent_type == "target_inaccessible" and environment_intent_entity != null,I can't access the {environment_intent_entity} from here. Can you provide me an instruction so it's in my view?,False
 
 environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> Let's get closer,True
@@ -482,7 +490,7 @@ verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} are you referring to?,False
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} do you mean?,False
 
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and not verbal_interaction_intent_entity =~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)",I am unaware of any special capabilities of the {verbal_interaction_intent_entity},False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity !~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)",I am unaware of any special capabilities of the {verbal_interaction_intent_entity},False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity == "coffee maker",To operate the coffe maker - you need to pour coffee beans and water into it and then turn it on. , False
 
