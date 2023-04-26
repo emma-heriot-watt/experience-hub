@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.59.1](https://github.com/emma-simbot/experience-hub/compare/v8.59.0...v8.59.1) (2023-04-26)
+
+
+### Bug Fixes
+
+* update model checkpoints trained up to cdf batch 10 ([#559](https://github.com/emma-simbot/experience-hub/issues/559)) ([e832e16](https://github.com/emma-simbot/experience-hub/commit/e832e167bc0a172ccd95f0a1fd9e00017d1fc0e7))
+
 ## [8.59.0](https://github.com/emma-simbot/experience-hub/compare/v8.58.0...v8.59.0) (2023-04-26)
 
 
