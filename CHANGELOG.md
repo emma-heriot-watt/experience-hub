@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.59.4](https://github.com/emma-simbot/experience-hub/compare/v8.59.3...v8.59.4) (2023-04-26)
+
+
+### Bug Fixes
+
+* **feedback:** rules for going to new rooms ([#560](https://github.com/emma-simbot/experience-hub/issues/560)) ([a9e9a1b](https://github.com/emma-simbot/experience-hub/commit/a9e9a1bde536080a7b5712c436f84627748a1cc1))
+* include missing args in background services command call ([6421012](https://github.com/emma-simbot/experience-hub/commit/642101201d3576d3032b52ff974ceae51f491d18))
+
 ## [8.59.3](https://github.com/emma-simbot/experience-hub/compare/v8.59.2...v8.59.3) (2023-04-26)
 
 
