@@ -321,6 +321,7 @@ def run_production_server(
         run_in_background=True,
         observability=True,
         num_gpus=4,
+        offline_evaluation=False,
     )
     run_controller_api(
         auxiliary_metadata_dir=Path("../auxiliary_metadata"),
