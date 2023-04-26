@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.59.5](https://github.com/emma-simbot/experience-hub/compare/v8.59.4...v8.59.5) (2023-04-26)
+
+
+### Bug Fixes
+
+* Fix qa default rule ([#561](https://github.com/emma-simbot/experience-hub/issues/561)) ([1a424a0](https://github.com/emma-simbot/experience-hub/commit/1a424a088c971f88b7096051515aa5c503e81e99))
+
 ## [8.59.4](https://github.com/emma-simbot/experience-hub/compare/v8.59.3...v8.59.4) (2023-04-26)
 
 
