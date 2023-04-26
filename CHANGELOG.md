@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.58.0](https://github.com/emma-simbot/experience-hub/compare/v8.57.1...v8.58.0) (2023-04-26)
+
+
+### Features
+
+* more verbose responses for unsupported place ([#546](https://github.com/emma-simbot/experience-hub/issues/546)) ([33a46ca](https://github.com/emma-simbot/experience-hub/commit/33a46caafbaf7cf345953ce32d1f12ed32809345))
+
 ## [8.57.1](https://github.com/emma-simbot/experience-hub/compare/v8.57.0...v8.57.1) (2023-04-25)
 
 
