@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.59.3](https://github.com/emma-simbot/experience-hub/compare/v8.59.2...v8.59.3) (2023-04-26)
+
+
+### Bug Fixes
+
+* also include the default timeout arg because it was weirdly failing ([9fcd9b5](https://github.com/emma-simbot/experience-hub/commit/9fcd9b5d8b4902b52db1f37f05ebc352188eb037))
+
 ## [8.59.2](https://github.com/emma-simbot/experience-hub/compare/v8.59.1...v8.59.2) (2023-04-26)
 
 
