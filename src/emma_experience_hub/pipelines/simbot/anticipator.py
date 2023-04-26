@@ -62,8 +62,8 @@ class SimbotAnticipatorPipeline:
                 SimBotQueueUtterance(utterance=utterance, role=SpeakerRole.agent)
                 for utterance in anticipator_output.utterances
             )
-            # Do not ask for confirmation if the anticipator has only one utterance
-            if len(anticipator_output.utterances) > 1:
+
+            if anticipator_output.requires_confirmation:
                 # We also need to update the verbal interaction intent to confirm in order to
                 # get the confirmation from the user in the next turn
                 session.current_turn.intent.verbal_interaction = SimBotIntent(

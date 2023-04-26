@@ -45,7 +45,7 @@ services:
 
   - name: simbot_hacks
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-hacks
-    image_version: 1.20.0
+    image_version: 1.21.0
 
   - name: simbot_qa
     image_repository_uri: 020417957102.dkr.ecr.us-east-1.amazonaws.com/emma/simbot-qa

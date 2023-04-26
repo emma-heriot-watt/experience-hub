@@ -172,7 +172,8 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
     def should_return_dummy_action(self, decoded_trajectory: str) -> Optional[SimBotAction]:
         """Should we for some reason return a dummy action?"""
-        if decoded_trajectory == SimBotDummyRawActions.DummyLookDown.value:
+        decoded_trajectory_str = decoded_trajectory.replace(MODEL_EOS_TOKEN, "")
+        if decoded_trajectory_str == SimBotDummyRawActions.DummyLookDown.value:
             return SimBotAction(
                 id=0,
                 type=SimBotActionType.LookDown,

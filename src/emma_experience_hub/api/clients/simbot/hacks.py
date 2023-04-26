@@ -29,6 +29,7 @@ class SimBotHacksAnticipator(BaseModel):
 
     intent: str
     utterances: list[str]
+    requires_confirmation: bool
 
 
 class SimBotHacksClient(Client):
