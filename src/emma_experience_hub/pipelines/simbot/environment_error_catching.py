@@ -1,3 +1,5 @@
+from typing import Optional
+
 from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.constants.simbot import get_arena_definitions
 from emma_experience_hub.datamodels.simbot import (
@@ -38,31 +40,44 @@ class SimBotEnvironmentErrorCatchingPipeline:
 
     def __call__(self, session: SimBotSession) -> bool:
         """Process environment state changes to inform the agent of its standing in the world."""
-        # Check that there was an environment erro
+        # Check that there was an environment error
         environment_error = session.current_turn.intent.environment
         previous_turn = session.previous_valid_turn
         if environment_error is None or previous_turn is None:
             return False
         # Make sure we have the environment error entity
-        environment_error_entity = environment_error.entity
-        if environment_error_entity is None:
-            return False
+        environment_error_entity = (
+            environment_error.entity.lower() if environment_error.entity else None
+        )
 
         error_handler = self.error_handlers.get(environment_error.type, None)
         if error_handler is None:
             return False
         # If the error was caught, set the user intent to act to continue acting
         caught_environmnent_error = error_handler(
-            session, previous_turn=previous_turn, target=environment_error_entity.lower()
+            session, previous_turn=previous_turn, target=environment_error_entity
         )
         if caught_environmnent_error:
             session.current_turn.intent.user = SimBotIntentType.act
         return caught_environmnent_error
 
+    def is_handling_unsupported_navigation(self, session: SimBotSession) -> bool:
+        """Check if the handled error is unsported navigation in the robotics lab."""
+        if session.current_turn.environment.current_room.lower() != "lab1":
+            return False
+        # Check that there was an environment error
+        environment_error = session.current_turn.intent.environment
+        if environment_error is None:
+            return False
+
+        return environment_error.type == SimBotIntentType.unsupported_navigation
+
     def _handle_already_holding_object_action_error(
-        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
+        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: Optional[str]
     ) -> bool:
         """Handle already holding object action error."""
+        if target is None:
+            return False
         if session.current_state.inventory.entity is None:
             return False
         # Check if we are holding the same type of object
@@ -72,11 +87,13 @@ class SimBotEnvironmentErrorCatchingPipeline:
         return False
 
     def _handle_receptacle_is_closed_action_error(
-        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
+        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: Optional[str]
     ) -> bool:
         """Handle receptacle is closed."""
         # Continue executing the current utterance if the user intent was set.
         if session.current_turn.intent.user is None:
+            return False
+        if target is None:
             return False
         return self._fix_and_repeat_failed_instruction(
             session=session,
@@ -85,12 +102,15 @@ class SimBotEnvironmentErrorCatchingPipeline:
         )
 
     def _handle_target_out_of_range_error(
-        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
+        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: Optional[str]
     ) -> bool:
         """Handle target out of range error.
 
         Go to the object and repeat the instruction.
         """
+        if target is None:
+            return False
+
         return self._fix_and_repeat_failed_instruction(
             session=session,
             previous_turn=previous_turn,
@@ -98,7 +118,7 @@ class SimBotEnvironmentErrorCatchingPipeline:
         )
 
     def _handle_unsupported_action_error(
-        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
+        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: Optional[str]
     ) -> bool:
         """Handle unsupported action error depending on the action type."""
         if previous_turn.actions.interaction is not None:
@@ -112,11 +132,15 @@ class SimBotEnvironmentErrorCatchingPipeline:
 
         return False
 
-    def _handle_open_action_execution_error(self, session: SimBotSession, target: str) -> bool:
+    def _handle_open_action_execution_error(
+        self, session: SimBotSession, target: Optional[str]
+    ) -> bool:
         """Ignore an error from trying to open a target.
 
         Continue executing the current utterance if the user intent was set.
         """
+        if target is None:
+            return False
         if target not in self._openable_objects:
             return False
         # If we have a new user utterance, continue handling that
@@ -130,8 +154,12 @@ class SimBotEnvironmentErrorCatchingPipeline:
         )
         return not previous_action_was_end_of_trajectory
 
-    def _handle_fill_action_execution_error(self, session: SimBotSession, target: str) -> bool:
+    def _handle_fill_action_execution_error(
+        self, session: SimBotSession, target: Optional[str]
+    ) -> bool:
         """Retry to turn on the sink and fill the holding object."""
+        if target is None:
+            return False
         if target != "sink" and target is self._fillable_objects:
             return False
         self._store_current_utterance_if_needed(session)
@@ -146,8 +174,12 @@ class SimBotEnvironmentErrorCatchingPipeline:
         )
         return True
 
-    def _handle_clean_action_execution_error(self, session: SimBotSession, target: str) -> bool:
+    def _handle_clean_action_execution_error(
+        self, session: SimBotSession, target: Optional[str]
+    ) -> bool:
         """Retry to turn on the sink and clean the holding object."""
+        if target is None:
+            return False
         if target != "sink" and target is self._cleanable_objects:
             return False
         self._store_current_utterance_if_needed(session)
@@ -198,7 +230,7 @@ class SimBotEnvironmentErrorCatchingPipeline:
         return True
 
     def _handle_unsupported_navigation_error(
-        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: str
+        self, session: SimBotSession, previous_turn: SimBotSessionTurn, target: Optional[str]
     ) -> bool:
         """Handle unsupported navigation error for the robotics lab."""
         if session.current_turn.environment.current_room.lower() != "lab1":
@@ -210,6 +242,8 @@ class SimBotEnvironmentErrorCatchingPipeline:
             target_entity = previous_turn.intent.physical_interaction.entity  # type: ignore[union-attr]
             if target_entity is None:
                 return False
+            # If we were in the middle of a search, reset the search
+            session.current_state.find_queue.reset()
             previous_utterance = f"find the {target_entity}"
             queue_elem = SimBotQueueUtterance(utterance=previous_utterance, role=SpeakerRole.agent)
         else:
@@ -225,13 +259,7 @@ class SimBotEnvironmentErrorCatchingPipeline:
         queue_elem = SimBotQueueUtterance(utterance="toggle the robot arm", role=SpeakerRole.agent)
         session.current_state.utterance_queue.append_to_head(queue_elem)
         # Add a new instruction to find the robot arm
-        new_current_utterance = "find the robot arm"
-        session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
-            utterance=new_current_utterance,
-            role=SpeakerRole.agent,
-            original_utterance=session.current_turn.speech.original_utterance
-            if session.current_turn.speech
-            else None,
-        )
+        queue_elem = SimBotQueueUtterance(utterance="find the robot arm", role=SpeakerRole.agent)
+        session.current_state.utterance_queue.append_to_head(queue_elem)
 
         return True

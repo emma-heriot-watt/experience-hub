@@ -194,6 +194,9 @@ class SimBotFindObjectPipeline:
         if session.current_turn.intent.is_searching_inferred_object:
             return False
 
+        if self._has_already_been_scanned(session, found_object_label):
+            return False
+
         frame_idx = scene_object_tokens.frame_index
 
         class_is_unique = class_label_is_unique_in_frame(
@@ -396,3 +399,21 @@ class SimBotFindObjectPipeline:
         # Reset the utterance queue if there is no next action or the next action is end-of-trajectory
         self._search_planner.reset_utterance_queue_if_object_not_found(session, next_action)
         return next_action
+
+    def _has_already_been_scanned(self, session: SimBotSession, object_name: str) -> bool:
+        """Check if the object has been scanned."""
+        object_name = object_name.lower()
+        scanned_actions = [
+            self._was_succesful_scan_object_action(turn.actions.interaction, object_name)
+            for turn in session.turns
+            if turn.actions.interaction and turn.actions.interaction.type == SimBotActionType.Scan
+        ]
+        return any(scanned_actions)
+
+    def _was_succesful_scan_object_action(self, action: SimBotAction, object_name: str) -> bool:
+        """Check if the action was a successful scan action for the given object."""
+        if not action.is_successful:
+            return False
+        if action.payload.entity_name is None:
+            return False
+        return action.payload.entity_name.lower() == object_name

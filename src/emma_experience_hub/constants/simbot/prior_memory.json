@@ -1,11 +1,13 @@
 {
 	"coffee unmaker": "BreakRoom",
 	"color changer": "Lab2",
+	"emotion tester": "Lab1",
 	"fridge": "BreakRoom",
 	"freezer": "BreakRoom",
 	"freeze ray": "Lab1",
 	"freeze ray monitor": "Lab1",
 	"freeze ray shelf": "Lab1",
+	"generator": "Lab2",
 	"laser": "Lab1",
 	"laser monitor": "Lab1",
 	"laser shelf": "Lab1",

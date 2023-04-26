@@ -85,12 +85,9 @@ class SimBotAgentIntentSelectionPipeline:
     def run(self, session: SimBotSession) -> SimBotAgentIntents:  # noqa: WPS212
         """Decide next action for the agent."""
         # If there was an environment error, try to catch it and continue acting - else respond to it.
-        if session.current_turn.intent.environment:
-            if not self._environment_error_pipeline(session):
-                logger.debug("Returning None as environment errors do not cause the agent to act.")
-                session.current_state.utterance_queue.reset()
-                session.current_state.find_queue.reset()
-                return SimBotAgentIntents()
+        intents = self._set_intent_from_environment(session)
+        if intents is not None:
+            return intents
 
         # If the user has said something, determine the agent intent
         if session.current_turn.intent.user:
@@ -209,3 +206,19 @@ class SimBotAgentIntentSelectionPipeline:
     def _should_skip_action_selection(self, user_intent_type: SimBotAnyUserIntentType) -> bool:
         """No action needed after an invalid utterance, QA or an environment error."""
         return user_intent_type.is_invalid_user_utterance or user_intent_type.is_user_qa
+
+    def _set_intent_from_environment(self, session: SimBotSession) -> Optional[SimBotAgentIntents]:
+        if session.current_turn.intent.environment is None:
+            return None
+        # Can we handle the environment error? If not, return empty agent intents
+        if not self._environment_error_pipeline(session):
+            logger.debug("Returning None as environment errors do not cause the agent to act.")
+            session.current_state.utterance_queue.reset()
+            session.current_state.find_queue.reset()
+            return SimBotAgentIntents()
+        # If it is an unsupported navigation that we can handle, we need to confirm before acting
+        if self._environment_error_pipeline.is_handling_unsupported_navigation(session):
+            return SimBotAgentIntents(
+                verbal_interaction=SimBotIntent(type=SimBotIntentType.confirm_before_plan)
+            )
+        return None

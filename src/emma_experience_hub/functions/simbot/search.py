@@ -246,13 +246,20 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         if isinstance(gfh_location, ArenaLocation):
             name_candidates.append("gfh_location")
             location_candidates.append(gfh_location.position.as_list())
+            name_candidates, location_candidates = self._remove_current_position_from_candidates(
+                name_candidates, location_candidates
+            )
             first_selected_idx = name_candidates.index("gfh_location")
         elif isinstance(gfh_location, str):
+            name_candidates, location_candidates = self._remove_current_position_from_candidates(
+                name_candidates, location_candidates
+            )
             first_selected_idx = name_candidates.index(gfh_location)
         else:
             raise AssertionError(
                 "GFH location should be a viewpoint name (str) or an Arena Location."
             )
+
         return name_candidates, location_candidates, first_selected_idx
 
     def get_actions_for_position(
@@ -357,3 +364,13 @@ class GreedyMaximumVertexCoverSearchPlanner(BasicSearchPlanner):
         gfh_viewpoint = self._get_viewpoint_closest_to_location(gfh_location, session)
         planned_actions.append(self._create_goto_viewpoint_action(gfh_viewpoint))
         return gfh_viewpoint
+
+    def _remove_current_position_from_candidates(
+        self, name_candidates: list[str], location_candidates: list[list[float]]
+    ) -> tuple[list[str], list[list[float]]]:
+        """Remove the current position from the candidates when the first position is from GFH."""
+        if "current_position" in name_candidates:
+            current_pos_index = name_candidates.index("current_position")
+            name_candidates.pop(current_pos_index)
+            location_candidates.pop(current_pos_index)
+        return name_candidates, location_candidates
