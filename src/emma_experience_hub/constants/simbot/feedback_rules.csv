@@ -634,8 +634,8 @@ verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom"
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
 
-verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter and current_room != null,<amazon:emotion name="excited" intensity="low">In the {current_room}! What's next?</amazon:emotion>,False
-verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter and current_room != null,<amazon:emotion name="excited" intensity="low">So what are we doing in the {current_room}?</amazon:emotion>,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter and current_room != null,<amazon:emotion name="excited" intensity="low">In the {interaction_action_entity}! What's next?</amazon:emotion>,False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter,<amazon:emotion name="excited" intensity="low">So what are we doing in the {interaction_action_entity}?</amazon:emotion>,False
 
 verbal_interaction_intent_type =~ "(ask_about_affordance|ask_about_location)" and verbal_interaction_intent_entity =~ "(dino|dinosaur)", If we set the portal to the past - we can feed the dinosaur that appears! We should only go to the generator is we have something to feed the dinosaur with. If we disappoint the dinosaur - it might eat us!, False
 
