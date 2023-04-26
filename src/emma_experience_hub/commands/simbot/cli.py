@@ -328,6 +328,7 @@ def run_production_server(
         extracted_features_cache_dir=Path("../cache/features"),
         observability=True,
         workers=workers,
+        timeout=100,
     )
 
 
