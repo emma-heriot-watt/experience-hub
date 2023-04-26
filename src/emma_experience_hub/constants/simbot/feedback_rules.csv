@@ -525,7 +525,7 @@ verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "hammer" , Hammers are useful to break objects such as bowls plates and floppy disks. , False
 
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "laser monitor" , The red montitor can activate the laser to heat anything on the red shelf., False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "laser monitor" , The red monitor can activate the laser to heat anything on the red shelf., False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "portal monitor" , The black monitor can turn the portal generator on and off - creating windows to the past and the future , False
 
@@ -637,8 +637,6 @@ verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom"
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter and current_room != null,<amazon:emotion name="excited" intensity="low">In the {interaction_action_entity}! What's next?</amazon:emotion>,False
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity not in visited_room_counter,<amazon:emotion name="excited" intensity="low">So what are we doing in the {interaction_action_entity}?</amazon:emotion>,False
 
-verbal_interaction_intent_type =~ "(ask_about_affordance|ask_about_location)" and verbal_interaction_intent_entity =~ "(dino|dinosaur)", If we set the portal to the past - we can feed the dinosaur that appears! We should only go to the generator is we have something to feed the dinosaur with. If we disappoint the dinosaur - it might eat us!, False
+verbal_interaction_intent_type =~ "(ask_about_affordance|ask_about_location)" and verbal_interaction_intent_entity =~ "(dino|dinosaur)", If we set the portal to the past - we can feed the dinosaur that appears! We should only go to the generator if we have something to feed the dinosaur with. If we disappoint the dinosaur - it might eat us!, False
 
-verbal_interaction_intent_type =~ "(ask_about_appearance|ask_about_affordance)" and verbal_interaction_intent_entity == null, I don't understand which object you're referring to. Can you ask me a different question?,False
-
-verbal_interaction_intent_type =~ "(ask_about_appearance|ask_about_affordance|ask_about_location)", Sorry I'm not sure I understand the question. Can you give me a different instruction?,False
+verbal_interaction_intent_type =~ "(ask_about_appearance|ask_about_affordance|ask_about_location)" and verbal_interaction_intent_entity == null, I don't understand which object you're referring to. Can you ask me a different question?,False
