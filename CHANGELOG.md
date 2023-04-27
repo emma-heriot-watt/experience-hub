@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.65.0](https://github.com/emma-simbot/experience-hub/compare/v8.64.0...v8.65.0) (2023-04-27)
+
+
+### Features
+
+* Feedback responses for small objects ([#569](https://github.com/emma-simbot/experience-hub/issues/569)) ([76e2212](https://github.com/emma-simbot/experience-hub/commit/76e22121186be070b854a7b70131b5f842d8054a))
+
+
+### Bug Fixes
+
+* Update nlu ([#572](https://github.com/emma-simbot/experience-hub/issues/572)) ([0733177](https://github.com/emma-simbot/experience-hub/commit/07331770c8079cf2e1b777800b1fc3b86c7ec267))
+
 ## [8.64.0](https://github.com/emma-simbot/experience-hub/compare/v8.63.0...v8.64.0) (2023-04-27)
 
 
