@@ -435,7 +435,7 @@ user_intent_type == "empty_utterance",<say-as interpret-as="interjection">er</sa
 user_intent_type == "greeting",Hi there - what's next?,False
 user_intent_type == "greeting",Hi - What should I do next?,False
 
-user_intent_type == "greeting" and intent_type_counter["user_intent_type"] == 1,Hi - what would you like me to do? If you want to know more about the game ask me what is the game. If you want to know about my capabilities tell me what can you do.,False
+user_intent_type == "greeting" and intent_type_counter[user_intent_type] == 1,Hi - what would you like me to do? If you want to know more about the game ask me what is the game. If you want to know about my capabilities tell me what can you do.,False
 
 user_intent_type == "incomplete_utterance" and intent_type_counter["incomplete_utterance"] == 1,Sorry I wasn't able to understand the entire instruction. Are you able to repeat that?, False
 
