@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.61.2](https://github.com/emma-simbot/experience-hub/compare/v8.61.1...v8.61.2) (2023-04-27)
+
+
+### Bug Fixes
+
+* **feedback:** alternative line for anticipating the 3d printer ([763651a](https://github.com/emma-simbot/experience-hub/commit/763651aa07eb9657103b5b8ddf1b49e292fd8a07))
+* **feedback:** alternative line for asking about agent ([dc11419](https://github.com/emma-simbot/experience-hub/commit/dc1141900edf8129b72c41cbdf070e873aa50fee))
+* **feedback:** condition for greeting rule ([500bfd5](https://github.com/emma-simbot/experience-hub/commit/500bfd553b53c7a90d58488177046a6ca0b10737))
+* **feedback:** remove the robotic arm lightweight line ([0c97c2a](https://github.com/emma-simbot/experience-hub/commit/0c97c2a263805e5e391ea5e7453a15eff76439aa))
+* **feedback:** use contraction for rule ([b4a951e](https://github.com/emma-simbot/experience-hub/commit/b4a951eb8862d34f71829df8c3d08292204b9826))
+
 ## [8.61.1](https://github.com/emma-simbot/experience-hub/compare/v8.61.0...v8.61.1) (2023-04-27)
 
 
