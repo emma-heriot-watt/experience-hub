@@ -97,7 +97,9 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
     ) -> SimBotFeedbackRule:
         """Select the highest-scoring rule from the set of rules."""
         # Try to filter out any rules that have already been used
-        valid_candidates = [rule for rule in candidates if rule.id not in used_rule_ids]
+        valid_candidates = [
+            rule for rule in candidates if (rule.id not in used_rule_ids) or (rule.is_mandatory)
+        ]
 
         if not valid_candidates:
             logger.warning("No unused candidate rules! Will need to reuse a response.")

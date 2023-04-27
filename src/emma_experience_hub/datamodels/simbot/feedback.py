@@ -6,7 +6,7 @@ from typing import Any, Optional
 import orjson
 from pydantic import BaseModel, Field, validator
 from rule_engine import Context, Rule
-from rule_engine.ast import ExpressionBase, SymbolExpression
+from rule_engine.ast import ExpressionBase, StringExpression, SymbolExpression
 
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 from emma_experience_hub.datamodels.simbot.enums import (
@@ -51,6 +51,36 @@ def get_score_for_rule_expression(
     return 0
 
 
+def should_rule_be_mandatory(expression: ExpressionBase) -> bool:  # noqa: WPS231
+    """Determine if the rule is mandatory.
+
+    Mandatory rules include responses that we want actually to include in the selection process no
+    matter what. These are generally responses where we want to communicate back to the user
+    something important aka, confirm_before_plan, ask_about_the_game.
+    """
+    # Try to get the left and right nodes within the expression
+    left_node: Optional[ExpressionBase] = getattr(expression, "left", None)
+    right_node: Optional[ExpressionBase] = getattr(expression, "right", None)
+
+    # If the left node is a SymbolExpression, we are at the slot name and can go no lower
+    if isinstance(left_node, SymbolExpression):
+        # Check the slot name for the verbal interaction intent type
+        if left_node.name == "verbal_interaction_intent_type":
+            # Check to see if the slot value is a mandatory one
+            if isinstance(right_node, StringExpression):
+                return "confirm_before_plan" in right_node.value or "ask_about" in right_node.value
+
+        # Otherwise, return False since we can go no lower
+        return False
+
+    # Otherwise, ensure both nodes are not None, and we can dig into them further
+    if left_node is not None and right_node is not None:
+        return should_rule_be_mandatory(left_node) or should_rule_be_mandatory(right_node)
+
+    # Otherwise, return False since that's the end.
+    return False
+
+
 class SimBotFeedbackRule(BaseModel):
     """Rule for response generation."""
 
@@ -64,6 +94,10 @@ class SimBotFeedbackRule(BaseModel):
         ..., description="Should the response be a lightweight dialog action"
     )
     score: int = Field(default=0, description="Determined by the number of conditions in the rule")
+    is_mandatory: bool = Field(
+        default=False,
+        description="Mandatory rules are always included in the candidate pool even if they have already been used",
+    )
 
     class Config:
         """Updated config."""
@@ -106,12 +140,15 @@ class SimBotFeedbackRule(BaseModel):
         if not rule.is_valid(rule.text):
             raise AssertionError(f"Invalid rule: ID {rule_id} - {rule.text}")
 
+        is_mandatory = should_rule_be_mandatory(rule.statement.expression)
+
         return cls(
             id=rule_id,
             rule=rule,
             response=raw_dict["response"],
             is_lightweight_dialog=raw_dict["is_lightweight"] == "True",
             score=len(rule.context.symbols),
+            is_mandatory=is_mandatory,
         )
 
     @validator("score", always=True)
