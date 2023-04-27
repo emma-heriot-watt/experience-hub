@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.61.0](https://github.com/emma-simbot/experience-hub/compare/v8.60.0...v8.61.0) (2023-04-27)
+
+
+### Features
+
+* being able to find and goto a sticky note ([#566](https://github.com/emma-simbot/experience-hub/issues/566)) ([8448af5](https://github.com/emma-simbot/experience-hub/commit/8448af5e60c81ba65c8f2bac3f4affc05067effc))
+* make selective rules mandatory (using recursion) ([#565](https://github.com/emma-simbot/experience-hub/issues/565)) ([583fbb6](https://github.com/emma-simbot/experience-hub/commit/583fbb6f83dda10345d1ce1460daebd5be0d8047)), closes [#562](https://github.com/emma-simbot/experience-hub/issues/562)
+
 ## [8.60.0](https://github.com/emma-simbot/experience-hub/compare/v8.59.5...v8.60.0) (2023-04-27)
 
 
