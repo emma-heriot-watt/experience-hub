@@ -29,7 +29,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_clarification_questions: bool = True
     enable_confirmation_questions: bool = True
     enable_grab_from_history: bool = True
-    enable_incomplete_utterances_intent: bool = False
+    enable_incomplete_utterances_intent: bool = True
     enable_object_related_questions_from_user: bool = True
     enable_out_of_domain_detector: bool = True
     enable_profanity_filter: bool = True

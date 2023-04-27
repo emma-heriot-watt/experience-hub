@@ -52,6 +52,7 @@ class SimBotIntentType(Enum):
     incomplete_utterance_find = "<incomplete_utterance_find>"
     incomplete_utterance_goto = "<incomplete_utterance_goto>"
     incomplete_utterance_pick = "<incomplete_utterance_pick>"
+    incomplete_utterance_place = "<incomplete_utterance_place>"
 
     # Feedback for previous turn success
     generic_success = "<success><generic>"
@@ -215,6 +216,7 @@ SimBotUserQAType = Literal[
     SimBotIntentType.incomplete_utterance_find,
     SimBotIntentType.incomplete_utterance_goto,
     SimBotIntentType.incomplete_utterance_pick,
+    SimBotIntentType.incomplete_utterance_place,
 ]
 
 

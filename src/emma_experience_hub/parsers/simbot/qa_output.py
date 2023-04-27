@@ -1,3 +1,4 @@
+import re
 from typing import Any, Optional, cast
 
 from loguru import logger
@@ -16,13 +17,15 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
     ) -> None:
         self._instruction_intent = instruction_intent
         self._enable_incomplete_utterances_intent = enable_incomplete_utterances_intent
+        self._incomplete_utterance_regex_pattern = self._regex_patterns_map()
 
     def __call__(self, intent_entity_response: dict[str, Any]) -> Optional[SimBotUserQAType]:
         """Parses the intent from rasa intent entity extraction."""
         logger.debug(f"SimBotQA output: `{intent_entity_response}`")
 
         # Get the intent from the response
-        try:
+        try:  # noqa: WPS229
+            utterance = intent_entity_response["text"]
             qa_intent_str: str = intent_entity_response["intent"]["name"]
             qa_entities_response: list[Any] = intent_entity_response["entities"]
         except KeyError:
@@ -41,7 +44,7 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
         )
         if should_process_intent:
             processed_intent = self._process_intent(
-                intent=qa_intent_str, entities=qa_entities_response
+                utterance=utterance, intent=qa_intent_str, entities=qa_entities_response
             )
             if processed_intent == qa_intent_str:
                 return None
@@ -59,11 +62,64 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
 
         return intent_type
 
-    def _process_intent(self, intent: str, entities: list[Any]) -> str:
-        # @TODO handle based on the extractor/entity. Reject if it can not be resolved to a known set of entities
-        if intent == "instruct_find" and not entities:
-            return "incomplete_utterance_find"
+    def _process_intent(self, utterance: str, intent: str, entities: list[Any]) -> str:
+        # if rasa model found an entity or there was no regex match for incomplete utterance
+        if entities or not self._is_regex_match_for_incomplete_utterance(utterance):
+            return intent
+        # if the utterance has 5 or more tokens, it will not be filtered. Long sequences may contain un accounted valid instruction
+        if len(utterance.split(" ")) > 4:
+            return intent
 
-        if intent == "instruct_goto" and not entities:
-            return "incomplete_utterance_goto"
+        if intent == "instruct_find":
+            intent = "incomplete_utterance_find"
+
+        if intent == "instruct_pick":
+            intent = "incomplete_utterance_pick"
+
+        if intent == "instruct_place":
+            intent = "incomplete_utterance_place"
+
+        if intent == "instruct_goto":
+            intent = "incomplete_utterance_goto"
+
         return intent
+
+    def _is_regex_match_for_incomplete_utterance(self, utterance) -> bool:
+        if re.search(self._incomplete_utterance_regex_pattern, utterance):
+            logger.debug(f"found incomplete regex match for the utterance: {utterance}")
+            return True
+        logger.debug(f"No incomplete regex match for the utterance: {utterance}")
+        return False
+
+    def _regex_patterns_map(self) -> bool:
+        verbs = [
+            "find",
+            "search",
+            "search for",
+            "look for",
+            "locate",
+            "pick",
+            "pick up",
+            "take",
+            "get",
+            "take out",
+            "take off",
+            "grab",
+            "retrieve",
+            "place",
+            "put",
+            "deliver",
+            "leave",
+            "set",
+            "insert",
+            "stack",
+            "goto",
+            "go to",
+            "get to",
+            "move to",
+            "move towards",
+        ]
+        patterns = [rf"\S?{verb}( the| a| an)?$" for verb in verbs]
+        combined_pattern = "|".join(patterns)
+        final_regex = f"({combined_pattern})"
+        return final_regex
