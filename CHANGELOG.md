@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.60.0](https://github.com/emma-simbot/experience-hub/compare/v8.59.5...v8.60.0) (2023-04-27)
+
+
+### Features
+
+* Incomplete utterance filtering ([#563](https://github.com/emma-simbot/experience-hub/issues/563)) ([ab82751](https://github.com/emma-simbot/experience-hub/commit/ab82751b628bcb78ae6176fa51e8761237de2857))
+
 ## [8.59.5](https://github.com/emma-simbot/experience-hub/compare/v8.59.4...v8.59.5) (2023-04-26)
 
 
