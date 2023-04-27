@@ -170,7 +170,7 @@ class SimBotUserIntentExtractionPipeline:
         if previous_turn is None:
             return False
         if previous_turn.actions.interaction is None:
-            return True
+            return False
         return not previous_turn.actions.interaction.is_successful
 
     def _get_verbal_interaction_intent_from_turn(
