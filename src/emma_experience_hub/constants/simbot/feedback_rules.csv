@@ -631,7 +631,7 @@ verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom"
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and current_room == interaction_action_entity and interaction_action_entity != null,Staying in the {interaction_action_entity},True
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,In the {interaction_action_entity} - now what?,False
-verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I am in the {interaction_action_entity},False
+verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I'm in the {interaction_action_entity},False
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null,I got to the {interaction_action_entity},False
 
 verbal_interaction_intent_type == null and interaction_action_type == "GotoRoom" and interaction_action_entity != null and interaction_action_entity in visited_room_counter and visited_room_counter[interaction_action_entity] > 1,Back in the {interaction_action_entity},False
