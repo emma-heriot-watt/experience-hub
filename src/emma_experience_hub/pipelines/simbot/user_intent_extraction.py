@@ -60,7 +60,7 @@ class SimBotUserIntentExtractionPipeline:
             with suppress(AssertionError):
                 return self.check_for_user_qa(session.current_turn.speech.utterance)
 
-        # Did the agent as the user aquestion in the previous turn?
+        # Did the agent as the user a question in the previous turn?
         if self._was_question_asked_in_previous_turn(session.previous_valid_turn):
             # Previous turn DID have a question to the user.
             with suppress(AssertionError, NotImplementedError):
@@ -148,12 +148,30 @@ class SimBotUserIntentExtractionPipeline:
         self, previous_turn: Optional[SimBotSessionTurn]
     ) -> bool:
         """Was a question asked by the agent in the previous turn?"""
+        if self._was_previous_action_unsuccessful(previous_turn):
+            return False
+        return self._was_question_intended_in_previous_turn(previous_turn)
+
+    def _was_question_intended_in_previous_turn(
+        self, previous_turn: Optional[SimBotSessionTurn]
+    ) -> bool:
+        """Was a question intended by the agent in the previous turn?"""
         return (
             previous_turn is not None
             and previous_turn.actions.dialog is not None
             and previous_turn.intent.verbal_interaction is not None
             and previous_turn.intent.verbal_interaction.type.triggers_question_to_user
         )
+
+    def _was_previous_action_unsuccessful(
+        self, previous_turn: Optional[SimBotSessionTurn]
+    ) -> bool:
+        """Was the previous action unsuccessful?"""
+        if previous_turn is None:
+            return False
+        if previous_turn.actions.interaction is None:
+            return True
+        return not previous_turn.actions.interaction.is_successful
 
     def _get_verbal_interaction_intent_from_turn(
         self, turn: Optional[SimBotSessionTurn]
