@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.64.0](https://github.com/emma-simbot/experience-hub/compare/v8.63.0...v8.64.0) (2023-04-27)
+
+
+### Features
+
+* **feedback:** make the feedback rules more 'conversational' ([#570](https://github.com/emma-simbot/experience-hub/issues/570)) ([dc629ed](https://github.com/emma-simbot/experience-hub/commit/dc629eda8a43be944573124d4bab472958e37702))
+
+
+### Bug Fixes
+
+* Confirmation unsuccessful action ([#571](https://github.com/emma-simbot/experience-hub/issues/571)) ([ee31be7](https://github.com/emma-simbot/experience-hub/commit/ee31be7763f26394891befb26f072532642fb30b))
+
 ## [8.63.0](https://github.com/emma-simbot/experience-hub/compare/v8.62.0...v8.63.0) (2023-04-27)
 
 
