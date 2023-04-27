@@ -207,49 +207,29 @@ def test_simbot_action_parser_object_navigation(
             visual_token_id - 1
         ] = simbot_object_name
 
-    if simbot_object_name == "Sticky Note":
-        raw_output = _build_raw_output(
-            "goto",
-            simbot_object_name,
-            include_end_of_trajectory=include_end_of_trajectory,
-        )
-        expected_action = SimBotAction(
-            id=0,
-            type=SimBotActionType.Goto,
-            raw_output=raw_output.removesuffix("</s>").removesuffix("."),
-            payload=SimBotGotoPayload(
-                object=SimBotGotoObject(
-                    name="stickynote",
-                    colorImageIndex=_get_expected_color_image_index(
-                        simbot_object_name, frame_token_id
-                    ),
+    raw_output = _build_raw_output(
+        "goto",
+        simbot_object_name,
+        visual_token_id=visual_token_id,
+        frame_token_id=frame_token_id,
+        include_end_of_trajectory=include_end_of_trajectory,
+    )
+    expected_action = SimBotAction(
+        id=0,
+        type=SimBotActionType.Goto,
+        raw_output=raw_output.removesuffix("</s>").removesuffix("."),
+        payload=SimBotGotoPayload(
+            object=SimBotGotoObject(
+                name=simbot_object_name,
+                colorImageIndex=_get_expected_color_image_index(
+                    simbot_object_name, frame_token_id
+                ),
+                mask=get_mask_from_special_tokens(
+                    frame_token_id, visual_token_id, simbot_extracted_features
                 ),
             ),
-        )
-    else:
-        raw_output = _build_raw_output(
-            "goto",
-            simbot_object_name,
-            visual_token_id=visual_token_id,
-            frame_token_id=frame_token_id,
-            include_end_of_trajectory=include_end_of_trajectory,
-        )
-        expected_action = SimBotAction(
-            id=0,
-            type=SimBotActionType.Goto,
-            raw_output=raw_output.removesuffix("</s>").removesuffix("."),
-            payload=SimBotGotoPayload(
-                object=SimBotGotoObject(
-                    name=simbot_object_name,
-                    colorImageIndex=_get_expected_color_image_index(
-                        simbot_object_name, frame_token_id
-                    ),
-                    mask=get_mask_from_special_tokens(
-                        frame_token_id, visual_token_id, simbot_extracted_features
-                    ),
-                ),
-            ),
-        )
+        ),
+    )
 
     parsed_action = simbot_action_parser(
         raw_output,

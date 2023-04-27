@@ -212,7 +212,12 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
         extracted_features: list[EmmaExtractedFeatures],
         num_frames_in_current_turn: int,
     ) -> tuple[Optional[SimBotObjectMaskType], int, str]:
-        if deconstructed_action.class_name == "stickynote":
+        # We can go to the mask provided by the sticky note
+        remove_mask_for_sticky_note = (
+            deconstructed_action.class_name == "stickynote"
+            and deconstructed_action.action_type != SimBotActionType.Goto
+        )
+        if remove_mask_for_sticky_note:
             # TODO: are we sure that we want to assume that the sticky note is in frame 0?
             return None, 0, "stickynote"
 
