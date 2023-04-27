@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.61.1](https://github.com/emma-simbot/experience-hub/compare/v8.61.0...v8.61.1) (2023-04-27)
+
+
+### Bug Fixes
+
+* **feedback:** rule for unsupported place on tables ([f86930d](https://github.com/emma-simbot/experience-hub/commit/f86930d628998a8075df1d93b2cf2bf4a3ec70cc))
+
 ## [8.61.0](https://github.com/emma-simbot/experience-hub/compare/v8.60.0...v8.61.0) (2023-04-27)
 
 
