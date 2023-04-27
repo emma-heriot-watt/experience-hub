@@ -267,8 +267,6 @@ interaction_action_type == "Toggle" and interaction_action_entity != null,Activa
 
 interaction_action_type == "Toggle" and interaction_action_entity == "Lever",Pulling the lever!,True
 
-interaction_action_type == "Toggle" and interaction_action_entity == "Robot Arm", I guess you could say we've got a handle on things now., True
-
 interaction_action_type =~ "(GotoRoom|GotoObject)",Getting there!,True
 
 physical_interaction_intent_type != null,',True
