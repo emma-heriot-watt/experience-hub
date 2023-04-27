@@ -576,6 +576,7 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Microwave" and inventory_entity != null,Shall I use the microwave to heat up the {inventory_entity}?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Printer" and inventory_entity == "Printer Cartridge",Do you want me to 3D print the cartridge?,False
+verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Printer" and inventory_entity == "Printer Cartridge",Do you want me use the 3D printer with the cartridge?,False
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Got to the robot arm - should I flip the switch?,False
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type == "GotoObject" and interaction_action_entity == "Robot Arm",Do you want me to activate the robot arm?,False
