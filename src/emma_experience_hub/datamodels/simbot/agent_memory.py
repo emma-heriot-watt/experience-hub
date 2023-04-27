@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from emma_experience_hub.constants.simbot import get_prior_memory
+from emma_experience_hub.constants.simbot import get_prior_memory, get_prior_memory_candidates
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.common import ArenaLocation, Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
@@ -35,6 +35,7 @@ class SimBotObjectMemory(BaseModel):
 
     memory: dict[str, SimBotRoomMemoryType] = {}
     _prior_memory: dict[str, str] = get_prior_memory()
+    _prior_memory_candidates: dict[str, list[str]] = get_prior_memory_candidates()
 
     def update_from_action(  # noqa: WPS231
         self,
@@ -118,7 +119,21 @@ class SimBotObjectMemory(BaseModel):
         """Is the object in the current room or prior memory?"""
         if self.read_memory_entity_in_room(room_name=current_room, object_label=object_label):
             return True
-        return self._prior_memory.get(object_label.lower(), None) is not None
+        object_label = object_label.lower()
+
+        if current_room in self._prior_memory_candidates.get(object_label, []):
+            return True
+
+        return self._prior_memory.get(object_label, None) is not None
+
+    def get_entity_room_candidate(self, object_label: str) -> Optional[list[str]]:
+        """Get all candidate rooms based on prior memory."""
+        object_label = object_label.lower()
+        prior_memory_room = self._prior_memory.get(object_label, None)
+        if prior_memory_room is not None:
+            return [prior_memory_room]
+
+        return self._prior_memory_candidates.get(object_label, None)
 
     def write_memory_entities_in_room(
         self,

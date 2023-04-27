@@ -92,13 +92,15 @@ class SimBotFindObjectPipeline:
             scan_area_threshold=scan_area_threshold,
         )
 
-    def run(self, session: SimBotSession) -> Optional[SimBotAction]:
+    def run(self, session: SimBotSession) -> Optional[SimBotAction]:  # noqa: WPS212
         """Handle the search through the environment."""
         if self._should_start_new_search(session):
             logger.debug("Preparing search plan...")
             with tracer.start_as_current_span("Building search plan"):
                 search_plan = self._build_search_plan(session)
 
+            if not search_plan:
+                return None
             if self._should_goto_room_before_new_search(search_plan):
                 return search_plan[0]
             # Reset the queue and counter and add the search plan
