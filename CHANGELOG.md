@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.68.2](https://github.com/emma-simbot/experience-hub/compare/v8.68.1...v8.68.2) (2023-04-28)
+
+
+### Bug Fixes
+
+* **feedback:** rephrase ask about location rules ([#587](https://github.com/emma-simbot/experience-hub/issues/587)) ([ff766dc](https://github.com/emma-simbot/experience-hub/commit/ff766dc5ed81abef471e6989e178bfb40f45f5c0))
+
 ## [8.68.1](https://github.com/emma-simbot/experience-hub/compare/v8.68.0...v8.68.1) (2023-04-28)
 
 
