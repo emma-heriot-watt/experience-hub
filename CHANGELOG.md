@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.71.0](https://github.com/emma-simbot/experience-hub/compare/v8.70.1...v8.71.0) (2023-04-28)
+
+
+### Features
+
+* Update OOD to v11 ([#593](https://github.com/emma-simbot/experience-hub/issues/593)) ([fdca5c7](https://github.com/emma-simbot/experience-hub/commit/fdca5c75a3a61eaca5bc3aceba8f7ccf29dbc855))
+* update policy coffee unmaker ([#591](https://github.com/emma-simbot/experience-hub/issues/591)) ([7508fea](https://github.com/emma-simbot/experience-hub/commit/7508fea53877fb8d14d7d25d648ba1f3c006a204))
+
+
+### Bug Fixes
+
+* Fix default qa rule ([#592](https://github.com/emma-simbot/experience-hub/issues/592)) ([9d86171](https://github.com/emma-simbot/experience-hub/commit/9d86171d42ad17627ae3b8d192bc4a84f8fb8c6e))
+
 ## [8.70.1](https://github.com/emma-simbot/experience-hub/compare/v8.70.0...v8.70.1) (2023-04-28)
 
 
