@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.70.0](https://github.com/emma-simbot/experience-hub/compare/v8.69.0...v8.70.0) (2023-04-28)
+
+
+### Features
+
+* Prioritise interacted candidate rooms ([#585](https://github.com/emma-simbot/experience-hub/issues/585)) ([6daa595](https://github.com/emma-simbot/experience-hub/commit/6daa5954cf55d90233a9a9c75448edb5215e1c74))
+
+
+### Bug Fixes
+
+* dont refer to small objects on pickup ([#589](https://github.com/emma-simbot/experience-hub/issues/589)) ([cf23d6f](https://github.com/emma-simbot/experience-hub/commit/cf23d6fe7fe41e2ed255ed798cd905897296ada1))
+
 ## [8.69.0](https://github.com/emma-simbot/experience-hub/compare/v8.68.2...v8.69.0) (2023-04-28)
 
 
