@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.66.2](https://github.com/emma-simbot/experience-hub/compare/v8.66.1...v8.66.2) (2023-04-28)
+
+
+### Bug Fixes
+
+* avoid double confirmation for act no match ([#581](https://github.com/emma-simbot/experience-hub/issues/581)) ([25a10e5](https://github.com/emma-simbot/experience-hub/commit/25a10e527b8813fa00c97503e96d63862eba6f85))
+* Vinvl Checkpoint update ([#582](https://github.com/emma-simbot/experience-hub/issues/582)) ([cb00808](https://github.com/emma-simbot/experience-hub/commit/cb008083bba3ee57a5330c2e93e178d0fb62ae3b))
+
 ## [8.66.1](https://github.com/emma-simbot/experience-hub/compare/v8.66.0...v8.66.1) (2023-04-28)
 
 
