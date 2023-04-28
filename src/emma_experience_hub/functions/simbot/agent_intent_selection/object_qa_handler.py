@@ -52,10 +52,7 @@ class SimBotObjectQAHandler:
         has_seen_object = session.current_state.memory.object_in_memory(
             target_entity, current_room=session.current_turn.environment.current_room
         )
-        prior_memory_candidate_locations = (
-            session.current_state.memory.get_entity_room_candidate(target_entity) is not None
-        )
-        return has_seen_object or prior_memory_candidate_locations
+        return has_seen_object
 
     def _handle_in_memory_entities(
         self, session: SimBotSession, target_entity: str

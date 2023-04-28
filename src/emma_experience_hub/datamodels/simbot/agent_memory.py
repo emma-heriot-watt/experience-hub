@@ -121,7 +121,7 @@ class SimBotObjectMemory(BaseModel):
             return True
         object_label = object_label.lower()
 
-        if current_room in self._prior_memory_candidates.get(object_label, []):
+        if object_label in self._prior_memory_candidates:
             return True
 
         return self._prior_memory.get(object_label, None) is not None
