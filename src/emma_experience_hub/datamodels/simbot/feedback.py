@@ -9,6 +9,7 @@ from rule_engine import Context, Rule
 from rule_engine.ast import ExpressionBase, StringExpression, SymbolExpression
 
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
+from emma_experience_hub.datamodels.simbot.agent_memory import get_area_from_compressed_mask
 from emma_experience_hub.datamodels.simbot.enums import (
     SimBotActionType,
     SimBotAnyUserIntentType,
@@ -18,6 +19,7 @@ from emma_experience_hub.datamodels.simbot.enums import (
     SimBotVerbalInteractionIntentType,
 )
 from emma_experience_hub.datamodels.simbot.intents import SimBotIntent
+from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectInteractionPayload
 
 
 def get_score_for_rule_expression(
@@ -273,6 +275,8 @@ class SimBotFeedbackState(BaseModel):
 
     current_turn_has_user_utterance: bool = False
 
+    object_area: Optional[float] = None
+
     class Config:
         """Config for the model."""
 
@@ -313,6 +317,13 @@ class SimBotFeedbackState(BaseModel):
             find_queue_not_empty=find_queue_not_empty,
             verbal_interaction_intent=verbal_interaction_intent,
         )
+
+        object_area = None
+        interaction_action_has_bbox = interaction_action is not None and isinstance(
+            interaction_action.payload, SimBotObjectInteractionPayload
+        )
+        if interaction_action_has_bbox:
+            object_area = get_area_from_compressed_mask(interaction_action.payload.object.mask)
 
         return cls(
             # Require a lightweight dialog action when the model does not decode a <stop token
@@ -367,6 +378,7 @@ class SimBotFeedbackState(BaseModel):
                 agent_responses_since_last_user_utterance
             ),
             current_turn_has_user_utterance=current_turn_has_user_utterance,
+            object_area=object_area,
         )
 
     def to_query(self) -> dict[str, Any]:
