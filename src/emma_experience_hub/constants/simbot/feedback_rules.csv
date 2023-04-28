@@ -279,8 +279,10 @@ interaction_action_type == "Toggle" and interaction_action_entity == "Lever",Pul
 interaction_action_type == "Toggle" and interaction_action_entity == "Blue Button",<amazon:emotion name="excited" intensity="high">Oh bluetiful!</amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Coffee Unmaker", <say-as interpret-as="interjection">hmm</say-as> - <amazon:emotion name="excited" intensity="medium">Coffee into coffee beans? That's a whole latte science!</amazon:emotion>,True
 interaction_action_type == "Toggle" and interaction_action_entity =~ "(Blue Button|Red Button|Green Button)", <amazon:emotion name="excited" intensity="medium">Yeees! - time to put my art skills in practice</amazon:emotion>,False
+interaction_action_type == "Toggle" and interaction_action_entity =~ "(Blue Button|Red Button|Green Button)", <say-as interpret-as="interjection">voila</say-as>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Freeze Ray Monitor",<amazon:emotion name="excited" intensity="high">Ice to see that we're working on something cool! </amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Laser Monitor",<amazon:emotion name="excited" intensity="medium">Wow - better be laser focused! </amazon:emotion>,False
+interaction_action_type == "Toggle" and interaction_action_entity == "Laser Monitor",<say-as interpret-as="interjection">pew pew</say-as>,False
 
 interaction_action_type =~ "(GotoRoom|GotoObject)",Getting there!,True
 
@@ -289,7 +291,8 @@ physical_interaction_intent_type != null,',False
 
 physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">all righty</say-as>.,False
 physical_interaction_intent_type == "act_one_match",',True
-physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">alrighty</say-as> - <amazon:domain name="conversational">What's next?</amazon:domain>,False
+physical_interaction_intent_type == "act_one_match",<amazon:domain name="conversational">So what are we doing next?</amazon:domain>,False
+physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">alrighty</say-as>,False
 physical_interaction_intent_type == "act_one_match",Now what?,False
 physical_interaction_intent_type == "act_one_match",So what's next?,False
 physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">righto</say-as>,False
@@ -438,6 +441,7 @@ user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|Goto
 user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",Heading there now!,True
 user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",I'm on my way!,True
 user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",Going there right away!,True
+user_intent_type == "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoPosition)",<say-as interpret-as="interjection">roger</say-as><say-as interpret-as="interjection">roger</say-as>,True
 
 user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="low">On it!</amazon:emotion>,True
 user_intent_type == "confirm_yes" and physical_interaction_intent_type == "search" and verbal_interaction_intent_type == "act_no_match" and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance,<amazon:emotion name="excited" intensity="low">Let's find it!</amazon:emotion>,True
@@ -468,13 +472,13 @@ user_intent_type == "incomplete_utterance_pick", Sorry I wasn't able to understa
 
 user_intent_type == "incomplete_utterance_place", I apologize for not being able to understand your instruction. If you need me to place something - please be specific about where you would like me to place it., False
 
-user_intent_type == "low_asr_confidence",I'm not sure I got that,False
-user_intent_type == "low_asr_confidence",I didn't hear properly - can you repeat that?,False
-user_intent_type == "low_asr_confidence",I didn't hear properly - can you say repeat that?,False
-user_intent_type == "low_asr_confidence",I didn't hear that properly - can you say it again?,False
-user_intent_type == "low_asr_confidence",I'm not sure I got that - I'll wait here until you tell me what to do next,False
-user_intent_type == "low_asr_confidence",I didn't hear that properly - could you say it again?,False
-user_intent_type == "low_asr_confidence",I didn't quite catch that properly - could you say it again?,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I'm not sure I got that</amazon:domain>,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't hear properly - can you repeat that?</amazon:domain>,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't hear properly - can you say repeat that?</amazon:domain>,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't hear that properly - can you say it again?</amazon:domain>,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I'm not sure I got that - I'll wait here until you tell me what to do next</amazon:domain>,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't hear that properly - could you say it again?</amazon:domain>,False
+user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't quite catch that properly - could you say it again?</amazon:domain>,False
 
 user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] == 1,Sorry I wasn't able to understand what you said. Are you able to repeat that?,False
 
