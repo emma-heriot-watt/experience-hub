@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.68.1](https://github.com/emma-simbot/experience-hub/compare/v8.68.0...v8.68.1) (2023-04-28)
+
+
+### Bug Fixes
+
+* merge agent responses into a long string for the feedback dict ([#586](https://github.com/emma-simbot/experience-hub/issues/586)) ([f1c5169](https://github.com/emma-simbot/experience-hub/commit/f1c5169967c1bd1abc790bf206cd09278236fd24))
+
 ## [8.68.0](https://github.com/emma-simbot/experience-hub/compare/v8.67.0...v8.68.0) (2023-04-28)
 
 
