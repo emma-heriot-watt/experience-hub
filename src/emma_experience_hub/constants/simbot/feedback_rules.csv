@@ -297,7 +297,6 @@ interaction_action_type == "Toggle" and interaction_action_entity == "Laser Moni
 interaction_action_type =~ "(GotoRoom|GotoObject)",Getting there!,True
 
 physical_interaction_intent_type != null,',True
-physical_interaction_intent_type != null,',False
 
 physical_interaction_intent_type == "act_one_match",<say-as interpret-as="interjection">all righty</say-as>.,False
 physical_interaction_intent_type == "act_one_match",',True
