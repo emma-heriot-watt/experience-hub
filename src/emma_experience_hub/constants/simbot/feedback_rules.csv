@@ -22,45 +22,44 @@ environment_intent_type == "already_holding_object" and inventory_entity != null
 environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. Can you give me another instruction?,False
 environment_intent_type == "already_holding_object" and inventory_entity != null and current_turn_has_user_utterance,Already holding the {inventory_entity}. What's next?,False
 
-environment_intent_type == "alternate_navigation_used",Hope that's close enough!,False
-environment_intent_type == "alternate_navigation_used",<say-as interpret-as="interjection">all righty</say-as> I think that's close enough,False
-environment_intent_type == "alternate_navigation_used",I got as close as I could.,False
+environment_intent_type == "alternate_navigation_used",<prosody rate="105%"><amazon:domain name="conversational">I hope that's close enough!</amazon:domain></prosody>,False
+environment_intent_type == "alternate_navigation_used",<prosody rate="105%"><amazon:domain name="conversational">I think that's close enough</amazon:domain></prosody>,False
+environment_intent_type == "alternate_navigation_used",<prosody rate="105%"><amazon:domain name="conversational">I got as close as I could.</amazon:domain></prosody>,False
 
-environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,Hope that's close enough to the {environment_intent_entity}!,False
-environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<say-as interpret-as="interjection">all righty</say-as> - I think that's close enough to the {environment_intent_entity},False
-environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,I got as close as I could to the {environment_intent_entity},False
+environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">Hope that's close enough to the {environment_intent_entity}!</amazon:domain></prosody>,False
+environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I think that's close enough to the {environment_intent_entity}</amazon:domain></prosody>,False
+environment_intent_type == "alternate_navigation_used" and environment_intent_action_type == "GotoObject" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I got as close as I could to the {environment_intent_entity}</amazon:domain></prosody>,False
 
-environment_intent_type == "arena_unavailable",Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?,False
+environment_intent_type == "arena_unavailable",<prosody rate="105%"><amazon:domain name="conversational">Love the enthusiasm but I wasn't in the room yet! What would you like me to do again?</amazon:domain></prosody>,False
 
-environment_intent_type == "generic_failure",I'm having some trouble and I'm not sure what to do - can you give me another instruction?,False
-environment_intent_type == "generic_failure",I'm having some trouble. Can you try rephrase that?,False
-environment_intent_type == "generic_failure",I'm struggling with this one. Are you able to give me a different instruction?,False
+environment_intent_type == "generic_failure",<prosody rate="105%"><amazon:domain name="conversational">I'm having some trouble and I'm not sure what to do - can you give me another instruction?</amazon:domain></prosody>,False
+environment_intent_type == "generic_failure",<prosody rate="105%"><amazon:domain name="conversational">I'm having some trouble. Can you try rephrase that?</amazon:domain></prosody>,False
+environment_intent_type == "generic_failure",<prosody rate="105%"><amazon:domain name="conversational">I'm struggling with this one. Are you able to give me a different instruction?</amazon:domain></prosody>,False
 
-environment_intent_type == "incorrect_action_format",I tried to perform an action but looks like I don't remember how to do it. Can you give me a different instruction?,False
+environment_intent_type == "incorrect_action_format",<prosody rate="105%"><amazon:emotion name="disappointed" intensity="low">I tried to perform an action but looks like I don't remember how to do it. Are you able to give me a different instruction?</amazon:emotion></prosody>,False
 
-environment_intent_type == "invalid_command",I had trouble executing the instruction. Could you please give me a different instruction?,False
+environment_intent_type == "invalid_command",<prosody rate="105%"><amazon:emotion name="disappointed" intensity="low">I had trouble executing the instruction. Could you please give me a different one?</amazon:emotion></prosody>,False
 
-environment_intent_type == "invalid_object_class",<say-as interpret-as="interjection">oops</say-as> - I made a mistake in interacting with that. Could you please give me a different instruction?,False
+environment_intent_type == "invalid_object_class",<prosody rate="105%"><amazon:emotion name="disappointed" intensity="low">I made a mistake in interacting with that. Could you please give me a different instruction?</amazon:emotion></prosody>,False
 
-environment_intent_type == "invalid_object_class" and environment_intent_entity != null,<say-as interpret-as="interjection">oops</say-as> - I made a mistake in interacting with the {environment_intent_entity}. Could you please give me a different instruction?,False
+environment_intent_type == "invalid_object_class" and environment_intent_entity != null,<prosody rate="105%"><amazon:emotion name="disappointed" intensity="low">I made a mistake in interacting with the {environment_intent_entity}. Could you please give me a different instruction?</amazon:emotion></prosody>,False
 
 environment_intent_type == "killed_by_hazard",I am dead,False
 environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">ouch</say-as>,False
-environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">ouch</say-as>. Let's not do that again,False
 environment_intent_type == "killed_by_hazard",<say-as interpret-as="interjection">no</say-as>,False
 
 environment_intent_type == "object_not_picked_up",I didn't pick that up for some reason - can you give me a different instruction?,False
 
-environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity} - can you give me a different instruction?,False
-environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,I'm not holding the {environment_intent_entity},False
+environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I'm not holding the {environment_intent_entity} - can you give me a different instruction?</amazon:domain></prosody>,False
+environment_intent_type == "object_not_picked_up" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I'm not holding the {environment_intent_entity}</amazon:domain></prosody>,False
 
-environment_intent_type == "object_overloaded",<say-as interpret-as="interjection">hmm</say-as> - it seems like it is currently overloaded. I think we need to fix that first? Try reading a sticky note on how to do that.,False
+environment_intent_type == "object_overloaded",<prosody rate="105%"><amazon:domain name="conversational">It seems like it is currently overloaded. I think we need to fix that first? Try reading a sticky note on how to do that.</amazon:domain></prosody>,False
 
-environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - it seems like it's not currently powered. Try reading a sticky note for help on how to turn on the power!,False
-environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - it seems like it's not currently powered. I think we need to handle that first?,False
-environment_intent_type == "object_unpowered",<say-as interpret-as="interjection">hmm</say-as> - seems like the power is off. Maybe you can get a useful hint by reading a sticky note,False
+environment_intent_type == "object_unpowered",<prosody rate="105%"><amazon:domain name="conversational">It looks like it's not currently powered. Try reading a sticky note for help on how to turn on the power!</amazon:domain></prosody>,False
+environment_intent_type == "object_unpowered",<prosody rate="105%"><amazon:domain name="conversational">It looks like it's not currently powered. I think we need to handle that first?</amazon:domain></prosody>,False
+environment_intent_type == "object_unpowered",<prosody rate="105%"><amazon:domain name="conversational">It looks like the power is off. Maybe you can get a useful hint by reading a sticky note</amazon:domain></prosody>,False
 
-environment_intent_type == "object_unpowered" and environment_intent_entity != null,It seems like the {environment_intent_entity} is not powered. Try saying 'Turn on the power' to bring back the electricity - or read a sticky note for help on how to turn on the power,False
+environment_intent_type == "object_unpowered" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">It seems like the {environment_intent_entity} is not powered. Try saying 'Turn on the power' to bring back the electricity - or read a sticky note for help on how to turn on the power</amazon:domain></prosody>,False
 
 environment_intent_type == "post_process_error",Something went wrong when I tried to execute this action. Can you give me a different instruction?,False
 
@@ -81,30 +80,38 @@ environment_intent_type == "receptacle_is_full" and environment_intent_action_ty
 
 environment_intent_type == "target_inaccessible" and environment_intent_entity != null,I can't access the {environment_intent_entity} from here. Can you provide me an instruction so it's in my view?,False
 
-environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> I was too far. Let's get closer,True
-environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> Let's get closer,True
-environment_intent_type == "target_out_of_range" and environment_intent_entity != "stickynote",<say-as interpret-as="interjection">whoops</say-as> it's too far. Can you tell me how to get closer?,False
-environment_intent_type == "target_out_of_range" and environment_intent_entity != null and environment_intent_entity == "stickynote",<say-as interpret-as="interjection">whoops</say-as> I could not read the sticky note. Can you give me a different instruction?,False
+environment_intent_type == "target_out_of_range",<prosody rate="105%"><amazon:domain name="conversational">Let's get closer</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range",<prosody rate="105%"><amazon:domain name="conversational">Let's move closer and try that again</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range",<prosody rate="105%"><amazon:domain name="conversational">Let me just get closer and try again</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range",<prosody rate="105%"><amazon:domain name="conversational">Let me get closer and try it again</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range",<prosody rate="105%"><amazon:domain name="conversational">Let me get closer and try that again</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range" and environment_intent_entity != "stickynote",<prosody rate="105%"><amazon:domain name="conversational">it's too far. Can you tell me how to get closer?</amazon:domain></prosody>,False
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null and environment_intent_entity == "stickynote",<prosody rate="105%"><amazon:domain name="conversational">I couldn't read the stickynote. Can you give me a different instruction?</amazon:domain></prosody>,False
 
-environment_intent_type == "target_out_of_range" and environment_intent_entity != null,The {environment_intent_entity} was too far. Moving closer,True
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">The {environment_intent_entity} was too far. Let me just get closer and try again</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">The {environment_intent_entity} was too far. Let me just get closer and try that again</amazon:domain></prosody>,True
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">The {environment_intent_entity} was too far. Let me get closer and try it again</amazon:domain></prosody>,True
 
-environment_intent_type == "target_out_of_range" and environment_intent_action_type == "Place" and environment_intent_entity != null,I can't reach the {environment_intent_entity} from here. Can you help me get closer?,False
+environment_intent_type == "target_out_of_range" and environment_intent_action_type == "Place" and environment_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I can't reach the {environment_intent_entity} away. Can you help me get closer to it?</amazon:domain></prosody>,False
 
-environment_intent_type == "target_out_of_range" and environment_intent_entity != null and environment_intent_entity != "stickynote",The {environment_intent_entity} is too far away. I think we should get closer first.,False
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null and environment_intent_entity != "stickynote",<prosody rate="105%"><amazon:domain name="conversational">The {environment_intent_entity} is too far away. I think we should get closer first.</amazon:domain></prosody>,False
 
-environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pickup",I'm not allowed to pick up that object - do you have another instruction to perform?,False
-environment_intent_type == "unsupported_action",I'm not allowed to perform that action on that object - do you have another instruction to perform?,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type == "Pickup",<amazon:domain name="conversational">I'm not allowed to pick up that object - do you have another instruction to perform?</amazon:domain>,False
+environment_intent_type == "unsupported_action",<amazon:domain name="conversational">I'm not allowed to perform that action on that object - can you give me another instruction instead?</amazon:domain>,False
 environment_intent_type == "unsupported_action",<amazon:domain name="conversational">I'm sorry - I'm afraid I can't do that</amazon:domain>,False
-environment_intent_type == "unsupported_action",I'm not allowed to perform that action on that object - what do you want me to do next?,False
-environment_intent_type == "unsupported_action",I'm not able to perform that action on that object - what do you want me to do next?,False
+environment_intent_type == "unsupported_action",<amazon:domain name="conversational">I'm not allowed to perform that action on that object - what do you want me to do next?</amazon:domain>,False
+environment_intent_type == "unsupported_action",<amazon:domain name="conversational">I'm not able to perform that action on that object - what do you want me to do next?</amazon:domain>,False
 
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type == "Pickup" and environment_intent_entity != null and object_area != null and object_area > 200,I'm unable to {environment_intent_action_type} the {environment_intent_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean|Pickup)" and environment_intent_entity != null,I'm unable to {environment_intent_action_type} the {environment_intent_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean|Pickup)" and environment_intent_entity != null,I'm afraid that I can't {environment_intent_action_type} the {environment_intent_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean|Pickup)" and environment_intent_entity != null,I can't {environment_intent_action_type} the {environment_intent_entity}.,False
-environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean|Pickup)" and environment_intent_entity != null,I'm not allowed to {environment_intent_action_type} the {environment_intent_entity}.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type != "Pickup" and environment_intent_entity =~ "(Action Figure|Can|Dart|Fan|Fork|Hammer|Handsaw|Knife|Circuit Board|Control Panel|Laser Tip|Printer Cartridge|Radio|Screwdriver|Spoon)",Sorry I was unable to {environment_intent_action_type} it. I can only pick up the {environment_intent_entity}.,False
+
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type == "Pickup" and environment_intent_entity != null and object_area != null and object_area > 200,<amazon:domain name="conversational">I'm unable to {environment_intent_action_type} the {environment_intent_entity}.</amazon:domain>,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,<amazon:domain name="conversational">I'm unable to {environment_intent_action_type} the {environment_intent_entity}.</amazon:domain>,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,<amazon:domain name="conversational">I'm afraid that I can't {environment_intent_action_type} the {environment_intent_entity}.</amazon:domain>,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,<amazon:domain name="conversational">I can't {environment_intent_action_type} the {environment_intent_entity}.</amazon:domain>,False
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_action_type !~ "(Place|Pour|Fill|Clean)" and environment_intent_entity != null,<amazon:domain name="conversational">I'm not allowed to {environment_intent_action_type} the {environment_intent_entity}.</amazon:domain>,False
+
+environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity =~ "(Action Figure|Can|Dart|Fan|Fork|Hammer|Handsaw|Knife|Circuit Board|Control Panel|Laser Tip|Printer Cartridge|Radio|Screwdriver|Spoon)",Sorry I can't {environment_intent_action_type} it. I can only pick up the {environment_intent_entity}.,False
 
 environment_intent_type == "unsupported_action" and environment_intent_action_type != null and environment_intent_entity =~ "(Apple|Banana|Bread|Burger|Cake|Candy Bar|Carrot|Donut|Pear|Pie|Sandwich)",I'm not allowed to {environment_intent_action_type} the {environment_intent_entity}. I can only pick it up.,False
 
@@ -222,7 +229,7 @@ environment_intent_type == "unsupported_action" and environment_intent_entity =~
 
 environment_intent_type == "unsupported_action" and interaction_action_type == "Break" and inventory_entity == "Hammer" and interaction_action_entity =~ "(Record|Floppy Disk|Trophy|Mug|Bowl|Plate)",We cannot break the {interaction_action_entity} using the hammer. Can you give me a different instruction?,False
 
-environment_intent_type == "unsupported_action" and interaction_action_type == "Break" and inventory_entity == null and interaction_action_entity != null,We need to pick up a hammer in order to break the {interaction_action_entity}. Let's first find a hammer, or print one using the 3D printer.,False
+environment_intent_type == "unsupported_action" and interaction_action_type == "Break" and inventory_entity == null and interaction_action_entity != null,We need to pick up a hammer in order to break the {interaction_action_entity}. Let's first find a hammer - or print one using the 3D printer.,False
 
 environment_intent_type == "unsupported_navigation" and verbal_interaction_intent_type != "confirm_before_plan",<amazon:domain name="conversational">I can't calculate a path without anything in the way</amazon:domain>,False
 environment_intent_type == "unsupported_navigation" and verbal_interaction_intent_type != "confirm_before_plan",<say-as interpret-as="interjection">le sigh</say-as> - I'm unable to figure out a clear route. Can you give me another instruction?,False
@@ -283,7 +290,7 @@ interaction_action_type == "Toggle" and interaction_action_entity == "Blue Butto
 interaction_action_type == "Toggle" and interaction_action_entity == "Coffee Unmaker", <say-as interpret-as="interjection">hmm</say-as> - <amazon:emotion name="excited" intensity="medium">Coffee into coffee beans? That's a whole latte science!</amazon:emotion>,True
 interaction_action_type == "Toggle" and interaction_action_entity =~ "(Blue Button|Red Button|Green Button)", <amazon:emotion name="excited" intensity="medium">Yeees! - time to put my art skills in practice</amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity =~ "(Blue Button|Red Button|Green Button)", <say-as interpret-as="interjection">voila</say-as>,False
-interaction_action_type == "Toggle" and interaction_action_entity == "Freeze Ray Monitor",<amazon:emotion name="excited" intensity="high">Ice to see that we're working on something cool! </amazon:emotion>,False
+interaction_action_type == "Toggle" and interaction_action_entity == "Freeze Ray Monitor",<amazon:emotion name="excited" intensity="medium">Ice to see that we're working on something cool! </amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Laser Monitor",<amazon:emotion name="excited" intensity="medium">Wow - better be laser focused! </amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Laser Monitor",<say-as interpret-as="interjection">pew pew</say-as>,False
 
@@ -340,16 +347,18 @@ physical_interaction_intent_type == "search" and interaction_action_type == "Got
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,I think we saw it somewhere here.,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoPosition" and visited_room_counter[current_room] > 1,It should be somewhere here.,True
 
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still looking,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's try one more spot,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe a new perspective will help!,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Let's look over here,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Maybe it's somewhere here,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Still looking</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Let's try one more spot</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Lemme try one more spot</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Maybe a new perspective will help!</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Let's look over here</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Lemme look over here</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Maybe it's somewhere here</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Still searching!</amazon:domain></prosody>,True
+physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,<prosody rate="105%"><amazon:domain name="conversational">Searching from a new spot!</amazon:domain></prosody>,True
 physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,',True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Still searching,True
-physical_interaction_intent_type == "search" and interaction_action_type == "GotoViewpoint" and find_queue_not_empty,Searching from a new spot,True
-
 physical_interaction_intent_type == "search" and interaction_action_type == "LookAround" and interaction_action_per_turn[-1]["type"] == "GotoPosition",',True
+
 
 physical_interaction_intent_type == "search" and interaction_action_type == "RotateLeft" and find_queue_not_empty,',True
 
@@ -400,28 +409,30 @@ physical_interaction_intent_type == "search" and verbal_interaction_intent_type 
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,Looking for the {physical_interaction_intent_entity}.,True
 physical_interaction_intent_type == "search" and verbal_interaction_intent_type == null and interaction_action_type == "RotateLeft" and current_turn_has_user_utterance and utterance_queue_not_empty and physical_interaction_intent_entity != null,<amazon:emotion name="excited" intensity="low">I am on it! The {physical_interaction_intent_entity} will be found in no time</amazon:emotion>,True
 
-user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Moving to the {interaction_action_entity},True
-user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,Let me get to the {interaction_action_entity},True
+user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,<amazon:emotion name="excited" intensity="low">Moving to the {interaction_action_entity}</amazon:emotion>,True
+user_intent_type != "confirm_yes" and interaction_action_type == "GotoRoom" and interaction_action_entity != null,<amazon:emotion name="excited" intensity="low">Let me get to the {interaction_action_entity}</amazon:emotion>,True
 
-user_intent_type != "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,Going to the {interaction_action_entity},True
+user_intent_type != "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,<amazon:emotion name="excited" intensity="low">Going to the {interaction_action_entity}</amazon:emotion>,True
+user_intent_type != "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,<amazon:emotion name="excited" intensity="low">Heading to the {interaction_action_entity}</amazon:emotion>,True
+user_intent_type != "confirm_yes" and interaction_action_type =~ "(GotoRoom|GotoObject)" and interaction_action_entity != null,<amazon:emotion name="excited" intensity="low">Let me just wheel over to the {interaction_action_entity}</amazon:emotion>,True
 
 user_intent_type == "admiration",Happy to be working with you. What's the next instruction?,False
 
-user_intent_type == "ask_about_agent",<prosody rate="110%"><amazon:domain name="conversational">I can follow simple instructions so break down the tasks and I'll follow the best I can! You can tell me to go to objects or other rooms or you can tell me to interact with nearby objects. You can also ask me to find something and i'll search in this room for it! </amazon:domain>So - what should I do?</prosody>, False
+user_intent_type == "ask_about_agent",<prosody rate="105%"><amazon:domain name="conversational">I can follow simple instructions so break down the tasks and I'll follow the best I can! You can tell me to go to objects or other rooms or you can tell me to interact with nearby objects. You can also ask me to find something and i'll search in this room for it! </amazon:domain>So - what should I do?</prosody>, False
 
-user_intent_type == "ask_about_agent" and current_room == "BreakRoom",<prosody rate="110%"><amazon:domain name="conversational">Break down the tasks into some step-by-step instructions and I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can pick up small objects like bowls or open objects like the fridge to see what's inside. If we turn on the sink - I can fill what I'm holding or clean dirty plates. So what's next?</amazon:domain></prosody>, False
+user_intent_type == "ask_about_agent" and current_room == "BreakRoom",<prosody rate="105%"><amazon:domain name="conversational">Break down the tasks into some step-by-step instructions and I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can pick up small objects like bowls or open objects like the fridge to see what's inside. If we turn on the sink - I can fill what I'm holding or clean dirty plates. So what's next?</amazon:domain></prosody>, False
 
-user_intent_type == "ask_about_agent" and current_room =~ "(Lab1|Lab2|Warehouse)",<prosody rate="110%"><amazon:domain name="conversational">Break down the tasks into some step-by-step instructions and I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can turn on the 3D printer or pickup and place items like cartridges. So what's next?</amazon:domain></prosody>, False
-user_intent_type == "ask_about_agent" and current_room =~ "(Lab1|Lab2|Warehouse)",<prosody rate="110%"><amazon:domain name="conversational">Break down the tasks into some step-by-step instructions and I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can turn on the 3D printer or pickup and place items like cartridges. So where would you like me to start?</amazon:domain></prosody>, False
+user_intent_type == "ask_about_agent" and current_room =~ "(Lab1|Lab2|Warehouse)",<prosody rate="105%"><amazon:domain name="conversational">Break down the tasks into some step-by-step instructions and I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can turn on the 3D printer or pickup and place items like cartridges. So what's next?</amazon:domain></prosody>, False
+user_intent_type == "ask_about_agent" and current_room =~ "(Lab1|Lab2|Warehouse)",<prosody rate="105%"><amazon:domain name="conversational">Break down the tasks into some step-by-step instructions and I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can turn on the 3D printer or pickup and place items like cartridges. So where would you like me to start?</amazon:domain></prosody>, False
 
-user_intent_type == "ask_about_agent" and current_room =~ "(SmallOffice|MainOffice|Reception)",<prosody rate="110%"><amazon:domain name="conversational">If you break down the tasks into some step-by-step instructions - I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can pick up small objects like a floppy disk - and then insert it in a computer with a slot. You can also ask me to scan nearby objects. So what would you like me to do next?</amazon:domain></prosody>,False
+user_intent_type == "ask_about_agent" and current_room =~ "(SmallOffice|MainOffice|Reception)",<prosody rate="105%"><amazon:domain name="conversational">If you break down the tasks into some step-by-step instructions - I'll do my best to follow along! I can move around - turn - go to different rooms - or I can search for objects and go to them. I can pick up small objects like a floppy disk - and then insert it in a computer with a slot. You can also ask me to scan nearby objects. So what would you like me to do next?</amazon:domain></prosody>,False
 
-user_intent_type == "ask_about_game",<prosody rate="110%"><amazon:domain name="conversational">Our mission is to complete the tasks on the upper-left of your screen. I don't know what the tasks are - you have to break them down and tell me what to do. If you want to know more about what I can do <break time="50ms"/> just say - what can you do. Let's go!</amazon:domain></prosody>,False
-user_intent_type == "ask_about_game",<prosody rate="110%"><amazon:domain name="conversational">We need to complete the tasks on your screen! Give me some step-by-step instructions and I'll do my best to follow along! If you want to know more about what I can do <break time="50ms"/> just say - what can you do. For more hints <break time="50ms"/> try reading a sticky note! So what's next?</amazon:domain></prosody>,False
+user_intent_type == "ask_about_game",<prosody rate="105%"><amazon:domain name="conversational">Our mission is to complete the tasks on the upper-left of your screen. I don't know what the tasks are - you have to break them down and tell me what to do. If you want to know more about what I can do <break time="50ms"/> just say - what can you do. Let's go!</amazon:domain></prosody>,False
+user_intent_type == "ask_about_game",<prosody rate="105%"><amazon:domain name="conversational">We need to complete the tasks on your screen! Give me some step-by-step instructions and I'll do my best to follow along! If you want to know more about what I can do <break time="50ms"/> just say - what can you do. For more hints <break time="50ms"/> try reading a sticky note! So what's next?</amazon:domain></prosody>,False
 
-user_intent_type == "confirm_no", Okay so what should I do?, True
-user_intent_type == "confirm_no", Can you give me a different instruction?, True
-user_intent_type == "confirm_no", So what's next?, True
+user_intent_type == "confirm_no", <prosody rate="105%"><amazon:domain name="conversational">Okay so what should I do?</amazon:domain></prosody>, False
+user_intent_type == "confirm_no", <prosody rate="105%"><amazon:domain name="conversational">Can you give me a different instruction?</amazon:domain></prosody>, False
+user_intent_type == "confirm_no", <prosody rate="105%"><amazon:domain name="conversational">Allright - so what are we doing next?</amazon:domain></prosody>, False
 
 user_intent_type == "confirm_no" and interaction_action_per_turn[-1]["type"] == "GotoObject" and interaction_action_per_turn[-1]["goto"]["object"]["name"] == "Computer" and inventory_entity == "Floppy Disk",Alright - you can help me navigate to another computer. Start by telling me to turn left or right - or even go to a different room.,False
 
@@ -473,7 +484,7 @@ user_intent_type == "incomplete_utterance_goto", Sorry I wasn't able to understa
 
 user_intent_type == "incomplete_utterance_pick", Sorry I wasn't able to understand what you need me to pick up. Can you please repeat that for me?,False
 
-user_intent_type == "incomplete_utterance_place", I apologize for not being able to understand your instruction. If you need me to place something - please be specific about where you would like me to place it., False
+user_intent_type == "incomplete_utterance_place", I'm not able to understand your instruction. If you need me to place something - please be specific about where you would like me to place it., False
 
 user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I'm not sure I got that</amazon:domain>,False
 user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't hear properly - can you repeat that?</amazon:domain>,False
@@ -483,11 +494,11 @@ user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I'
 user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't hear that properly - could you say it again?</amazon:domain>,False
 user_intent_type == "low_asr_confidence",<amazon:domain name="conversational">I didn't quite catch that properly - could you say it again?</amazon:domain>,False
 
-user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] == 1,Sorry I wasn't able to understand what you said. Are you able to repeat that?,False
+user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] == 1,<prosody rate="105%"><amazon:domain name="conversational">Sorry I wasn't able to understand what you said. Are you able to repeat that?</amazon:domain></prosody>,False
 
-user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] > 1,<say-as interpret-as="interjection">um</say-as> - Can you repeat that please?,False
+user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] > 1,<prosody rate="105%"><amazon:domain name="conversational">Can you repeat that again please?</amazon:domain></prosody>,False
 
-user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] > 2,Sorry I'm struggling to hear you - maybe try to go slower?,False
+user_intent_type == "low_asr_confidence" and intent_type_counter["low_asr_confidence"] > 2,<prosody rate="105%"><amazon:domain name="conversational">Sorry I'm struggling to hear you - maybe try to go slower?</amazon:domain></prosody>,False
 
 user_intent_type == "not_enough_information",Sorry what would you like me to do next?,False
 
@@ -523,8 +534,8 @@ verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,Which {verbal_interaction_intent_entity} are you referring to?,False
 verbal_interaction_intent_type == "act_too_many_matches" and verbal_interaction_intent_entity != null,I can see several - which {verbal_interaction_intent_entity} do you want?,False
 
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity !~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor|hammer|everything's a carrot machine)",I'm not aware of any special properties of the {verbal_interaction_intent_entity}. What shall we do next?,False
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity !~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor|hammer|everything's a carrot machine)",I believe it is just like a regular {verbal_interaction_intent_entity}. So what's next?,False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity !~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor|hammer|everything's a carrot machine)",<prosody rate="112%"><amazon:domain name="conversational">I not aware of any special properties of the {verbal_interaction_intent_entity}. What shall we do next?</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity !~ "(time machine|color changer|sticky note|gravity pad|printer|printer cartridge|robot arm|freeze ray|coffee maker|coffee unmaker|dino|dinosaur|portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor|hammer|everything's a carrot machine)",<prosody rate="112%"><amazon:domain name="conversational">I believe it's just like a regular {verbal_interaction_intent_entity}? What's next?</amazon:domain></prosody>,False
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "coffee maker",<prosody rate="112%"><amazon:domain name="conversational">Let me see - to use the coffee maker? you need to pour some coffee beans and water into it and then turn it on.</amazon:domain></prosody>, False
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "coffee maker",<prosody rate="112%"><amazon:domain name="conversational">We can use the coffee maker to brew some fresh coffee! We just need to pour some coffee beans and water in and turn it on.</amazon:domain></prosody>, False
@@ -562,7 +573,7 @@ verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_
 
 verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "sticky note", Sticky notes have useful hints and clues to complete the mission. Try read a sticky note when you're not sure what to do!,False
 
-verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "time machine",The time machine can restore objects to their original state! We can turn back time to restore a broken bowl or turn a carrot back into its original object,False
+verbal_interaction_intent_type == "ask_about_affordance" and verbal_interaction_intent_entity == "time machine",The time machine can restore objects to their original state! We can turn back time to restore a broken bowl or turn a carrot back into whatever it was before!,False
 
 verbal_interaction_intent_type == "ask_about_appearance" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity !~ "(portal monitor|freeze ray monitor|laser monitor|embiggenator monitor|gravity monitor)",I am unaware of any special features of the {verbal_interaction_intent_entity},False
 
@@ -636,10 +647,10 @@ verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_t
 
 verbal_interaction_intent_type == "confirm_before_plan" and interaction_action_type =~ "(GotoObject|Place)" and interaction_action_entity == "Time Machine" and inventory_entity =~ "(Bowl|Trophy|Record|Floppy Disk)",<prosody rate="105%"><amazon:domain name="conversational">Do you want me to repair the {inventory_entity}?</amazon:domain></prosody>,False
 
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="110%"><amazon:domain name="conversational">I don't see the {verbal_interaction_intent_entity}. Do you want me to search for it first?</amazon:domain></prosody>,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="110%"><amazon:domain name="conversational">The {verbal_interaction_intent_entity} is not in my view. I should first look for it - right?</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">The {verbal_interaction_intent_entity} is not in my view. I should first look for it - right?</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I don't see the {verbal_interaction_intent_entity} in front of me. Do you want me to search for it first?</amazon:domain></prosody>,False
 verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">I don't see the {verbal_interaction_intent_entity} in front of me - should I start by finding it?</amazon:domain></prosody>,False
-verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">My vision system is not detecting the {verbal_interaction_intent_entity} - should I first search for it?</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "confirm_before_search" and verbal_interaction_intent_entity != null,<prosody rate="105%"><amazon:domain name="conversational">My vision system is not detecting the {verbal_interaction_intent_entity} in front of me - should I search the room for it?</amazon:domain></prosody>,False
 
 interaction_action_type == null and verbal_interaction_intent_type == "confirm_before_plan" and verbal_interaction_intent_entity == "BreakRoom" and physical_interaction_intent_type == "search" and physical_interaction_intent_entity == "Sink",<prosody rate="105%"><amazon:domain name="conversational">The sink should be in the breakroom. Do you want me to search for it in the breakroom?</amazon:domain></prosody>,False
 interaction_action_type == null and verbal_interaction_intent_type == "confirm_before_plan" and verbal_interaction_intent_entity == "BreakRoom" and physical_interaction_intent_type == "search" and physical_interaction_intent_entity == "Vending Machine",<prosody rate="105%"><amazon:domain name="conversational">The vending machine should be in the breakroom. Do you want me to search for it in the breakroom?</amazon:domain></prosody>,False
@@ -675,13 +686,13 @@ verbal_interaction_intent_type =~ "(ask_about_affordance|ask_about_location)" an
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity != null and verbal_interaction_intent_entity !~ "(wall shelf|toaster|microwave|milk|cereal box|cake|burger|sandwich|coffee beans|dino|dinosaur)",<prosody rate="105%"><amazon:domain name="conversational">I'm sorry - but I don't rememember seeing any {verbal_interaction_intent_entity} - You can ask me to search for it.</amazon:domain></prosody>, False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2",<prosody rate="110%"><amazon:domain name="conversational">We might find a {verbal_interaction_intent_entity} inside containers like the fridge or the microwave. So what's next?</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room != "Lab2",<prosody rate="105%"><amazon:domain name="conversational">We might find a {verbal_interaction_intent_entity} inside containers like the fridge or the microwave. So what's next?</amazon:domain></prosody>,False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2",<prosody rate="110%"><amazon:domain name="conversational">I've seen {verbal_interaction_intent_entity}s on the gravity flipper before. If not - it might be in the fridge or even in the microwave. What do you want to do next?</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(burger|sandwich)" and current_room == "Lab2",<prosody rate="105%"><amazon:domain name="conversational">I've seen {verbal_interaction_intent_entity}s on the gravity flipper before. If not - it might be in the fridge or even in the microwave. What do you want to do next?</amazon:domain></prosody>,False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2",<prosody rate="110%"><amazon:domain name="conversational">There might be a cake on the gravity flipper. If not - we can try the fridge or the freezer in the break room.</amazon:domain></prosody>, False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(cake)" and current_room == "Lab2",<prosody rate="105%"><amazon:domain name="conversational">There might be a cake on the gravity flipper. If not - we can try the fridge or the freezer in the break room.</amazon:domain></prosody>, False
 
-verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(coffee beans)",<prosody rate="110%"><amazon:domain name="conversational">I've seen coffee beans show up in the break room cabinets or on the gravity flipper or just literally anywhere! We could always make some by pouring some coffee in the coffee composer too.</amazon:domain></prosody>,False
+verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(coffee beans)",<prosody rate="105%"><amazon:domain name="conversational">I've seen coffee beans show up in the break room cabinets or on the gravity flipper or just literally anywhere! We could always make some by pouring some coffee in the coffee composer too.</amazon:domain></prosody>,False
 
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(wall shelf)",<prosody rate="105%"><amazon:domain name="conversational">Both the red and blue shelves should be in the robotics lab.</amazon:domain></prosody>,False
 verbal_interaction_intent_type == "ask_about_location" and verbal_interaction_intent_entity =~ "(wall shelf)",<prosody rate="105%"><amazon:domain name="conversational">Red and blue shelves should be in the robotics lab.</amazon:domain></prosody>,False
