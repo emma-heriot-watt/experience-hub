@@ -332,3 +332,8 @@ class SimBotDialogAction(SimBotAction):
     def is_lightweight_dialog(self) -> bool:
         """Return True if the dialog action is a lightweight dialog."""
         return self.type == SimBotActionType.LightweightDialog
+
+    @property
+    def utterance(self) -> str:
+        """Get the utterance spoken by the agent."""
+        return self.payload.value

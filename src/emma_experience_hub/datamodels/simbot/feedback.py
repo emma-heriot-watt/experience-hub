@@ -266,6 +266,11 @@ class SimBotFeedbackState(BaseModel):
     # History of used rule ids
     used_rule_ids: list[int] = Field(default_factory=list)
 
+    # History of agent responses within local window
+    #   This allows us to ensure words are not being repeated across responses, which gives us
+    #   more control and allows for more natural responses.
+    words_used_in_responses_within_window: list[str] = Field(default_factory=list)
+
     current_turn_has_user_utterance: bool = False
 
     class Config:
@@ -297,6 +302,7 @@ class SimBotFeedbackState(BaseModel):
         used_rule_ids: list[int],
         inventory_turn: int,
         inventory_entity: Optional[str],
+        agent_responses_since_last_user_utterance: list[str],
         current_turn_has_user_utterance: bool,
     ) -> "SimBotFeedbackState":
         """Create the state in a simple way."""
@@ -307,6 +313,19 @@ class SimBotFeedbackState(BaseModel):
             find_queue_not_empty=find_queue_not_empty,
             verbal_interaction_intent=verbal_interaction_intent,
         )
+
+        # If there are agent responses since the last user utternace, extract all the words used
+        # across them
+        if agent_responses_since_last_user_utterance:
+            words_used_in_responses_within_window = set(
+                itertools.chain.from_iterable(
+                    agent_response.split(" ")
+                    for agent_response in agent_responses_since_last_user_utterance
+                )
+            )
+        else:
+            words_used_in_responses_within_window = set()
+
         return cls(
             # Require a lightweight dialog action when the model does not decode a <stop token
             require_lightweight_dialog=require_lightweight_dialog,
@@ -356,6 +375,7 @@ class SimBotFeedbackState(BaseModel):
             used_rule_ids=used_rule_ids,
             inventory_turn=inventory_turn,
             inventory_entity=inventory_entity,
+            words_used_in_responses_within_window=list(words_used_in_responses_within_window),
             current_turn_has_user_utterance=current_turn_has_user_utterance,
         )
 

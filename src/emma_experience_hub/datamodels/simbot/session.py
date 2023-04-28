@@ -367,9 +367,7 @@ class SimBotSessionTurn(BaseModel):
         # Do not include lightweight dialog actions within the utterances!
         if self.actions.dialog is not None:
             utterances.append(
-                DialogueUtterance(
-                    utterance=self.actions.dialog.payload.value, role=SpeakerRole.agent
-                )
+                DialogueUtterance(utterance=self.actions.dialog.utterance, role=SpeakerRole.agent)
             )
 
         return utterances
@@ -657,6 +655,11 @@ class SimBotSession(BaseModel):
             used_rule_ids=self._get_used_feedback_rule_ids(),
             inventory_turn=self.inventory.turn_idx,
             inventory_entity=self.inventory.entity,
+            agent_responses_since_last_user_utterance=[
+                turn.actions.dialog.utterance
+                for turn in self.get_turns_since_last_original_user_utterance()
+                if turn.actions.dialog is not None
+            ],
             current_turn_has_user_utterance=self.current_turn.speech is not None,
         )
 
