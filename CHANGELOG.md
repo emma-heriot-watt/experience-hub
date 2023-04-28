@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.71.1](https://github.com/emma-simbot/experience-hub/compare/v8.71.0...v8.71.1) (2023-04-28)
+
+
+### Bug Fixes
+
+* color changer response ([#595](https://github.com/emma-simbot/experience-hub/issues/595)) ([041b310](https://github.com/emma-simbot/experience-hub/commit/041b31099ab1ac5623ec1d0721b4e3cefceed50f))
+* remove empty non-lighweight empty response ([#594](https://github.com/emma-simbot/experience-hub/issues/594)) ([2860da0](https://github.com/emma-simbot/experience-hub/commit/2860da0af5f3f4d24b2182188085c92f8821f6b7))
+
 ## [8.71.0](https://github.com/emma-simbot/experience-hub/compare/v8.70.1...v8.71.0) (2023-04-28)
 
 
