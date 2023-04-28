@@ -107,8 +107,17 @@ def raw_decoded_outputs(
     return raw_output
 
 
-def _get_expected_color_image_index(entity: str, frame_token_id: Optional[int] = None) -> int:
-    if "sticky" in entity.lower() or frame_token_id is None:
+def _get_expected_color_image_index(
+    entity: str,
+    frame_token_id: Optional[int] = None,
+    action_type: Optional[SimBotActionType] = None,
+) -> int:
+    # if no frame token id, then the color image index is 0
+    if frame_token_id is None:
+        return 0
+
+    # If we are NOT going to a sticky note, return 0
+    if "sticky" in entity.lower() and action_type != SimBotActionType.Goto:
         return 0
 
     return frame_token_id - 1
@@ -222,7 +231,7 @@ def test_simbot_action_parser_object_navigation(
             object=SimBotGotoObject(
                 name=simbot_object_name,
                 colorImageIndex=_get_expected_color_image_index(
-                    simbot_object_name, frame_token_id
+                    simbot_object_name, frame_token_id, SimBotActionType.Goto
                 ),
                 mask=get_mask_from_special_tokens(
                     frame_token_id, visual_token_id, simbot_extracted_features
