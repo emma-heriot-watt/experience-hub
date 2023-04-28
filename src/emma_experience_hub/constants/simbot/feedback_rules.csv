@@ -288,7 +288,7 @@ interaction_action_type == "Toggle" and interaction_action_entity != null,Activa
 interaction_action_type == "Toggle" and interaction_action_entity == "Lever",Pulling the lever!,True
 interaction_action_type == "Toggle" and interaction_action_entity == "Blue Button",<amazon:emotion name="excited" intensity="high">Oh bluetiful!</amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Coffee Unmaker", <say-as interpret-as="interjection">hmm</say-as> - <amazon:emotion name="excited" intensity="medium">Coffee into coffee beans? That's a whole latte science!</amazon:emotion>,True
-interaction_action_type == "Toggle" and interaction_action_entity =~ "(Blue Button|Red Button|Green Button)", <amazon:emotion name="excited" intensity="medium">Yeees! - time to put my art skills in practice</amazon:emotion>,False
+interaction_action_type == "Goto" and interaction_action_entity == "Color Changer" and inventory_entity != null, <amazon:emotion name="excited" intensity="medium">Yeees! - time to put my art skills in practice</amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity =~ "(Blue Button|Red Button|Green Button)", <say-as interpret-as="interjection">voila</say-as>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Freeze Ray Monitor",<amazon:emotion name="excited" intensity="medium">Ice to see that we're working on something cool! </amazon:emotion>,False
 interaction_action_type == "Toggle" and interaction_action_entity == "Laser Monitor",<amazon:emotion name="excited" intensity="medium">Wow - better be laser focused! </amazon:emotion>,False
