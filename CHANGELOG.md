@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.68.0](https://github.com/emma-simbot/experience-hub/compare/v8.67.0...v8.68.0) (2023-04-28)
+
+
+### Features
+
+* update images ([#584](https://github.com/emma-simbot/experience-hub/issues/584)) ([f66d242](https://github.com/emma-simbot/experience-hub/commit/f66d242706fd59c022d8de244a422e460454260a))
+
+
+### Bug Fixes
+
+* next viewpoint response ([#583](https://github.com/emma-simbot/experience-hub/issues/583)) ([0dd3b45](https://github.com/emma-simbot/experience-hub/commit/0dd3b45e8f530bf30fd7c2c1a4a1253c6405c64c))
+
 ## [8.67.0](https://github.com/emma-simbot/experience-hub/compare/v8.66.2...v8.67.0) (2023-04-28)
 
 
