@@ -18,6 +18,7 @@ class SimBotMemoryEntity(BaseModel):
     viewpoint: str
     area: float
     location: ArenaLocation
+    interaction_turn: int = -1
 
 
 SimBotRoomMemoryType = dict[str, SimBotMemoryEntity]
@@ -88,6 +89,26 @@ class SimBotObjectMemory(BaseModel):
                 if previous_interaction:
                     break
 
+    def update_interaction_turn_index(
+        self,
+        room_name: str,
+        action: SimBotAction,
+        turn_index: int,
+    ) -> None:
+        """Update the interaction turn."""
+        if not action.is_successful:
+            return
+
+        should_update_interaction_turn = (
+            action.is_object_interaction
+            and action.payload.entity_name is not None
+            and room_name in self.memory
+            and action.payload.entity_name.lower() in self.memory[room_name]
+        )
+        if should_update_interaction_turn:
+            object_label = action.payload.entity_name.lower()  # type: ignore[union-attr]
+            self.memory[room_name][object_label].interaction_turn = turn_index
+
     def read_memory_entity_in_room(
         self, room_name: str, object_label: str
     ) -> Optional[ArenaLocation]:
@@ -125,6 +146,27 @@ class SimBotObjectMemory(BaseModel):
             return True
 
         return self._prior_memory.get(object_label, None) is not None
+
+    def get_other_interacted_room(self, object_label: str) -> Optional[str]:
+        """Get the room where the object was interacted with."""
+        # Check if the object has multiple prior memory room candidates.
+        object_label = object_label.lower()
+        prior_room_candidates = self._prior_memory_candidates.get(object_label, None)
+        if prior_room_candidates is None:
+            return None
+
+        # Find the most recent room where the object was interacted with.
+        object_memory_entry = [
+            self.memory[room].get(object_label) if room in self.memory else None
+            for room in prior_room_candidates
+        ]
+        interaction_turns = [
+            entry.interaction_turn if entry else -1 for entry in object_memory_entry
+        ]
+        most_recent_interaction_turn = max(interaction_turns)
+        if most_recent_interaction_turn < 0:
+            return None
+        return prior_room_candidates[interaction_turns.index(most_recent_interaction_turn)]
 
     def get_entity_room_candidate(self, object_label: str) -> Optional[list[str]]:
         """Get all candidate rooms based on prior memory."""
@@ -217,10 +259,14 @@ class SimBotObjectMemory(BaseModel):
     ) -> None:
         object_label = object_label.lower()
         memory_entity = self.memory[room_name].get(object_label, None)
+        interaction_turn = memory_entity.interaction_turn if memory_entity else -1
         if memory_entity is None or memory_entity.area < area:
             location = ArenaLocation(room_name=room_name, position=position, rotation=rotation)
             self.memory[room_name][object_label] = SimBotMemoryEntity(
-                viewpoint=viewpoint, area=area, location=location
+                viewpoint=viewpoint,
+                area=area,
+                location=location,
+                interaction_turn=interaction_turn,
             )
 
     def _action_places_object_to_transform(

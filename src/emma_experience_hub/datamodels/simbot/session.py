@@ -616,6 +616,11 @@ class SimBotSession(BaseModel):
                 action_history=[turn.actions.interaction for turn in past_turns],  # type: ignore[union-attr]
                 inventory_history=[turn.state.inventory.entity for turn in past_turns],
             )
+        self.current_state.memory.update_interaction_turn_index(
+            room_name=self.previous_valid_turn.environment.current_room,
+            action=self.previous_valid_turn.actions.interaction,
+            turn_index=self.current_turn.idx - 1,
+        )
 
     def update_agent_memory(self, extracted_features: list[EmmaExtractedFeatures]) -> None:
         """Write to agent memory."""

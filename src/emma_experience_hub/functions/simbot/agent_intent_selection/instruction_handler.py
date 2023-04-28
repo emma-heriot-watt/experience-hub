@@ -228,11 +228,12 @@ class SimBotActHandler:
                 ),
             )
         # Otherwise start the search
-        queue_elem = SimBotQueueUtterance(
-            utterance=session.current_turn.speech.utterance,  # type: ignore[union-attr]
-            role=SpeakerRole.user,
-        )
-        session.current_state.utterance_queue.append_to_head(queue_elem)
+        if not session.current_turn.speech.utterance.startswith("go to the"):  # type: ignore[union-attr]
+            queue_elem = SimBotQueueUtterance(
+                utterance=session.current_turn.speech.utterance,  # type: ignore[union-attr]
+                role=SpeakerRole.user,
+            )
+            session.current_state.utterance_queue.append_to_head(queue_elem)
         session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
             utterance=f"find the {target_entity}",
             role=SpeakerRole.agent,

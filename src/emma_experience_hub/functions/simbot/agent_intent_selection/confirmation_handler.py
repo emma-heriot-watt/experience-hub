@@ -96,12 +96,13 @@ class SimBotConfirmationHandler:
             raise AssertionError("User intent is confirmation without a previous verbal intent")
 
         # Do a search routine before executing the latest instruction.
-        session.current_state.utterance_queue.append_to_head(
-            SimBotQueueUtterance(
-                utterance=previous_turn.speech.utterance,  # type: ignore[union-attr]
-                role=previous_turn.speech.role,  # type: ignore[union-attr]
-            ),
-        )
+        if not session.current_turn.speech.utterance.startswith("go to the"):  # type: ignore[union-attr]
+            session.current_state.utterance_queue.append_to_head(
+                SimBotQueueUtterance(
+                    utterance=previous_turn.speech.utterance,  # type: ignore[union-attr]
+                    role=previous_turn.speech.role,  # type: ignore[union-attr]
+                ),
+            )
         target_entity = previous_turn.intent.verbal_interaction.entity
         session.current_turn.speech = SimBotUserSpeech.update_user_utterance(
             utterance=f"find the {target_entity}",

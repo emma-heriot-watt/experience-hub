@@ -30,6 +30,17 @@ class GrabFromHistory:
 
         current_room = session.current_turn.environment.current_room
 
+        # Have we interacted with the object in another room?
+        previous_interaction_room = session.current_state.memory.get_other_interacted_room(
+            object_label=searchable_object
+        )
+        if previous_interaction_room is not None and previous_interaction_room != current_room:
+            return self._goto_room_before_search(
+                session=session,
+                searchable_object=searchable_object,
+                room=previous_interaction_room,
+            )
+
         # Have we seen the object in the current room?
         gfh_location = session.current_state.memory.read_memory_entity_in_room(
             room_name=current_room, object_label=searchable_object
