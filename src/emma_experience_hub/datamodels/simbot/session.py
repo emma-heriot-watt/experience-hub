@@ -574,6 +574,24 @@ class SimBotSession(BaseModel):
 
         return turns_within_window
 
+    def get_turns_since_last_original_user_utterance(self) -> list[SimBotSessionTurn]:
+        """Get all the turns since the last user utterance that was not from the queue."""
+        turns_within_window = []
+
+        # Iterate in reverse-order because we only care about the most recents turns
+        for turn in self.valid_turns[::-1]:
+            # Add the turn to the window
+            turns_within_window.append(turn)
+
+            # If the turn is the start of the local window, break
+            if turn.speech is not None and not turn.speech.from_utterance_queue:
+                break
+
+        # Reverse the order within the list so that they are in the correct order
+        turns_within_window.reverse()
+
+        return turns_within_window
+
     def try_to_update_agent_inventory(self) -> None:
         """Try to update the agent inventory given the actions from the previous turn."""
         if not self.previous_valid_turn:

@@ -82,13 +82,14 @@ environment_intent_type == "target_inaccessible" and environment_intent_entity !
 
 environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> I was too far. Let's get closer,True
 environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> Let's get closer,True
-environment_intent_type == "target_out_of_range",<say-as interpret-as="interjection">whoops</say-as> it's too far. Can you tell me how to get closer?,False
+environment_intent_type == "target_out_of_range" and environment_intent_entity != "stickynote",<say-as interpret-as="interjection">whoops</say-as> it's too far. Can you tell me how to get closer?,False
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null and environment_intent_entity == "stickynote",<say-as interpret-as="interjection">whoops</say-as> I could not read the sticky note. Can you give me a different instruction?,False
 
 environment_intent_type == "target_out_of_range" and environment_intent_entity != null,The {environment_intent_entity} was too far. Moving closer,True
 
 environment_intent_type == "target_out_of_range" and environment_intent_action_type == "Place" and environment_intent_entity != null,I can't reach the {environment_intent_entity} from here. Can you help me get closer?,False
 
-environment_intent_type == "target_out_of_range" and environment_intent_entity != null,The {environment_intent_entity} is too far away. I think we should get closer first.,False
+environment_intent_type == "target_out_of_range" and environment_intent_entity != null and environment_intent_entity != "stickynote",The {environment_intent_entity} is too far away. I think we should get closer first.,False
 
 environment_intent_type == "unsupported_action",I'm not allowed to perform that action on that object - do you have another instruction to perform?,False
 environment_intent_type == "unsupported_action",<amazon:domain name="conversational">I'm sorry - I'm afraid I can't do that</amazon:domain>,False

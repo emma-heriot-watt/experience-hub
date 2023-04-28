@@ -4,6 +4,7 @@ from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.constants.simbot import get_arena_definitions
 from emma_experience_hub.datamodels.simbot import (
     SimBotActionType,
+    SimBotEnvironmentIntentType,
     SimBotIntentType,
     SimBotSession,
     SimBotSessionTurn,
@@ -44,6 +45,9 @@ class SimBotEnvironmentErrorCatchingPipeline:
         environment_error = session.current_turn.intent.environment
         previous_turn = session.previous_valid_turn
         if environment_error is None or previous_turn is None:
+            return False
+
+        if self._check_for_error_catching_loops(session, environment_error.type):
             return False
         # Make sure we have the environment error entity
         environment_error_entity = (
@@ -263,3 +267,16 @@ class SimBotEnvironmentErrorCatchingPipeline:
         session.current_state.utterance_queue.append_to_head(queue_elem)
 
         return True
+
+    def _check_for_error_catching_loops(
+        self,
+        session: SimBotSession,
+        environment_error_type: SimBotEnvironmentIntentType,
+    ) -> bool:
+        """Check if the same error was caught since the last time the user said something."""
+        errors = [
+            turn.intent.environment.type
+            for turn in session.get_turns_since_last_original_user_utterance()
+            if turn.intent.environment
+        ]
+        return errors.count(environment_error_type) > 1
