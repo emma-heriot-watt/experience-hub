@@ -253,7 +253,7 @@ interaction_action_type == "GotoObject" and interaction_action_entity == "Coffee
 
 interaction_action_type == "GotoObject" and interaction_action_entity == "Time Machine" and inventory_entity == null,This time machine can be used to turn objects into their original state! Let's find something that we can repair before using the time machine.,False
 
-interaction_action_type == "MoveForward" and action_type_counter["MoveForward"] > 1 and current_room != null,If you want to move faster through the {current_room} say - next viewpoint - and I will move to a new location in this room, False
+interaction_action_type == "MoveForward" and action_type_counter["MoveForward"] == 2 and current_room != null,If you want to move faster through the {current_room} say - next viewpoint - and I will move to a new location in this room, False
 
 interaction_action_type == "Pickup" and interaction_action_entity != null and interaction_action_entity == "Coffee Beans",<amazon:emotion name="excited" intensity="low">We can make fresh coffee by pouring coffee beans and water into the coffee maker.</amazon:emotion>,False
 
