@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.69.0](https://github.com/emma-simbot/experience-hub/compare/v8.68.2...v8.69.0) (2023-04-28)
+
+
+### Features
+
+* **feedback:** add more conversational feedback rules ([#588](https://github.com/emma-simbot/experience-hub/issues/588)) ([49a3877](https://github.com/emma-simbot/experience-hub/commit/49a387711348a34a6ac0424c152b4426a2b57aba))
+
 ## [8.68.2](https://github.com/emma-simbot/experience-hub/compare/v8.68.1...v8.68.2) (2023-04-28)
 
 
