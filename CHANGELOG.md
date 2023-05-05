@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.71.2](https://github.com/emma-simbot/experience-hub/compare/v8.71.1...v8.71.2) (2023-05-05)
+
+
+### Bug Fixes
+
+* add flag to prevent/allow default response as lightweight ([#605](https://github.com/emma-simbot/experience-hub/issues/605)) ([f3b1c0b](https://github.com/emma-simbot/experience-hub/commit/f3b1c0bdd1b3d3faaa0584376aa93a731d258d77)), closes [#604](https://github.com/emma-simbot/experience-hub/issues/604)
+* disable checking for question when all questions are disabled ([#607](https://github.com/emma-simbot/experience-hub/issues/607)) ([8793aca](https://github.com/emma-simbot/experience-hub/commit/8793aca611e919c3da2675cdbd5680ec8576d53a)), closes [#606](https://github.com/emma-simbot/experience-hub/issues/606)
+
 ## [8.71.1](https://github.com/emma-simbot/experience-hub/compare/v8.71.0...v8.71.1) (2023-04-28)
 
 
