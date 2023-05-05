@@ -34,6 +34,8 @@ class SimBotUserIntentExtractionPipeline:
         qa_intent_parser: SimBotQAOutputParser,
         _enable_object_related_questions: bool = False,
         _enable_simbot_qa: bool = True,
+        _enable_confirmation_questions: bool = True,
+        _enable_clarification_questions: bool = True,
     ) -> None:
         self._confirmation_response_classifier = confirmation_response_classifier
 
@@ -42,6 +44,8 @@ class SimBotUserIntentExtractionPipeline:
 
         self._enable_object_related_questions = _enable_object_related_questions
         self._enable_simbot_qa = _enable_simbot_qa
+        self._enable_confirmation_questions = _enable_confirmation_questions
+        self._enable_clarification_questions = _enable_clarification_questions
 
     def run(self, session: SimBotSession) -> Optional[SimBotUserIntentType]:
         """Run the pipeline to get the user's intent.
@@ -148,6 +152,8 @@ class SimBotUserIntentExtractionPipeline:
         self, previous_turn: Optional[SimBotSessionTurn]
     ) -> bool:
         """Was a question asked by the agent in the previous turn?"""
+        if not (self._enable_clarification_questions or self._enable_confirmation_questions):
+            return False
         if self._was_previous_action_unsuccessful(previous_turn):
             return False
         return self._was_question_intended_in_previous_turn(previous_turn)

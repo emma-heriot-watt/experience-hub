@@ -78,6 +78,8 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 confirmation_response_classifier=clients.confirmation_response_classifier,
                 _enable_object_related_questions=simbot_settings.feature_flags.enable_object_related_questions_from_user,
                 _enable_simbot_qa=simbot_settings.feature_flags.enable_simbot_qa,
+                _enable_confirmation_questions=simbot_settings.feature_flags.enable_confirmation_questions,
+                _enable_clarification_questions=simbot_settings.feature_flags.enable_clarification_questions,
             ),
             environment_intent_extractor=SimBotEnvironmentIntentExtractionPipeline(),
             agent_intent_selector=SimBotAgentIntentSelectionPipeline(
