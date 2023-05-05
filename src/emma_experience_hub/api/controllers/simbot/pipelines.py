@@ -109,7 +109,9 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 find_object_pipeline=find_object,
                 simbot_hacks_client=clients.simbot_hacks,
             ),
-            agent_language_generator=SimBotAgentLanguageGenerationPipeline(),
+            agent_language_generator=SimBotAgentLanguageGenerationPipeline(
+                prevent_default_response_as_lightweight=simbot_settings.feature_flags.prevent_default_response_as_lightweight
+            ),
             anticipator=SimbotAnticipatorPipeline(
                 simbot_hacks_client=clients.simbot_hacks,
                 features_client=clients.features,

@@ -25,9 +25,11 @@ class SimBotAgentLanguageGenerationPipeline:
 
     _default_entity = "object"
 
-    def __init__(self) -> None:
+    def __init__(self, *, prevent_default_response_as_lightweight: bool = True) -> None:
         self._feedback_parser = SimBotFeedbackFromSessionStateParser.from_rules_csv()
         self._default_utterance = "'"
+
+        self._prevent_default_response_as_lightweight = prevent_default_response_as_lightweight
 
     def run(self, session: SimBotSession) -> Optional[SimBotDialogAction]:
         """Generate an utterance to send back to the user."""
@@ -47,8 +49,9 @@ class SimBotAgentLanguageGenerationPipeline:
         utterance = self._generate_utterance(rule, feedback_state)
 
         # Dont return the default utterance for lightweight dialog actions.
-        if feedback_state.require_lightweight_dialog and utterance == self._default_utterance:
-            return None
+        if self._prevent_default_response_as_lightweight:
+            if feedback_state.require_lightweight_dialog and utterance == self._default_utterance:
+                return None
 
         # Determine the dialog type for the response
         dialog_type = (
