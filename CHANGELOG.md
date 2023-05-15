@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.72.0](https://github.com/emma-simbot/experience-hub/compare/v8.71.2...v8.72.0) (2023-05-15)
+
+
+### Features
+
+* Add more flags for offline inference ([#616](https://github.com/emma-simbot/experience-hub/issues/616)) ([6df4342](https://github.com/emma-simbot/experience-hub/commit/6df4342122429650846d2b9f9de4df5a35fb3889))
+
 ## [8.71.2](https://github.com/emma-simbot/experience-hub/compare/v8.71.1...v8.71.2) (2023-05-05)
 
 
