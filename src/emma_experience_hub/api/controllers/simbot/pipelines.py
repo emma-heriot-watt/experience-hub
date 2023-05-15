@@ -56,7 +56,11 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
             scan_area_threshold=simbot_settings.feature_arguments.scan_area_threshold,
         )
         action_predictor_response_parser = SimBotActionPredictorOutputParser()
-        compound_splitter = SimBotCompoundSplitterPipeline(clients.compound_splitter)
+        compound_splitter = SimBotCompoundSplitterPipeline(
+            clients.compound_splitter,
+            _enable_compound_splitting=simbot_settings.feature_flags.enable_compound_splitting,
+            _enable_coreference_resolution=simbot_settings.feature_flags.enable_coreference_resolution,
+        )
         return cls(
             compound_splitter=compound_splitter,
             find_object=find_object,

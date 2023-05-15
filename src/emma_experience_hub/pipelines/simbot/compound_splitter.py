@@ -9,11 +9,20 @@ from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 class SimBotCompoundSplitterPipeline:
     """A component that splits complex instructions into smaller and simpler ones."""
 
-    def __init__(self, compound_splitter_client: CompoundSplitterClient) -> None:
+    def __init__(
+        self,
+        compound_splitter_client: CompoundSplitterClient,
+        _enable_compound_splitting: bool = True,
+        _enable_coreference_resolution: bool = True,
+    ) -> None:
         self.compound_splitter_client = compound_splitter_client
+        self._enable_compound_splitting = _enable_compound_splitting
+        self._enable_coreference_resolution = _enable_coreference_resolution
 
     def run(self, session: SimBotSession) -> SimBotSession:
         """Given the user instruction, updates the utterance queue with simpler instructions."""
+        if not self._enable_compound_splitting:
+            return session
         if not session.current_turn.speech:
             logger.warning(
                 "There is no utterance to extract intent from. Therefore the user has not explicitly told us to do anything."
@@ -65,6 +74,9 @@ class SimBotCompoundSplitterPipeline:
 
     def run_coreference_resolution(self, session: SimBotSession) -> SimBotSession:
         """Given the current and previous user instruction, perform coreference resolution."""
+        if not self._enable_coreference_resolution:
+            return session
+
         if len(session.current_state.last_user_utterance) <= 1:
             logger.warning("There are no utterances to resolve coreferences.")
             return session

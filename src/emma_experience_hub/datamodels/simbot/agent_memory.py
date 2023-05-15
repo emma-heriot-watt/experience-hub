@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from emma_experience_hub.common.settings import SimBotFeatureFlags
 from emma_experience_hub.constants.simbot import get_prior_memory, get_prior_memory_candidates
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.common import ArenaLocation, Position, RotationQuaternion
@@ -35,8 +36,19 @@ class SimBotObjectMemory(BaseModel):
     """Track all the observed objects and their closest viewpoints."""
 
     memory: dict[str, SimBotRoomMemoryType] = {}
-    _prior_memory: dict[str, str] = get_prior_memory()
-    _prior_memory_candidates: dict[str, list[str]] = get_prior_memory_candidates()
+    _prior_memory: dict[str, str] = {}
+    _prior_memory_candidates: dict[str, list[str]] = {}
+
+    @classmethod
+    def from_simbot_feature_flags(cls) -> "SimBotObjectMemory":
+        """Instantiate the prior memory depending on the feature flags."""
+        flags = SimBotFeatureFlags()
+        if flags.enable_prior_memory:
+            return cls(
+                _prior_memory=get_prior_memory(),
+                _prior_memory_candidates=get_prior_memory_candidates(),
+            )
+        return cls()
 
     def update_from_action(  # noqa: WPS231
         self,
