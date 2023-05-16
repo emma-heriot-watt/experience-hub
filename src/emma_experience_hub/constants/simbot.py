@@ -95,6 +95,7 @@ def get_feedback_rules() -> list[dict[str, str]]:
 @lru_cache(maxsize=1)
 def get_prior_memory() -> dict[str, str]:
     """Load prior memory of object location in rooms from file."""
+    return {}
     json_path = constants_absolute_path.joinpath("simbot", "prior_memory.json")
     with open(json_path) as json_file:
         return json.load(json_file)["fixed_locations"]
@@ -103,6 +104,7 @@ def get_prior_memory() -> dict[str, str]:
 @lru_cache(maxsize=1)
 def get_prior_memory_candidates() -> dict[str, list[str]]:
     """Load prior memory of object location in candidate rooms from file."""
+    return {}
     json_path = constants_absolute_path.joinpath("simbot", "prior_memory.json")
     with open(json_path) as json_file:
         return json.load(json_file)["candidate_locations"]

@@ -23,7 +23,7 @@ class SimBotFeatureArgs(BaseModel):
 class SimBotFeatureFlags(BaseModel):
     """Feature flags for the SimBot agent."""
 
-    enable_offline_evaluation: bool = False
+    enable_offline_evaluation: bool = True
 
     enable_always_highlight_before_object_action: bool = False
     enable_clarification_questions: bool = True
