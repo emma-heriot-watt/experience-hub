@@ -68,7 +68,7 @@ class SimBotFeatureFlags(BaseModel):
             values["enable_scanning_during_search"] = False
             values["enable_search_after_missing_inventory"] = False
             values["enable_simbot_qa"] = False
-            values["do_not_return_default_response_as_lightweight_response"] = False
+            values["prevent_default_response_as_lightweight"] = False
 
             values["gfh_location_type"] = GFHLocationType.viewpoint
         return values
