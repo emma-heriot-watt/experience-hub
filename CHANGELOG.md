@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.72.1](https://github.com/emma-simbot/experience-hub/compare/v8.72.0...v8.72.1) (2023-05-17)
+
+
+### Bug Fixes
+
+* **settings:** `prevent_default_response_as_lightweight` was not being set to False during offline inference ([785f4b4](https://github.com/emma-simbot/experience-hub/commit/785f4b4bf45a912ffde987288359a5d13fe11369))
+
 ## [8.72.0](https://github.com/emma-simbot/experience-hub/compare/v8.71.2...v8.72.0) (2023-05-15)
 
 
