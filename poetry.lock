@@ -1160,14 +1160,14 @@ test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
 name = "convert-case"
-version = "1.1.1"
+version = "1.2.3"
 description = "Convert between string cases with built-in case inference."
 category = "main"
 optional = false
-python-versions = ">= 3.6"
+python-versions = ">=3.6"
 files = [
-    {file = "convert-case-1.1.1.tar.gz", hash = "sha256:bb215e7bcca830713225f74945f157754fcac8c72cde92899958af9e03b21cbe"},
-    {file = "convert_case-1.1.1-py3-none-any.whl", hash = "sha256:30557b4d186e74e4e2ff23f96e986844d9798c19f684dd5a40313012725348af"},
+    {file = "convert-case-1.2.3.tar.gz", hash = "sha256:a8c4329e47233a2b16cac3c5d020e8ba0305293efbe22a6d80f8ffddf049703f"},
+    {file = "convert_case-1.2.3-py3-none-any.whl", hash = "sha256:ec8884050ca548e990666f82cba7ae2edfaa3c85dbead3042c2fd663b292373a"},
 ]
 
 [package.extras]
