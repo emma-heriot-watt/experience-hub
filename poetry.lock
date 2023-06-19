@@ -4788,12 +4788,12 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "rule-engine"
-version = "3.5.1"
+version = "3.6.0"
 description = "A lightweight, optionally typed expression language with a custom grammar for matching arbitrary Python objects."
 optional = false
 python-versions = "*"
 files = [
-    {file = "rule-engine-3.5.1.tar.gz", hash = "sha256:6e7d0f50f899a1d56c39efbd7d2cd18d23ba2fbbdf72149b70c38397cdbdfd5a"},
+    {file = "rule-engine-3.6.0.tar.gz", hash = "sha256:c177480fe34195e4e0d98f4c113b62a0358b65437303b112d54ca44802263608"},
 ]
 
 [package.dependencies]
