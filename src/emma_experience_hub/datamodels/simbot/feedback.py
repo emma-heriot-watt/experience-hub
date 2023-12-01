@@ -177,7 +177,7 @@ class SimBotFeedbackRule(BaseModel):
     def is_query_suitable(self, query: dict[str, Any]) -> bool:
         """Evaluate the rule given the query and ensure it is suitable."""
         try:
-            return self.rule.matches(query) and all([name in query for name in self.slot_names])
+            return self.rule.matches(query) and all(name in query for name in self.slot_names)
         except Exception:
             return False
 
@@ -323,7 +323,7 @@ class SimBotFeedbackState(BaseModel):
             interaction_action.payload, SimBotObjectInteractionPayload
         )
         if interaction_action_has_bbox:
-            object_area = get_area_from_compressed_mask(interaction_action.payload.object.mask)
+            object_area = get_area_from_compressed_mask(interaction_action.payload.object.mask)  # type: ignore[union-attr]
 
         return cls(
             # Require a lightweight dialog action when the model does not decode a <stop token

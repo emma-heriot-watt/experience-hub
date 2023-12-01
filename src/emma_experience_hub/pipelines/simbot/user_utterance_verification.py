@@ -103,7 +103,7 @@ class SimBotUserUtteranceVerificationPipeline:
         self, speech_recognition_payload: SimBotSpeechRecognitionPayload
     ) -> bool:
         """Detect whether the utterance only contains the wake word or not."""
-        return all([token.is_wake_word for token in speech_recognition_payload.tokens])
+        return all(token.is_wake_word for token in speech_recognition_payload.tokens)
 
     @tracer.start_as_current_span("Check for empty utterance")
     def _utterance_is_empty(

@@ -14,6 +14,8 @@ extend-ignore =
 		E501,
 		# Stop finding commented out code because it's mistaking shape annotations for code
 		E800,
+		# Don't complain about asserts
+		S101,
 		# Stop complaining about subprocess, we need it for this project
 		S404,S602,S603,S607,
 		# Stop complaining about using functions from random

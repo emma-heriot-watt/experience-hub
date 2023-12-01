@@ -84,14 +84,14 @@ class SimBotQAOutputParser(Parser[dict[str, Any], Optional[SimBotUserQAType]]):
 
         return intent
 
-    def _is_regex_match_for_incomplete_utterance(self, utterance) -> bool:
+    def _is_regex_match_for_incomplete_utterance(self, utterance: str) -> bool:
         if re.search(self._incomplete_utterance_regex_pattern, utterance):
             logger.debug(f"found incomplete regex match for the utterance: {utterance}")
             return True
         logger.debug(f"No incomplete regex match for the utterance: {utterance}")
         return False
 
-    def _regex_patterns_map(self) -> bool:
+    def _regex_patterns_map(self) -> str:
         verbs = [
             "find",
             "search",
