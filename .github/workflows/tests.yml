@@ -5,6 +5,8 @@ on:
   workflow_call:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
 
 env:
   PYTHON_VERSION: 3.9
@@ -18,7 +20,7 @@ env:
 jobs:
   changes:
     name: Check for Python file changes
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
     outputs:
       python: ${{steps.filter.outputs.python}}
@@ -43,7 +45,7 @@ jobs:
       run:
         shell: bash
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [changes]
     if: ${{needs.changes.outputs.python == 'true' && !github.event.pull_request.draft }}
     steps:

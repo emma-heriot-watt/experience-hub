@@ -7,6 +7,8 @@ on:
     types: [opened, reopened, synchronize, ready_for_review]
     branches:
       - main
+  push:
+    branches: [main]
 
 env:
   PYTHON_VERSION: 3.9
@@ -14,7 +16,7 @@ env:
 jobs:
   changes:
     name: Check for Python file changes
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
     outputs:
       python: ${{steps.filter.outputs.python}}
@@ -37,7 +39,7 @@ jobs:
     name: Type check Python
     needs: [changes]
     if: ${{needs.changes.outputs.python == 'true' && !github.event.pull_request.draft }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -113,7 +115,7 @@ jobs:
     name: Lint Python
     needs: [changes]
     if: ${{needs.changes.outputs.python == 'true' && !github.event.pull_request.draft }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -172,7 +174,7 @@ jobs:
 
   format:
     name: Format
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
     steps:
       - name: Checkout repository
