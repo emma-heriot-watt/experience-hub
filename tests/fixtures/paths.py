@@ -37,13 +37,17 @@ def auxiliary_metadata_dir(fixtures_root: Path) -> Path:
 @fixture(scope="session")
 def auxiliary_metadata_cache_dir(fixtures_root: Path) -> Path:
     """Path to the auxilary the metadata cache."""
-    return fixtures_root.joinpath("simbot/metadata_cache_dir/")
+    cache_dir = fixtures_root.joinpath("simbot/metadata_cache_dir/")
+    cache_dir.mkdir(exist_ok=True)
+    return cache_dir
 
 
 @fixture(scope="session")
 def features_cache_dir(fixtures_root: Path) -> Path:
     """Path to the auxilary features cache."""
-    return fixtures_root.joinpath("simbot/features/")
+    features_cache_dir = fixtures_root.joinpath("simbot/features/")
+    features_cache_dir.mkdir(exist_ok=True)
+    return features_cache_dir
 
 
 @fixture(scope="session")
