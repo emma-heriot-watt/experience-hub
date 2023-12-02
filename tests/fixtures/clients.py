@@ -33,11 +33,11 @@ def profanity_filter_client(httpx_mock: HTTPXMock) -> Generator[ProfanityFilterC
 def mock_feature_extraction_response(monkeypatch: MonkeyPatch) -> None:
     """Mock get_features from the SimBotFeaturesClient."""
 
-    def mock_get_features(*args: Any, **kwargs: Any) -> list[EmmaExtractedFeatures]:  # noqa: WPS430
+    def mock_features(*args: Any, **kwargs: Any) -> list[EmmaExtractedFeatures]:  # noqa: WPS430
         features = create_placeholder_features_frames()
         return features
 
-    monkeypatch.setattr(SimBotFeaturesClient, "get_features", mock_get_features)
+    monkeypatch.setattr(SimBotFeaturesClient, "get_features", mock_features)
 
 
 @fixture
