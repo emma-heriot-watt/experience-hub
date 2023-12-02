@@ -31,7 +31,6 @@ class SimBotFeatureFlags(BaseModel):
     enable_coreference_resolution: bool = True
     enable_confirmation_questions: bool = True
     enable_grab_from_history: bool = True
-    enable_prior_memory: bool = True
     enable_incomplete_utterances_intent: bool = True
     enable_object_related_questions_from_user: bool = True
     enable_out_of_domain_detector: bool = True
@@ -60,7 +59,6 @@ class SimBotFeatureFlags(BaseModel):
             values["enable_clarification_questions"] = False
             values["enable_compound_splitting"] = False
             values["enable_coreference_resolution"] = False
-            values["enable_prior_memory"] = False
             values["enable_confirmation_questions"] = False
             values["enable_incomplete_utterances_intent"] = False
             values["enable_object_related_questions_from_user"] = False
