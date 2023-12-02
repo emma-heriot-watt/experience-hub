@@ -233,7 +233,7 @@ def run_controller_api(
     ),
     auxiliary_metadata_cache_dir: Path = typer.Option(
         ...,
-        help="Local directory to store the cached auxiliary metadata before uploading to S3.",
+        help="Local directory to store the cached auxiliary metadata.",
         writable=True,
         exists=True,
         rich_help_panel="Directories",

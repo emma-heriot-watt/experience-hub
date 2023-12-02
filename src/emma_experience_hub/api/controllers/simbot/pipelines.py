@@ -104,6 +104,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 _enable_search_after_no_match=simbot_settings.feature_flags.enable_search_after_no_match,
                 _enable_search_after_missing_inventory=simbot_settings.feature_flags.enable_search_after_missing_inventory,
                 _enable_high_level_planner=simbot_settings.feature_flags.enable_rasa_high_level_planner,
+                _enable_simbot_raw_text_match=simbot_settings.feature_flags.enable_simbot_raw_text_match,
             ),
             agent_action_generator=SimBotAgentActionGenerationPipeline(
                 features_client=clients.features,
@@ -112,6 +113,7 @@ class SimBotControllerPipelines(BaseModel, arbitrary_types_allowed=True):
                 previous_action_parser=SimBotPreviousActionParser(),
                 find_object_pipeline=find_object,
                 simbot_hacks_client=clients.simbot_hacks,
+                _enable_simbot_raw_text_match=simbot_settings.feature_flags.enable_simbot_raw_text_match,
             ),
             agent_language_generator=SimBotAgentLanguageGenerationPipeline(
                 prevent_default_response_as_lightweight=simbot_settings.feature_flags.prevent_default_response_as_lightweight

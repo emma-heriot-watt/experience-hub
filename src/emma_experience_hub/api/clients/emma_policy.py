@@ -39,7 +39,6 @@ class EmmaPolicyClient(Client):
         emma_policy_request = EmmaPolicyRequest(
             environment_history=environment_state_history,
             dialogue_history=dialogue_history,
-            inventory=inventory_entity,
             force_stop_token=force_stop_token,
         )
         logger.debug(f"Sending {emma_policy_request.num_images} images.")

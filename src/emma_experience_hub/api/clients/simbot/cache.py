@@ -14,8 +14,6 @@ from pathlib import Path
 from typing import Generic, Optional, TypeVar, Union
 
 import torch
-from cloudpathlib import S3Client, S3Path
-from opentelemetry import trace
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.api.clients.pydantic import PydanticClientMixin, PydanticT
@@ -25,8 +23,6 @@ from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetada
 
 T = TypeVar("T")
 
-tracer = trace.get_tracer(__name__)
-
 
 class SimBotCacheClient(Client, Generic[T]):
     """Cache client for SimBot data."""
@@ -35,15 +31,11 @@ class SimBotCacheClient(Client, Generic[T]):
 
     def __init__(
         self,
-        bucket_name: str,
         local_cache_dir: Path,
         object_prefix: Optional[str] = None,
     ) -> None:
-        self.bucket = bucket_name
         self.prefix = object_prefix if object_prefix is not None else ""
         self._local_cache_dir = local_cache_dir
-
-        self._s3 = S3Client(local_cache_dir=self._local_cache_dir)
 
     def healthcheck(self) -> bool:
         """Healthcheck for the client."""
@@ -61,12 +53,6 @@ class SimBotCacheClient(Client, Generic[T]):
         """Load the data, converting from bytes to the object."""
         raise NotImplementedError()
 
-    def upload_to_s3(self, session_id: str, prediction_request_id: str) -> None:
-        """Load the cached data to S3."""
-        cached_data = self._load_bytes(session_id, prediction_request_id)
-        s3_path = self._create_s3_path(session_id, prediction_request_id)
-        s3_path.write_bytes(cached_data)
-
     def _save_bytes(self, data: bytes, session_id: str, prediction_request_id: str) -> None:
         """Save the data."""
         destination_path = self._create_local_path(session_id, prediction_request_id)
@@ -83,14 +69,6 @@ class SimBotCacheClient(Client, Generic[T]):
         return self._local_cache_dir.joinpath(
             Path(f"{session_id}/{str(prediction_request_id)}.{self.suffix}")
         )
-
-    def _create_s3_path(self, session_id: str, prediction_request_id: str) -> S3Path:
-        """Build the name of the object on S3."""
-        object_name = "/".join(
-            [self.prefix, session_id, f"{str(prediction_request_id)}.{self.suffix}"]
-        ).lstrip("/")
-
-        return self._s3.CloudPath(f"s3://{self.bucket}/{object_name}")
 
 
 class SimBotPydanticCacheClient(PydanticClientMixin[PydanticT], SimBotCacheClient[PydanticT]):
@@ -119,7 +97,7 @@ class SimBotPydanticCacheClient(PydanticClientMixin[PydanticT], SimBotCacheClien
 
 
 class SimBotAuxiliaryMetadataClient(SimBotPydanticCacheClient[SimBotAuxiliaryMetadataPayload]):
-    """Cache auxiliary metadata on S3."""
+    """Cache auxiliary metadata."""
 
     model = SimBotAuxiliaryMetadataPayload
     suffix = "json"
@@ -130,7 +108,6 @@ class SimBotExtractedFeaturesClient(SimBotCacheClient[list[EmmaExtractedFeatures
 
     suffix = "pt"
 
-    @tracer.start_as_current_span("Save extracted features")
     def save(
         self,
         data: list[EmmaExtractedFeatures],
@@ -151,7 +128,6 @@ class SimBotExtractedFeaturesClient(SimBotCacheClient[list[EmmaExtractedFeatures
         # Write data
         self._save_bytes(data_buffer.getvalue(), session_id, prediction_request_id)
 
-    @tracer.start_as_current_span("Load extracted features from file")
     def load(self, session_id: str, prediction_request_id: str) -> list[EmmaExtractedFeatures]:
         """Load the extracted features from a single file."""
         # Load the raw data using torch.

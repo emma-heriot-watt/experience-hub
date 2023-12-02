@@ -14,7 +14,7 @@ from emma_experience_hub.functions.simbot.search import SearchPlanner
 class GrabFromHistory:
     """Grab from History class."""
 
-    def __call__(  # noqa: WPS212
+    def __call__(
         self,
         session: SimBotSession,
         search_planner: SearchPlanner,
@@ -30,17 +30,6 @@ class GrabFromHistory:
 
         current_room = session.current_turn.environment.current_room
 
-        # Have we interacted with the object in another room?
-        previous_interaction_room = session.current_state.memory.get_other_interacted_room(
-            object_label=searchable_object
-        )
-        if previous_interaction_room is not None and previous_interaction_room != current_room:
-            return self._goto_room_before_search(
-                session=session,
-                searchable_object=searchable_object,
-                room=previous_interaction_room,
-            )
-
         # Have we seen the object in the current room?
         gfh_location = session.current_state.memory.read_memory_entity_in_room(
             room_name=current_room, object_label=searchable_object
@@ -52,38 +41,7 @@ class GrabFromHistory:
                 gfh_location = None
             return search_planner.run(session, gfh_location=gfh_location)
 
-        # Is it an object we should search in different rooms?
-        # 1. Get the candidate rooms
-        # 2. If there are no candidate rooms or the current room is in the candidates - search in
-        #    the current room
-        # 3. If there are multiple candidate rooms, ask for confirmation
-        # 4. If there is only one candidate room, go to that room
-
-        gfh_prior_memory_room_candidates = session.current_state.memory.get_entity_room_candidate(
-            object_label=searchable_object
-        )
-        if gfh_prior_memory_room_candidates is None:
-            logger.debug(
-                f"Could not retrieve {searchable_object} from memory {session.current_state.memory}"
-            )
-            return search_planner.run(session)
-        # If prior knowlwedge says that the object is in the current room start searching
-        if current_room in gfh_prior_memory_room_candidates:
-            return search_planner.run(session)
-
-        gfh_prior_memory_room = gfh_prior_memory_room_candidates[0]
-        if len(gfh_prior_memory_room_candidates) > 1:
-            return self._ask_for_confirmation_before_search(
-                session=session, searchable_object=searchable_object, room=gfh_prior_memory_room
-            )
-
-        # Otherwise, just go to the room
-        logger.debug(
-            f"Found object {searchable_object} in prior memory room {gfh_prior_memory_room}"
-        )
-        return self._goto_room_before_search(
-            session=session, searchable_object=searchable_object, room=gfh_prior_memory_room
-        )
+        return search_planner.run(session)
 
     def _goto_room_before_search(
         self, session: SimBotSession, room: str, searchable_object: str

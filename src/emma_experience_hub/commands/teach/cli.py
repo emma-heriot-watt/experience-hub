@@ -41,10 +41,10 @@ app = typer.Typer(
 @app.command()
 def prepare_everything(
     remote_perception_model_uri: str = typer.Option(
-        ..., envvar="REMOTE_PERCEPTION_MODEL_URI", help="URI for the Perception model file on S3."
+        ..., envvar="REMOTE_PERCEPTION_MODEL_URI", help="URI for the Perception model file."
     ),
     remote_policy_model_uri: str = typer.Option(
-        ..., envvar="REMOTE_POLICY_MODEL_URI", help="URI for the Policy model file on S3."
+        ..., envvar="REMOTE_POLICY_MODEL_URI", help="URI for the Policy model file."
     ),
     count: Optional[int] = typer.Option(
         None,

@@ -23,7 +23,7 @@ class SimBotFeatureArgs(BaseModel):
 class SimBotFeatureFlags(BaseModel):
     """Feature flags for the SimBot agent."""
 
-    enable_offline_evaluation: bool = False
+    enable_offline_evaluation: bool = True
 
     enable_always_highlight_before_object_action: bool = False
     enable_clarification_questions: bool = True
@@ -31,7 +31,6 @@ class SimBotFeatureFlags(BaseModel):
     enable_coreference_resolution: bool = True
     enable_confirmation_questions: bool = True
     enable_grab_from_history: bool = True
-    enable_prior_memory: bool = True
     enable_incomplete_utterances_intent: bool = True
     enable_object_related_questions_from_user: bool = True
     enable_out_of_domain_detector: bool = True
@@ -42,6 +41,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_search_after_missing_inventory: bool = True
     enable_search_after_no_match: bool = True
     enable_simbot_qa: bool = True
+    enable_simbot_raw_text_match: bool = True
 
     prevent_default_response_as_lightweight: bool = True
 
@@ -59,7 +59,6 @@ class SimBotFeatureFlags(BaseModel):
             values["enable_clarification_questions"] = False
             values["enable_compound_splitting"] = False
             values["enable_coreference_resolution"] = False
-            values["enable_prior_memory"] = False
             values["enable_confirmation_questions"] = False
             values["enable_incomplete_utterances_intent"] = False
             values["enable_object_related_questions_from_user"] = False
@@ -69,6 +68,7 @@ class SimBotFeatureFlags(BaseModel):
             values["enable_search_after_missing_inventory"] = False
             values["enable_simbot_qa"] = False
             values["prevent_default_response_as_lightweight"] = False
+            values["enable_simbot_raw_text_match"] = False
 
             values["gfh_location_type"] = GFHLocationType.viewpoint
         return values
@@ -100,6 +100,7 @@ class SimBotSettings(BaseSettings):
     extracted_features_cache_dir: DirectoryPath
 
     session_db_memory_table_name: str = "SIMBOT_MEMORY_TABLE"
+    session_local_db_file: str = "storage/local_sessions.db"
     session_db_region: str = "us-east-1"
 
     feature_extractor_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5500", scheme=scheme)

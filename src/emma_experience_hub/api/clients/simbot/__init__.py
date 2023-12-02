@@ -11,3 +11,4 @@ from emma_experience_hub.api.clients.simbot.nlu_intent import SimBotNLUIntentCli
 from emma_experience_hub.api.clients.simbot.placeholder_vision import SimBotPlaceholderVisionClient
 from emma_experience_hub.api.clients.simbot.qa_intent import SimBotQAIntentClient
 from emma_experience_hub.api.clients.simbot.session_db import SimBotSessionDbClient
+from emma_experience_hub.api.clients.simbot.session_local_db import SimBotSQLLiteClient

@@ -1,7 +1,6 @@
 from typing import Optional
 
 from loguru import logger
-from opentelemetry import trace
 
 from emma_common.datamodels import EmmaExtractedFeatures, EnvironmentStateTurn
 from emma_experience_hub.api.clients.simbot import (
@@ -29,9 +28,6 @@ from emma_experience_hub.functions.simbot import (
     get_mask_from_special_tokens,
 )
 from emma_experience_hub.parsers.simbot import SimBotVisualGroundingOutputParser
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotFindObjectPipeline:
@@ -96,8 +92,7 @@ class SimBotFindObjectPipeline:
         """Handle the search through the environment."""
         if self._should_start_new_search(session):
             logger.debug("Preparing search plan...")
-            with tracer.start_as_current_span("Building search plan"):
-                search_plan = self._build_search_plan(session)
+            search_plan = self._build_search_plan(session)
 
             if not search_plan:
                 return None
@@ -217,7 +212,6 @@ class SimBotFindObjectPipeline:
         head_action = session.current_state.find_queue.queue[0]
         return head_action.type == SimBotActionType.MoveForward
 
-    @tracer.start_as_current_span("Trying to find object from visuals")
     def _get_object_from_turn(
         self,
         session: SimBotSession,
@@ -236,15 +230,13 @@ class SimBotFindObjectPipeline:
             inventory_entity=session.current_state.inventory.entity,
         )
 
-        with tracer.start_as_current_span("Parse visual grounding output"):
-            scene_object_tokens = self._visual_grounding_output_parser(raw_visual_grounding_output)
+        scene_object_tokens = self._visual_grounding_output_parser(raw_visual_grounding_output)
 
         if scene_object_tokens is None:
             raise AssertionError("Unable to get scene object tokens from the model output.")
 
         return scene_object_tokens
 
-    @tracer.start_as_current_span("Create actions for the found object")
     def _create_actions_for_found_object(
         self,
         session: SimBotSession,
@@ -390,7 +382,6 @@ class SimBotFindObjectPipeline:
             ),
         )
 
-    @tracer.start_as_current_span("Try get next action from plan")
     def _get_next_action_from_plan(self, session: SimBotSession) -> Optional[SimBotAction]:
         """If the model did not find the object, get the next action from the search plan."""
         next_action: Optional[SimBotAction] = None

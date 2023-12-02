@@ -1,4 +1,5 @@
 import signal
+from pathlib import Path
 from threading import Event
 from time import sleep
 from typing import Any
@@ -23,7 +24,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotNLUIntentClient,
     SimBotPlaceholderVisionClient,
     SimBotQAIntentClient,
-    SimBotSessionDbClient,
+    SimBotSQLLiteClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
 
@@ -36,7 +37,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     features: SimBotFeaturesClient
     nlu_intent: SimBotNLUIntentClient
     action_predictor: SimbotActionPredictionClient
-    session_db: SimBotSessionDbClient
+    session_db: SimBotSQLLiteClient
     profanity_filter: ProfanityFilterClient
     out_of_domain_detector: OutOfDomainDetectorClient
     confirmation_response_classifier: ConfirmationResponseClassifierClient
@@ -50,7 +51,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
         return cls(
             features=SimBotFeaturesClient(
                 auxiliary_metadata_cache_client=SimBotAuxiliaryMetadataClient(
-                    bucket_name=simbot_settings.simbot_cache_s3_bucket,
                     local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
                 ),
                 feature_extractor_client=FeatureExtractorClient(
@@ -58,7 +58,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                     timeout=simbot_settings.client_timeout,
                 ),
                 features_cache_client=SimBotExtractedFeaturesClient(
-                    bucket_name=simbot_settings.simbot_cache_s3_bucket,
                     local_cache_dir=simbot_settings.extracted_features_cache_dir,
                 ),
                 placeholder_vision_client=SimBotPlaceholderVisionClient(
@@ -66,9 +65,8 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                     timeout=simbot_settings.client_timeout,
                 ),
             ),
-            session_db=SimBotSessionDbClient(
-                resource_region=simbot_settings.session_db_region,
-                table_name=simbot_settings.session_db_memory_table_name,
+            session_db=SimBotSQLLiteClient(
+                db_file=Path(simbot_settings.session_local_db_file),
             ),
             nlu_intent=SimBotNLUIntentClient(
                 endpoint=simbot_settings.nlu_predictor_url,
@@ -100,6 +98,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
             simbot_hacks=SimBotHacksClient(
                 endpoint=simbot_settings.simbot_hacks_url,
                 timeout=simbot_settings.client_timeout,
+                disable=not simbot_settings.feature_flags.enable_simbot_raw_text_match,
             ),
             simbot_qa=SimBotQAIntentClient(
                 endpoint=simbot_settings.simbot_qa_url,
@@ -147,7 +146,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     def _healthcheck_all_clients(self) -> bool:
         """Check all the clients are healthy and running."""
         clients: list[Client] = list(self.dict().values())
-
         for client in clients:
             if not client.healthcheck():
                 logger.exception(f"Failed to verify the healthcheck for client `{client}`")

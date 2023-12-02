@@ -303,7 +303,7 @@ class SimBotSessionState(BaseModel, validate_assignment=True):
     utterance_queue: SimBotQueue[SimBotQueueUtterance] = SimBotQueue[SimBotQueueUtterance]()
     find_queue: SimBotQueue[SimBotAction] = SimBotQueue[SimBotAction]()
     inventory: SimBotInventory = SimBotInventory()
-    memory: SimBotObjectMemory = SimBotObjectMemory.from_simbot_feature_flags()
+    memory: SimBotObjectMemory = SimBotObjectMemory()
     last_user_utterance: SimBotQueue[str] = SimBotQueue[str]()
 
 

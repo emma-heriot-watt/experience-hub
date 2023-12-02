@@ -2,15 +2,11 @@ from typing import Literal, Optional, Union, overload
 
 import torch
 from loguru import logger
-from opentelemetry import trace
 from pydantic import BaseModel, Field
 
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.simbot.payloads import SimBotObjectMaskType
 from emma_experience_hub.functions.simbot.masks import compress_segmentation_mask
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotSceneObjectTokens(BaseModel):
@@ -69,8 +65,7 @@ def get_mask_from_special_tokens(
     # Populate the bbox region in the mask
     mask[int(y_min) : int(y_max) + 1, int(x_min) : int(x_max) + 1] = 1  # noqa: WPS221
 
-    with tracer.start_as_current_span("Compress segmentation mask"):
-        compressed_mask = compress_segmentation_mask(mask)
+    compressed_mask = compress_segmentation_mask(mask)
 
     if return_coords:
         return compressed_mask, (x_min, y_min, x_max, y_max)

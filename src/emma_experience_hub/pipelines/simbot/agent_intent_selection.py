@@ -57,6 +57,7 @@ class SimBotAgentIntentSelectionPipeline:
         _enable_search_after_no_match: bool = True,
         _enable_search_after_missing_inventory: bool = True,
         _enable_high_level_planner: bool = True,
+        _enable_simbot_raw_text_match: bool = True,
     ) -> None:
         self.clarification_handler = SimBotClarificationHandler()
         self._features_client = features_client
@@ -79,6 +80,7 @@ class SimBotAgentIntentSelectionPipeline:
             _enable_search_after_no_match=_enable_search_after_no_match,
             _enable_search_after_missing_inventory=_enable_search_after_missing_inventory,
             _enable_high_level_planner=_enable_high_level_planner,
+            _enable_simbot_raw_text_match=_enable_simbot_raw_text_match,
         )
         self._environment_error_pipeline = environment_error_pipeline
 

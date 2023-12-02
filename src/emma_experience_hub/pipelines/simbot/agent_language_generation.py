@@ -1,7 +1,6 @@
 from typing import Optional
 
 from loguru import logger
-from opentelemetry import trace
 
 from emma_experience_hub.constants.simbot import ACTION_SYNONYMS_FOR_GENERATION, ROOM_SYNONYNMS
 from emma_experience_hub.datamodels.simbot import (
@@ -17,9 +16,6 @@ from emma_experience_hub.parsers.simbot.feedback_from_session_context import (
 )
 
 
-tracer = trace.get_tracer(__name__)
-
-
 class SimBotAgentLanguageGenerationPipeline:
     """Generate language for the agent to say to the user."""
 
@@ -33,11 +29,9 @@ class SimBotAgentLanguageGenerationPipeline:
 
     def run(self, session: SimBotSession) -> Optional[SimBotDialogAction]:
         """Generate an utterance to send back to the user."""
-        with tracer.start_as_current_span("Get feedback state"):
-            feedback_state = session.to_feedback_state()
+        feedback_state = session.to_feedback_state()
 
-        with tracer.start_as_current_span("Choose utterance"):
-            matching_rule = self._feedback_parser(feedback_state)
+        matching_rule = self._feedback_parser(feedback_state)
 
         action = self._generate_dialog_action(matching_rule, feedback_state)
         return action

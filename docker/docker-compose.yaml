@@ -54,6 +54,7 @@ services:
       LOG_LEVEL: debug
       MODEL_NAME: "heriot-watt/emma-base"
       MODEL_CHECKPOINT_PATH: "/app/model/${INTENT_EXTRACTOR_MODEL}"
+      ENABLE_PREDICTION_PATCHING: False
     ports:
       - "5501:6000"
     healthcheck:
@@ -69,6 +70,7 @@ services:
     environment:
       LOG_LEVEL: debug
       MODEL_CHECKPOINT_PATH: "/app/model/${INSTRUCTION_PREDICTOR_MODEL}"
+      ENABLE_PREDICTION_PATCHING: False
     ports:
       - "5502:6000"
     healthcheck:
