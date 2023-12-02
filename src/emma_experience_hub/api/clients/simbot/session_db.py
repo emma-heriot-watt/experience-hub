@@ -122,4 +122,4 @@ class SimBotSessionDbClient(DynamoDbClient):
 
             all_response_items.extend(response["Items"])
 
-        return all_response_items
+        return all_response_items  # type: ignore[unreachable]

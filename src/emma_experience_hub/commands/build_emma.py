@@ -16,10 +16,10 @@ def torch_cuda_version_callback(torch_version: Optional[str]) -> str:
 
     try:
         int(torch_version.split("+cu")[-1])
-    except ValueError:
+    except ValueError as err:
         raise typer.BadParameter(
             "The cuda version must be castable to an integer. For example, `113` and not `11.3`"
-        )
+        ) from err
 
     return torch_version
 

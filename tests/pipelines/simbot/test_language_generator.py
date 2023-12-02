@@ -59,7 +59,7 @@ def test_response_slots_in_all_rules(rule_parser: SimBotFeedbackFromSessionState
     ]
     for rule_text, slots in rules_and_slots:
         rule_words = rule_text.split()
-        assert all([slot_name in rule_words for slot_name in slots])
+        assert all(slot_name in rule_words for slot_name in slots)
 
 
 def test_all_response_slots_are_validated_by_rules(
@@ -71,10 +71,10 @@ def test_all_response_slots_are_validated_by_rules(
     ]
     for rule_text, slots in rules_and_slots:
         # Each slot name must be used in the rule so that it exists in some way
-        assert all([slot_name in rule_text for slot_name in slots])
+        assert all(slot_name in rule_text for slot_name in slots)
 
         # Any slot name in the rule must not be checking for it to be equal to None
-        assert not any([f"{slot_name} == null" in rule_text for slot_name in slots])
+        assert not any(f"{slot_name} == null" in rule_text for slot_name in slots)
 
 
 def test_all_rule_symbols_in_state(rule_parser: SimBotFeedbackFromSessionStateParser) -> None:

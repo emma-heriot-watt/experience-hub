@@ -14,6 +14,8 @@ extend-ignore =
 		E501,
 		# Stop finding commented out code because it's mistaking shape annotations for code
 		E800,
+		# Don't complain about asserts
+		S101,
 		# Stop complaining about subprocess, we need it for this project
 		S404,S602,S603,S607,
 		# Stop complaining about using functions from random
@@ -69,8 +71,6 @@ extend-select =
 	# Within an except clause, raise exceptions with `raise ... from err` or `raise ...
 	# from None` to distinguish them from errors in exception handling
 	B904,
-	# Alternative to E501 regarding line length
-	B950,
 	#	Counterpart to W503, enforce having the operator at the start of a new line.
 	W504,
 

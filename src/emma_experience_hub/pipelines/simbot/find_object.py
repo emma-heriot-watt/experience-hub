@@ -206,6 +206,7 @@ class SimBotFindObjectPipeline:
             class_label=found_object_label,
             extracted_features=extracted_features,
         )
+        assert scene_object_tokens.object_index is not None
 
         object_idx = scene_object_tokens.object_index - 1
         area = extracted_features[frame_idx - 1].bbox_areas[object_idx].item()

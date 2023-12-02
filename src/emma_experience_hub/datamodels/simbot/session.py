@@ -613,7 +613,7 @@ class SimBotSession(BaseModel):
                 viewpoint=self.previous_valid_turn.environment.get_closest_viewpoint_name(),
                 action=self.previous_valid_turn.actions.interaction,
                 inventory_entity=self.previous_valid_turn.state.inventory.entity,
-                action_history=[turn.actions.interaction for turn in past_turns],  # type: ignore[union-attr]
+                action_history=[turn.actions.interaction for turn in past_turns],  # type: ignore[misc]
                 inventory_history=[turn.state.inventory.entity for turn in past_turns],
             )
         self.current_state.memory.update_interaction_turn_index(

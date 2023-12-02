@@ -90,7 +90,7 @@ def filter_edh_instances(
         edh_instances = [
             instance
             for instance in edh_instances
-            if any([action.obj_interaction_action for action in instance.driver_actions_future])
+            if any(action.obj_interaction_action for action in instance.driver_actions_future)
         ]
         console.log(
             f"{num_instances_before_filter - len(edh_instances)} EDH instances [cyan]do not have an interaction action[/] in their future. {len(edh_instances)} EDH instances remaining..."

@@ -64,9 +64,9 @@ class SimBotActionPredictorOutputParser(NeuralParser[SimBotAction]):
 
         try:
             decoded_action = self._separate_decoded_trajectory(decoded_trajectory)[0]
-        except IndexError:
+        except IndexError as err:
             # If there is a problem when decoding the action
-            raise IndexError("Could not decode any actions from the trajectory")
+            raise IndexError("Could not decode any actions from the trajectory") from err
 
         # Just use the first action, because if that is wrong, any future ones after it are likely
         # hallucinated

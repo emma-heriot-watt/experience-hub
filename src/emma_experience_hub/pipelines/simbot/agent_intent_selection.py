@@ -97,7 +97,7 @@ class SimBotAgentIntentSelectionPipeline:
 
             # check for object-qa and return
             if session.current_turn.intent.user.is_user_qa_about_object:
-                return self.handle_object_qa_intent(session)
+                return self.handle_object_qa_intent(session)  # type: ignore[return-value]
 
             # If we have received an invalid utterance, the agent does not act
             should_skip_action_selection = self._should_skip_action_selection(
