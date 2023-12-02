@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from typing import Any
 
 import httpx
 from pydantic import AnyHttpUrl
@@ -32,7 +33,7 @@ def profanity_filter_client(httpx_mock: HTTPXMock) -> Generator[ProfanityFilterC
 def mock_feature_extraction_response(monkeypatch: MonkeyPatch) -> None:
     """Mock get_features from the SimBotFeaturesClient."""
 
-    def mock_get_features(*args, **kwargs) -> list[EmmaExtractedFeatures]:  # noqa: WPS430
+    def mock_get_features(*args: Any, **kwargs: Any) -> list[EmmaExtractedFeatures]:  # noqa: WPS430
         features = create_placeholder_features_frames()
         return features
 
@@ -43,10 +44,10 @@ def mock_feature_extraction_response(monkeypatch: MonkeyPatch) -> None:
 def mock_policy_response_goto_room(monkeypatch: MonkeyPatch) -> None:
     """Mock the responses of EMMA policy."""
 
-    def get_nlu(*args, **kwargs) -> str:  # noqa: WPS430
+    def get_nlu(*args: Any, **kwargs: Any) -> str:  # noqa: WPS430
         return "<act><one_match>"
 
-    def get_action(*args, **kwargs) -> str:  # noqa: WPS430
+    def get_action(*args: Any, **kwargs: Any) -> str:  # noqa: WPS430
         return "goto breakroom<stop>."
 
     monkeypatch.setattr(SimBotNLUIntentClient, "generate", get_nlu)
@@ -58,10 +59,10 @@ def mock_policy_response_toggle_computer(monkeypatch: MonkeyPatch) -> None:
     """Mock the responses of EMMA policy when the input instruction is about turning on the
     computer."""
 
-    def get_nlu(*args, **kwargs) -> str:  # noqa: WPS430
+    def get_nlu(*args: Any, **kwargs: Any) -> str:  # noqa: WPS430
         return "<act><one_match>"
 
-    def get_action(*args, **kwargs) -> str:  # noqa: WPS430
+    def get_action(*args: Any, **kwargs: Any) -> str:  # noqa: WPS430
         return "toggle computer <frame_token_1> <vis_token_1><stop>."
 
     monkeypatch.setattr(SimBotNLUIntentClient, "generate", get_nlu)
@@ -73,13 +74,13 @@ def mock_policy_response_search(monkeypatch: MonkeyPatch) -> None:
     """Mock the responses of EMMA policy when the input instruction is about searching an
     object."""
 
-    def get_nlu(*args, **kwargs) -> str:  # noqa: WPS430
+    def get_nlu(*args: Any, **kwargs: Any) -> str:  # noqa: WPS430
         return "<search>"
 
-    def get_object(*args, **kwargs) -> list[str]:  # noqa: WPS430
+    def get_object(*args: Any, **kwargs: Any) -> list[str]:  # noqa: WPS430
         return ["<frame_token_1> <vis_token_1>"]
 
-    def get_target(*args, **kwargs) -> str:  # noqa: WPS430
+    def get_target(*args: Any, **kwargs: Any) -> str:  # noqa: WPS430
         return "goto object <frame_token_1> <vis_token_1> <stop>."
 
     monkeypatch.setattr(SimBotNLUIntentClient, "generate", get_nlu)

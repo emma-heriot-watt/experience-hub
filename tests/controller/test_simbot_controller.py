@@ -34,4 +34,4 @@ def test_simbot_api(
     controller = SimBotController.from_simbot_settings(simbot_settings)
     response = controller.handle_request_from_simbot_arena(simbot_request)
     assert response.actions[0].raw_output is not None
-    assert response.actions[0].raw_output == SimbotActionPredictionClient.generate()
+    assert response.actions[0].raw_output == SimbotActionPredictionClient.generate()  # type: ignore[call-arg]
