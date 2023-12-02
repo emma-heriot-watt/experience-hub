@@ -1,5 +1,4 @@
 from loguru import logger
-from opentelemetry import trace
 
 from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.api.controllers.simbot.clients import SimBotControllerClients
@@ -12,9 +11,6 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotSession,
     SimBotUserSpeech,
 )
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotController:
@@ -73,24 +69,21 @@ class SimBotController:
             return session
 
         logger.debug("Trying to split the instruction...")
-        with tracer.start_as_current_span("Split compound utterance"):
-            session = self.pipelines.compound_splitter.run(session)
-            return self.pipelines.compound_splitter.run_coreference_resolution(session)
+        session = self.pipelines.compound_splitter.run(session)
+        return self.pipelines.compound_splitter.run_coreference_resolution(session)
 
     def load_session_from_request(self, simbot_request: SimBotRequest) -> SimBotSession:
         """Load the entire session from the given request."""
         logger.debug("Running request processing")
 
-        with tracer.start_as_current_span("Load session from request"):
-            session = self.pipelines.request_processing.run(simbot_request)
+        session = self.pipelines.request_processing.run(simbot_request)
 
         # Verify user utterance is valid
         if self.settings.is_not_offline_evaluation and simbot_request.speech_recognition:
-            with tracer.start_as_current_span("Verify incoming utterance"):
-                user_intent = self.pipelines.user_utterance_verifier.run(
-                    simbot_request.speech_recognition
-                )
-                session.current_turn.intent.user = user_intent
+            user_intent = self.pipelines.user_utterance_verifier.run(
+                simbot_request.speech_recognition
+            )
+            session.current_turn.intent.user = user_intent
 
         # Cache the auxiliary metadata for the turn
         self.clients.features.get_auxiliary_metadata(session.current_turn)
@@ -117,8 +110,7 @@ class SimBotController:
         # If the utterance is valid, extract the intent from it.
         logger.debug("Extracting intent from user input...")
 
-        with tracer.start_as_current_span("Extract intent from user utterance"):
-            user_intent = self.pipelines.user_intent_extractor.run(session)
+        user_intent = self.pipelines.user_intent_extractor.run(session)
 
         logger.info(f"[INTENT] User: `{user_intent}`")
         user_intent_is_not_act = user_intent != SimBotIntentType.act
@@ -132,10 +124,9 @@ class SimBotController:
         """Determine what feedback from the environment tells us to do, if anything."""
         logger.debug("Extracting intent from the environment...")
 
-        with tracer.start_as_current_span("Extract intent from environment feedback"):
-            session.current_turn.intent.environment = (
-                self.pipelines.environment_intent_extractor.run(session)
-            )
+        session.current_turn.intent.environment = self.pipelines.environment_intent_extractor.run(
+            session
+        )
 
         logger.info(f"[INTENT] Environment: `{session.current_turn.intent.environment}`")
         return session
@@ -174,11 +165,10 @@ class SimBotController:
     def decide_what_the_agent_should_do(self, session: SimBotSession) -> SimBotSession:
         """Decide what the agent should do next."""
         logger.debug("Selecting agent intent...")
-        with tracer.start_as_current_span("Determine agent intent"):
-            agent_intents = self.pipelines.agent_intent_selector.run(session)
+        agent_intents = self.pipelines.agent_intent_selector.run(session)
 
-            session.current_turn.intent.physical_interaction = agent_intents[0]
-            session.current_turn.intent.verbal_interaction = agent_intents[1]
+        session.current_turn.intent.physical_interaction = agent_intents[0]
+        session.current_turn.intent.verbal_interaction = agent_intents[1]
 
         logger.info(f"[INTENT] Interaction: `{session.current_turn.intent.physical_interaction}`")
         logger.info(
@@ -198,13 +188,11 @@ class SimBotController:
         # Therefore, there is no interaction for the current turn, try to fill it
         if session.current_turn.actions.interaction is None:
             logger.debug("Generating interaction action...")
-            with tracer.start_as_current_span("Generate interaction action"):
-                session.current_turn.actions.interaction = (
-                    self.pipelines.agent_action_generator.run(session)
-                )
+            session.current_turn.actions.interaction = self.pipelines.agent_action_generator.run(
+                session
+            )
 
-            with tracer.start_as_current_span("Anticipate instructions"):
-                self.pipelines.anticipator.run(session)
+            self.pipelines.anticipator.run(session)
 
         logger.info(f"[ACTION] Interaction: `{session.current_turn.actions.interaction}`")
         return session
@@ -213,10 +201,7 @@ class SimBotController:
         """Generate a language action if needed."""
         logger.debug("Generating utterance for the turn (if needed)...")
 
-        with tracer.start_as_current_span("Generate utterance"):
-            session.current_turn.actions.dialog = self.pipelines.agent_language_generator.run(
-                session
-            )
+        session.current_turn.actions.dialog = self.pipelines.agent_language_generator.run(session)
 
         logger.info(f"[ACTION] Dialog: `{session.current_turn.actions.dialog}`")
         return session

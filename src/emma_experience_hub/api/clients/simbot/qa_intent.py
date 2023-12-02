@@ -3,12 +3,10 @@ from typing import Any, Optional
 import httpx
 from loguru import logger
 from methodtools import lru_cache
-from opentelemetry import trace
 
 from emma_experience_hub.api.clients.client import Client
 
 
-tracer = trace.get_tracer(__name__)
 LRU_CACHE_MAX_SIZE = 64
 
 
@@ -21,8 +19,7 @@ class SimBotQAIntentClient(Client):
 
     def process_utterance(self, utterance: str) -> Optional[dict[str, Any]]:
         """Given an utterance extract intents and entities."""
-        with tracer.start_as_current_span("Match text to template"):
-            response = self._process_utterance(utterance)
+        response = self._process_utterance(utterance)
 
         logger.debug(f"Cache info: {self._process_utterance.cache_info()}")
         return response

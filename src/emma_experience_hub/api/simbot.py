@@ -2,15 +2,11 @@ from typing import Literal
 
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from loguru import logger
-from opentelemetry import trace
 
 from emma_experience_hub.api.controllers import SimBotController
 from emma_experience_hub.api.observability import create_logger_context
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.datamodels.simbot import SimBotRequest, SimBotResponse
-
-
-tracer = trace.get_tracer(__name__)
 
 
 app = FastAPI(title="SimBot Challenge Inference")
@@ -55,21 +51,19 @@ async def handle_request_from_simbot_arena(
     raw_request = await request.json()
 
     # Parse the request from the server
-    with tracer.start_as_current_span("Parse raw request"):
-        try:
-            simbot_request = SimBotRequest.parse_obj(raw_request)
-        except Exception as request_err:
-            logger.exception("Unable to parse request")
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            raise request_err
+    try:
+        simbot_request = SimBotRequest.parse_obj(raw_request)
+    except Exception as request_err:
+        logger.exception("Unable to parse request")
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise request_err
 
     with create_logger_context(simbot_request):
         # Log the incoming request
         logger.info(f"Received request: {raw_request}")
 
-        with tracer.start_as_current_span("Handle request"):
-            # Handle the request
-            simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
+        # Handle the request
+        simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
 
         # Return response
         logger.info(f"Returning the response {simbot_response.json(by_alias=True)}")

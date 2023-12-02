@@ -1,7 +1,6 @@
 from typing import Callable, Optional
 
 from loguru import logger
-from opentelemetry import trace
 
 from emma_experience_hub.api.clients.simbot import (
     SimbotActionPredictionClient,
@@ -22,9 +21,6 @@ from emma_experience_hub.parsers.simbot import (
     SimBotPreviousActionParser,
 )
 from emma_experience_hub.pipelines.simbot.find_object import SimBotFindObjectPipeline
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotAgentActionGenerationPipeline:
@@ -69,12 +65,11 @@ class SimBotAgentActionGenerationPipeline:
             )
             return None
 
-        with tracer.start_as_current_span("Generate action"):
-            try:
-                return action_intent_handler(session)
-            except Exception:
-                logger.error("Failed to convert the agent intent to executable form.")
-                return None
+        try:
+            return action_intent_handler(session)
+        except Exception:
+            logger.error("Failed to convert the agent intent to executable form.")
+            return None
 
     def handle_act_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action when we want to just act."""
@@ -109,7 +104,6 @@ class SimBotAgentActionGenerationPipeline:
 
         return switcher[intent.type]
 
-    @tracer.start_as_current_span("Predict from template matching")
     def _predict_action_from_template_matching(self, session: SimBotSession) -> SimBotAction:
         """Generate an action from the raw-text matching templater."""
         if not session.current_turn.speech:
@@ -138,25 +132,21 @@ class SimBotAgentActionGenerationPipeline:
             )
             raise err
 
-    @tracer.start_as_current_span("Predict from Policy")
     def _predict_action_from_emma_policy(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action from the EMMA policy client."""
-        with tracer.start_as_current_span("Get turns within interaction window"):
-            if session.current_turn.utterance_from_queue:
-                turns_within_interaction_window = session.get_turns_since_last_user_utterance()
-            else:
-                turns_within_interaction_window = session.get_turns_within_interaction_window()
+        if session.current_turn.utterance_from_queue:
+            turns_within_interaction_window = session.get_turns_since_last_user_utterance()
+        else:
+            turns_within_interaction_window = session.get_turns_within_interaction_window()
 
-        with tracer.start_as_current_span("Build environment state history"):
-            environment_state_history = session.get_environment_state_history_from_turns(
-                turns_within_interaction_window,
-                self._features_client.get_features,
-            )
+        environment_state_history = session.get_environment_state_history_from_turns(
+            turns_within_interaction_window,
+            self._features_client.get_features,
+        )
 
-        with tracer.start_as_current_span("Get dialogue history"):
-            dialogue_history = session.get_dialogue_history_from_session_turns(
-                turns_within_interaction_window
-            )
+        dialogue_history = session.get_dialogue_history_from_session_turns(
+            turns_within_interaction_window
+        )
 
         raw_action_prediction = self._action_predictor_client.generate(
             dialogue_history=dialogue_history,
@@ -212,7 +202,6 @@ class SimBotAgentActionGenerationPipeline:
         )
         return not should_skip_goto_object_action
 
-    @tracer.start_as_current_span("Try replace mask with placeholder")
     def _replace_mask_with_placeholder(
         self, session: SimBotSession, action: SimBotAction
     ) -> SimBotAction:

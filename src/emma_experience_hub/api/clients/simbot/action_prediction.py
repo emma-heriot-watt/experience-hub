@@ -1,12 +1,7 @@
 from typing import Optional
 
-from opentelemetry import trace
-
 from emma_common.datamodels import DialogueUtterance, EnvironmentStateTurn
 from emma_experience_hub.api.clients.emma_policy import EmmaPolicyClient
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimbotActionPredictionClient(EmmaPolicyClient):
@@ -20,14 +15,13 @@ class SimbotActionPredictionClient(EmmaPolicyClient):
         inventory_entity: Optional[str] = None,
     ) -> str:
         """Generate a response from the features and provided language."""
-        with tracer.start_as_current_span("Generate action"):
-            return self._make_request(
-                f"{self._endpoint}/generate",
-                environment_state_history,
-                dialogue_history,
-                force_stop_token=force_stop_token,
-                inventory_entity=inventory_entity,
-            )
+        return self._make_request(
+            f"{self._endpoint}/generate",
+            environment_state_history,
+            dialogue_history,
+            force_stop_token=force_stop_token,
+            inventory_entity=inventory_entity,
+        )
 
     def find_object_in_scene(
         self,
@@ -36,10 +30,9 @@ class SimbotActionPredictionClient(EmmaPolicyClient):
         inventory_entity: Optional[str] = None,
     ) -> list[str]:
         """Generate a response from the features and provided language."""
-        with tracer.start_as_current_span("Find object in scene"):
-            return self._make_request(
-                f"{self._endpoint}/generate_find",
-                environment_state_history,
-                dialogue_history,
-                inventory_entity=inventory_entity,
-            )
+        return self._make_request(
+            f"{self._endpoint}/generate_find",
+            environment_state_history,
+            dialogue_history,
+            inventory_entity=inventory_entity,
+        )

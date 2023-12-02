@@ -2,7 +2,6 @@ from typing import Optional
 
 import torch
 from loguru import logger
-from opentelemetry import trace
 
 from emma_common.datamodels import SpeakerRole
 from emma_experience_hub.api.clients.simbot import SimBotFeaturesClient, SimBotHacksClient
@@ -11,9 +10,6 @@ from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 from emma_experience_hub.datamodels.simbot.enums import SimBotActionType
 from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 from emma_experience_hub.functions.simbot.special_tokens import extract_index_from_special_token
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimbotAnticipatorPipeline:

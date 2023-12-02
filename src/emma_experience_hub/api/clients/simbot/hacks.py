@@ -4,14 +4,11 @@ from typing import Optional
 import httpx
 from loguru import logger
 from methodtools import lru_cache
-from opentelemetry import trace
 from pydantic import BaseModel
 
 from emma_experience_hub.api.clients import Client
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
 
-
-tracer = trace.get_tracer(__name__)
 
 LRU_CACHE_MAX_SIZE = 64
 
@@ -41,16 +38,14 @@ class SimBotHacksClient(Client):
 
     def get_low_level_prediction_from_raw_text(self, utterance: str) -> Optional[str]:
         """Generate a response from the provided language."""
-        with tracer.start_as_current_span("Match text to template"):
-            response = self._get_low_level_prediction_from_raw_text(utterance)
+        response = self._get_low_level_prediction_from_raw_text(utterance)
 
         logger.debug(f"Cache info: {self._get_low_level_prediction_from_raw_text.cache_info()}")
         return response
 
     def get_room_prediction_from_raw_text(self, utterance: str) -> Optional[SimBotHacksRoom]:
         """Generate a room prediction from the provided language."""
-        with tracer.start_as_current_span("Get room from raw text"):
-            response = self._get_room_prediction_from_raw_text(utterance)
+        response = self._get_room_prediction_from_raw_text(utterance)
 
         logger.debug(f"Cache info: {self._get_room_prediction_from_raw_text.cache_info()}")
         return response
@@ -62,8 +57,7 @@ class SimBotHacksClient(Client):
         entity_labels: Optional[list[str]] = None,
     ) -> Optional[SimBotHacksAnticipator]:
         """Generate possible plan of instructions from the given action."""
-        with tracer.start_as_current_span("Get anticipator plan"):
-            response = self._get_anticipated_instructions(action, inventory_entity, entity_labels)
+        response = self._get_anticipated_instructions(action, inventory_entity, entity_labels)
 
         logger.debug(f"Cache info: {self._get_room_prediction_from_raw_text.cache_info()}")
         return response

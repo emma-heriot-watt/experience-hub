@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import Generic, Optional, TypeVar, Union
 
 import torch
-from opentelemetry import trace
 
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.api.clients.pydantic import PydanticClientMixin, PydanticT
@@ -23,8 +22,6 @@ from emma_experience_hub.datamodels.simbot.payloads import SimBotAuxiliaryMetada
 
 
 T = TypeVar("T")
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotCacheClient(Client, Generic[T]):
@@ -111,7 +108,6 @@ class SimBotExtractedFeaturesClient(SimBotCacheClient[list[EmmaExtractedFeatures
 
     suffix = "pt"
 
-    @tracer.start_as_current_span("Save extracted features")
     def save(
         self,
         data: list[EmmaExtractedFeatures],
@@ -132,7 +128,6 @@ class SimBotExtractedFeaturesClient(SimBotCacheClient[list[EmmaExtractedFeatures
         # Write data
         self._save_bytes(data_buffer.getvalue(), session_id, prediction_request_id)
 
-    @tracer.start_as_current_span("Load extracted features from file")
     def load(self, session_id: str, prediction_request_id: str) -> list[EmmaExtractedFeatures]:
         """Load the extracted features from a single file."""
         # Load the raw data using torch.

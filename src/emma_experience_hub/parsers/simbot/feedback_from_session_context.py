@@ -5,15 +5,11 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from typing import Optional
 
 from loguru import logger
-from opentelemetry import trace
 from rule_engine import Rule
 
 from emma_experience_hub.constants.simbot import get_feedback_rules
 from emma_experience_hub.datamodels.simbot import SimBotFeedbackRule, SimBotFeedbackState
 from emma_experience_hub.parsers.parser import Parser
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFeedbackRule]):
@@ -50,7 +46,6 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
         logger.debug(f"Loaded {len(rules)} feedback rules.")
         return cls(rules=rules)
 
-    @tracer.start_as_current_span("Get compatible rules")
     def _get_all_compatible_rules(self, state: SimBotFeedbackState) -> list[SimBotFeedbackRule]:
         """Get all of the rules which are compatible with the current state."""
         # Store all the compatible rules with the given query
@@ -91,7 +86,6 @@ class SimBotFeedbackFromSessionStateParser(Parser[SimBotFeedbackState, SimBotFee
             filtered_rules = (rule for rule in self._rules if not rule.is_lightweight_dialog)
         return filtered_rules
 
-    @tracer.start_as_current_span("Select feedback rule")
     def _select_feedback_rule(
         self, candidates: list[SimBotFeedbackRule], used_rule_ids: list[int]
     ) -> SimBotFeedbackRule:

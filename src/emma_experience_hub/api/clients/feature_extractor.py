@@ -6,15 +6,11 @@ import numpy as np
 import torch
 from loguru import logger
 from numpy.typing import ArrayLike
-from opentelemetry import trace
 from PIL import Image
 
 from emma_common.datamodels import TorchDataMixin
 from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class FeatureExtractorClient(Client):
@@ -48,7 +44,6 @@ class FeatureExtractorClient(Client):
         if response.status_code == httpx.codes.OK:
             logger.info(f"Feature extractor model moved to device `{device}`")
 
-    @tracer.start_as_current_span("Extract features from single image")
     def process_single_image(self, image: Union[Image.Image, ArrayLike]) -> EmmaExtractedFeatures:
         """Submit a request to the feature extraction server for a single image."""
         image_bytes = self._convert_single_image_to_bytes(image)
@@ -70,7 +65,6 @@ class FeatureExtractorClient(Client):
 
         return feature_response
 
-    @tracer.start_as_current_span("Extract features from image batch")
     def process_many_images(
         self, images: Union[list[Image.Image], list[ArrayLike]]
     ) -> list[EmmaExtractedFeatures]:

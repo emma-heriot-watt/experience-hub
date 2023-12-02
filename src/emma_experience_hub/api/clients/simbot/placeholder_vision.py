@@ -1,12 +1,8 @@
 import httpx
 from loguru import logger
-from opentelemetry import trace
 from PIL import Image
 
 from emma_experience_hub.api.clients.feature_extractor import FeatureExtractorClient
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotPlaceholderVisionClient(FeatureExtractorClient):

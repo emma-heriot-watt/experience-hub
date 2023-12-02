@@ -2,7 +2,6 @@ from contextlib import suppress
 from typing import Optional
 
 from loguru import logger
-from opentelemetry import trace
 
 from emma_experience_hub.api.clients import ConfirmationResponseClassifierClient
 from emma_experience_hub.api.clients.simbot import SimBotQAIntentClient
@@ -15,9 +14,6 @@ from emma_experience_hub.datamodels.simbot import (
 )
 from emma_experience_hub.datamodels.simbot.enums.intents import SimBotUserQAType
 from emma_experience_hub.parsers.simbot import SimBotQAOutputParser
-
-
-tracer = trace.get_tracer(__name__)
 
 
 class SimBotUserIntentExtractionPipeline:
@@ -73,7 +69,6 @@ class SimBotUserIntentExtractionPipeline:
         # If nothing else, just let the model try to act.
         return SimBotIntentType.act
 
-    @tracer.start_as_current_span("Check for user QA")
     def check_for_user_qa(self, utterance: str) -> Optional[SimBotUserQAType]:
         """Check if the user is asking us a question or are unparsable utterances."""
         raw_user_qa_intent = self._qa_intent_client.process_utterance(utterance)
