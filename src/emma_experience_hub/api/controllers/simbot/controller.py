@@ -229,6 +229,8 @@ class SimBotController:
 
         If the file does not exist, we don't care so just suppress that exception.
         """
+        # Dont upload anything to s3
+        return None
         with suppress(FileNotFoundError):
             self.clients.features.auxiliary_metadata_cache_client.upload_to_s3(
                 session_id, prediction_request_id

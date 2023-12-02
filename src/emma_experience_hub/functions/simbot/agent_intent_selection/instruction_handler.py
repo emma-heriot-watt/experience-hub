@@ -16,6 +16,7 @@ from emma_experience_hub.datamodels.simbot import (
     SimBotNLUIntentType,
     SimBotSession,
     SimBotUserSpeech,
+    SimBotUtterance,
 )
 from emma_experience_hub.datamodels.simbot.queue import SimBotQueueUtterance
 from emma_experience_hub.parsers import NeuralParser
@@ -39,6 +40,7 @@ class SimBotActHandler:
         _enable_search_after_no_match: bool = True,
         _enable_search_after_missing_inventory: bool = True,
         _enable_high_level_planner: bool = True,
+        _enable_simbot_raw_text_match: bool = True,
     ) -> None:
         self._features_client = features_client
 
@@ -54,6 +56,7 @@ class SimBotActHandler:
         self._enable_search_after_no_match = _enable_search_after_no_match
         self._enable_missing_inventory = _enable_search_after_missing_inventory
         self._enable_high_level_planner = _enable_high_level_planner
+        self._enable_simbot_raw_text_match = _enable_simbot_raw_text_match
 
     def run(self, session: SimBotSession) -> Optional[SimBotAgentIntents]:
         """Get the agent intent."""
@@ -68,9 +71,10 @@ class SimBotActHandler:
         if self._enable_high_level_planner:
             session = self._compound_splitter_pipeline.run_high_level_planner(session)
         # Check if the utterance matches one of the known templates
-        intents = self._process_utterance_with_raw_text_matcher(session)
-        if intents is not None:
-            return intents
+        if self._enable_simbot_raw_text_match:
+            intents = self._process_utterance_with_raw_text_matcher(session)
+            if intents is not None:
+                return intents
 
         # Otherwise, use the NLU to detect it
         intents = self._process_utterance_with_nlu(session)
@@ -164,6 +168,15 @@ class SimBotActHandler:
         )
         session.update_agent_memory(extracted_features)
         logger.debug(f"Extracted intent: {intent}")
+
+        if not intent.type.triggers_question_to_user:
+            new_utterance = session.current_turn.speech.utterance.split("<<driver>>")[0].strip()
+            session.current_turn.speech = SimBotUserSpeech(
+                modified_utterance=SimBotUtterance(
+                    utterance=new_utterance, role=session.current_turn.speech.role
+                ),
+                original_utterance=session.current_turn.speech.original_utterance,
+            )
 
         if not self._enable_clarification_questions and intent.type.triggers_question_to_user:
             logger.info(

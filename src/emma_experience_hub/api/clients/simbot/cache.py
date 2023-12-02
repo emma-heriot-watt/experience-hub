@@ -43,7 +43,7 @@ class SimBotCacheClient(Client, Generic[T]):
         self.prefix = object_prefix if object_prefix is not None else ""
         self._local_cache_dir = local_cache_dir
 
-        self._s3 = S3Client(local_cache_dir=self._local_cache_dir)
+        # self._s3 = S3Client(local_cache_dir=self._local_cache_dir)
 
     def healthcheck(self) -> bool:
         """Healthcheck for the client."""
@@ -63,6 +63,8 @@ class SimBotCacheClient(Client, Generic[T]):
 
     def upload_to_s3(self, session_id: str, prediction_request_id: str) -> None:
         """Load the cached data to S3."""
+        # Dont upload anything to s3
+        return None
         cached_data = self._load_bytes(session_id, prediction_request_id)
         s3_path = self._create_s3_path(session_id, prediction_request_id)
         s3_path.write_bytes(cached_data)

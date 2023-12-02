@@ -43,6 +43,7 @@ class SimBotAgentActionGenerationPipeline:
         previous_action_parser: SimBotPreviousActionParser,
         find_object_pipeline: SimBotFindObjectPipeline,
         simbot_hacks_client: SimBotHacksClient,
+        _enable_simbot_raw_text_match: bool = True,
     ) -> None:
         self._features_client = features_client
         self._action_predictor_client = action_predictor_client
@@ -51,6 +52,7 @@ class SimBotAgentActionGenerationPipeline:
         self._simbot_hacks_client = simbot_hacks_client
         self._find_object_pipeline = find_object_pipeline
         self._viewpoint_action_planner = ViewpointPlanner()
+        self._enable_simbot_raw_text_match = _enable_simbot_raw_text_match
 
     def run(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action to perform on the environment."""
@@ -76,10 +78,12 @@ class SimBotAgentActionGenerationPipeline:
 
     def handle_act_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Generate an action when we want to just act."""
-        try:
-            return self._predict_action_from_template_matching(session)
-        except Exception:
-            return self._predict_action_from_emma_policy(session)
+        if self._enable_simbot_raw_text_match:
+            try:
+                return self._predict_action_from_template_matching(session)
+            except Exception:
+                return self._predict_action_from_emma_policy(session)
+        return self._predict_action_from_emma_policy(session)
 
     def handle_act_previous_intent(self, session: SimBotSession) -> Optional[SimBotAction]:
         """Get the action from the previous turn."""

@@ -42,6 +42,7 @@ class SimBotFeatureFlags(BaseModel):
     enable_search_after_missing_inventory: bool = True
     enable_search_after_no_match: bool = True
     enable_simbot_qa: bool = True
+    enable_simbot_raw_text_match: bool = True
 
     prevent_default_response_as_lightweight: bool = True
 
@@ -69,6 +70,7 @@ class SimBotFeatureFlags(BaseModel):
             values["enable_search_after_missing_inventory"] = False
             values["enable_simbot_qa"] = False
             values["prevent_default_response_as_lightweight"] = False
+            values["enable_simbot_raw_text_match"] = False
 
             values["gfh_location_type"] = GFHLocationType.viewpoint
         return values
@@ -100,6 +102,9 @@ class SimBotSettings(BaseSettings):
     extracted_features_cache_dir: DirectoryPath
 
     session_db_memory_table_name: str = "SIMBOT_MEMORY_TABLE"
+    session_local_db_file: str = (
+        "/home/gmp2000/simbot-offline-inference/storage/experience-hub/storage/local_sessions.db"
+    )
     session_db_region: str = "us-east-1"
 
     feature_extractor_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5500", scheme=scheme)
