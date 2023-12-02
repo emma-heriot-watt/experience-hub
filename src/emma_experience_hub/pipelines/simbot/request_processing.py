@@ -2,6 +2,7 @@ from contextlib import suppress
 
 from loguru import logger
 
+from emma_experience_hub.api.clients.simbot import SimBotSQLLiteClient
 from emma_experience_hub.datamodels.simbot import (
     SimBotActionStatus,
     SimBotRequest,
@@ -13,7 +14,7 @@ from emma_experience_hub.datamodels.simbot import (
 class SimBotRequestProcessingPipeline:
     """Process the incoming requests and build the session data."""
 
-    def __init__(self, session_db_client) -> None:
+    def __init__(self, session_db_client: SimBotSQLLiteClient) -> None:
         self._session_db_client = session_db_client
 
     def run(self, request: SimBotRequest) -> SimBotSession:

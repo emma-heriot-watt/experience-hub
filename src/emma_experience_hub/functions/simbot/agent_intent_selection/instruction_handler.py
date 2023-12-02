@@ -169,7 +169,7 @@ class SimBotActHandler:
         session.update_agent_memory(extracted_features)
         logger.debug(f"Extracted intent: {intent}")
 
-        if not intent.type.triggers_question_to_user:
+        if not intent.type.triggers_question_to_user and session.current_turn.speech is not None:
             new_utterance = session.current_turn.speech.utterance.split("<<driver>>")[0].strip()
             session.current_turn.speech = SimBotUserSpeech(
                 modified_utterance=SimBotUtterance(

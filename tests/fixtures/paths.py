@@ -1,7 +1,13 @@
+import os
 from pathlib import Path
 from typing import Any
 
 from pytest_cases import fixture
+
+from emma_experience_hub.common.settings import SimBotSettings
+
+
+os.environ["profile"] = "offline"
 
 
 @fixture(scope="session")
@@ -20,3 +26,34 @@ def fixtures_root(storage_root: Path) -> Path:
 def cache_root(request: Any) -> Path:
     """Root of cached dir for the tests."""
     return Path(request.config.cache._cachedir)
+
+
+@fixture(scope="session")
+def auxiliary_metadata_dir(fixtures_root: Path) -> Path:
+    """Path to the auxilary game metadata."""
+    return fixtures_root.joinpath("simbot/game_metadata/")
+
+
+@fixture(scope="session")
+def auxiliary_metadata_cache_dir(fixtures_root: Path) -> Path:
+    """Path to the auxilary the metadata cache."""
+    return fixtures_root.joinpath("simbot/metadata_cache_dir/")
+
+
+@fixture(scope="session")
+def features_cache_dir(fixtures_root: Path) -> Path:
+    """Path to the auxilary features cache."""
+    return fixtures_root.joinpath("simbot/features/")
+
+
+@fixture(scope="session")
+def simbot_settings(
+    auxiliary_metadata_dir: Path, auxiliary_metadata_cache_dir: Path, features_cache_dir: Path
+) -> SimBotSettings:
+    """Settings."""
+    simbot_settings = SimBotSettings(
+        auxiliary_metadata_dir=auxiliary_metadata_dir,
+        auxiliary_metadata_cache_dir=auxiliary_metadata_cache_dir,
+        extracted_features_cache_dir=features_cache_dir,
+    )
+    return simbot_settings

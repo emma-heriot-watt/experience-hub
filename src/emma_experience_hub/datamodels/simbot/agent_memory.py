@@ -2,7 +2,6 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from emma_experience_hub.constants.simbot import get_prior_memory, get_prior_memory_candidates
 from emma_experience_hub.datamodels import EmmaExtractedFeatures
 from emma_experience_hub.datamodels.common import ArenaLocation, Position, RotationQuaternion
 from emma_experience_hub.datamodels.simbot.actions import SimBotAction
@@ -35,8 +34,6 @@ class SimBotObjectMemory(BaseModel):
     """Track all the observed objects and their closest viewpoints."""
 
     memory: dict[str, SimBotRoomMemoryType] = {}
-    _prior_memory: dict[str, str] = get_prior_memory()
-    _prior_memory_candidates: dict[str, list[str]] = get_prior_memory_candidates()
 
     def update_from_action(  # noqa: WPS231
         self,
@@ -132,50 +129,12 @@ class SimBotObjectMemory(BaseModel):
                 found_object_locations.append((room, memory_location))
         return found_object_locations
 
-    def read_prior_memory_entity_in_arena(self, object_label: str) -> Optional[str]:
-        """Find object room based on prior memory."""
-        return self._prior_memory.get(object_label.lower(), None)
-
     def object_in_memory(self, object_label: str, current_room: str) -> bool:
         """Is the object in the current room or prior memory?"""
-        if self.read_memory_entity_in_room(room_name=current_room, object_label=object_label):
-            return True
-        object_label = object_label.lower()
-
-        if object_label in self._prior_memory_candidates:
-            return True
-
-        return self._prior_memory.get(object_label, None) is not None
-
-    def get_other_interacted_room(self, object_label: str) -> Optional[str]:
-        """Get the room where the object was interacted with."""
-        # Check if the object has multiple prior memory room candidates.
-        object_label = object_label.lower()
-        prior_room_candidates = self._prior_memory_candidates.get(object_label, None)
-        if prior_room_candidates is None:
-            return None
-
-        # Find the most recent room where the object was interacted with.
-        object_memory_entry = [
-            self.memory[room].get(object_label) if room in self.memory else None
-            for room in prior_room_candidates
-        ]
-        interaction_turns = [
-            entry.interaction_turn if entry else -1 for entry in object_memory_entry
-        ]
-        most_recent_interaction_turn = max(interaction_turns)
-        if most_recent_interaction_turn < 0:
-            return None
-        return prior_room_candidates[interaction_turns.index(most_recent_interaction_turn)]
-
-    def get_entity_room_candidate(self, object_label: str) -> Optional[list[str]]:
-        """Get all candidate rooms based on prior memory."""
-        object_label = object_label.lower()
-        prior_memory_room = self._prior_memory.get(object_label, None)
-        if prior_memory_room is not None:
-            return [prior_memory_room]
-
-        return self._prior_memory_candidates.get(object_label, None)
+        return (
+            self.read_memory_entity_in_room(room_name=current_room, object_label=object_label)
+            is not None
+        )
 
     def write_memory_entities_in_room(
         self,

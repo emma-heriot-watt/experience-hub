@@ -1,5 +1,3 @@
-from contextlib import suppress
-
 from loguru import logger
 from opentelemetry import trace
 
@@ -222,22 +220,6 @@ class SimBotController:
 
         logger.info(f"[ACTION] Dialog: `{session.current_turn.actions.dialog}`")
         return session
-
-    @tracer.start_as_current_span("Upload cache to S3")
-    def upload_cache_to_s3(self, session_id: str, prediction_request_id: str) -> None:
-        """Upload the cached data to S3.
-
-        If the file does not exist, we don't care so just suppress that exception.
-        """
-        # Dont upload anything to s3
-        return None
-        with suppress(FileNotFoundError):
-            self.clients.features.auxiliary_metadata_cache_client.upload_to_s3(
-                session_id, prediction_request_id
-            )
-            self.clients.features.features_cache_client.upload_to_s3(
-                session_id, prediction_request_id
-            )
 
     def _upload_session_turn_to_database(self, session: SimBotSession) -> None:
         """Upload the current session turn to the database."""

@@ -1,10 +1,9 @@
+import sqlite3
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-import sqlite3
 from loguru import logger
 
-from emma_experience_hub.api.clients.client import Client
 from emma_experience_hub.datamodels.simbot import SimBotSessionTurn
 
 
@@ -19,7 +18,7 @@ class SimBotSQLLiteClient:
         self._db_file = db_file
         self.create_table()
 
-    def create_table(self) -> None:  # noqa: WPS231
+    def create_table(self) -> None:
         """Create table."""
         if self._db_file.exists():
             return
@@ -161,19 +160,3 @@ class SimBotSQLLiteClient:
                 connection.close()
 
         return turns
-
-
-# db = SimBotSQLLiteClient(
-#     Path("/home/gmp2000/simbot-offline-inference/storage/experience-hub/storage/local_sessions.db")
-# )
-
-# session_turns = db.get_all_session_turns("T1_39786908-bee2-48a5-bf33-6640de5b80e8")
-
-# for turn in session_turns:
-#     print(turn.prediction_request_id)
-#     if turn.speech:
-#         print(turn.speech.original_utterance.utterance, turn.speech.modified_utterance.utterance)
-#     print(turn.actions.interaction.raw_output)
-#     if turn.actions.interaction.status:
-#         print(turn.actions.interaction.status.success)
-# breakpoint()

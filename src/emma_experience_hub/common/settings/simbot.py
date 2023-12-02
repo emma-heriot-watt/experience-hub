@@ -102,9 +102,7 @@ class SimBotSettings(BaseSettings):
     extracted_features_cache_dir: DirectoryPath
 
     session_db_memory_table_name: str = "SIMBOT_MEMORY_TABLE"
-    session_local_db_file: str = (
-        "/home/gmp2000/simbot-offline-inference/storage/experience-hub/storage/local_sessions.db"
-    )
+    session_local_db_file: str = "storage/local_sessions.db"
     session_db_region: str = "us-east-1"
 
     feature_extractor_url: AnyHttpUrl = AnyHttpUrl(url=f"{scheme}://0.0.0.0:5500", scheme=scheme)

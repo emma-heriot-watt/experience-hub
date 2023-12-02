@@ -1,11 +1,11 @@
 import signal
+from pathlib import Path
 from threading import Event
 from time import sleep
 from typing import Any
 
 from loguru import logger
 from pydantic import BaseModel
-from pathlib import Path
 
 from emma_experience_hub.api.clients import (
     Client,
@@ -24,7 +24,6 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotNLUIntentClient,
     SimBotPlaceholderVisionClient,
     SimBotQAIntentClient,
-    SimBotSessionDbClient,
     SimBotSQLLiteClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
@@ -52,7 +51,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
         return cls(
             features=SimBotFeaturesClient(
                 auxiliary_metadata_cache_client=SimBotAuxiliaryMetadataClient(
-                    bucket_name=simbot_settings.simbot_cache_s3_bucket,
                     local_cache_dir=simbot_settings.auxiliary_metadata_cache_dir,
                 ),
                 feature_extractor_client=FeatureExtractorClient(
@@ -60,7 +58,6 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                     timeout=simbot_settings.client_timeout,
                 ),
                 features_cache_client=SimBotExtractedFeaturesClient(
-                    bucket_name=simbot_settings.simbot_cache_s3_bucket,
                     local_cache_dir=simbot_settings.extracted_features_cache_dir,
                 ),
                 placeholder_vision_client=SimBotPlaceholderVisionClient(

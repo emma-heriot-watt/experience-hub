@@ -1,6 +1,5 @@
 from typing import Literal
 
-import boto3
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from loguru import logger
 from opentelemetry import trace
@@ -71,12 +70,6 @@ async def handle_request_from_simbot_arena(
         with tracer.start_as_current_span("Handle request"):
             # Handle the request
             simbot_response = state["controller"].handle_request_from_simbot_arena(simbot_request)
-
-        background_tasks.add_task(
-            state["controller"].upload_cache_to_s3,
-            simbot_response.session_id,
-            simbot_response.prediction_request_id,
-        )
 
         # Return response
         logger.info(f"Returning the response {simbot_response.json(by_alias=True)}")
