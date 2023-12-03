@@ -24,7 +24,7 @@ from emma_experience_hub.api.clients.simbot import (
     SimBotNLUIntentClient,
     SimBotPlaceholderVisionClient,
     SimBotQAIntentClient,
-    SimBotSQLLiteClient,
+    SimBotSessionDbClient,
 )
 from emma_experience_hub.common.settings import SimBotSettings
 
@@ -37,7 +37,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
     features: SimBotFeaturesClient
     nlu_intent: SimBotNLUIntentClient
     action_predictor: SimbotActionPredictionClient
-    session_db: SimBotSQLLiteClient
+    session_db: SimBotSessionDbClient
     profanity_filter: ProfanityFilterClient
     out_of_domain_detector: OutOfDomainDetectorClient
     confirmation_response_classifier: ConfirmationResponseClassifierClient
@@ -65,7 +65,7 @@ class SimBotControllerClients(BaseModel, arbitrary_types_allowed=True):
                     timeout=simbot_settings.client_timeout,
                 ),
             ),
-            session_db=SimBotSQLLiteClient(
+            session_db=SimBotSessionDbClient(
                 db_file=Path(simbot_settings.session_local_db_file),
             ),
             nlu_intent=SimBotNLUIntentClient(
