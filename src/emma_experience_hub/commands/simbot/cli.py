@@ -21,10 +21,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 
 from emma_common.api.gunicorn import create_gunicorn_server
-from emma_common.api.instrumentation import instrument_app
-from emma_common.aws.cloudwatch import add_cloudwatch_handler_to_logger
-from emma_common.logging import InstrumentedInterceptHandler, setup_logging, setup_rich_logging
-from emma_experience_hub._version import __version__  # noqa: WPS436
+from emma_common.logging import InterceptHandler, setup_logging, setup_rich_logging
 from emma_experience_hub.api.simbot import app as simbot_api
 from emma_experience_hub.common.settings import SimBotSettings
 from emma_experience_hub.constants.simbot import get_service_registry_file_path
@@ -269,14 +266,7 @@ def run_controller_api(
     simbot_settings = SimBotSettings.from_env()
 
     if observability:
-        instrument_app(
-            simbot_api,
-            otlp_endpoint=simbot_settings.otlp_endpoint,
-            service_name=simbot_settings.opensearch_service_name,
-            service_version=__version__,
-            service_namespace="SimBot",
-        )
-        setup_logging(sys.stdout, InstrumentedInterceptHandler())
+        setup_logging(sys.stdout, InterceptHandler())
     else:
         setup_rich_logging(rich_traceback_show_locals=False)
 
@@ -287,15 +277,6 @@ def run_controller_api(
         workers,
         timeout=timeout,
     )
-
-    if observability:
-        add_cloudwatch_handler_to_logger(
-            boto3_profile_name=simbot_settings.aws_profile,
-            log_stream_name=simbot_settings.watchtower_log_stream_name,
-            log_group_name=simbot_settings.watchtower_log_group_name,
-            send_interval=1,
-            enable_trace_logging=observability,
-        )
 
     server.run()
 

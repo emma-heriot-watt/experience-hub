@@ -19,7 +19,6 @@ state: dict[Literal["controller"], SimBotController] = {}
 async def startup_event() -> None:
     """Handle the startup of the API."""
     simbot_settings = SimBotSettings.from_env()
-    # boto3.setup_default_session(profile_name=simbot_settings.aws_profile)
 
     state["controller"] = SimBotController.from_simbot_settings(simbot_settings)
 

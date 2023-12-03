@@ -25,13 +25,7 @@ class SimBotAuxiliaryMetadataUri(AnyUrl):
     __slots__ = ()
 
     def resolve_path(self, game_metadata_efs_dir: Path) -> FilePath:
-        """Fully resolve the path to the game metadata file.
-
-        This follows the provided example:
-
-
-        https://us-east-1.console.aws.amazon.com/codesuite/codecommit/repositories/AlexaSimbotModelInferenceService/browse/refs/heads/main/--/alexa_simbot_action_inference_model_wrapper/service/models/V103.py?region=us-east-1&lines=1479-1481
-        """
+        """Fully resolve the path to the game metadata file."""
         # Perform the replace as they've done (from the example)
         efs_dir_as_string = str(game_metadata_efs_dir.resolve())
         corrected_image_uri = self.replace("efs://", f"{efs_dir_as_string}/")

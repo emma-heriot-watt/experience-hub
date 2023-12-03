@@ -3,9 +3,6 @@ import typer
 from emma_experience_hub.commands.simbot.cli import app as simbot_cli
 
 
-# from emma_experience_hub.commands.teach import app as teach_cli
-
-
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
@@ -15,7 +12,6 @@ app = typer.Typer(
 
 app.add_typer(simbot_cli, name="simbot")
 
-# app.add_typer(teach_cli, name="teach")
 
 if __name__ == "__main__":
     app()

@@ -32,7 +32,6 @@ cmd = "pytest -v --durations=40 --color=yes --junitxml=pytest.xml --cov=src -m '
 python = ">=3.9,<3.10"
 torch = ">=1.13.1,<2"
 rich = ">=12.5.1"
-boto3 = "1.23.3"
 Pillow = ">=9.2.0"
 httpx = ">=0.23.0"
 orjson = ">=3.8.0"
@@ -61,10 +60,6 @@ isort = ">=5.10.1"
 pytest-cases = ">=3.6.13"
 pytest-xdist = ">=2.5.0"
 pytest-cov = ">=3.0.0"
-boto3-stubs = { extras = [
-	"essential",
-	"secretsmanager",
-], version = ">=1.26.27" }
 moto = { extras = ["all"], version = ">=4.0.5" }
 pytest-httpx = ">=0.21.0"
 types-pyyaml = ">=6.0.12.1"

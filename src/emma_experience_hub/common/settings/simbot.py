@@ -1,14 +1,6 @@
 from typing import Any, Optional
 
-from pydantic import (
-    AnyHttpUrl,
-    BaseModel,
-    BaseSettings,
-    DirectoryPath,
-    Field,
-    root_validator,
-    validator,
-)
+from pydantic import AnyHttpUrl, BaseModel, BaseSettings, DirectoryPath, root_validator, validator
 
 from emma_experience_hub.datamodels.common import GFHLocationType
 from emma_experience_hub.datamodels.enums import SearchPlannerType
@@ -85,8 +77,6 @@ class SimBotSettings(BaseSettings):
     scheme: str = "http"
 
     client_timeout: Optional[int] = 5
-
-    aws_profile: str = Field(default="TeamProfile", env="aws_profile")
 
     watchtower_log_group_name: str = "simbot_challenge"
     opensearch_service_name: str = "experience-hub"
