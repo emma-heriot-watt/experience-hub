@@ -1,0 +1,90 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true,
+		"**/.idea": true,
+		"**/LICENSE": true,
+		"**/.rsync-filter": true,
+		"**/.coverage*": true,
+		"**/.hypothesis": true,
+		"**/{*.egg-info,_*cache*,.*cache*,.venv,*.lock}": true,
+		"**/{.python-version,py.typed}": true,
+		"**/.gitkeep": true,
+		"**/.gitignore": true,
+		"**/.gitattributes": true,
+		".editorconfig": true,
+		".pre-commit-config.yaml": true,
+		".flake8": true,
+		".dockerignore": true,
+		"Dockerfile": true,
+		"docker-compose.yaml": true,
+		"Makefile": true,
+		".mypy.ini": true,
+		"pytest.ini": true,
+		"pyproject.toml": false,
+		".env*": true,
+		".vscode/": true,
+		".github/": true,
+		"*.md": true,
+		"data": true,
+		"notebooks": true,
+		"scripts": true,
+		".kodiak.toml": true
+	},
+	"explorerExclude.backup": {},
+	"editor.wordWrapColumn": 99,
+	"editor.rulers": [99, 120],
+	"python.envFile": "${workspaceFolder}/.env",
+	"terminal.integrated.env.linux": {
+		"PYTHONPATH": "${workspaceFolder}"
+	},
+	"git.ignoreLimitWarning": true,
+	"[json,yaml]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true
+	},
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.python",
+		"editor.formatOnPaste": false,
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": true,
+			"source.fixAll": false
+		}
+	},
+	"[csv,tsv]": {
+		"rewrap.autoWrap.enabled": false,
+		"editor.wordWrap": "off"
+	},
+	"python.formatting.provider": "black",
+	"python.sortImports.args": ["--atomic"],
+	"python.linting.enabled": true,
+	"python.linting.lintOnSave": true,
+	"python.linting.pylintEnabled": false,
+	"python.linting.mypyEnabled": false,
+	"python.linting.flake8Enabled": true,
+	"python.linting.pydocstyleEnabled": false,
+	"python.testing.pytestEnabled": true,
+	"python.linting.mypyArgs": ["-v"],
+	"jupyter.notebookFileRoot": "${workspaceFolder}",
+	"python.testing.unittestEnabled": false,
+	"shellformat.useEditorConfig": true,
+	"python.testing.cwd": "${workspaceFolder}",
+	"rewrap.autoWrap.enabled": true,
+	"editor.insertSpaces": false,
+	"autoDocstring.docstringFormat": "google",
+	"python.testing.pytestArgs": ["tests"],
+	"editor.bracketPairColorization.enabled": true,
+	"editor.guides.bracketPairs": "active",
+	"yaml.schemas": {
+		"https://squidfunk.github.io/mkdocs-material/schema.json": "mkdocs.yml"
+	},
+	"python.analysis.typeCheckingMode": "basic",
+	"python.analysis.diagnosticMode": "workspace",
+	"python.analysis.ignore": ["storage/", ".venv/"],
+	"python.analysis.indexing": true
+}

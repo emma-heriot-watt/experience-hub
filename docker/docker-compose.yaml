@@ -1,0 +1,67 @@
+x-model-volume: &model-volume
+  - type: bind
+    source: ../storage/models
+    target: /app/model
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 1m30s
+  timeout: 10s
+  retries: 3
+  start_period: 30s
+
+x-environment-defaults: &environment-defaults
+  HUGGINGFACE_HUB_CACHE: /app/model/huggingface/hub
+  HUGGINGFACE_ASSETS_CACHE: /app/model/huggingface/assets
+  HUGGINGFACE_HUB_VERBOSITY: info
+
+services:
+  feature_extractor:
+    container_name: feature_extractor
+    image: ghcr.io/emma-heriot-watt/perception:cpu
+    environment:
+      LOG_LEVEL: "debug"
+      CLASSMAP_TYPE: "simbot"
+      <<: *environment-defaults
+    ports:
+      - "5500:5500"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5500/ping"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    entrypoint: python
+    command: src/emma_perception/commands/run_server.py
+
+  intent_extractor:
+    container_name: intent_extractor
+    image: ghcr.io/emma-heriot-watt/policy:cpu
+    environment:
+      LOG_LEVEL: debug
+      MODEL_NAME: "heriot-watt/emma-base"
+      MODEL_CHECKPOINT_PATH: "/app/model/${INTENT_EXTRACTOR_MODEL}"
+      ENABLE_PREDICTION_PATCHING: False
+      <<: *environment-defaults
+    ports:
+      - "5501:6000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    entrypoint: python
+    command: src/emma_policy/commands/run_simbot_cr.py
+
+  instruction_predictor:
+    container_name: instruction_predictor
+    image: ghcr.io/emma-heriot-watt/policy:cpu
+    environment:
+      LOG_LEVEL: debug
+      MODEL_CHECKPOINT_PATH: "/app/model/${INSTRUCTION_PREDICTOR_MODEL}"
+      ENABLE_PREDICTION_PATCHING: False
+      <<: *environment-defaults
+    ports:
+      - "5502:6000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/ping"]
+      <<: *healthcheck-defaults
+    volumes: *model-volume
+    entrypoint: python
+    command: src/emma_policy/commands/run_simbot_action_api.py

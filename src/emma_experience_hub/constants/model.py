@@ -1,0 +1,3 @@
+PREDICTED_ACTION_DELIMITER = "."
+MODEL_EOS_TOKEN = "</s>"  # noqa: S105
+END_OF_TRAJECTORY_TOKEN = "<stop>"  # noqa: S105

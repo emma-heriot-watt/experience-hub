@@ -1,0 +1,26 @@
+x-deploy-gpu: &deploy-gpu
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          device_ids: ["all"]
+          capabilities: [gpu]
+
+services:
+  feature_extractor:
+    image: ghcr.io/emma-heriot-watt/perception:cu113
+    environment:
+      DEVICE_ID: "0"
+    deploy: *deploy-gpu
+
+  intent_extractor:
+    image: ghcr.io/emma-heriot-watt/policy:cu113
+    environment:
+      DEVICE: "cuda:0"
+    deploy: *deploy-gpu
+
+  instruction_predictor:
+    image: ghcr.io/emma-heriot-watt/policy:cu113
+    environment:
+      DEVICE: "cuda:0"
+    deploy: *deploy-gpu

@@ -1,0 +1,81 @@
+[tool.poetry]
+name = "emma-experience-hub"
+version = "8.72.1"
+description = ""
+authors = ["Amit Parekh <7276308+amitkparekh@users.noreply.github.com>"]
+
+packages = [{ include = "emma_experience_hub", from = "src" }]
+
+[tool.poe.tasks]
+
+[tool.poe.tasks.format]
+help = "Format using the pre-commit hooks"
+cmd = "pre-commit run --all-files"
+
+[tool.poe.tasks.typecheck]
+help = "Check types with mypy"
+cmd = "mypy ."
+
+[tool.poe.tasks.lint]
+help = "Lint with flake8"
+cmd = "flake8 ."
+
+[tool.poe.tasks.test]
+help = "Run the fast Python tests"
+cmd = "pytest --cov=src -m 'not slow'"
+
+[tool.poe.tasks.test-everything]
+help = "Run all the tests and get the coverage"
+cmd = "pytest -v --durations=40 --color=yes --junitxml=pytest.xml --cov=src -m 'not slow' -n 2"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.10"
+torch = ">=1.13.1,<2"
+rich = ">=12.5.1"
+Pillow = ">=9.2.0"
+httpx = ">=0.23.0"
+orjson = ">=3.8.0"
+fastapi = ">=0.88.0"
+typer = ">=0.6.1"
+pydantic = { version = ">=1.10.0,<2", extras = ["dotenv"] }
+cloudpathlib = { extras = ["s3"], version = ">=0.10.0" }
+convert-case = ">=1.1.1"
+gunicorn = ">=20.1.0"
+rule-engine = ">=3.5.0"
+overrides = ">=6.1.0"
+numpy = ">=1.23.5"
+methodtools = ">=0.4.5"
+emma-common = { git = "https://github.com/emma-heriot-watt/common.git" }
+more-itertools = ">=9.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = ">=22.3.0"
+wemake-python-styleguide = ">=0.17.0"
+flake8 = ">=4.0.1"
+mypy = ">=0.981"
+pytest = ">=7.1.2"
+pre-commit = ">=2.19.0"
+poethepoet = ">=0.16.2"
+isort = ">=5.10.1"
+pytest-cases = ">=3.6.13"
+pytest-xdist = ">=2.5.0"
+pytest-cov = ">=3.0.0"
+moto = { extras = ["all"], version = ">=4.0.5" }
+pytest-httpx = ">=0.21.0"
+types-pyyaml = ">=6.0.12.1"
+hypothesis = ">=6.56.4"
+pytest-benchmark = ">=4.0.0"
+
+[tool.black]
+line-length = 99
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+lines_after_imports = 2
+line_length = 99
+known_first_party = ["emma_*"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
